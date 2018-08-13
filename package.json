@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "d3": "^5.5.0",
+    "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "prop-types": "latest"
   },
   "scripts": {
     "start": "react-scripts start",
