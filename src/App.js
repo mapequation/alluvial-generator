@@ -1,6 +1,5 @@
 import React from "react";
 
-import "./App.css";
 import { parseMap } from "./parse-map";
 import AlluvialDiagram from "./AlluvialDiagram";
 

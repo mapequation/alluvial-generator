@@ -17,7 +17,7 @@ export default class AlluvialDiagram extends React.Component {
         padding: 3,
         streamlineWidth: 200,
         numModules: 15,
-        streamlineThreshold: 0.01,
+        streamlineThreshold: 0.005,
     };
 
     static propTypes = {
@@ -46,7 +46,7 @@ export default class AlluvialDiagram extends React.Component {
         const { barWidth, totalHeight, padding, streamlineWidth, numModules, streamlineThreshold, networks } = this.props;
 
         const diagram = networks.reduce((child, network) =>
-            new BarDiagram({ network, wrap: child }), null);
+            new BarDiagram({ network, leftDiagram: child }), null);
 
         diagram.draw(this.svg, numModules, streamlineThreshold, { barWidth, totalHeight, padding, streamlineWidth });
     }

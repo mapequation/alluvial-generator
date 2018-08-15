@@ -1,37 +1,35 @@
 import { streamlineHorizontal } from "./streamline";
 
 
-const calculateFlows = (sourceNodes, targetNodes) => {
+const calculateModuleFlows = (sourceNodes, targetNodes) => {
     const nodesByName = new Map(targetNodes.map(node => [node.name, node]));
 
-    const flows = [];
-
-    sourceNodes.forEach(({ parentPath, name, flow }) => {
-        const other = nodesByName.get(name);
-        if (other) {
-            const sourcePath = parentPath;
+    return sourceNodes
+        .filter(node => nodesByName.has(node.name))
+        .reduce((acc, node) => {
+            const other = nodesByName.get(node.name);
+            const sourcePath = node.parentPath;
             const targetPath = other.parentPath;
-            const found = flows.find(each => each.sourcePath === sourcePath && each.targetPath === targetPath);
+            const found = acc.find(each => each.sourcePath === sourcePath && each.targetPath === targetPath);
             if (found) {
-                found.flow += flow;
+                found.flow += node.flow;
             } else {
-                flows.push({ sourcePath, targetPath, flow });
+                acc.push({ sourcePath, targetPath, flow: node.flow });
             }
-        }
-    });
-
-    return flows;
+            return acc;
+        }, []);
 };
 
 const calculateModuleHeight = (modules, totalHeight, padding) => {
-    let currentY = totalHeight;
-    const totalPadding = padding * (modules.length - 1);
     const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr);
+    const totalPadding = padding * (modules.length - 1);
+
+    let accumulatedHeight = totalHeight; // starting with largest module, so we subtract from this
 
     return modules.map(module => {
         const height = module.flow / totalFlow * (totalHeight - totalPadding);
-        const y = currentY - height;
-        currentY = y - padding;
+        const y = accumulatedHeight - height;
+        accumulatedHeight -= height + padding;
         return { height, y, ...module };
     });
 };
@@ -39,7 +37,7 @@ const calculateModuleHeight = (modules, totalHeight, padding) => {
 export default class BarDiagram {
     constructor(opts) {
         this.network = opts.network;
-        this.leftDiagram = opts.wrap || null;
+        this.leftDiagram = opts.leftDiagram || null;
         this._xOffset = 0;
     }
 
@@ -52,18 +50,7 @@ export default class BarDiagram {
         if (this.leftDiagram) {
             const leftModules = this.leftDiagram.draw(element, numModules, threshold, style);
             this._xOffset += this.leftDiagram._xOffset + barWidth + streamlineWidth;
-            const streamlineCoordinates = this._streamlineCoordinates(leftModules, modules, threshold, streamlineWidth);
-            const streamlineGenerator = streamlineHorizontal();
-
-            element.append("g")
-                .classed("streamlines", true)
-                .attr("transform", `translate(${this.leftDiagram._xOffset + barWidth} 0)`)
-                .selectAll(".link")
-                .data(streamlineCoordinates)
-                .enter()
-                .append("path")
-                .classed("streamline", true)
-                .attr("d", streamlineGenerator);
+            this._drawStreamlines(element, leftModules, modules, threshold, streamlineWidth, barWidth);
         }
 
         element.append("g")
@@ -81,13 +68,28 @@ export default class BarDiagram {
         return modules;
     }
 
+    _drawStreamlines(element, sourceModules, targetModules, threshold, streamlineWidth, barWidth) {
+        const streamlineCoordinates = this._streamlineCoordinates(sourceModules, targetModules, threshold, streamlineWidth);
+        const streamlineGenerator = streamlineHorizontal();
+
+        element.append("g")
+            .classed("streamlines", true)
+            .attr("transform", `translate(${this.leftDiagram._xOffset + barWidth} 0)`)
+            .selectAll(".link")
+            .data(streamlineCoordinates)
+            .enter()
+            .append("path")
+            .classed("streamline", true)
+            .attr("d", streamlineGenerator);
+    }
+
     _streamlineCoordinates(sourceModules, targetModules, threshold, streamlineWidth) {
         const streamlineCoordinates = [];
 
         const sourceOffsets = new Map();
         const targetOffsets = new Map();
 
-        calculateFlows(this.leftDiagram.network.nodes, this.network.nodes)
+        calculateModuleFlows(this.leftDiagram.network.nodes, this.network.nodes)
             .filter(f => f.flow > threshold)
             .sort((a, b) => b.flow - a.flow)
             .forEach(({ sourcePath, targetPath, flow }) => {
