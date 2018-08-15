@@ -4,11 +4,12 @@
   "private": true,
   "dependencies": {
     "d3": "^5.5.0",
+    "prop-types": "latest",
     "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts": "1.1.4",
-    "prop-types": "latest"
+    "semantic-ui-react": "^0.82.2"
   },
   "scripts": {
     "start": "react-scripts start",

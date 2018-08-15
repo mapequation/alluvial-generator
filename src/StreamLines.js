@@ -28,9 +28,9 @@ export default class StreamLines {
 
         return flows
             .filter(({ sourceFlow, targetFlow }) => sourceFlow > threshold || targetFlow > threshold)
-            .sort((a, b) => (b.sourceFlow + b.targetFlow) - (a.sourceFlow + a.targetFlow))
             .filter(({ sourcePath, targetPath }) =>
                 sourceModules.some(m => m.id.toString() === sourcePath) && targetModules.some(m => m.id.toString() === targetPath))
+            .sort((a, b) => (b.sourceFlow + b.targetFlow) - (a.sourceFlow + a.targetFlow))
             .map(({ sourcePath, targetPath, sourceFlow, targetFlow }) => {
                 const sourceModule = sourceModules.find(m => m.id.toString() === sourcePath);
                 const targetModule = targetModules.find(m => m.id.toString() === targetPath);
@@ -51,5 +51,29 @@ export default class StreamLines {
         const offset = module.y + module.height + streamlineOffset;
         accumulatedOffsets.set(module.id, streamlineOffset - height);
         return { height, offset };
+    }
+
+    static calculateModuleFlows(sourceNodes, targetNodes) {
+        const nodesByName = new Map(targetNodes.map(node => [node.name, node]));
+
+        return sourceNodes
+            .filter(node => nodesByName.has(node.name))
+            .reduce((moduleFlows, sourceNode) => {
+                const targetNode = nodesByName.get(sourceNode.name);
+                const found = moduleFlows.find(each =>
+                    each.sourcePath === sourceNode.parentPath && each.targetPath === targetNode.parentPath);
+                if (found) {
+                    found.sourceFlow += sourceNode.flow;
+                    found.targetFlow += targetNode.flow;
+                } else {
+                    moduleFlows.push({
+                        sourcePath: sourceNode.parentPath,
+                        targetPath: targetNode.parentPath,
+                        sourceFlow: sourceNode.flow,
+                        targetFlow: targetNode.flow,
+                    });
+                }
+                return moduleFlows;
+            }, []);
     }
 }

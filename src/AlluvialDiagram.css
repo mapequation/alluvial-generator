@@ -1,10 +1,10 @@
 .bar {
-    fill: #fee;
-    stroke: black;
+    fill: #fbb;
+    stroke: white;
 }
 
 .streamline {
-    fill: #eef;
-    stroke: black;
-    opacity: 0.8;
+    fill: #aaf;
+    stroke: white;
+    opacity: 0.7;
 }

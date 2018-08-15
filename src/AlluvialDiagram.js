@@ -12,22 +12,18 @@ export default class AlluvialDiagram extends React.Component {
     static defaultProps = {
         width: 1200,
         height: 500,
-        barWidth: 200,
-        totalHeight: 400,
         padding: 3,
-        streamlineWidth: 200,
         numModules: 15,
+        streamlineFraction: 1,
         streamlineThreshold: 0.005,
     };
 
     static propTypes = {
         width: PropTypes.number,
         height: PropTypes.number,
-        barWidth: PropTypes.number,
-        totalHeight: PropTypes.number,
         padding: PropTypes.number,
-        streamlineWidth: PropTypes.number,
         numModules: PropTypes.number,
+        streamlineFraction: PropTypes.number,
         streamlineThreshold: PropTypes.number,
         networks: PropTypes.arrayOf(PropTypes.object),
     };
@@ -43,17 +39,21 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     draw() {
-        const { barWidth, totalHeight, padding, streamlineWidth, numModules, streamlineThreshold, networks } = this.props;
+        const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
+
+        const N = networks.length;
+        const barWidth = width / (N + (N - 1) * streamlineFraction);
+        const streamlineWidth = streamlineFraction * barWidth;
 
         const diagram = networks.reduce((child, network) =>
             new BarDiagram({ network, leftDiagram: child }), null);
 
-        diagram.draw(this.svg, numModules, streamlineThreshold, { barWidth, totalHeight, padding, streamlineWidth });
+        diagram.draw(this.svg, numModules, streamlineThreshold, { barWidth, height, padding, streamlineWidth });
     }
 
     render() {
         const { width, height } = this.props;
-        return <svg style={{ background: "#efe", margin: "20px" }} width={width} height={height}
+        return <svg style={{ margin: "20px" }} width={width} height={height}
                     ref={node => this.node = node}/>;
     }
 }
