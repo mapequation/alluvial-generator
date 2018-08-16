@@ -17,9 +17,9 @@ export default class BarDiagram {
         if (this.leftDiagram) {
             const leftModules = this.leftDiagram.draw(element, numModules, threshold, style);
             this._xOffset += this.leftDiagram._xOffset + barWidth + streamlineWidth;
-            const streamlines = new StreamLines(leftModules, modules);
-            const flows = StreamLines.calculateModuleFlows(this.leftDiagram.network.nodes, this.network.nodes);
-            streamlines.draw(element, flows, threshold, streamlineWidth, this.leftDiagram._xOffset + barWidth);
+            const moduleFlows = calculateModuleFlows(this.leftDiagram.network.nodes, this.network.nodes);
+            const streamlines = new StreamLines(leftModules, modules, moduleFlows);
+            streamlines.draw(element, threshold, streamlineWidth, this.leftDiagram._xOffset + barWidth);
         }
 
         element.append("g")
@@ -41,7 +41,7 @@ export default class BarDiagram {
         const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr);
         const totalPadding = padding * (modules.length - 1);
 
-        let accumulatedHeight = totalHeight; // starting with largest module, so we subtract from this
+        let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this
 
         return modules.map(module => {
             const height = module.flow / totalFlow * (totalHeight - totalPadding);
@@ -51,4 +51,28 @@ export default class BarDiagram {
         });
     }
 
+}
+
+function calculateModuleFlows(sourceNodes, targetNodes) {
+    const nodesByName = new Map(targetNodes.map(node => [node.name, node]));
+
+    return sourceNodes
+        .filter(node => nodesByName.has(node.name))
+        .reduce((moduleFlows, sourceNode) => {
+            const targetNode = nodesByName.get(sourceNode.name);
+            const found = moduleFlows.find(each =>
+                each.sourcePath === sourceNode.parentPath && each.targetPath === targetNode.parentPath);
+            if (found) {
+                found.sourceFlow += sourceNode.flow;
+                found.targetFlow += targetNode.flow;
+            } else {
+                moduleFlows.push({
+                    sourcePath: sourceNode.parentPath,
+                    targetPath: targetNode.parentPath,
+                    sourceFlow: sourceNode.flow,
+                    targetFlow: targetNode.flow,
+                });
+            }
+            return moduleFlows;
+        }, []);
 }
