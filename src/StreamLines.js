@@ -31,7 +31,12 @@ export default class StreamLines {
             .filter(({ sourceFlow, targetFlow }) => sourceFlow > threshold || targetFlow > threshold)
             .filter(({ sourcePath, targetPath }) =>
                 sourceModules.some(m => m.id.toString() === sourcePath) && targetModules.some(m => m.id.toString() === targetPath))
-            .sort((a, b) => (b.sourceFlow + b.targetFlow) - (a.sourceFlow + a.targetFlow))
+            .sort((a, b) => {
+                const sourcePath = a.sourcePath - b.sourcePath;
+                const targetPath = a.targetPath - b.targetPath;
+                const flow = b.sourceFlow + b.targetFlow - a.sourceFlow + a.targetFlow;
+                return sourcePath !== 0 ? sourcePath : targetPath !== 0 ? targetPath : flow;
+            })
             .map(({ sourcePath, targetPath, sourceFlow, targetFlow }) => {
                 const sourceModule = sourceModules.find(m => m.id.toString() === sourcePath);
                 const targetModule = targetModules.find(m => m.id.toString() === targetPath);
