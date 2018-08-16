@@ -39,7 +39,7 @@ export default class BarDiagram {
 
     _maxTotalFlow(numModules) {
         const modules = this.network.modules.slice(0, numModules);
-        const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr);
+        const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr, 0);
         return this.leftDiagram ? Math.max(this.leftDiagram._maxTotalFlow(numModules), totalFlow) : totalFlow;
     }
 
