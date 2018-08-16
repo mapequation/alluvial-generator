@@ -37,8 +37,14 @@ export default class BarDiagram {
         return modules;
     }
 
-    _calculateModuleHeight(modules, totalHeight, padding) {
+    _maxTotalFlow(numModules) {
+        const modules = this.network.modules.slice(0, numModules);
         const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr);
+        return this.leftDiagram ? Math.max(this.leftDiagram._maxTotalFlow(numModules), totalFlow) : totalFlow;
+    }
+
+    _calculateModuleHeight(modules, totalHeight, padding) {
+        const totalFlow = this._maxTotalFlow(modules.length);
         const totalPadding = padding * (modules.length - 1);
 
         let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this
