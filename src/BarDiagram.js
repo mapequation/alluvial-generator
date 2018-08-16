@@ -8,14 +8,14 @@ export default class BarDiagram {
         this._xOffset = 0;
     }
 
-    draw(element, numModules, threshold, style) {
+    draw(element, numModules, threshold, maxTotalFlow, style) {
         const { barWidth, height, padding, streamlineWidth } = style;
 
         const largestModules = this.network.modules.slice(0, numModules);
-        const modules = this._calculateModuleHeight(largestModules, height, padding);
+        const modules = this._calculateModuleHeight(largestModules, maxTotalFlow, height, padding);
 
         if (this.leftDiagram) {
-            const leftModules = this.leftDiagram.draw(element, numModules, threshold, style);
+            const leftModules = this.leftDiagram.draw(element, numModules, threshold, maxTotalFlow, style);
             this._xOffset += this.leftDiagram._xOffset + barWidth + streamlineWidth;
             const moduleFlows = calculateModuleFlows(this.leftDiagram.network.nodes, this.network.nodes);
             const streamlines = new StreamLines(leftModules, modules, moduleFlows);
@@ -37,14 +37,7 @@ export default class BarDiagram {
         return modules;
     }
 
-    _maxTotalFlow(numModules) {
-        const modules = this.network.modules.slice(0, numModules);
-        const totalFlow = modules.map(module => module.flow).reduce((tot, curr) => tot + curr, 0);
-        return this.leftDiagram ? Math.max(this.leftDiagram._maxTotalFlow(numModules), totalFlow) : totalFlow;
-    }
-
-    _calculateModuleHeight(modules, totalHeight, padding) {
-        const totalFlow = this._maxTotalFlow(modules.length);
+    _calculateModuleHeight(modules, totalFlow, totalHeight, padding) {
         const totalPadding = padding * (modules.length - 1);
 
         let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this

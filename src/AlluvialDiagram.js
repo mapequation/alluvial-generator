@@ -44,11 +44,14 @@ export default class AlluvialDiagram extends React.Component {
         const N = networks.length;
         const barWidth = width / (N + (N - 1) * streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
+        const maxTotalFlow = networks.map(network =>
+            network.modules.slice(0, numModules).map(module => module.flow).reduce((tot, curr) => tot + curr, 0)
+        ).reduce((max, curr) => Math.max(max, curr), -Infinity);
 
         const diagram = networks.reduce((child, network) =>
             new BarDiagram({ network, leftDiagram: child }), null);
 
-        diagram.draw(this.svg, numModules, streamlineThreshold, { barWidth, height, padding, streamlineWidth });
+        diagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, { barWidth, height, padding, streamlineWidth });
     }
 
     render() {
