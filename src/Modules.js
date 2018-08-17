@@ -1,7 +1,6 @@
 export default class Modules {
-    constructor(network, numModules, maxTotalFlow, style) {
-        this.network = network;
-        this.numModules = numModules;
+    constructor(modules, maxTotalFlow, style) {
+        this.modules = modules;
         this.maxTotalFlow = maxTotalFlow;
         this.style = style;
         this.xOffset = 0;
@@ -12,31 +11,31 @@ export default class Modules {
     width = () => this.style.barWidth;
     height = d => d.height;
 
-    offsetOf(leftModules) {
+    get rightSide() {
+        return this.xOffset + this.style.barWidth;
+    }
+
+    moveToRightOf(leftModules) {
         const { barWidth, streamlineWidth } = this.style;
         this.xOffset += leftModules.xOffset + barWidth + streamlineWidth;
     }
 
     get data() {
         const { height, padding } = this.style;
-        const largestModules = this.network.modules.slice(0, this.numModules);
-        return this._modulesWithHeightY(largestModules, this.maxTotalFlow, height, padding);
+        return this._modulesWithHeightY(this.modules, this.maxTotalFlow, height, padding);
     }
 
     _modulesWithHeightY(modules, totalFlow, totalHeight, padding) {
+        const totalPadding = padding * (modules.length - 1);
+        const usableHeight = totalHeight - totalPadding;
+
         let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this
 
         return modules.map(module => {
-            const height = this._moduleHeight(padding, modules.length, totalHeight, module.flow, totalFlow);
+            const height = module.flow / totalFlow * usableHeight;
             const y = accumulatedHeight - height;
             accumulatedHeight -= height + padding;
             return { height, y, ...module };
         });
-    }
-
-    _moduleHeight(padding, numModules, totalHeight, moduleFlow, totalFlow) {
-        const totalPadding = padding * (numModules - 1);
-        const usableHeight = totalHeight - totalPadding;
-        return moduleFlow / totalFlow * usableHeight;
     }
 }

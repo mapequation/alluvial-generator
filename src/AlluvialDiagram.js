@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import * as d3 from "d3";
 
 import "./AlluvialDiagram.css";
-import BarDiagram from "./BarDiagram";
+import Diagram from "./Diagram";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -45,11 +45,10 @@ export default class AlluvialDiagram extends React.Component {
         const streamlineWidth = streamlineFraction * barWidth;
         const maxTotalFlow = AlluvialDiagram.maxTotalFlow(networks, numModules);
 
-        const diagram = networks.reduce((child, network) =>
-            new BarDiagram({ network, leftDiagram: child }), null);
+        const rightDiagram = networks.reduce((leftDiagram, network) =>
+            new Diagram(network, leftDiagram), null);
 
-        const style = { barWidth, height, padding, streamlineWidth };
-        diagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, style);
+        rightDiagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, { barWidth, height, padding, streamlineWidth });
     }
 
     static maxTotalFlow(networks, numModules) {

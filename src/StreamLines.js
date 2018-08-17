@@ -5,7 +5,7 @@ export default class StreamLines {
     constructor(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
         this.sourceModules = sourceModules;
         this.targetModules = targetModules;
-        this.moduleFlows = moduleFlows;
+        this._moduleFlows = moduleFlows;
         this.threshold = threshold;
         this.width = width;
         this.xOffset = xOffset;
@@ -15,7 +15,7 @@ export default class StreamLines {
     path = (d) => this.streamlineGenerator(d.coordinates);
 
     get data() {
-        return this._streamlinesWithCoordinates(this.sourceModules, this.targetModules, this.moduleFlows, this.threshold, this.width, this.xOffset);
+        return this._streamlinesWithCoordinates(this.sourceModules, this.targetModules, this._moduleFlows, this.threshold, this.width, this.xOffset);
     }
 
     _streamlinesWithCoordinates(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
@@ -56,5 +56,29 @@ export default class StreamLines {
         const offset = module.y + module.height + streamlineOffset;
         accumulatedOffsets.set(module.id, streamlineOffset - height);
         return { height, offset };
+    }
+
+    static moduleFlows(sourceNodes, targetNodes) {
+        const nodesByName = new Map(targetNodes.map(node => [node.name, node]));
+
+        return sourceNodes
+            .filter(node => nodesByName.has(node.name))
+            .reduce((moduleFlows, sourceNode) => {
+                const targetNode = nodesByName.get(sourceNode.name);
+                const found = moduleFlows.find(each =>
+                    each.sourcePath === sourceNode.parentPath && each.targetPath === targetNode.parentPath);
+                if (found) {
+                    found.sourceFlow += sourceNode.flow;
+                    found.targetFlow += targetNode.flow;
+                } else {
+                    moduleFlows.push({
+                        sourcePath: sourceNode.parentPath,
+                        targetPath: targetNode.parentPath,
+                        sourceFlow: sourceNode.flow,
+                        targetFlow: targetNode.flow,
+                    });
+                }
+                return moduleFlows;
+            }, []);
     }
 }
