@@ -1,10 +1,16 @@
-.bar {
+.module {
     fill: #fbb;
-    stroke: white;
+}
+
+.module:hover {
+    fill: #f99;
 }
 
 .streamline {
     fill: #aaf;
-    stroke: white;
     opacity: 0.7;
+}
+
+.streamline:hover {
+    fill: #88f;
 }

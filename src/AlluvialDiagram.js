@@ -41,17 +41,28 @@ export default class AlluvialDiagram extends React.Component {
     draw() {
         const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
 
-        const N = networks.length;
-        const barWidth = width / (N + (N - 1) * streamlineFraction);
+        const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
-        const maxTotalFlow = networks.map(network =>
-            network.modules.slice(0, numModules).map(module => module.flow).reduce((tot, curr) => tot + curr, 0)
-        ).reduce((max, curr) => Math.max(max, curr), -Infinity);
+        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(networks, numModules);
 
         const diagram = networks.reduce((child, network) =>
             new BarDiagram({ network, leftDiagram: child }), null);
 
-        diagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, { barWidth, height, padding, streamlineWidth });
+        const style = { barWidth, height, padding, streamlineWidth };
+        diagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, style);
+    }
+
+    static maxTotalFlow(networks, numModules) {
+        return networks
+            .map(network => network.modules.slice(0, numModules)
+                .map(module => module.flow)
+                .reduce((tot, curr) => tot + curr, 0))
+            .reduce((max, curr) => Math.max(max, curr), -Infinity);
+    }
+
+    static barWidth(numModules, totalWidth, streamlineFraction) {
+        const numStreamlines = numModules - 1;
+        return totalWidth / (numModules + numStreamlines * streamlineFraction);
     }
 
     render() {

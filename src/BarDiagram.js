@@ -1,55 +1,48 @@
 import StreamLines from "./StreamLines";
+import Modules from "./Modules";
 
 
 export default class BarDiagram {
     constructor(opts) {
         this.network = opts.network;
         this.leftDiagram = opts.leftDiagram || null;
-        this._xOffset = 0;
     }
 
     draw(element, numModules, threshold, maxTotalFlow, style) {
-        const { barWidth, height, padding, streamlineWidth } = style;
+        const { barWidth, streamlineWidth } = style;
 
-        const largestModules = this.network.modules.slice(0, numModules);
-        const modules = this._calculateModuleHeight(largestModules, maxTotalFlow, height, padding);
+        const modules = new Modules(this.network, numModules, maxTotalFlow, style);
 
         if (this.leftDiagram) {
             const leftModules = this.leftDiagram.draw(element, numModules, threshold, maxTotalFlow, style);
-            this._xOffset += this.leftDiagram._xOffset + barWidth + streamlineWidth;
+            modules.offsetOf(leftModules);
             const moduleFlows = calculateModuleFlows(this.leftDiagram.network.nodes, this.network.nodes);
-            const streamlines = new StreamLines(leftModules, modules, moduleFlows);
-            streamlines.draw(element, threshold, streamlineWidth, this.leftDiagram._xOffset + barWidth);
+            const streamlines = new StreamLines(leftModules.data, modules.data, moduleFlows, threshold, streamlineWidth, leftModules.xOffset + barWidth);
+
+            element.append("g")
+                .classed("streamlines", true)
+                .selectAll(".streamline")
+                .data(streamlines.data)
+                .enter()
+                .append("path")
+                .classed("streamline", true)
+                .attr("d", streamlines.path);
         }
 
         element.append("g")
-            .classed("bars", true)
-            .attr("transform", `translate(${this._xOffset} 0)`)
-            .selectAll(".bar")
-            .data(modules)
+            .classed("modules", true)
+            .selectAll(".module")
+            .data(modules.data)
             .enter()
             .append("rect")
-            .classed("bar", true)
-            .attr("width", barWidth)
-            .attr("height", d => d.height)
-            .attr("y", d => d.y);
+            .classed("module", true)
+            .attr("width", modules.width)
+            .attr("height", modules.height)
+            .attr("x", modules.x)
+            .attr("y", modules.y);
 
         return modules;
     }
-
-    _calculateModuleHeight(modules, totalFlow, totalHeight, padding) {
-        const totalPadding = padding * (modules.length - 1);
-
-        let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this
-
-        return modules.map(module => {
-            const height = module.flow / totalFlow * (totalHeight - totalPadding);
-            const y = accumulatedHeight - height;
-            accumulatedHeight -= height + padding;
-            return { height, y, ...module };
-        });
-    }
-
 }
 
 function calculateModuleFlows(sourceNodes, targetNodes) {

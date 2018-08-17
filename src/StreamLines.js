@@ -2,28 +2,23 @@ import { streamlineHorizontal } from "./streamline";
 
 
 export default class StreamLines {
-    constructor(sourceModules, targetModules, moduleFlows) {
+    constructor(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
         this.sourceModules = sourceModules;
         this.targetModules = targetModules;
         this.moduleFlows = moduleFlows;
+        this.threshold = threshold;
+        this.width = width;
+        this.xOffset = xOffset;
+        this.streamlineGenerator = streamlineHorizontal();
     }
 
-    draw(element, threshold, streamlineWidth, xOffset) {
-        const streamlineCoordinates = this._streamlineCoordinates(this.sourceModules, this.targetModules, this.moduleFlows, threshold, streamlineWidth);
-        const streamlineGenerator = streamlineHorizontal();
+    path = (d) => this.streamlineGenerator(d.coordinates);
 
-        element.append("g")
-            .classed("streamlines", true)
-            .attr("transform", `translate(${xOffset} 0)`)
-            .selectAll(".link")
-            .data(streamlineCoordinates)
-            .enter()
-            .append("path")
-            .classed("streamline", true)
-            .attr("d", streamlineGenerator);
+    get data() {
+        return this._streamlinesWithCoordinates(this.sourceModules, this.targetModules, this.moduleFlows, this.threshold, this.width, this.xOffset);
     }
 
-    _streamlineCoordinates(sourceModules, targetModules, moduleFlows, threshold, streamlineWidth) {
+    _streamlinesWithCoordinates(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
         const sourceOffsets = new Map();
         const targetOffsets = new Map();
 
@@ -37,17 +32,21 @@ export default class StreamLines {
                 const flow = b.sourceFlow + b.targetFlow - a.sourceFlow + a.targetFlow;
                 return sourcePath !== 0 ? sourcePath : targetPath !== 0 ? targetPath : flow;
             })
-            .map(({ sourcePath, targetPath, sourceFlow, targetFlow }) => {
+            .map((moduleFlow) => {
+                const { sourcePath, targetPath, sourceFlow, targetFlow } = moduleFlow;
                 const sourceModule = sourceModules.find(m => m.id.toString() === sourcePath);
                 const targetModule = targetModules.find(m => m.id.toString() === targetPath);
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
-                return [
-                    [0, streamlineSource.offset],
-                    [streamlineWidth, streamlineTarget.offset],
-                    [streamlineWidth, streamlineTarget.offset - streamlineTarget.height],
-                    [0, streamlineSource.offset - streamlineSource.height],
-                ];
+                return {
+                    ...moduleFlow,
+                    coordinates: [
+                        [xOffset, streamlineSource.offset],
+                        [xOffset + width, streamlineTarget.offset],
+                        [xOffset + width, streamlineTarget.offset - streamlineTarget.height],
+                        [xOffset, streamlineSource.offset - streamlineSource.height],
+                    ],
+                };
             });
     }
 
