@@ -6,11 +6,6 @@ export default class Modules {
         this.xOffset = 0;
     }
 
-    x = () => this.xOffset;
-    y = d => d.y;
-    width = () => this.style.barWidth;
-    height = d => d.height;
-
     get rightSide() {
         return this.xOffset + this.style.barWidth;
     }
@@ -35,7 +30,13 @@ export default class Modules {
             const height = module.flow / totalFlow * usableHeight;
             const y = accumulatedHeight - height;
             accumulatedHeight -= height + padding;
-            return { height, y, ...module };
+            return {
+                width: this.style.barWidth,
+                height,
+                x: this.xOffset,
+                y,
+                ...module,
+            };
         });
     }
 }

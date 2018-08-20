@@ -12,8 +12,6 @@ export default class StreamLines {
         this.streamlineGenerator = streamlineHorizontal();
     }
 
-    path = (d) => this.streamlineGenerator(d.coordinates);
-
     get data() {
         return this._streamlinesWithCoordinates(this.sourceModules, this.targetModules, this._moduleFlows, this.threshold, this.width, this.xOffset);
     }
@@ -39,13 +37,13 @@ export default class StreamLines {
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
                 return {
-                    ...moduleFlow,
-                    coordinates: [
+                    path: this.streamlineGenerator([
                         [xOffset, streamlineSource.offset],
                         [xOffset + width, streamlineTarget.offset],
                         [xOffset + width, streamlineTarget.offset - streamlineTarget.height],
                         [xOffset, streamlineSource.offset - streamlineSource.height],
-                    ],
+                    ]),
+                    ...moduleFlow,
                 };
             });
     }

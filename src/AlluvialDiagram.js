@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import * as d3 from "d3";
 
 import "./AlluvialDiagram.css";
-import Diagram from "./Diagram";
+import Modules from "./Modules";
+import StreamLines from "./StreamLines";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -44,11 +45,42 @@ export default class AlluvialDiagram extends React.Component {
         const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
         const maxTotalFlow = AlluvialDiagram.maxTotalFlow(networks, numModules);
+        const style = { barWidth, height, padding, streamlineWidth };
 
-        const rightDiagram = networks.reduce((leftDiagram, network) =>
-            new Diagram(network, leftDiagram), null);
+        const largestModules = networks.map(network => network.modules.slice(0, numModules));
+        const modules = largestModules.map(m => new Modules(m, maxTotalFlow, style));
+        const streamlines = [];
 
-        rightDiagram.draw(this.svg, numModules, streamlineThreshold, maxTotalFlow, { barWidth, height, padding, streamlineWidth });
+        for (let i = 0; i < modules.length - 1; i++) {
+            const left = modules[i];
+            const right = modules[i + 1];
+            right.moveToRightOf(left);
+            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[i + 1].nodes);
+            streamlines.push(new StreamLines(left.data, right.data, moduleFlows, streamlineThreshold, streamlineWidth, left.rightSide));
+        }
+
+        this.svg.selectAll(".modules")
+            .data(modules)
+            .enter().append("g")
+            .classed("modules", true)
+            .selectAll(".module")
+            .data(m => m.data)
+            .enter().append("rect")
+            .classed("module", true)
+            .attr("width", d => d.width)
+            .attr("height", d => d.height)
+            .attr("x", d => d.x)
+            .attr("y", d => d.y);
+
+        this.svg.selectAll(".streamlines")
+            .data(streamlines)
+            .enter().append("g")
+            .classed("streamlines", true)
+            .selectAll(".streamline")
+            .data(s => s.data)
+            .enter().append("path")
+            .classed("streamline", true)
+            .attr("d", s => s.path);
     }
 
     static maxTotalFlow(networks, numModules) {
