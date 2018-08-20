@@ -5,6 +5,7 @@ import * as d3 from "d3";
 import "./AlluvialDiagram.css";
 import Modules from "./Modules";
 import StreamLines from "./StreamLines";
+import { pairwise } from "./helpers";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -35,7 +36,6 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     componentDidUpdate() {
-        this.svg.selectAll("*").remove();
         this.draw();
     }
 
@@ -51,35 +51,56 @@ export default class AlluvialDiagram extends React.Component {
         const modules = largestModules.map(m => new Modules(m, maxTotalFlow, style));
         const streamlines = [];
 
-        for (let i = 0; i < modules.length - 1; i++) {
-            const left = modules[i];
-            const right = modules[i + 1];
-            right.moveToRightOf(left);
-            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[i + 1].nodes);
-            streamlines.push(new StreamLines(left.data, right.data, moduleFlows, streamlineThreshold, streamlineWidth, left.rightSide));
-        }
+        pairwise(modules, (left, right) => right.moveToRightOf(left));
 
-        this.svg.selectAll(".modules")
-            .data(modules)
-            .enter().append("g")
-            .classed("modules", true)
-            .selectAll(".module")
-            .data(m => m.data)
-            .enter().append("rect")
+        pairwise(modules, (leftModules, rightModules, i) => {
+            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[i + 1].nodes);
+            streamlines.push(new StreamLines(leftModules.data, rightModules.data, moduleFlows, streamlineThreshold, streamlineWidth, leftModules.rightSide));
+        });
+
+        let modulesGroups = this.svg.selectAll(".modules")
+            .data(modules);
+
+        modulesGroups.exit().remove();
+
+        modulesGroups = modulesGroups.enter().append("g")
+            .merge(modulesGroups)
+            .classed("modules", true);
+
+        let modulesElements = modulesGroups.selectAll(".module")
+            .data(modules => modules.data, function byKey(d) {
+                return d ? d.id : this.id;
+            });
+
+        modulesElements.exit().remove();
+
+        modulesElements = modulesElements.enter().append("rect")
+            .merge(modulesElements)
             .classed("module", true)
             .attr("width", d => d.width)
-            .attr("height", d => d.height)
             .attr("x", d => d.x)
+            .transition()
+            .attr("height", d => d.height)
             .attr("y", d => d.y);
 
-        this.svg.selectAll(".streamlines")
-            .data(streamlines)
-            .enter().append("g")
-            .classed("streamlines", true)
-            .selectAll(".streamline")
-            .data(s => s.data)
-            .enter().append("path")
+        let streamlinesGroups = this.svg.selectAll(".streamlines")
+            .data(streamlines);
+
+        streamlinesGroups.exit().remove();
+
+        streamlinesGroups = streamlinesGroups.enter().append("g")
+            .merge(streamlinesGroups)
+            .classed("streamlines", true);
+
+        let streamlinesElements = streamlinesGroups.selectAll(".streamline")
+            .data(s => s.data);
+
+        streamlinesElements.exit().remove();
+
+        streamlinesElements = streamlinesElements.enter().append("path")
+            .merge(streamlinesElements)
             .classed("streamline", true)
+            .transition()
             .attr("d", s => s.path);
     }
 
