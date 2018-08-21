@@ -2,18 +2,18 @@ import { streamlineHorizontal } from "./streamline";
 
 
 export default class StreamLines {
-    constructor(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
+    constructor(sourceModules, targetModules, moduleFlows, threshold, width) {
         this.sourceModules = sourceModules;
         this.targetModules = targetModules;
         this._moduleFlows = moduleFlows;
         this.threshold = threshold;
         this.width = width;
-        this.xOffset = xOffset;
+        this.xOffset = sourceModules.rightSide;
         this.streamlineGenerator = streamlineHorizontal();
     }
 
     get data() {
-        return this._streamlinesWithCoordinates(this.sourceModules, this.targetModules, this._moduleFlows, this.threshold, this.width, this.xOffset);
+        return this._streamlinesWithCoordinates(this.sourceModules.data, this.targetModules.data, this._moduleFlows, this.threshold, this.width, this.xOffset);
     }
 
     _streamlinesWithCoordinates(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
@@ -37,6 +37,12 @@ export default class StreamLines {
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
                 return {
+                    initialPath: this.streamlineGenerator([
+                        [xOffset, streamlineSource.offset],
+                        [xOffset, streamlineSource.offset],
+                        [xOffset, streamlineSource.offset - streamlineTarget.height],
+                        [xOffset, streamlineSource.offset - streamlineSource.height],
+                    ]),
                     path: this.streamlineGenerator([
                         [xOffset, streamlineSource.offset],
                         [xOffset + width, streamlineTarget.offset],

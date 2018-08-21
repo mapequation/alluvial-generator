@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import "./AlluvialDiagram.css";
 import Modules from "./Modules";
 import StreamLines from "./StreamLines";
 import { pairwise } from "./helpers";
@@ -55,7 +54,7 @@ export default class AlluvialDiagram extends React.Component {
 
         pairwise(modules, (leftModules, rightModules, i) => {
             const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[i + 1].nodes);
-            streamlines.push(new StreamLines(leftModules.data, rightModules.data, moduleFlows, streamlineThreshold, streamlineWidth, leftModules.rightSide));
+            streamlines.push(new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth));
         });
 
         let modulesGroups = this.svg.selectAll(".modules")
@@ -65,21 +64,25 @@ export default class AlluvialDiagram extends React.Component {
 
         modulesGroups = modulesGroups.enter().append("g")
             .merge(modulesGroups)
-            .classed("modules", true);
+            .attr("class", "modules");
 
         let modulesElements = modulesGroups.selectAll(".module")
-            .data(modules => modules.data, function byKey(d) {
+            .data(modules => modules.data, function key(d) {
                 return d ? d.id : this.id;
             });
 
         modulesElements.exit().remove();
 
-        modulesElements = modulesElements.enter().append("rect")
+        const t1 = d3.transition().duration(1000);
+        const t2 = d3.transition().duration(1000);
+
+        modulesElements.enter().append("rect")
             .merge(modulesElements)
-            .classed("module", true)
+            .attr("class", "module")
             .attr("width", d => d.width)
             .attr("x", d => d.x)
-            .transition()
+            .transition(t1)
+            .attr("fill", "#CCCCBB")
             .attr("height", d => d.height)
             .attr("y", d => d.y);
 
@@ -90,17 +93,28 @@ export default class AlluvialDiagram extends React.Component {
 
         streamlinesGroups = streamlinesGroups.enter().append("g")
             .merge(streamlinesGroups)
-            .classed("streamlines", true);
+            .attr("class", "streamlines");
 
         let streamlinesElements = streamlinesGroups.selectAll(".streamline")
-            .data(s => s.data);
+            .data(s => s.data, function key(d) {
+                return d ? "" + d.sourcePath + ":" + d.targetPath : this.id;
+            });
 
-        streamlinesElements.exit().remove();
+        streamlinesElements.exit()
+            .transition(t2)
+            .attr("d", s => s.initialPath)
+            .remove();
 
-        streamlinesElements = streamlinesElements.enter().append("path")
+        streamlinesElements.enter().append("path")
+            .attr("d", s => s.initialPath)
+            .attr("opacity", 0)
             .merge(streamlinesElements)
-            .classed("streamline", true)
-            .transition()
+            .attr("class", "streamline")
+            .attr("fill", "#CCCCBB")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5)
+            .transition(t2)
+            .attr("opacity", 0.8)
             .attr("d", s => s.path);
     }
 
