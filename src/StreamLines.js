@@ -37,7 +37,7 @@ export default class StreamLines {
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
                 return {
-                    initialPath: this.streamlineGenerator([
+                    enterPath: this.streamlineGenerator([
                         [xOffset, streamlineSource.offset],
                         [xOffset, streamlineSource.offset],
                         [xOffset, streamlineSource.offset - streamlineTarget.height],
@@ -48,6 +48,12 @@ export default class StreamLines {
                         [xOffset + width, streamlineTarget.offset],
                         [xOffset + width, streamlineTarget.offset - streamlineTarget.height],
                         [xOffset, streamlineSource.offset - streamlineSource.height],
+                    ]),
+                    exitPath: this.streamlineGenerator([
+                        [xOffset, 0],
+                        [xOffset + width, 0],
+                        [xOffset + width, 0],
+                        [xOffset, 0],
                     ]),
                     ...moduleFlow,
                 };

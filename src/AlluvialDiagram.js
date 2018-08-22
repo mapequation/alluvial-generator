@@ -57,6 +57,9 @@ export default class AlluvialDiagram extends React.Component {
             streamlines.push(new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth));
         });
 
+        /**
+         * Modules
+         */
         let modulesGroups = this.svg.selectAll(".modules")
             .data(modules);
 
@@ -66,26 +69,32 @@ export default class AlluvialDiagram extends React.Component {
             .merge(modulesGroups)
             .attr("class", "modules");
 
-        let modulesElements = modulesGroups.selectAll(".module")
+        const modulesUpdate = modulesGroups.selectAll(".module")
             .data(modules => modules.data, function key(d) {
                 return d ? d.id : this.id;
             });
 
-        modulesElements.exit().remove();
+        const modulesEnter = modulesUpdate.enter().append("rect");
 
-        const t1 = d3.transition().duration(1000);
-        const t2 = d3.transition().duration(1000);
+        modulesUpdate.exit()
+            .transition(d3.transition().duration(300))
+            .attr("height", 0)
+            .attr("y", 0)
+            .remove();
 
-        modulesElements.enter().append("rect")
-            .merge(modulesElements)
+        modulesEnter
+            .merge(modulesUpdate)
             .attr("class", "module")
             .attr("width", d => d.width)
             .attr("x", d => d.x)
-            .transition(t1)
+            .transition(d3.transition().duration(300))
             .attr("fill", "#CCCCBB")
             .attr("height", d => d.height)
             .attr("y", d => d.y);
 
+        /**
+         * Streamlines
+         */
         let streamlinesGroups = this.svg.selectAll(".streamlines")
             .data(streamlines);
 
@@ -95,25 +104,34 @@ export default class AlluvialDiagram extends React.Component {
             .merge(streamlinesGroups)
             .attr("class", "streamlines");
 
-        let streamlinesElements = streamlinesGroups.selectAll(".streamline")
+        const streamlinesUpdate = streamlinesGroups.selectAll(".streamline")
             .data(s => s.data, function key(d) {
                 return d ? "" + d.sourcePath + ":" + d.targetPath : this.id;
             });
 
-        streamlinesElements.exit()
-            .transition(t2)
-            .attr("d", s => s.initialPath)
+        const streamlinesEnter = streamlinesUpdate.enter().append("path");
+
+        streamlinesUpdate.exit()
+            .transition(d3.transition().duration(300))
+            .attr("d", s => s.exitPath)
             .remove();
 
-        streamlinesElements.enter().append("path")
-            .attr("d", s => s.initialPath)
+        streamlinesEnter
+            .attr("d", s => s.enterPath)
             .attr("opacity", 0)
-            .merge(streamlinesElements)
+            .transition(d3.transition().duration(300).delay(100))
+            .attr("opacity", 0.8)
+            .attr("d", s => s.path);
+
+        streamlinesEnter
+            .merge(streamlinesUpdate)
             .attr("class", "streamline")
             .attr("fill", "#CCCCBB")
             .attr("stroke", "#fff")
-            .attr("stroke-width", 0.5)
-            .transition(t2)
+            .attr("stroke-width", 0.5);
+
+        streamlinesUpdate
+            .transition(d3.transition().duration(300))
             .attr("opacity", 0.8)
             .attr("d", s => s.path);
     }
