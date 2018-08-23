@@ -2,9 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import Modules from "./Modules";
-import StreamLines from "./StreamLines";
-import pairwise from "./helpers/pairwise";
+import Modules from "../models/Modules";
+import StreamLines from "../models/StreamLines";
+import pairwise from "../helpers/pairwise";
 
 
 export default class AlluvialDiagram extends React.Component {

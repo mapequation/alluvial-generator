@@ -15,7 +15,7 @@ const sectionTypes = {
     links: link,
 };
 
-export const parseMap = rows => {
+const parseMap = rows => {
     const sections = {
         modules: [],
         nodes: [],
@@ -40,3 +40,5 @@ export const parseMap = rows => {
 
     return sections;
 };
+
+export default parseMap;

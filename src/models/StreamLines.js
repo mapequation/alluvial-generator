@@ -1,4 +1,4 @@
-import { streamlineHorizontal } from "./streamline";
+import { streamlineHorizontal } from "../helpers/streamline";
 
 
 export default class StreamLines {

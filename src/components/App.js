@@ -1,8 +1,8 @@
 import React from "react";
-import { Sidebar, Menu, Input } from "semantic-ui-react";
+import { Input, Menu, Sidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
-import { parseMap } from "./parse-map";
+import parseMap from "../helpers/parse-map";
 import AlluvialDiagram from "./AlluvialDiagram";
 
 
