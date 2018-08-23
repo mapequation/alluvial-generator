@@ -3,7 +3,7 @@ import { Input, Menu, Sidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
 import parseMap from "../io/parse-map";
-import parsePromise from "../io/parse-promise";
+import papaParsePromise from "../io/papa-parse-promise";
 import AlluvialDiagram from "./AlluvialDiagram";
 
 
@@ -36,7 +36,7 @@ export default class App extends React.Component {
         Promise.all(networks.map(f => fetch(f)))
             .then(responses =>
                 Promise.all(responses.map(res => res.text()))
-                    .then(files => Promise.all(files.map(file => parsePromise(file, parseOpts)))))
+                    .then(files => Promise.all(files.map(file => papaParsePromise(file, parseOpts)))))
             .then(parsed => {
                 parsed.map(_ => _.errors).forEach(_ => _.forEach(err => {
                     throw err;
