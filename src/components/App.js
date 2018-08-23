@@ -3,6 +3,7 @@ import { Input, Menu, Sidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
 import parseMap from "../helpers/parse-map";
+import parsePromise from "../helpers/parse-promise";
 import AlluvialDiagram from "./AlluvialDiagram";
 
 
@@ -35,9 +36,7 @@ export default class App extends React.Component {
         Promise.all(networks.map(f => fetch(f)))
             .then(responses =>
                 Promise.all(responses.map(res => res.text()))
-                    .then(files =>
-                        Promise.all(files.map(file => new Promise((complete, error) =>
-                            Papa.parse(file, Object.assign(parseOpts, { complete, error }))))))) // eslint-disable-line no-undef
+                    .then(files => Promise.all(files.map(file => parsePromise(file, parseOpts)))))
             .then(parsed => {
                 parsed.map(_ => _.errors).forEach(_ => _.forEach(err => {
                     throw err;
