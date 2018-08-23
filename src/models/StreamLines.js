@@ -1,4 +1,4 @@
-import { streamlineHorizontal } from "../helpers/streamline";
+import { streamlineHorizontal } from "../lib/streamline";
 
 
 export default class StreamLines {
@@ -23,7 +23,7 @@ export default class StreamLines {
         return moduleFlows
             .filter(({ sourceFlow, targetFlow }) => sourceFlow > threshold || targetFlow > threshold)
             .filter(({ sourcePath, targetPath }) =>
-                sourceModules.some(m => m.id.toString() === sourcePath) && targetModules.some(m => m.id.toString() === targetPath))
+                sourceModules.some(m => m.id.toString() === sourcePath.toString()) && targetModules.some(m => m.id.toString() === targetPath.toString()))
             .sort((a, b) => {
                 const sourcePath = a.sourcePath - b.sourcePath;
                 const targetPath = a.targetPath - b.targetPath;
@@ -32,8 +32,8 @@ export default class StreamLines {
             })
             .map((moduleFlow) => {
                 const { sourcePath, targetPath, sourceFlow, targetFlow } = moduleFlow;
-                const sourceModule = sourceModules.find(m => m.id.toString() === sourcePath);
-                const targetModule = targetModules.find(m => m.id.toString() === targetPath);
+                const sourceModule = sourceModules.find(m => m.id.toString() === sourcePath.toString());
+                const targetModule = targetModules.find(m => m.id.toString() === targetPath.toString());
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
                 return {
@@ -76,7 +76,8 @@ export default class StreamLines {
             .reduce((moduleFlows, sourceNode) => {
                 const targetNode = nodesByName.get(sourceNode.name);
                 const found = moduleFlows.find(each =>
-                    each.sourcePath === sourceNode.parentPath && each.targetPath === targetNode.parentPath);
+                    each.sourcePath.toString() === sourceNode.parentPath.toString() &&
+                    each.targetPath.toString() === targetNode.parentPath.toString());
                 if (found) {
                     found.sourceFlow += sourceNode.flow;
                     found.targetFlow += targetNode.flow;

@@ -1,10 +1,13 @@
+import TreePath from "../lib/treepath";
+
+
 const module = row => ({ id: row[0], name: row[1], flow: row[2], exitFlow: row[3] });
 
 const node = row => ({
-    path: row[0],
+    path: new TreePath(row[0]),
     name: row[1],
     flow: row[2],
-    parentPath: row[0].substr(0, row[0].lastIndexOf(":")),
+    parentPath: TreePath.parentPath(row[0]),
 });
 
 const link = row => ({ source: row[0], target: row[1], flow: row[2] });
