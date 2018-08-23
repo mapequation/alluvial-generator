@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import Modules from "./Modules";
 import StreamLines from "./StreamLines";
-import { pairwise } from "./helpers";
+import pairwise from "./helpers/pairwise";
 
 
 export default class AlluvialDiagram extends React.Component {
