@@ -38,10 +38,10 @@ export default class StreamLines {
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
                 return {
                     enterPath: this.streamlineGenerator([
-                        [xOffset, streamlineSource.offset],
-                        [xOffset, streamlineSource.offset],
-                        [xOffset, streamlineSource.offset - streamlineTarget.height],
-                        [xOffset, streamlineSource.offset - streamlineSource.height],
+                        [xOffset + width / 10, streamlineSource.offset],
+                        [xOffset + width / 10, streamlineSource.offset],
+                        [xOffset + width / 10, streamlineSource.offset - streamlineTarget.height],
+                        [xOffset + width / 10, streamlineSource.offset - streamlineTarget.height],
                     ]),
                     path: this.streamlineGenerator([
                         [xOffset, streamlineSource.offset],

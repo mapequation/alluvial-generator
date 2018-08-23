@@ -34,11 +34,11 @@ export default class AlluvialDiagram extends React.Component {
         this.draw();
     }
 
-    componentDidUpdate() {
-        this.draw();
+    componentDidUpdate(prevProps) {
+        this.draw(prevProps);
     }
 
-    draw() {
+    draw(prevProps = this.props) {
         const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
 
         const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
@@ -82,15 +82,26 @@ export default class AlluvialDiagram extends React.Component {
             .attr("y", 0)
             .remove();
 
-        modulesEnter
-            .merge(modulesUpdate)
-            .attr("class", "module")
-            .attr("width", d => d.width)
-            .attr("x", d => d.x)
-            .transition(d3.transition().duration(300))
-            .attr("fill", "#CCCCBB")
-            .attr("height", d => d.height)
-            .attr("y", d => d.y);
+        const modulesToUpdate = modulesEnter.merge(modulesUpdate)
+            .attr("class", "module");
+
+        if (this.props.streamlineFraction !== prevProps.streamlineFraction) {
+            modulesToUpdate
+                .transition(d3.transition().duration(300))
+                .attr("width", d => d.width)
+                .attr("x", d => d.x)
+                .attr("fill", "#CCCCBB")
+                .attr("height", d => d.height)
+                .attr("y", d => d.y);
+        } else {
+            modulesToUpdate
+                .attr("width", d => d.width)
+                .attr("x", d => d.x)
+                .transition(d3.transition().duration(300))
+                .attr("fill", "#CCCCBB")
+                .attr("height", d => d.height)
+                .attr("y", d => d.y);
+        }
 
         /**
          * Streamlines
