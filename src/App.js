@@ -1,5 +1,6 @@
 import React from "react";
 import { Sidebar, Menu, Input } from "semantic-ui-react";
+import { Slider } from "react-semantic-ui-range";
 
 import { parseMap } from "./parse-map";
 import AlluvialDiagram from "./AlluvialDiagram";
@@ -16,12 +17,8 @@ export default class App extends React.Component {
         networks: null,
     };
 
-    handleWidthChange = (e, {value}) => this.setState({ width: value});
-    handleHeightChange = (e, {value}) => this.setState({ height: value});
-    handlePaddingChange = (e, {value}) => this.setState({ padding: value});
-    handleStreamlineFractionChange = (e, {value}) => this.setState({ streamlineFraction: value});
-    handleNumModulesChange = (e, {value}) => this.setState({ numModules: value});
-    handleStreamlineThresholdChange = (e, {value}) => this.setState({ streamlineThreshold: value});
+    handleWidthChange = (e, { value }) => this.setState({ width: value });
+    handleHeightChange = (e, { value }) => this.setState({ height: value });
 
     componentDidMount() {
         const networks = ["/science1998_2y.map", "/science2001_2y.map", "/science2004_2y.map"];
@@ -67,27 +64,53 @@ export default class App extends React.Component {
                     >
                         <Menu.Item>
                             <Input type="text" label="Width" labelPosition="left" value={this.state.width}
-                                   onChange={this.handleWidthChange} />
+                                   onChange={this.handleWidthChange}/>
                         </Menu.Item>
                         <Menu.Item>
                             <Input type="text" label="Height" labelPosition="left" value={this.state.height}
-                                   onChange={this.handleHeightChange} />
+                                   onChange={this.handleHeightChange}/>
                         </Menu.Item>
                         <Menu.Item>
-                            <Input type="text" label="Streamline fraction" labelPosition="left" value={this.state.streamlineFraction}
-                                   onChange={this.handleStreamlineFractionChange} />
+                            <Input type="text" label="Streamline fraction" labelPosition="left"
+                                   value={this.state.streamlineFraction}/>
+                            <Slider settings={{
+                                start: this.state.streamlineFraction,
+                                min: 0,
+                                max: 3,
+                                step: 0.1,
+                                onChange: streamlineFraction => this.setState({ streamlineFraction }),
+                            }}/>
                         </Menu.Item>
                         <Menu.Item>
-                            <Input type="text" label="Padding" labelPosition="left" value={this.state.padding}
-                                   onChange={this.handlePaddingChange} />
+                            <Input type="text" label="Padding" labelPosition="left" value={this.state.padding}/>
+                            <Slider discrete settings={{
+                                start: this.state.padding,
+                                min: 0,
+                                max: 10,
+                                step: 1,
+                                onChange: padding => this.setState({ padding }),
+                            }}/>
                         </Menu.Item>
                         <Menu.Item>
-                            <Input type="text" label="Num modules" labelPosition="left" value={this.state.numModules}
-                                   onChange={this.handleNumModulesChange} />
+                            <Input type="text" label="Num modules" labelPosition="left" value={this.state.numModules}/>
+                            <Slider discrete settings={{
+                                start: this.state.numModules,
+                                min: 1,
+                                max: 30,
+                                step: 1,
+                                onChange: numModules => this.setState({ numModules }),
+                            }}/>
                         </Menu.Item>
                         <Menu.Item>
-                            <Input type="text" label="Streamline threshold" labelPosition="left" value={this.state.streamlineThreshold}
-                                   onChange={this.handleStreamlineThresholdChange} />
+                            <Input type="text" label="Streamline threshold" labelPosition="left"
+                                   value={this.state.streamlineThreshold}/>
+                            <Slider settings={{
+                                start: this.state.streamlineThreshold,
+                                min: 0.00000001,
+                                max: 0.05,
+                                step: 0.0001,
+                                onChange: streamlineThreshold => this.setState({ streamlineThreshold }),
+                            }}/>
                         </Menu.Item>
                     </Sidebar>
                     <Sidebar.Pusher>
