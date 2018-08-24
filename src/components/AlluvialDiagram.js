@@ -57,6 +57,8 @@ export default class AlluvialDiagram extends React.Component {
             streamlines.push(new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth));
         });
 
+        const t = d3.transition().duration(300);
+
         /**
          * Modules
          */
@@ -77,7 +79,7 @@ export default class AlluvialDiagram extends React.Component {
         const modulesEnter = modulesUpdate.enter().append("rect");
 
         modulesUpdate.exit()
-            .transition(d3.transition().duration(300))
+            .transition(t)
             .attr("height", 0)
             .attr("y", 0)
             .remove();
@@ -87,7 +89,7 @@ export default class AlluvialDiagram extends React.Component {
 
         if (this.props.streamlineFraction !== prevProps.streamlineFraction) {
             modulesToUpdate
-                .transition(d3.transition().duration(300))
+                .transition(t)
                 .attr("width", d => d.width)
                 .attr("x", d => d.x)
                 .attr("fill", "#CCCCBB")
@@ -97,7 +99,7 @@ export default class AlluvialDiagram extends React.Component {
             modulesToUpdate
                 .attr("width", d => d.width)
                 .attr("x", d => d.x)
-                .transition(d3.transition().duration(300))
+                .transition(t)
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
@@ -123,14 +125,15 @@ export default class AlluvialDiagram extends React.Component {
         const streamlinesEnter = streamlinesUpdate.enter().append("path");
 
         streamlinesUpdate.exit()
-            .transition(d3.transition().duration(300))
+            .transition(t)
             .attr("d", s => s.exitPath)
             .remove();
 
         streamlinesEnter
             .attr("d", s => s.enterPath)
             .attr("opacity", 0)
-            .transition(d3.transition().duration(300).delay(100))
+            .transition(t)
+            .delay((d, i) => 100 + 5 * i)
             .attr("opacity", 0.8)
             .attr("d", s => s.path);
 
@@ -142,7 +145,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("stroke-width", 0.5);
 
         streamlinesUpdate
-            .transition(d3.transition().duration(300))
+            .transition(t)
             .attr("opacity", 0.8)
             .attr("d", s => s.path);
     }
