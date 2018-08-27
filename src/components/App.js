@@ -22,16 +22,16 @@ export default class App extends React.Component {
     handleWidthChange = (e, { value }) => this.setState({ width: value });
     handleHeightChange = (e, { value }) => this.setState({ height: value });
 
-    incrementVisibleNetworksBy = amount => () => this.setState(({ networks, visibleNetworks }) => ({
+    incrementVisibleNetworksBy = amount => ({ networks, visibleNetworks }) => ({
         visibleNetworks: visibleNetworks.length + amount > networks.length
             ? networks
             : visibleNetworks.length + amount < 1
                 ? visibleNetworks
                 : networks.slice(0, visibleNetworks.length + amount)
-    }));
+    });
 
-    addNetwork = this.incrementVisibleNetworksBy(1);
-    removeNetwork = this.incrementVisibleNetworksBy(-1);
+    addNetwork = () => this.setState(this.incrementVisibleNetworksBy(1));
+    removeNetwork = () => this.setState(this.incrementVisibleNetworksBy(-1));
 
     componentDidMount() {
         const networks = ["science1998_2y.map", "science2001_2y.map", "science2004_2y.map"];
