@@ -40,6 +40,11 @@ export default class AlluvialDiagram extends React.Component {
 
     draw(prevProps = this.props) {
         const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
+        const networkRemoved = networks.length < prevProps.networks.length;
+        const networkAdded = networks.length > prevProps.networks.length;
+        const widthChanged = width !== prevProps.width;
+        const heightChanged = height !== prevProps.height;
+        const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
 
         const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
@@ -60,7 +65,7 @@ export default class AlluvialDiagram extends React.Component {
         const t = d3.transition().duration(200);
         const baseDelay = 150;
 
-        const svgShouldTransition = width !== prevProps.width || height !== prevProps.height;
+        const svgShouldTransition = widthChanged || heightChanged;
         const svgMaybeTransition = svgShouldTransition ? this.svg.transition(t) : this.svg;
 
         svgMaybeTransition
@@ -103,7 +108,7 @@ export default class AlluvialDiagram extends React.Component {
         const modulesEnterUpdate = modulesEnter.merge(modulesUpdate)
             .attr("class", "module");
 
-        if (streamlineFraction !== prevProps.streamlineFraction || width !== prevProps.width) {
+        if (streamlineFractionChanged || widthChanged) {
             modulesEnterUpdate
                 .transition(t)
                 .attr("width", d => d.width)
@@ -111,7 +116,7 @@ export default class AlluvialDiagram extends React.Component {
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
-        } else if (networks.length < prevProps.networks.length) {
+        } else if (networkRemoved) {
             modulesUpdate
                 .transition(t)
                 .delay(baseDelay)
@@ -120,7 +125,7 @@ export default class AlluvialDiagram extends React.Component {
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
-        } else if (networks.length > prevProps.networks.length) {
+        } else if (networkAdded) {
             modulesUpdate
                 .transition(t)
                 .attr("width", d => d.width)
@@ -189,13 +194,13 @@ export default class AlluvialDiagram extends React.Component {
             return delay + timePerElement * index;
         };
 
-        if (networks.length < prevProps.networks.length) {
+        if (networkRemoved) {
             streamlinesUpdate
                 .transition(t)
                 .delay(baseDelay)
                 .attr("opacity", 0.8)
                 .attr("d", s => s.path);
-        } else if (networks.length > prevProps.networks.length) {
+        } else if (networkAdded) {
             streamlinesUpdate
                 .transition(t)
                 .attr("opacity", 0.8)
