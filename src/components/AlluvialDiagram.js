@@ -95,6 +95,21 @@ export default class AlluvialDiagram extends React.Component {
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
+        } else if (this.props.networks.length !== prevProps.networks.length) {
+            modulesUpdate
+                .transition(t)
+                .attr("width", d => d.width)
+                .attr("x", d => d.x)
+                .attr("fill", "#CCCCBB")
+                .attr("height", d => d.height)
+                .attr("y", d => d.y);
+            modulesEnter
+                .attr("width", d => d.width)
+                .attr("x", d => d.x)
+                .transition(t)
+                .attr("fill", "#CCCCBB")
+                .attr("height", d => d.height)
+                .attr("y", d => d.y);
         } else {
             modulesToUpdate
                 .attr("width", d => d.width)
