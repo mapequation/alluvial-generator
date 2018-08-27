@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, Menu, Sidebar } from "semantic-ui-react";
+import { Button, Icon, Input, Menu, Sidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
 import parseMap from "../io/parse-map";
@@ -16,13 +16,25 @@ export default class App extends React.Component {
         streamlineFraction: 1,
         streamlineThreshold: 0.001,
         networks: null,
+        visibleNetworks: null,
     };
 
     handleWidthChange = (e, { value }) => this.setState({ width: value });
     handleHeightChange = (e, { value }) => this.setState({ height: value });
 
+    incrementVisibleNetworksBy = amount => () => this.setState(({ networks, visibleNetworks }) => ({
+        visibleNetworks: visibleNetworks.length + amount > networks.length
+            ? networks
+            : visibleNetworks.length + amount < 1
+                ? visibleNetworks
+                : networks.slice(0, visibleNetworks.length + amount)
+    }));
+
+    addNetwork = this.incrementVisibleNetworksBy(1);
+    removeNetwork = this.incrementVisibleNetworksBy(-1);
+
     componentDidMount() {
-        const networks = ["/science1998_2y.map", "/science2001_2y.map", "/science2004_2y.map"];
+        const networks = ["science1998_2y.map", "science2001_2y.map", "science2004_2y.map"];
 
         const parseOpts = {
             comments: "#",
@@ -33,17 +45,16 @@ export default class App extends React.Component {
             worker: true,
         };
 
-        Promise.all(networks.map(f => fetch(f)))
-            .then(responses =>
-                Promise.all(responses.map(res => res.text()))
-                    .then(files => Promise.all(files.map(file => papaParsePromise(file, parseOpts)))))
+        Promise.all(networks.map(network => fetch(`/data/${network}`)))
+            .then(responses => Promise.all(responses.map(response => response.text())))
+            .then(files => Promise.all(files.map(file => papaParsePromise(file, parseOpts))))
             .then(parsed => {
                 parsed.map(_ => _.errors).forEach(_ => _.forEach(err => {
                     throw err;
                 }));
                 return parsed.map(each => parseMap(each.data));
             })
-            .then(networks => this.setState({ networks }))
+            .then(networks => this.setState({ networks, visibleNetworks: networks }))
             .catch(console.error);
     }
 
@@ -61,6 +72,19 @@ export default class App extends React.Component {
                         visible={true}
                         vertical
                     >
+                        <Menu.Item>
+                            <Button>Visible networks {this.state.visibleNetworks.length}</Button>
+                            <Button.Group>
+                                <Button icon onClick={this.removeNetwork}
+                                        disabled={this.state.visibleNetworks.length === 1}>
+                                    <Icon name="minus"/>
+                                </Button>
+                                <Button icon onClick={this.addNetwork}
+                                        disabled={this.state.visibleNetworks.length === this.state.networks.length}>
+                                    <Icon name="plus"/>
+                                </Button>
+                            </Button.Group>
+                        </Menu.Item>
                         <Menu.Item>
                             <Input type="text" label="Width" labelPosition="left" value={this.state.width}
                                    onChange={this.handleWidthChange}/>
@@ -114,7 +138,7 @@ export default class App extends React.Component {
                     </Sidebar>
                     <Sidebar.Pusher>
                         <AlluvialDiagram
-                            networks={this.state.networks}
+                            networks={this.state.visibleNetworks}
                             width={+this.state.width}
                             height={+this.state.height}
                             padding={+this.state.padding}
