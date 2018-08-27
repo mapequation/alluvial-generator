@@ -57,7 +57,15 @@ export default class AlluvialDiagram extends React.Component {
             streamlines.push(new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth));
         });
 
-        const t = d3.transition().duration(300);
+        const t = d3.transition().duration(200);
+        const baseDelay = 150;
+
+        const svgShouldTransition = width !== prevProps.width || height !== prevProps.height;
+        const svgMaybeTransition = svgShouldTransition ? this.svg.transition(t) : this.svg;
+
+        svgMaybeTransition
+            .attr("width", width)
+            .attr("height", height);
 
         /**
          * Modules
@@ -65,7 +73,15 @@ export default class AlluvialDiagram extends React.Component {
         let modulesGroups = this.svg.selectAll(".modules")
             .data(modules);
 
-        modulesGroups.exit().remove();
+        modulesGroups.exit()
+            .selectAll(".module")
+            .transition(t)
+            .attr("height", 0)
+            .attr("y", 0);
+
+        modulesGroups.exit()
+            .transition(t)
+            .remove();
 
         modulesGroups = modulesGroups.enter().append("g")
             .merge(modulesGroups)
@@ -84,18 +100,27 @@ export default class AlluvialDiagram extends React.Component {
             .attr("y", 0)
             .remove();
 
-        const modulesToUpdate = modulesEnter.merge(modulesUpdate)
+        const modulesEnterUpdate = modulesEnter.merge(modulesUpdate)
             .attr("class", "module");
 
-        if (this.props.streamlineFraction !== prevProps.streamlineFraction) {
-            modulesToUpdate
+        if (streamlineFraction !== prevProps.streamlineFraction || width !== prevProps.width) {
+            modulesEnterUpdate
                 .transition(t)
                 .attr("width", d => d.width)
                 .attr("x", d => d.x)
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
-        } else if (this.props.networks.length !== prevProps.networks.length) {
+        } else if (networks.length < prevProps.networks.length) {
+            modulesUpdate
+                .transition(t)
+                .delay(baseDelay)
+                .attr("width", d => d.width)
+                .attr("x", d => d.x)
+                .attr("fill", "#CCCCBB")
+                .attr("height", d => d.height)
+                .attr("y", d => d.y);
+        } else if (networks.length > prevProps.networks.length) {
             modulesUpdate
                 .transition(t)
                 .attr("width", d => d.width)
@@ -107,11 +132,12 @@ export default class AlluvialDiagram extends React.Component {
                 .attr("width", d => d.width)
                 .attr("x", d => d.x)
                 .transition(t)
+                .delay(baseDelay)
                 .attr("fill", "#CCCCBB")
                 .attr("height", d => d.height)
                 .attr("y", d => d.y);
         } else {
-            modulesToUpdate
+            modulesEnterUpdate
                 .attr("width", d => d.width)
                 .attr("x", d => d.x)
                 .transition(t)
@@ -126,7 +152,14 @@ export default class AlluvialDiagram extends React.Component {
         let streamlinesGroups = this.svg.selectAll(".streamlines")
             .data(streamlines);
 
-        streamlinesGroups.exit().remove();
+        streamlinesGroups.exit()
+            .selectAll(".streamline")
+            .transition(t)
+            .attr("d", d => d.exitPath);
+
+        streamlinesGroups.exit()
+            .transition()
+            .remove();
 
         streamlinesGroups = streamlinesGroups.enter().append("g")
             .merge(streamlinesGroups)
@@ -144,29 +177,49 @@ export default class AlluvialDiagram extends React.Component {
             .attr("d", s => s.exitPath)
             .remove();
 
-        streamlinesEnter
-            .attr("d", s => s.enterPath)
-            .attr("opacity", 0)
-            .transition(t)
-            .delay((d, index, elements) => {
-                const timeBudget = 100;
-                const timePerElement = timeBudget / elements.length;
-                return 100 + timePerElement * index;
-            })
-            .attr("opacity", 0.8)
-            .attr("d", s => s.path);
-
-        streamlinesEnter
-            .merge(streamlinesUpdate)
+        streamlinesEnter.merge(streamlinesUpdate)
             .attr("class", "streamline")
             .attr("fill", "#CCCCBB")
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5);
 
-        streamlinesUpdate
-            .transition(t)
-            .attr("opacity", 0.8)
-            .attr("d", s => s.path);
+        const streamlineDelay = delay => (d, index, elements) => {
+            const timeBudget = 100;
+            const timePerElement = timeBudget / elements.length;
+            return delay + timePerElement * index;
+        };
+
+        if (networks.length < prevProps.networks.length) {
+            streamlinesUpdate
+                .transition(t)
+                .delay(baseDelay)
+                .attr("opacity", 0.8)
+                .attr("d", s => s.path);
+        } else if (networks.length > prevProps.networks.length) {
+            streamlinesUpdate
+                .transition(t)
+                .attr("opacity", 0.8)
+                .attr("d", s => s.path);
+            streamlinesEnter
+                .attr("d", s => s.enterPath)
+                .attr("opacity", 0)
+                .transition(t)
+                .delay(streamlineDelay(200))
+                .attr("opacity", 0.8)
+                .attr("d", s => s.path);
+        } else {
+            streamlinesUpdate
+                .transition(t)
+                .attr("opacity", 0.8)
+                .attr("d", s => s.path);
+            streamlinesEnter
+                .attr("d", s => s.enterPath)
+                .attr("opacity", 0)
+                .transition(t)
+                .delay(streamlineDelay(100))
+                .attr("opacity", 0.8)
+                .attr("d", s => s.path);
+        }
     }
 
     static maxTotalFlow(networks, numModules) {
@@ -183,8 +236,6 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     render() {
-        const { width, height } = this.props;
-        return <svg style={{ margin: "20px" }} width={width} height={height}
-                    ref={node => this.node = node}/>;
+        return <svg style={{ margin: "20px" }} ref={node => this.node = node}/>;
     }
 }
