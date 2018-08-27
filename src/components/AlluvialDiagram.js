@@ -133,7 +133,11 @@ export default class AlluvialDiagram extends React.Component {
             .attr("d", s => s.enterPath)
             .attr("opacity", 0)
             .transition(t)
-            .delay((d, i) => 100 + 5 * i)
+            .delay((d, index, elements) => {
+                const timeBudget = 100;
+                const timePerElement = timeBudget / elements.length;
+                return 100 + timePerElement * index;
+            })
             .attr("opacity", 0.8)
             .attr("d", s => s.path);
 
