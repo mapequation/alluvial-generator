@@ -1,10 +1,10 @@
 import React from "react";
-import { Button, Icon, Input, Menu, Sidebar } from "semantic-ui-react";
-import { Slider } from "react-semantic-ui-range";
+import { Sidebar } from "semantic-ui-react";
 
+import MySidebar from "./MySidebar";
+import AlluvialDiagram from "./AlluvialDiagram";
 import parseMap from "../io/parse-map";
 import papaParsePromise from "../io/papa-parse-promise";
-import AlluvialDiagram from "./AlluvialDiagram";
 
 
 export default class App extends React.Component {
@@ -27,11 +27,8 @@ export default class App extends React.Component {
             ? networks
             : visibleNetworks.length + amount < 1
                 ? visibleNetworks
-                : networks.slice(0, visibleNetworks.length + amount)
+                : networks.slice(0, visibleNetworks.length + amount),
     });
-
-    addNetwork = () => this.setState(this.incrementVisibleNetworksBy(1));
-    removeNetwork = () => this.setState(this.incrementVisibleNetworksBy(-1));
 
     componentDidMount() {
         const networks = ["science1998_2y.map", "science2001_2y.map", "science2004_2y.map"];
@@ -62,93 +59,31 @@ export default class App extends React.Component {
         const { networks } = this.state;
 
         if (networks) {
-            return (
-                <Sidebar.Pushable>
-                    <Sidebar
-                        as={Menu}
-                        animation="overlay"
-                        width="wide"
-                        direction="right"
-                        visible={true}
-                        vertical
-                    >
-                        <Menu.Item>
-                            <Button>Visible networks {this.state.visibleNetworks.length}</Button>
-                            <Button.Group>
-                                <Button icon onClick={this.removeNetwork}
-                                        disabled={this.state.visibleNetworks.length === 1}>
-                                    <Icon name="minus"/>
-                                </Button>
-                                <Button icon onClick={this.addNetwork}
-                                        disabled={this.state.visibleNetworks.length === this.state.networks.length}>
-                                    <Icon name="plus"/>
-                                </Button>
-                            </Button.Group>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Width" labelPosition="left" value={this.state.width}
-                                   onChange={this.handleWidthChange}/>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Height" labelPosition="left" value={this.state.height}
-                                   onChange={this.handleHeightChange}/>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Streamline fraction" labelPosition="left"
-                                   value={this.state.streamlineFraction}/>
-                            <Slider settings={{
-                                start: this.state.streamlineFraction,
-                                min: 0,
-                                max: 3,
-                                step: 0.1,
-                                onChange: streamlineFraction => this.setState({ streamlineFraction }),
-                            }}/>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Padding" labelPosition="left" value={this.state.padding}/>
-                            <Slider discrete settings={{
-                                start: this.state.padding,
-                                min: 0,
-                                max: 10,
-                                step: 1,
-                                onChange: padding => this.setState({ padding }),
-                            }}/>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Num modules" labelPosition="left" value={this.state.numModules}/>
-                            <Slider discrete settings={{
-                                start: this.state.numModules,
-                                min: 1,
-                                max: 30,
-                                step: 1,
-                                onChange: numModules => this.setState({ numModules }),
-                            }}/>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input type="text" label="Streamline threshold" labelPosition="left"
-                                   value={this.state.streamlineThreshold}/>
-                            <Slider settings={{
-                                start: this.state.streamlineThreshold,
-                                min: 0.00000001,
-                                max: 0.05,
-                                step: 0.0001,
-                                onChange: streamlineThreshold => this.setState({ streamlineThreshold }),
-                            }}/>
-                        </Menu.Item>
-                    </Sidebar>
-                    <Sidebar.Pusher>
-                        <AlluvialDiagram
-                            networks={this.state.visibleNetworks}
-                            width={+this.state.width}
-                            height={+this.state.height}
-                            padding={+this.state.padding}
-                            numModules={+this.state.numModules}
-                            streamlineFraction={+this.state.streamlineFraction}
-                            streamlineThreshold={+this.state.streamlineThreshold}
-                        />
-                    </Sidebar.Pusher>
-                </Sidebar.Pushable>
-            );
+            return <Sidebar.Pushable>
+                <MySidebar numVisibleNetworks={this.state.visibleNetworks.length} numNetworks={this.state.networks.length}
+                           onAddNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(1))}
+                           onRemoveNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(-1))}
+                           width={this.state.width} onWidthChange={this.handleWidthChange}
+                           height={this.state.height} onHeightChange={this.handleHeightChange}
+                           padding={this.state.padding} onPaddingChange={padding => this.setState({ padding })}
+                           numModules={this.state.numModules}
+                           onNumModulesChange={numModules => this.setState({ numModules })}
+                           streamlineFraction={this.state.streamlineFraction}
+                           onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
+                           streamlineThreshold={this.state.streamlineThreshold}
+                           onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}/>
+                <Sidebar.Pusher>
+                    <AlluvialDiagram
+                        networks={this.state.visibleNetworks}
+                        width={+this.state.width}
+                        height={+this.state.height}
+                        padding={+this.state.padding}
+                        numModules={+this.state.numModules}
+                        streamlineFraction={+this.state.streamlineFraction}
+                        streamlineThreshold={+this.state.streamlineThreshold}
+                    />
+                </Sidebar.Pusher>
+            </Sidebar.Pushable>;
         } else {
             return <div>Loading...</div>;
         }
