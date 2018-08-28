@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import Modules from "../models/Modules";
 import StreamLines from "../models/StreamLines";
-import pairwise from "../helpers/pairwise";
+import { pairwise, pairwiseEach } from "../helpers/pairwise";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -53,13 +53,12 @@ export default class AlluvialDiagram extends React.Component {
 
         const largestModules = networks.map(network => network.modules.slice(0, numModules));
         const modules = largestModules.map(m => new Modules(m, maxTotalFlow, style));
-        const streamlines = [];
 
-        pairwise(modules, (left, right) => right.moveToRightOf(left));
+        pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
-        pairwise(modules, (leftModules, rightModules, i) => {
-            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[i + 1].nodes);
-            streamlines.push(new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth));
+        const streamlines = pairwise(modules, (leftModules, rightModules, i, j) => {
+            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[j].nodes);
+            return new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth);
         });
 
         const t = d3.transition().duration(200);
