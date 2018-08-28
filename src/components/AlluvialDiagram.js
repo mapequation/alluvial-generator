@@ -63,7 +63,7 @@ export default class AlluvialDiagram extends React.Component {
         });
 
         const t = d3.transition().duration(200);
-        const baseDelay = 150;
+        const delay = 150;
 
         const svgShouldTransition = widthChanged || heightChanged;
         const svgMaybeTransition = svgShouldTransition ? this.svg.transition(t) : this.svg;
@@ -75,14 +75,18 @@ export default class AlluvialDiagram extends React.Component {
         /**
          * Modules
          */
+        const moduleWidthX = selection => selection.attr("width", d => d.width).attr("x", d => d.x);
+        const moduleHeightY = selection => selection.attr("height", d => d.height).attr("y", d => d.y);
+        const moduleUpdateTransition = selection => selection.call(moduleWidthX).call(moduleHeightY);
+        const moduleExitTransition = selection => selection.attr("height", 0).attr("y", 0);
+
         let modulesGroups = this.svg.selectAll(".modules")
             .data(modules);
 
         modulesGroups.exit()
             .selectAll(".module")
             .transition(t)
-            .attr("height", 0)
-            .attr("y", 0);
+            .call(moduleExitTransition);
 
         modulesGroups.exit()
             .transition(t)
@@ -101,59 +105,41 @@ export default class AlluvialDiagram extends React.Component {
 
         modulesUpdate.exit()
             .transition(t)
-            .attr("height", 0)
-            .attr("y", 0)
+            .call(moduleExitTransition)
             .remove();
 
         const modulesEnterUpdate = modulesEnter.merge(modulesUpdate)
+            .attr("fill", "#ccccbb")
             .attr("class", "module");
 
         if (streamlineFractionChanged || widthChanged) {
             modulesEnterUpdate
                 .transition(t)
-                .attr("width", d => d.width)
-                .attr("x", d => d.x)
-                .attr("fill", "#CCCCBB")
-                .attr("height", d => d.height)
-                .attr("y", d => d.y);
+                .call(moduleUpdateTransition);
         } else if (networkRemoved) {
             modulesUpdate
-                .transition(t)
-                .delay(baseDelay)
-                .attr("width", d => d.width)
-                .attr("x", d => d.x)
-                .attr("fill", "#CCCCBB")
-                .attr("height", d => d.height)
-                .attr("y", d => d.y);
+                .transition(t).delay(delay) // Wait for removed modules
+                .call(moduleUpdateTransition);
         } else if (networkAdded) {
             modulesUpdate
                 .transition(t)
-                .attr("width", d => d.width)
-                .attr("x", d => d.x)
-                .attr("fill", "#CCCCBB")
-                .attr("height", d => d.height)
-                .attr("y", d => d.y);
+                .call(moduleUpdateTransition);
             modulesEnter
-                .attr("width", d => d.width)
-                .attr("x", d => d.x)
-                .transition(t)
-                .delay(baseDelay)
-                .attr("fill", "#CCCCBB")
-                .attr("height", d => d.height)
-                .attr("y", d => d.y);
+                .call(moduleWidthX)
+                .transition(t).delay(delay) // Wait for existing modules
+                .call(moduleHeightY);
         } else {
             modulesEnterUpdate
-                .attr("width", d => d.width)
-                .attr("x", d => d.x)
+                .call(moduleWidthX)
                 .transition(t)
-                .attr("fill", "#CCCCBB")
-                .attr("height", d => d.height)
-                .attr("y", d => d.y);
+                .call(moduleHeightY);
         }
 
         /**
          * Streamlines
          */
+        const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", s => s.path);
+
         let streamlinesGroups = this.svg.selectAll(".streamlines")
             .data(streamlines);
 
@@ -163,7 +149,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("d", d => d.exitPath);
 
         streamlinesGroups.exit()
-            .transition()
+            .transition(t)
             .remove();
 
         streamlinesGroups = streamlinesGroups.enter().append("g")
@@ -179,12 +165,12 @@ export default class AlluvialDiagram extends React.Component {
 
         streamlinesUpdate.exit()
             .transition(t)
-            .attr("d", s => s.exitPath)
+            .attr("d", d => d.exitPath)
             .remove();
 
         streamlinesEnter.merge(streamlinesUpdate)
             .attr("class", "streamline")
-            .attr("fill", "#CCCCBB")
+            .attr("fill", "#ccccbb")
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5);
 
@@ -196,34 +182,17 @@ export default class AlluvialDiagram extends React.Component {
 
         if (networkRemoved) {
             streamlinesUpdate
-                .transition(t)
-                .delay(baseDelay)
-                .attr("opacity", 0.8)
-                .attr("d", s => s.path);
-        } else if (networkAdded) {
-            streamlinesUpdate
-                .transition(t)
-                .attr("opacity", 0.8)
-                .attr("d", s => s.path);
-            streamlinesEnter
-                .attr("d", s => s.enterPath)
-                .attr("opacity", 0)
-                .transition(t)
-                .delay(streamlineDelay(200))
-                .attr("opacity", 0.8)
-                .attr("d", s => s.path);
+                .transition(t).delay(delay) // Wait for removed modules
+                .call(streamlineOpacityPath);
         } else {
             streamlinesUpdate
                 .transition(t)
-                .attr("opacity", 0.8)
-                .attr("d", s => s.path);
+                .call(streamlineOpacityPath);
             streamlinesEnter
                 .attr("d", s => s.enterPath)
                 .attr("opacity", 0)
-                .transition(t)
-                .delay(streamlineDelay(100))
-                .attr("opacity", 0.8)
-                .attr("d", s => s.path);
+                .transition(t).delay(streamlineDelay(delay))
+                .call(streamlineOpacityPath);
         }
     }
 
