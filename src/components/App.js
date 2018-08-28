@@ -60,7 +60,8 @@ export default class App extends React.Component {
 
         if (networks) {
             return <Sidebar.Pushable>
-                <MySidebar numVisibleNetworks={this.state.visibleNetworks.length} numNetworks={this.state.networks.length}
+                <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
+                           numNetworks={this.state.networks.length}
                            onAddNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(1))}
                            onRemoveNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(-1))}
                            width={this.state.width} onWidthChange={this.handleWidthChange}
@@ -73,15 +74,13 @@ export default class App extends React.Component {
                            streamlineThreshold={this.state.streamlineThreshold}
                            onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}/>
                 <Sidebar.Pusher>
-                    <AlluvialDiagram
-                        networks={this.state.visibleNetworks}
-                        width={+this.state.width}
-                        height={+this.state.height}
-                        padding={+this.state.padding}
-                        numModules={+this.state.numModules}
-                        streamlineFraction={+this.state.streamlineFraction}
-                        streamlineThreshold={+this.state.streamlineThreshold}
-                    />
+                    <AlluvialDiagram networks={this.state.visibleNetworks}
+                                     width={+this.state.width}
+                                     height={+this.state.height}
+                                     padding={+this.state.padding}
+                                     numModules={+this.state.numModules}
+                                     streamlineFraction={+this.state.streamlineFraction}
+                                     streamlineThreshold={+this.state.streamlineThreshold}/>
                 </Sidebar.Pusher>
             </Sidebar.Pushable>;
         } else {

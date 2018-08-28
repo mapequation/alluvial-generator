@@ -5,14 +5,12 @@ import * as PropTypes from "prop-types";
 
 
 export default function MySidebar(props) {
-    return <Sidebar
-        as={Menu}
-        animation="overlay"
-        width="wide"
-        direction="right"
-        visible={true}
-        vertical
-    >
+    return <Sidebar as={Menu}
+                    animation="overlay"
+                    width="wide"
+                    direction="right"
+                    visible={true}
+                    vertical>
         <Menu.Item>
             <Button>Visible networks {props.numVisibleNetworks}</Button>
             <Button.Group>
