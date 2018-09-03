@@ -4,6 +4,8 @@
  * @author Anton Eriksson
  */
 export default class TreePath {
+    static _root = null;
+
     /**
      * Construct a new TreePath
      *
@@ -29,7 +31,7 @@ export default class TreePath {
      * @param {string|number} path
      */
     static join(parentPath, path) {
-        if (parentPath.toString() === "root") {
+        if (parentPath === TreePath.root()) {
             return new TreePath(path);
         }
         return TreePath.fromArray([parentPath.toString(), path.toString()]);
@@ -50,8 +52,16 @@ export default class TreePath {
         return `id-${path}`;
     }
 
+    /**
+     * Get the root
+     *
+     * @returns {TreePath} the root TreePath
+     */
     static root() {
-        return new TreePath("root");
+        if (!TreePath._root) {
+            TreePath._root = new TreePath("root");
+        }
+        return TreePath._root;
     }
 
     /**
@@ -116,7 +126,7 @@ export default class TreePath {
      * @return {IterableIterator<*>} an iterator
      */
     [Symbol.iterator]() {
-        if (this.toString() === "root") return [this.toString()].values();
+        if (this === TreePath.root()) return [this.toString()].values();
         return this.toArray().values();
     }
 
