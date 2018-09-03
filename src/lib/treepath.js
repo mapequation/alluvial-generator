@@ -21,7 +21,7 @@ export default class TreePath {
      * @param {string[]|number[]} path
      */
     static fromArray(path) {
-        return new TreePath(path.join(":"));
+        return !path.length ? TreePath.root() : new TreePath(path.join(":"));
     }
 
     /**
@@ -31,10 +31,26 @@ export default class TreePath {
      * @param {string|number} path
      */
     static join(parentPath, path) {
-        if (parentPath === TreePath.root()) {
+        if (TreePath.isRoot(parentPath)) {
             return new TreePath(path);
         }
         return TreePath.fromArray([parentPath.toString(), path.toString()]);
+    }
+
+    /**
+     * Get the root
+     *
+     * @returns {TreePath} the root TreePath
+     */
+    static root() {
+        if (!TreePath._root) {
+            TreePath._root = new TreePath("root");
+        }
+        return TreePath._root;
+    }
+
+    static isRoot(treePath) {
+        return treePath === TreePath.root();
     }
 
     /**
@@ -52,16 +68,47 @@ export default class TreePath {
         return `id-${path}`;
     }
 
-    /**
-     * Get the root
-     *
-     * @returns {TreePath} the root TreePath
-     */
-    static root() {
-        if (!TreePath._root) {
-            TreePath._root = new TreePath("root");
+    equal(other) {
+        return TreePath.equal(this, other);
+    }
+
+    static equal(a, b) {
+        return a.toString() === b.toString();
+    }
+
+    isAncestor(child) {
+        if (TreePath.isRoot(this)) return true;
+
+        const childArr = child.toArray();
+        return this.toArray().every((step, i) => step === childArr[i]);
+    }
+
+    isDescendant(parent) {
+        if (TreePath.isRoot(parent)) return true;
+
+        let parentPath = this.parentPath();
+
+        while (!TreePath.isRoot(parentPath)) {
+            if (parentPath.equal(parent)) return true;
+            parentPath = parentPath.parentPath();
         }
-        return TreePath._root;
+
+        return false;
+    }
+
+    get level() {
+        return TreePath.isRoot(this) ? 0 : this.toArray().length;
+    }
+
+    ancestorAtLevel(level) {
+        if (level === 0) return TreePath.root();
+        return TreePath.fromArray(this.toArray().slice(0, level));
+    }
+
+    get rank() {
+        if (TreePath.isRoot(this)) return 0;
+        const asArray = this.toArray();
+        return asArray[asArray.length - 1];
     }
 
     /**
@@ -126,8 +173,7 @@ export default class TreePath {
      * @return {IterableIterator<*>} an iterator
      */
     [Symbol.iterator]() {
-        if (this === TreePath.root()) return [this.toString()].values();
-        return this.toArray().values();
+        return TreePath.isRoot(this) ? [this.toString()].values() : this.toArray().values();
     }
 
     /**

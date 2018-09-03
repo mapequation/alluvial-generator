@@ -5,6 +5,7 @@ import * as d3 from "d3";
 import Modules from "../models/Modules";
 import StreamLines from "../models/StreamLines";
 import { pairwise, pairwiseEach } from "../helpers/pairwise";
+import TreePath from "../lib/treepath";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -46,18 +47,28 @@ export default class AlluvialDiagram extends React.Component {
         const heightChanged = height !== prevProps.height;
         const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
 
+        const parent = new TreePath(1);
+        //const parent = TreePath.root();
+
+        const largestModules = networks.map(network =>
+            network.data.modules
+                .filter(m => !TreePath.equal(m.path, TreePath.root()))
+                .filter(m => m.path.parentPath().equal(parent))
+                .filter(m => m.flow > 0)
+                .sort((a, b) => b.flow - a.flow)
+                .slice(0, numModules));
+
         const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
-        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(networks, numModules);
+        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(largestModules);
         const style = { barWidth, height, padding, streamlineWidth };
 
-        const largestModules = networks.map(network => network.modules.slice(0, numModules));
         const modules = largestModules.map(m => new Modules(m, maxTotalFlow, style));
 
         pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
         const streamlines = pairwise(modules, (leftModules, rightModules, i, j) => {
-            const moduleFlows = StreamLines.moduleFlows(networks[i].nodes, networks[j].nodes);
+            const moduleFlows = StreamLines.moduleFlows(networks[i].data.nodes, networks[j].data.nodes, parent);
             return new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth);
         });
 
@@ -97,7 +108,7 @@ export default class AlluvialDiagram extends React.Component {
 
         const modulesUpdate = modulesGroups.selectAll(".module")
             .data(modules => modules.data, function key(d) {
-                return d ? d.id : this.id;
+                return d ? d.path : this.id;
             });
 
         const modulesEnter = modulesUpdate.enter().append("rect");
@@ -157,7 +168,7 @@ export default class AlluvialDiagram extends React.Component {
 
         const streamlinesUpdate = streamlinesGroups.selectAll(".streamline")
             .data(s => s.data, function key(d) {
-                return d ? "" + d.sourcePath + ":" + d.targetPath : this.id;
+                return d ? TreePath.join(d.sourcePath, d.targetPath) : this.id;
             });
 
         const streamlinesEnter = streamlinesUpdate.enter().append("path");
@@ -195,9 +206,9 @@ export default class AlluvialDiagram extends React.Component {
         }
     }
 
-    static maxTotalFlow(networks, numModules) {
-        return networks
-            .map(network => network.modules.slice(0, numModules)
+    static maxTotalFlow(modules) {
+        return modules
+            .map(module => module
                 .map(module => module.flow)
                 .reduce((tot, curr) => tot + curr, 0))
             .reduce((max, curr) => Math.max(max, curr), -Infinity);

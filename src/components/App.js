@@ -3,8 +3,8 @@ import { Sidebar } from "semantic-ui-react";
 
 import MySidebar from "./MySidebar";
 import AlluvialDiagram from "./AlluvialDiagram";
-import parseMap from "../io/parse-map";
 import papaParsePromise from "../io/papa-parse-promise";
+import parseFTree from "../io/parse-ftree";
 
 
 export default class App extends React.Component {
@@ -15,8 +15,8 @@ export default class App extends React.Component {
         numModules: 15,
         streamlineFraction: 1,
         streamlineThreshold: 0.001,
-        networks: null,
-        visibleNetworks: null,
+        networks: [],
+        visibleNetworks: [],
     };
 
     handleWidthChange = (e, { value }) => this.setState({ width: value });
@@ -31,7 +31,7 @@ export default class App extends React.Component {
     });
 
     componentDidMount() {
-        const networks = ["science1998_2y.map", "science2001_2y.map", "science2004_2y.map"];
+        const networks = ["science1998_2y.ftree", "science2001_2y.ftree", "science2007_2y.ftree"];
 
         const parseOpts = {
             comments: "#",
@@ -49,7 +49,7 @@ export default class App extends React.Component {
                 parsed.map(_ => _.errors).forEach(_ => _.forEach(err => {
                     throw err;
                 }));
-                return parsed.map(each => parseMap(each.data));
+                return parsed.map(each => parseFTree(each.data));
             })
             .then(networks => this.setState({ networks, visibleNetworks: networks }))
             .catch(console.error);
@@ -58,7 +58,7 @@ export default class App extends React.Component {
     render() {
         const { networks } = this.state;
 
-        if (networks) {
+        if (networks.length) {
             return <Sidebar.Pushable>
                 <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
                            numNetworks={this.state.networks.length}
