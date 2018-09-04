@@ -33,7 +33,25 @@ export default class AlluvialDiagram extends React.Component {
     };
 
     componentDidMount() {
-        this.svg = d3.select(this.node);
+        const { width, height } = this.props;
+
+        const initialTransform = d3.zoomIdentity.translate(50, 50).scale(0.7);
+
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 1000]);
+
+        this.svg = d3.select(this.node)
+            .attr("width", width)
+            .attr("height", height)
+            .call(zoom)
+            .call(zoom.transform, initialTransform);
+
+        this.g = this.svg.append("g")
+            .attr("class", "alluvial-diagram")
+            .attr("transform", initialTransform);
+
+        zoom.on("zoom", () => this.g.attr("transform", d3.event.transform));
+
         this.draw();
     }
 
@@ -73,12 +91,11 @@ export default class AlluvialDiagram extends React.Component {
         const t = d3.transition().duration(200);
         const delay = 150;
 
-        const svgShouldTransition = widthChanged || heightChanged;
-        const svgMaybeTransition = svgShouldTransition ? this.svg.transition(t) : this.svg;
-
-        svgMaybeTransition
-            .attr("width", width)
-            .attr("height", height);
+        if (widthChanged || heightChanged) {
+            this.svg.transition(t)
+                .attr("width", width)
+                .attr("height", height);
+        }
 
         /**
          * Modules
@@ -88,7 +105,7 @@ export default class AlluvialDiagram extends React.Component {
         const moduleUpdateTransition = selection => selection.call(moduleWidthX).call(moduleHeightY);
         const moduleExitTransition = selection => selection.attr("height", 0).attr("y", 0);
 
-        let modulesGroups = this.svg.selectAll(".modules")
+        let modulesGroups = this.g.selectAll(".modules")
             .data(modules);
 
         modulesGroups.exit()
@@ -150,7 +167,7 @@ export default class AlluvialDiagram extends React.Component {
          */
         const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", s => s.path);
 
-        let streamlinesGroups = this.svg.selectAll(".streamlines")
+        let streamlinesGroups = this.g.selectAll(".streamlines")
             .data(streamlines);
 
         streamlinesGroups.exit()
