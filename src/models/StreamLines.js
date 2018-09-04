@@ -87,13 +87,13 @@ export default class StreamLines {
         const sourceNodesWithTarget = sourceNodes.filter(node => targetNodesByName.has(node.name));
         const sourceNodesBelowParent = sourceNodesWithTarget.filter(node => parent.isAncestor(node.path));
 
-        const accumulatedLevel = parent.level + 1;
+        const accumulationLevel = parent.level + 1;
 
         return sourceNodesBelowParent.reduce((moduleFlows, sourceNode) => {
             const targetNode = targetNodesByName.get(sourceNode.name);
 
-            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(accumulatedLevel);
-            const targetAncestorPath = targetNode.path.ancestorAtLevel(accumulatedLevel);
+            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(accumulationLevel);
+            const targetAncestorPath = targetNode.path.ancestorAtLevel(accumulationLevel);
 
             const found = moduleFlows.find(each =>
                 each.sourcePath.equal(sourceAncestorPath) &&
