@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 import { streamlineHorizontal } from "../lib/streamline";
 import TreePath from "../lib/treepath";
 
@@ -18,26 +19,37 @@ export default class StreamLines {
     }
 
     _streamlinesWithCoordinates(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
-        const sourceOffsets = new Map();
-        const targetOffsets = new Map();
+        const accumulatedSourceOffsets = d3.map();
+        const accumulatedTargetOffsets = d3.map();
+        const sourceModulesByPath = d3.map(sourceModules, m => m.path);
+        const targetModulesByPath = d3.map(targetModules, m => m.path);
 
         return moduleFlows
             .filter(({ sourceFlow, targetFlow }) => (sourceFlow + targetFlow) / 2 > threshold)
             .filter(({ sourcePath, targetPath }) =>
-                sourceModules.some(m => m.path.equal(sourcePath)) &&
-                targetModules.some(m => m.path.equal(targetPath)))
+                sourceModulesByPath.has(sourcePath) &&
+                targetModulesByPath.has(targetPath))
+            .map(moduleFlow => ({
+                sourceModule: sourceModulesByPath.get(moduleFlow.sourcePath),
+                targetModule: targetModulesByPath.get(moduleFlow.targetPath),
+                ...moduleFlow,
+            }))
             .sort((a, b) => {
-                const bySourcePath = a.sourcePath.rank - b.sourcePath.rank;
-                const byTargetPath = a.targetPath.rank - b.targetPath.rank;
+                const bySourceFlow = b.sourceModule.flow - a.sourceModule.flow;
+                const byTargetFlow = b.targetModule.flow - a.targetModule.flow;
                 const byFlow = b.sourceFlow + b.targetFlow - a.sourceFlow + a.targetFlow;
-                return bySourcePath !== 0 ? bySourcePath : byTargetPath !== 0 ? byTargetPath : byFlow;
+                return Math.abs(bySourceFlow) > 1e-4 ? bySourceFlow
+                    : Math.abs(byTargetFlow) > 1e-4 ? byTargetFlow
+                        : byFlow;
             })
             .map((moduleFlow) => {
-                const { sourcePath, targetPath, sourceFlow, targetFlow } = moduleFlow;
-                const sourceModule = sourceModules.find(m => m.path.equal(sourcePath));
-                const targetModule = targetModules.find(m => m.path.equal(targetPath));
-                const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, sourceOffsets);
-                const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, targetOffsets);
+                const { sourceFlow, targetFlow, sourceModule, targetModule } = moduleFlow;
+                const accumulatedSourceOffset = accumulatedSourceOffsets.get(sourceModule.path) || 0;
+                const accumulatedTargetOffset = accumulatedTargetOffsets.get(targetModule.path) || 0;
+                const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, accumulatedSourceOffset);
+                const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, accumulatedTargetOffset);
+                accumulatedSourceOffsets.set(sourceModule.path, accumulatedSourceOffset - streamlineSource.height);
+                accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineSource.height);
                 return {
                     enterPath: this.streamlineGenerator([
                         [xOffset + width / 10, streamlineSource.offset],
@@ -62,25 +74,26 @@ export default class StreamLines {
             });
     }
 
-    _streamlineHeightOffset(flow, module, accumulatedOffsets) {
-        const height = flow / module.flow * module.height;
-        const streamlineOffset = accumulatedOffsets.get(module.path.toString()) || 0;
-        const offset = module.y + module.height + streamlineOffset;
-        accumulatedOffsets.set(module.path.toString(), streamlineOffset - height);
-        return { height, offset };
+    _streamlineHeightOffset(flow, module, accumulatedOffset) {
+        return {
+            height: flow / module.flow * module.height,
+            offset: module.y + module.height + accumulatedOffset,
+        };
     }
 
     static moduleFlows(sourceNodes, targetNodes, parent = TreePath.root()) {
-        const targetNodesByName = new Map(targetNodes.map(node => [node.name, node]));
+        const targetNodesByName = d3.map(targetNodes, node => node.name);
 
         const sourceNodesWithTarget = sourceNodes.filter(node => targetNodesByName.has(node.name));
         const sourceNodesBelowParent = sourceNodesWithTarget.filter(node => parent.isAncestor(node.path));
 
+        const accumulatedLevel = parent.level + 1;
+
         return sourceNodesBelowParent.reduce((moduleFlows, sourceNode) => {
             const targetNode = targetNodesByName.get(sourceNode.name);
 
-            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(parent.level + 1);
-            const targetAncestorPath = targetNode.path.ancestorAtLevel(parent.level + 1);
+            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(accumulatedLevel);
+            const targetAncestorPath = targetNode.path.ancestorAtLevel(accumulatedLevel);
 
             const found = moduleFlows.find(each =>
                 each.sourcePath.equal(sourceAncestorPath) &&
