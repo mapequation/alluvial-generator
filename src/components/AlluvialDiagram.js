@@ -43,11 +43,7 @@ export default class AlluvialDiagram extends React.Component {
 
     draw(prevProps = this.props) {
         const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
-        const networkRemoved = networks.length < prevProps.networks.length;
-        const networkAdded = networks.length > prevProps.networks.length;
-        const widthChanged = width !== prevProps.width;
-        const heightChanged = height !== prevProps.height;
-        const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
+        const { networkRemoved, networkAdded, widthChanged, heightChanged, streamlineFractionChanged } = this.propsChanged(this.props, prevProps);
 
         const parent = new TreePath(this.props.parentModule);
 
@@ -205,6 +201,16 @@ export default class AlluvialDiagram extends React.Component {
                 .transition(t).delay(streamlineDelay(delay))
                 .call(streamlineOpacityPath);
         }
+    }
+
+    propsChanged(props, prevProps) {
+        return {
+            networkRemoved: props.networks.length < prevProps.networks.length,
+            networkAdded: props.networks.length > prevProps.networks.length,
+            widthChanged: props.width !== prevProps.width,
+            heightChanged: props.height !== prevProps.height,
+            streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
+        };
     }
 
     static maxTotalFlow(modules) {
