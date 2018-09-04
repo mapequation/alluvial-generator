@@ -25,6 +25,8 @@ export default function MySidebar(props) {
             </Button.Group>
         </Menu.Item>
         <Menu.Item>
+            <Input type="text" label="Parent module" labelPosition="left" value={props.parentModule}
+                   onChange={props.onParentModuleChange}/>
         </Menu.Item>
         <Menu.Item>
             <Input type="text" label="Streamline fraction" labelPosition="left"
@@ -84,4 +86,6 @@ MySidebar.propTypes = {
     onNumModulesChange: PropTypes.func,
     streamlineThreshold: PropTypes.number,
     onStreamlineThresholdChange: PropTypes.func,
+    parentModule: PropTypes.string,
+    onParentModuleChange: PropTypes.func,
 };

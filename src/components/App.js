@@ -13,6 +13,7 @@ export default class App extends React.Component {
         numModules: 15,
         streamlineFraction: 1,
         streamlineThreshold: 0.001,
+        parentModule: "root",
         networks: [],
         visibleNetworks: [],
     };
@@ -65,13 +66,16 @@ export default class App extends React.Component {
                            streamlineFraction={this.state.streamlineFraction}
                            onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
                            streamlineThreshold={this.state.streamlineThreshold}
-                           onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}/>
+                           onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
+                           parentModule={this.state.parentModule}
+                           onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
                 <Sidebar.Pusher>
                     <AlluvialDiagram networks={this.state.visibleNetworks}
                                      padding={+this.state.padding}
                                      numModules={+this.state.numModules}
                                      streamlineFraction={+this.state.streamlineFraction}
-                                     streamlineThreshold={+this.state.streamlineThreshold}/>
+                                     streamlineThreshold={+this.state.streamlineThreshold}
+                                     parentModule={this.state.parentModule}/>
                 </Sidebar.Pusher>
             </Sidebar.Pushable>;
         } else {

@@ -18,6 +18,7 @@ export default class AlluvialDiagram extends React.Component {
         numModules: 15,
         streamlineFraction: 1,
         streamlineThreshold: 0.005,
+        parentModule: "root",
     };
 
     static propTypes = {
@@ -28,6 +29,7 @@ export default class AlluvialDiagram extends React.Component {
         streamlineFraction: PropTypes.number,
         streamlineThreshold: PropTypes.number,
         networks: PropTypes.arrayOf(PropTypes.object),
+        parentModule: PropTypes.string,
     };
 
     componentDidMount() {
@@ -47,8 +49,7 @@ export default class AlluvialDiagram extends React.Component {
         const heightChanged = height !== prevProps.height;
         const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
 
-        const parent = new TreePath(1);
-        //const parent = TreePath.root();
+        const parent = new TreePath(this.props.parentModule);
 
         const largestModules = networks.map(network =>
             network.data.modules
