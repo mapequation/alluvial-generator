@@ -42,10 +42,10 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     draw(prevProps = this.props) {
-        const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks } = this.props;
+        const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks, parentModule } = this.props;
         const { networkRemoved, networkAdded, widthChanged, heightChanged, streamlineFractionChanged } = this.propsChanged(this.props, prevProps);
 
-        const parent = new TreePath(this.props.parentModule);
+        const parent = new TreePath(parentModule);
 
         const largestModules = networks.map(network =>
             network.data.modules
@@ -55,12 +55,13 @@ export default class AlluvialDiagram extends React.Component {
                 .sort((a, b) => b.flow - a.flow)
                 .slice(0, numModules));
 
+        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(largestModules);
+
         const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
-        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(largestModules);
         const style = { barWidth, height, padding, streamlineWidth };
 
-        const modules = largestModules.map(m => new Modules(m, maxTotalFlow, style));
+        const modules = largestModules.map(modules => new Modules(modules, maxTotalFlow, style));
 
         pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
@@ -108,16 +109,18 @@ export default class AlluvialDiagram extends React.Component {
                 return d ? d.path : this.id;
             });
 
-        const modulesEnter = modulesUpdate.enter().append("rect");
+        const modulesEnter = modulesUpdate.enter().append("rect")
+            .attr("class", "module")
+            .attr("fill", "#ccccbb")
+            .attr("opacity", 1)
+            .on("click", d => console.log(`${d.path}: ${d.flow} ${d.name}`));
 
         modulesUpdate.exit()
             .transition(t)
             .call(moduleExitTransition)
             .remove();
 
-        const modulesEnterUpdate = modulesEnter.merge(modulesUpdate)
-            .attr("fill", "#ccccbb")
-            .attr("class", "module");
+        const modulesEnterUpdate = modulesEnter.merge(modulesUpdate);
 
         if (streamlineFractionChanged || widthChanged) {
             modulesEnterUpdate
@@ -168,18 +171,17 @@ export default class AlluvialDiagram extends React.Component {
                 return d ? TreePath.join(d.sourcePath, d.targetPath) : this.id;
             });
 
-        const streamlinesEnter = streamlinesUpdate.enter().append("path");
+        const streamlinesEnter = streamlinesUpdate.enter().append("path")
+            .attr("class", "streamline")
+            .attr("fill", "#ccccbb")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 0.5)
+            .on("click", d => console.log(`${d.sourcePath} -> ${d.targetPath}`));
 
         streamlinesUpdate.exit()
             .transition(t)
             .attr("d", d => d.exitPath)
             .remove();
-
-        streamlinesEnter.merge(streamlinesUpdate)
-            .attr("class", "streamline")
-            .attr("fill", "#ccccbb")
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 0.5);
 
         const streamlineDelay = delay => (d, index, elements) => {
             const timeBudget = 100;
