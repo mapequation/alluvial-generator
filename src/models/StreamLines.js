@@ -49,7 +49,7 @@ export default class StreamLines {
                 const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, accumulatedSourceOffset);
                 const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, accumulatedTargetOffset);
                 accumulatedSourceOffsets.set(sourceModule.path, accumulatedSourceOffset - streamlineSource.height);
-                accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineSource.height);
+                accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineTarget.height);
                 return {
                     enterPath: this.streamlineGenerator([
                         [xOffset + width / 10, streamlineSource.offset],
