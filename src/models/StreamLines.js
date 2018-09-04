@@ -79,17 +79,20 @@ export default class StreamLines {
         return sourceNodesBelowParent.reduce((moduleFlows, sourceNode) => {
             const targetNode = targetNodesByName.get(sourceNode.name);
 
+            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(parent.level + 1);
+            const targetAncestorPath = targetNode.path.ancestorAtLevel(parent.level + 1);
+
             const found = moduleFlows.find(each =>
-                each.sourcePath.equal(sourceNode.path.ancestorAtLevel(parent.level + 1)) &&
-                each.targetPath.equal(targetNode.path.ancestorAtLevel(parent.level + 1)));
+                each.sourcePath.equal(sourceAncestorPath) &&
+                each.targetPath.equal(targetAncestorPath));
 
             if (found) {
                 found.sourceFlow += sourceNode.flow;
                 found.targetFlow += targetNode.flow;
             } else {
                 moduleFlows.push({
-                    sourcePath: sourceNode.path.ancestorAtLevel(parent.level + 1),
-                    targetPath: targetNode.path.ancestorAtLevel(parent.level + 1),
+                    sourcePath: sourceAncestorPath,
+                    targetPath: targetAncestorPath,
                     sourceFlow: sourceNode.flow,
                     targetFlow: targetNode.flow,
                 });
