@@ -75,7 +75,11 @@ export default class TreePath {
         if (TreePath.isRoot(this)) return true;
 
         const childArr = child.toArray();
-        return this.toArray().every((step, i) => step === childArr[i]);
+        const thisArr = this.toArray();
+
+        if (thisArr.length >= childArr.length) return false;
+
+        return thisArr.every((step, i) => step === childArr[i]);
     }
 
     isDescendant(parent) {
