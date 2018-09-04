@@ -12,8 +12,8 @@ export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
 
     static defaultProps = {
-        width: 1200,
-        height: 500,
+        width: window.innerWidth,
+        height: window.innerHeight,
         padding: 3,
         numModules: 15,
         streamlineFraction: 1,
@@ -220,6 +220,6 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     render() {
-        return <svg style={{ margin: "20px" }} ref={node => this.node = node}/>;
+        return <svg ref={node => this.node = node}/>;
     }
 }
