@@ -49,7 +49,7 @@ export default class AlluvialDiagram extends React.Component {
 
         const largestModules = networks.map(network =>
             network.data.modules
-                .filter(m => !TreePath.equal(m.path, TreePath.root()))
+                .filter(m => !TreePath.isRoot(m.path))
                 .filter(m => m.path.parentPath().equal(parent))
                 .filter(m => m.flow > 0)
                 .sort((a, b) => b.flow - a.flow)

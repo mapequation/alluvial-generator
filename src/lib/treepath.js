@@ -4,8 +4,6 @@
  * @author Anton Eriksson
  */
 export default class TreePath {
-    static _root = null;
-
     /**
      * Construct a new TreePath
      *
@@ -43,14 +41,11 @@ export default class TreePath {
      * @returns {TreePath} the root TreePath
      */
     static root() {
-        if (!TreePath._root) {
-            TreePath._root = new TreePath("root");
-        }
-        return TreePath._root;
+        return new TreePath("root");
     }
 
     static isRoot(treePath) {
-        return treePath === TreePath.root();
+        return treePath.toString() === "root";
     }
 
     /**
