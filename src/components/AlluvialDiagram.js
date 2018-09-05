@@ -10,8 +10,6 @@ export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
 
     static defaultProps = {
-        svgWidth: "100vw",
-        svgHeight: "100vh",
         width: 1200,
         height: 600,
         padding: 3,
@@ -22,8 +20,6 @@ export default class AlluvialDiagram extends React.Component {
     };
 
     static propTypes = {
-        svgWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-        svgHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
         width: PropTypes.number,
         height: PropTypes.number,
         padding: PropTypes.number,
@@ -35,25 +31,7 @@ export default class AlluvialDiagram extends React.Component {
     };
 
     componentDidMount() {
-        const { svgWidth, svgHeight} = this.props;
-
-        const initialTransform = d3.zoomIdentity.translate(50, 50);
-
-        const zoom = d3.zoom()
-            .scaleExtent([0.1, 1000]);
-
-        this.svg = d3.select(this.node)
-            .attr("width", svgWidth)
-            .attr("height", svgHeight)
-            .call(zoom)
-            .call(zoom.transform, initialTransform);
-
-        this.g = this.svg.append("g")
-            .attr("class", "alluvial-diagram")
-            .attr("transform", initialTransform);
-
-        zoom.on("zoom", () => this.g.attr("transform", d3.event.transform));
-
+        this.svg = d3.select(this.node);
         this.draw();
     }
 
@@ -85,6 +63,7 @@ export default class AlluvialDiagram extends React.Component {
 
         const t = d3.transition().duration(200);
         const delay = 150;
+        const g = this.svg.select(".alluvial-diagram");
 
         /**
          * Modules
@@ -94,7 +73,7 @@ export default class AlluvialDiagram extends React.Component {
         const moduleUpdateTransition = selection => selection.call(moduleWidthX).call(moduleHeightY);
         const moduleExitTransition = selection => selection.attr("height", 0).attr("y", 0);
 
-        let modulesGroups = this.g.selectAll(".modules")
+        let modulesGroups = g.selectAll(".modules")
             .data(modules);
 
         modulesGroups.exit()
@@ -163,7 +142,7 @@ export default class AlluvialDiagram extends React.Component {
         const streamlineEnterOpacityPath = selection => selection.attr("opacity", 0).attr("d", s => s.enterPath);
         const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", s => s.path);
 
-        let streamlinesGroups = this.g.selectAll(".streamlines")
+        let streamlinesGroups = g.selectAll(".streamlines")
             .data(streamlines);
 
         streamlinesGroups.exit()
@@ -223,6 +202,8 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     render() {
-        return <svg ref={node => this.node = node}/>;
+        return <svg ref={node => this.node = node}>
+            <g className="alluvial-diagram"/>
+        </svg>;
     }
 }

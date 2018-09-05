@@ -3,6 +3,7 @@ import { Sidebar } from "semantic-ui-react";
 
 import MySidebar from "./MySidebar";
 import AlluvialDiagram from "./AlluvialDiagram";
+import ZoomableSvg from "./ZoomableSvg";
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 
@@ -79,14 +80,16 @@ export default class App extends React.Component {
                            parentModule={this.state.parentModule}
                            onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
                 <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
-                    <AlluvialDiagram networks={this.state.visibleNetworks}
-                                     padding={+this.state.padding}
-                                     width={this.state.width}
-                                     height={this.state.height}
-                                     numModules={+this.state.numModules}
-                                     streamlineFraction={+this.state.streamlineFraction}
-                                     streamlineThreshold={+this.state.streamlineThreshold}
-                                     parentModule={this.state.parentModule}/>
+                    <ZoomableSvg>
+                        <AlluvialDiagram networks={this.state.visibleNetworks}
+                                         padding={+this.state.padding}
+                                         width={this.state.width}
+                                         height={this.state.height}
+                                         numModules={+this.state.numModules}
+                                         streamlineFraction={+this.state.streamlineFraction}
+                                         streamlineThreshold={+this.state.streamlineThreshold}
+                                         parentModule={this.state.parentModule}/>
+                    </ZoomableSvg>
                 </Sidebar.Pusher>
             </Sidebar.Pushable>;
         } else {
