@@ -84,7 +84,7 @@ export default class AlluvialDiagram extends React.Component {
         pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
         const streamlines = pairwise(modules, (leftModules, rightModules, i, j) => {
-            const moduleFlows = StreamLines.moduleFlows(networks[i].data.nodes, networks[j].data.nodes, parent);
+            const moduleFlows = StreamLines.accumulateModuleFlow(networks[i].data.nodes, networks[j].data.nodes, parent);
             return new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth);
         });
 

@@ -81,7 +81,7 @@ export default class StreamLines {
         };
     }
 
-    static moduleFlows(sourceNodes, targetNodes, parent = TreePath.root()) {
+    static accumulateModuleFlow(sourceNodes, targetNodes, parent = TreePath.root()) {
         const targetNodesByName = d3.map(targetNodes, node => node.name);
 
         const sourceNodesWithTarget = sourceNodes.filter(node => targetNodesByName.has(node.name));
@@ -89,28 +89,32 @@ export default class StreamLines {
 
         const accumulationLevel = parent.level + 1;
 
-        return sourceNodesBelowParent.reduce((moduleFlows, sourceNode) => {
+        const moduleFlows = d3.map();
+
+        sourceNodesBelowParent.forEach((sourceNode) => {
             const targetNode = targetNodesByName.get(sourceNode.name);
 
             const sourceAncestorPath = sourceNode.path.ancestorAtLevel(accumulationLevel);
             const targetAncestorPath = targetNode.path.ancestorAtLevel(accumulationLevel);
 
-            const found = moduleFlows.find(each =>
-                each.sourcePath.equal(sourceAncestorPath) &&
-                each.targetPath.equal(targetAncestorPath));
+            const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
+            const found = moduleFlows.get(key);
 
             if (found) {
                 found.sourceFlow += sourceNode.flow;
                 found.targetFlow += targetNode.flow;
+                found.accumulatedNodes++;
             } else {
-                moduleFlows.push({
+                moduleFlows.set(key, {
                     sourcePath: sourceAncestorPath,
                     targetPath: targetAncestorPath,
                     sourceFlow: sourceNode.flow,
                     targetFlow: targetNode.flow,
+                    accumulatedNodes: 1,
                 });
             }
-            return moduleFlows;
-        }, []);
+        });
+
+        return moduleFlows.values();
     }
 }
