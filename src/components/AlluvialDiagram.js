@@ -2,9 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import Modules from "../models/Modules";
-import StreamLines from "../models/StreamLines";
-import { pairwise, pairwiseEach } from "../helpers/pairwise";
+import diagram from "../models/diagram";
 import TreePath from "../lib/treepath";
 
 
@@ -59,34 +57,20 @@ export default class AlluvialDiagram extends React.Component {
         this.draw(prevProps);
     }
 
+    propsChanged(props, prevProps) {
+        return {
+            networkRemoved: props.networks.length < prevProps.networks.length,
+            networkAdded: props.networks.length > prevProps.networks.length,
+            widthChanged: props.width !== prevProps.width,
+            heightChanged: props.height !== prevProps.height,
+            streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
+        };
+    }
+
     draw(prevProps = this.props) {
-        const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks, parentModule } = this.props;
+        const { width, height } = this.props;
         const { networkRemoved, networkAdded, widthChanged, heightChanged, streamlineFractionChanged } = this.propsChanged(this.props, prevProps);
-
-        const parent = new TreePath(parentModule);
-
-        const largestModules = networks.map(network =>
-            network.data.modules
-                .filter(m => !TreePath.isRoot(m.path))
-                .filter(m => m.path.parentPath().equal(parent))
-                .filter(m => m.flow > 0)
-                .sort((a, b) => b.flow - a.flow)
-                .slice(0, numModules));
-
-        const maxTotalFlow = AlluvialDiagram.maxTotalFlow(largestModules);
-
-        const barWidth = AlluvialDiagram.barWidth(networks.length, width, streamlineFraction);
-        const streamlineWidth = streamlineFraction * barWidth;
-        const style = { barWidth, height, padding, streamlineWidth };
-
-        const modules = largestModules.map(modules => new Modules(modules, maxTotalFlow, style));
-
-        pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
-
-        const streamlines = pairwise(modules, (leftModules, rightModules, i, j) => {
-            const moduleFlows = StreamLines.accumulateModuleFlow(networks[i].data.nodes, networks[j].data.nodes, parent);
-            return new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth);
-        });
+        const { modules, streamlines } = diagram(this.props);
 
         const t = d3.transition().duration(200);
         const delay = 150;
@@ -220,29 +204,6 @@ export default class AlluvialDiagram extends React.Component {
                 .transition(t).delay(streamlineDelay(delay))
                 .call(streamlineOpacityPath);
         }
-    }
-
-    propsChanged(props, prevProps) {
-        return {
-            networkRemoved: props.networks.length < prevProps.networks.length,
-            networkAdded: props.networks.length > prevProps.networks.length,
-            widthChanged: props.width !== prevProps.width,
-            heightChanged: props.height !== prevProps.height,
-            streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
-        };
-    }
-
-    static maxTotalFlow(modules) {
-        return modules
-            .map(module => module
-                .map(module => module.flow)
-                .reduce((tot, curr) => tot + curr, 0))
-            .reduce((max, curr) => Math.max(max, curr), -Infinity);
-    }
-
-    static barWidth(numModules, totalWidth, streamlineFraction) {
-        const numStreamlines = numModules - 1;
-        return totalWidth / (numModules + numStreamlines * streamlineFraction);
     }
 
     render() {
