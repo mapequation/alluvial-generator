@@ -10,8 +10,10 @@ export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
 
     static defaultProps = {
-        width: window.innerWidth,
-        height: window.innerHeight,
+        svgWidth: "100vw",
+        svgHeight: "100vh",
+        width: 1200,
+        height: 600,
         padding: 3,
         numModules: 15,
         streamlineFraction: 1,
@@ -20,6 +22,8 @@ export default class AlluvialDiagram extends React.Component {
     };
 
     static propTypes = {
+        svgWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        svgHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
         width: PropTypes.number,
         height: PropTypes.number,
         padding: PropTypes.number,
@@ -31,16 +35,16 @@ export default class AlluvialDiagram extends React.Component {
     };
 
     componentDidMount() {
-        const { width, height } = this.props;
+        const { svgWidth, svgHeight} = this.props;
 
-        const initialTransform = d3.zoomIdentity.translate(50, 50).scale(0.7);
+        const initialTransform = d3.zoomIdentity.translate(50, 50);
 
         const zoom = d3.zoom()
             .scaleExtent([0.1, 1000]);
 
         this.svg = d3.select(this.node)
-            .attr("width", width)
-            .attr("height", height)
+            .attr("width", svgWidth)
+            .attr("height", svgHeight)
             .call(zoom)
             .call(zoom.transform, initialTransform);
 
@@ -64,22 +68,23 @@ export default class AlluvialDiagram extends React.Component {
             widthChanged: props.width !== prevProps.width,
             heightChanged: props.height !== prevProps.height,
             streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
+            parentModuleChanged: props.parentModule !== prevProps.parentModule,
         };
     }
 
     draw(prevProps = this.props) {
-        const { width, height } = this.props;
-        const { networkRemoved, networkAdded, widthChanged, heightChanged, streamlineFractionChanged } = this.propsChanged(this.props, prevProps);
+        const {
+            networkRemoved,
+            networkAdded,
+            widthChanged,
+            streamlineFractionChanged,
+            parentModuleChanged,
+        } = this.propsChanged(this.props, prevProps);
+
         const { modules, streamlines } = diagram(this.props);
 
         const t = d3.transition().duration(200);
         const delay = 150;
-
-        if (widthChanged || heightChanged) {
-            this.svg.transition(t)
-                .attr("width", width)
-                .attr("height", height);
-        }
 
         /**
          * Modules
@@ -139,6 +144,12 @@ export default class AlluvialDiagram extends React.Component {
                 .call(moduleWidthX)
                 .transition(t).delay(delay) // Wait for existing modules
                 .call(moduleHeightY);
+        } else if (parentModuleChanged) {
+            modulesEnter
+                .call(moduleWidthX)
+                .transition(t)
+                .delay(delay)
+                .call(moduleHeightY);
         } else {
             modulesEnterUpdate
                 .call(moduleWidthX)
@@ -149,6 +160,7 @@ export default class AlluvialDiagram extends React.Component {
         /**
          * Streamlines
          */
+        const streamlineEnterOpacityPath = selection => selection.attr("opacity", 0).attr("d", s => s.enterPath);
         const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", s => s.path);
 
         let streamlinesGroups = this.g.selectAll(".streamlines")
@@ -194,13 +206,17 @@ export default class AlluvialDiagram extends React.Component {
             streamlinesUpdate
                 .transition(t).delay(delay) // Wait for removed modules
                 .call(streamlineOpacityPath);
+        } else if (parentModuleChanged) {
+            streamlinesEnter
+                .call(streamlineEnterOpacityPath)
+                .transition(t).delay(streamlineDelay(2 * delay))
+                .call(streamlineOpacityPath);
         } else {
             streamlinesUpdate
                 .transition(t)
                 .call(streamlineOpacityPath);
             streamlinesEnter
-                .attr("d", s => s.enterPath)
-                .attr("opacity", 0)
+                .call(streamlineEnterOpacityPath)
                 .transition(t).delay(streamlineDelay(delay))
                 .call(streamlineOpacityPath);
         }

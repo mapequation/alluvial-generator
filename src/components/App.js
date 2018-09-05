@@ -9,6 +9,8 @@ import parseFTree from "../io/parse-ftree";
 
 export default class App extends React.Component {
     state = {
+        width: 1200,
+        height: 600,
         padding: 3,
         numModules: 15,
         streamlineFraction: 1,
@@ -17,6 +19,11 @@ export default class App extends React.Component {
         networks: [],
         visibleNetworks: [],
     };
+
+    validNumber = (value) => Number.isNaN(+value) ? 0 : +value;
+
+    handleWidthChange = (e, { value }) => this.setState({ width: this.validNumber(value) });
+    handleHeightChange = (e, { value }) => this.setState({ height: this.validNumber(value) });
 
     incrementVisibleNetworksBy = amount => ({ networks, visibleNetworks }) => ({
         visibleNetworks: visibleNetworks.length + amount > networks.length
@@ -60,6 +67,8 @@ export default class App extends React.Component {
                            numNetworks={this.state.networks.length}
                            onAddNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(1))}
                            onRemoveNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(-1))}
+                           width={this.state.width} onWidthChange={this.handleWidthChange}
+                           height={this.state.height} onHeightChange={this.handleHeightChange}
                            padding={this.state.padding} onPaddingChange={padding => this.setState({ padding })}
                            numModules={this.state.numModules}
                            onNumModulesChange={numModules => this.setState({ numModules })}
@@ -69,9 +78,11 @@ export default class App extends React.Component {
                            onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
                            parentModule={this.state.parentModule}
                            onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
-                <Sidebar.Pusher>
+                <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
                     <AlluvialDiagram networks={this.state.visibleNetworks}
                                      padding={+this.state.padding}
+                                     width={this.state.width}
+                                     height={this.state.height}
                                      numModules={+this.state.numModules}
                                      streamlineFraction={+this.state.streamlineFraction}
                                      streamlineThreshold={+this.state.streamlineThreshold}

@@ -25,6 +25,14 @@ export default function MySidebar(props) {
             </Button.Group>
         </Menu.Item>
         <Menu.Item>
+            <Input type="text" label="Width" labelPosition="left" value={props.width}
+                   onChange={props.onWidthChange}/>
+        </Menu.Item>
+        <Menu.Item>
+            <Input type="text" label="Height" labelPosition="left" value={props.height}
+                   onChange={props.onHeightChange}/>
+        </Menu.Item>
+        <Menu.Item>
             <Input type="text" label="Parent module" labelPosition="left" value={props.parentModule}
                    onChange={props.onParentModuleChange}/>
         </Menu.Item>
@@ -78,6 +86,10 @@ MySidebar.propTypes = {
     onRemoveNetworkClick: PropTypes.func,
     onAddNetworkClick: PropTypes.func,
     numNetworks: PropTypes.number,
+    width: PropTypes.number,
+    onWidthChange: PropTypes.func,
+    height: PropTypes.number,
+    onHeightChange: PropTypes.func,
     streamlineFraction: PropTypes.number,
     onStreamlineFractionChange: PropTypes.func,
     padding: PropTypes.number,
