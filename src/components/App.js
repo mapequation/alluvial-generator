@@ -8,6 +8,7 @@ import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 import { pairwise } from "../helpers/pairwise";
 import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
+import { ACCUMULATE, ECHO } from "../workers/actions"; // eslint-disable-line
 
 
 export default class App extends React.Component {
@@ -65,7 +66,7 @@ export default class App extends React.Component {
                     new Promise(resolve => {
                         const w = new Worker();
                         w.postMessage({
-                            type: "accumulate",
+                            type: ACCUMULATE,
                             sourceNodes: left.data.nodes,
                             targetNodes: right.data.nodes,
                         });
@@ -78,7 +79,7 @@ export default class App extends React.Component {
 
     render() {
         const { networks, moduleFlows } = this.state;
-        const loadingComplete = networks.length && moduleFlows.length;
+        const loadingComplete = networks.length > 0 && moduleFlows.length > 0;
 
         return <Sidebar.Pushable>
             <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
@@ -109,6 +110,9 @@ export default class App extends React.Component {
                                      streamlineThreshold={+this.state.streamlineThreshold}
                                      parentModule={this.state.parentModule}/>
                 </ZoomableSvg>
+                }
+                {!loadingComplete &&
+                <div>Loading...</div>
                 }
             </Sidebar.Pusher>
         </Sidebar.Pushable>;

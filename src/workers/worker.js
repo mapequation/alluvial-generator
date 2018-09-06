@@ -1,5 +1,6 @@
 import TreePath from "../lib/treepath";
 import { map } from "d3";
+import { ACCUMULATE, ECHO } from "./actions";
 
 
 const dispatch = postMessage;
@@ -54,16 +55,20 @@ onmessage = function onMessage(event) {
         return;
     }
 
-    log(`Got event of type ${type}`);
+    log(`Got event ${type}`);
 
-    if (type === "accumulate") {
-        const { sourceNodes, targetNodes } = data;
-        const result = accumulateModuleFlows(sourceNodes, targetNodes);
-        dispatch(result);
-    } else if (type === "echo") {
-        const { type, ...rest } = data;
-        console.log(rest);
-    } else {
-        log("Unknown event type");
+    switch (data.type) {
+        case ACCUMULATE:
+            const { sourceNodes, targetNodes } = data;
+            const result = accumulateModuleFlows(sourceNodes, targetNodes);
+            dispatch(result);
+            break;
+        case ECHO:
+            const { type, ...rest } = data;
+            console.log(rest);
+            break;
+        default:
+            log("Unknown event");
+            break;
     }
 };
