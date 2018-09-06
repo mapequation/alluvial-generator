@@ -36,7 +36,6 @@ const accumulateModuleFlows = (sourceNodes, targetNodes) => {
 
     for (const { key: nodeLevel, values: sourceNodes } of sourceNodesByLevel) {
         const accumulationLevel = nodeLevel - 1;
-
         const accumulatedFlow = map();
 
         sourceNodes.forEach(sourceNode => {
@@ -63,7 +62,7 @@ const accumulateModuleFlows = (sourceNodes, targetNodes) => {
             }
         });
 
-        const subModules = accumulatedFlowPerLevel[accumulationLevel + 1];
+        const subModules = accumulatedFlowPerLevel[nodeLevel];
 
         if (subModules) {
             subModules.forEach(({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes }) => {
