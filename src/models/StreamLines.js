@@ -104,7 +104,7 @@ export default class StreamLines {
                 found.sourceFlow += sourceNode.flow;
                 found.targetFlow += targetNode.flow;
                 found.accumulatedNodes++;
-            } else {
+            } else if (sourceNode.flow > 0 && targetNode.flow > 0) {
                 moduleFlows.set(key, {
                     sourcePath: sourceAncestorPath,
                     targetPath: targetAncestorPath,
