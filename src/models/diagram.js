@@ -41,7 +41,7 @@ export default function diagram(props) {
     pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
     const streamlines = pairwise(modules, (leftModules, rightModules, i) =>
-        new StreamLines(leftModules, rightModules, moduleFlows[i], streamlineThreshold, streamlineWidth));
+        new StreamLines(leftModules, rightModules, moduleFlows[i][parent.level+1], streamlineThreshold, streamlineWidth));
 
     return { modules, streamlines };
 }
