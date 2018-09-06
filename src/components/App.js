@@ -6,6 +6,8 @@ import AlluvialDiagram from "./AlluvialDiagram";
 import ZoomableSvg from "./ZoomableSvg";
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
+import { pairwise } from "../helpers/pairwise";
+import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
 
 
 export default class App extends React.Component {
@@ -19,6 +21,7 @@ export default class App extends React.Component {
         parentModule: "root",
         networks: [],
         visibleNetworks: [],
+        moduleFlows: [],
     };
 
     validNumber = (value) => Number.isNaN(+value) ? 0 : +value;
@@ -55,45 +58,59 @@ export default class App extends React.Component {
                 }));
                 return parsed.map(each => parseFTree(each.data));
             })
-            .then(networks => this.setState({ networks, visibleNetworks: networks }))
+            .then(networks => {
+                this.setState({ networks, visibleNetworks: networks });
+
+                return Promise.all(pairwise(networks, (left, right) =>
+                    new Promise(resolve => {
+                        const w = new Worker();
+                        w.postMessage({
+                            type: "accumulate",
+                            sourceNodes: left.data.nodes,
+                            targetNodes: right.data.nodes,
+                        });
+                        w.onmessage = event => resolve(event.data);
+                    })));
+            })
+            .then(moduleFlows => this.setState({ moduleFlows }))
             .catch(console.error);
     }
 
     render() {
-        const { networks } = this.state;
+        const { networks, moduleFlows } = this.state;
+        const loadingComplete = networks.length && moduleFlows.length;
 
-        if (networks.length) {
-            return <Sidebar.Pushable>
-                <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
-                           numNetworks={this.state.networks.length}
-                           onAddNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(1))}
-                           onRemoveNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(-1))}
-                           width={this.state.width} onWidthChange={this.handleWidthChange}
-                           height={this.state.height} onHeightChange={this.handleHeightChange}
-                           padding={this.state.padding} onPaddingChange={padding => this.setState({ padding })}
-                           numModules={this.state.numModules}
-                           onNumModulesChange={numModules => this.setState({ numModules })}
-                           streamlineFraction={this.state.streamlineFraction}
-                           onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
-                           streamlineThreshold={this.state.streamlineThreshold}
-                           onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
-                           parentModule={this.state.parentModule}
-                           onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
-                <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
-                    <ZoomableSvg>
-                        <AlluvialDiagram networks={this.state.visibleNetworks}
-                                         padding={+this.state.padding}
-                                         width={this.state.width}
-                                         height={this.state.height}
-                                         numModules={+this.state.numModules}
-                                         streamlineFraction={+this.state.streamlineFraction}
-                                         streamlineThreshold={+this.state.streamlineThreshold}
-                                         parentModule={this.state.parentModule}/>
-                    </ZoomableSvg>
-                </Sidebar.Pusher>
-            </Sidebar.Pushable>;
-        } else {
-            return <div>Loading...</div>;
-        }
+        return <Sidebar.Pushable>
+            <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
+                       numNetworks={this.state.networks.length}
+                       onAddNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(1))}
+                       onRemoveNetworkClick={() => this.setState(this.incrementVisibleNetworksBy(-1))}
+                       width={this.state.width} onWidthChange={this.handleWidthChange}
+                       height={this.state.height} onHeightChange={this.handleHeightChange}
+                       padding={this.state.padding} onPaddingChange={padding => this.setState({ padding })}
+                       numModules={this.state.numModules}
+                       onNumModulesChange={numModules => this.setState({ numModules })}
+                       streamlineFraction={this.state.streamlineFraction}
+                       onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
+                       streamlineThreshold={this.state.streamlineThreshold}
+                       onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
+                       parentModule={this.state.parentModule}
+                       onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
+            <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
+                {loadingComplete &&
+                <ZoomableSvg>
+                    <AlluvialDiagram networks={this.state.visibleNetworks}
+                                     moduleFlows={this.state.moduleFlows}
+                                     padding={+this.state.padding}
+                                     width={this.state.width}
+                                     height={this.state.height}
+                                     numModules={+this.state.numModules}
+                                     streamlineFraction={+this.state.streamlineFraction}
+                                     streamlineThreshold={+this.state.streamlineThreshold}
+                                     parentModule={this.state.parentModule}/>
+                </ZoomableSvg>
+                }
+            </Sidebar.Pusher>
+        </Sidebar.Pushable>;
     }
 }

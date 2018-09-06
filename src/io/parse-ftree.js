@@ -12,7 +12,7 @@ import TreePath from "../lib/treepath";
 const expanded = row => row.length === 5;
 
 const parse = row => ({
-    path: new TreePath(row[0]),
+    path: row[0].toString(),
     flow: row[1],
     name: row[2].toString(),
     node: row[row.length - 1],

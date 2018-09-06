@@ -27,6 +27,7 @@ export default class AlluvialDiagram extends React.Component {
         streamlineFraction: PropTypes.number,
         streamlineThreshold: PropTypes.number,
         networks: PropTypes.arrayOf(PropTypes.object),
+        moduleFlows: PropTypes.arrayOf(PropTypes.array),
         parentModule: PropTypes.string,
     };
 

@@ -24,7 +24,7 @@ const calcBarWidth = (numModules, totalWidth, streamlineFraction) => {
 };
 
 export default function diagram(props) {
-    const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks, parentModule } = props;
+    const { width, height, padding, streamlineFraction, numModules, streamlineThreshold, networks, parentModule, moduleFlows } = props;
 
     const parent = new TreePath(parentModule);
 
@@ -40,10 +40,8 @@ export default function diagram(props) {
 
     pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
-    const streamlines = pairwise(modules, (leftModules, rightModules, i, j) => {
-        const moduleFlows = StreamLines.accumulateModuleFlow(networks[i].data.nodes, networks[j].data.nodes, parent);
-        return new StreamLines(leftModules, rightModules, moduleFlows, streamlineThreshold, streamlineWidth);
-    });
+    const streamlines = pairwise(modules, (leftModules, rightModules, i) =>
+        new StreamLines(leftModules, rightModules, moduleFlows[i], streamlineThreshold, streamlineWidth));
 
     return { modules, streamlines };
 }

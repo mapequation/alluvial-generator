@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import { streamlineHorizontal } from "../lib/streamline";
-import TreePath from "../lib/treepath";
 
 
 export default class StreamLines {
@@ -79,42 +78,5 @@ export default class StreamLines {
             height: flow / module.flow * module.height,
             offset: module.y + module.height + accumulatedOffset,
         };
-    }
-
-    static accumulateModuleFlow(sourceNodes, targetNodes, parent = TreePath.root()) {
-        const targetNodesByName = d3.map(targetNodes, node => node.name);
-
-        const sourceNodesWithTarget = sourceNodes.filter(node => targetNodesByName.has(node.name));
-        const sourceNodesBelowParent = sourceNodesWithTarget.filter(node => parent.isAncestor(node.path));
-
-        const accumulationLevel = parent.level + 1;
-
-        const moduleFlows = d3.map();
-
-        sourceNodesBelowParent.forEach((sourceNode) => {
-            const targetNode = targetNodesByName.get(sourceNode.name);
-
-            const sourceAncestorPath = sourceNode.path.ancestorAtLevel(accumulationLevel);
-            const targetAncestorPath = targetNode.path.ancestorAtLevel(accumulationLevel);
-
-            const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
-            const found = moduleFlows.get(key);
-
-            if (found) {
-                found.sourceFlow += sourceNode.flow;
-                found.targetFlow += targetNode.flow;
-                found.accumulatedNodes++;
-            } else if (sourceNode.flow > 0 && targetNode.flow > 0) {
-                moduleFlows.set(key, {
-                    sourcePath: sourceAncestorPath,
-                    targetPath: targetAncestorPath,
-                    sourceFlow: sourceNode.flow,
-                    targetFlow: targetNode.flow,
-                    accumulatedNodes: 1,
-                });
-            }
-        });
-
-        return moduleFlows.values();
     }
 }
