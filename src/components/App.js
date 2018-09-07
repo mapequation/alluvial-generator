@@ -9,9 +9,8 @@ import ZoomableSvg from "./ZoomableSvg";
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 
-import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
 import { ACCUMULATE } from "../workers/actions";
-import workerPromise from "../workers/worker-promise";
+import { createWorker, workerPromise } from "../workers/worker-utils";
 
 
 export default class App extends React.Component {
@@ -66,7 +65,7 @@ export default class App extends React.Component {
                 this.setState({ networks, visibleNetworks: networks });
 
                 return Promise.all(pairs(networks).map(([left, right]) => {
-                    const worker = workerPromise(new Worker());
+                    const worker = workerPromise(createWorker());
                     return worker({
                         type: ACCUMULATE,
                         sourceNodes: left.data.nodes,

@@ -3,14 +3,13 @@ import PropTypes from "prop-types";
 import * as d3 from "d3";
 
 import TreePath from "../lib/treepath";
-import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
 import { COORDINATES } from "../workers/actions";
-import workerPromise from "../workers/worker-promise";
+import { createWorker, workerPromise } from "../workers/worker-utils";
 
 
 export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
-    worker = workerPromise(new Worker());
+    worker = workerPromise(createWorker());
 
     static defaultProps = {
         width: 1200,
