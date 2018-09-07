@@ -1,12 +1,14 @@
 import React from "react";
 import { Sidebar } from "semantic-ui-react";
+import { pairs } from "d3";
 
 import MySidebar from "./MySidebar";
 import AlluvialDiagram from "./AlluvialDiagram";
 import ZoomableSvg from "./ZoomableSvg";
+
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
-import { pairwise } from "../helpers/pairwise";
+
 import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
 import { ACCUMULATE } from "../workers/actions";
 import workerPromise from "../workers/worker-promise";
@@ -63,7 +65,7 @@ export default class App extends React.Component {
             .then(networks => {
                 this.setState({ networks, visibleNetworks: networks });
 
-                return Promise.all(pairwise(networks, (left, right) => {
+                return Promise.all(pairs(networks).map(([left, right]) => {
                     const worker = workerPromise(new Worker());
                     return worker({
                         type: ACCUMULATE,

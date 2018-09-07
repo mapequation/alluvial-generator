@@ -1,7 +1,8 @@
+import { pairs } from "d3";
+
 import Modules from "./Modules";
 import StreamLines from "./StreamLines";
 import TreePath from "../lib/treepath";
-import { pairwise, pairwiseEach } from "../helpers/pairwise";
 
 
 const largestModulesBelowParent = (modules, numModules, parent) => modules
@@ -38,9 +39,11 @@ export default function diagram(props) {
     const modules = largestModules.map(modules =>
         new Modules(modules, maxTotalFlow, { barWidth, height, padding, streamlineWidth }));
 
-    pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
+    const modulePairs = pairs(modules);
+    
+    modulePairs.forEach(([left, right]) => right.moveToRightOf(left));
 
-    const streamlines = pairwise(modules, (leftModules, rightModules, i) =>
+    const streamlines = modulePairs.map(([leftModules, rightModules], i) =>
         new StreamLines(leftModules, rightModules, moduleFlows[i][parent.level + 1], streamlineThreshold, streamlineWidth));
 
     return {

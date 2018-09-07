@@ -6,8 +6,6 @@
  *
  * @author Anton Eriksson
  */
-import TreePath from "../lib/treepath";
-
 
 const expanded = row => row.length === 5;
 
@@ -159,7 +157,7 @@ export default function parseFTree(rows) {
                 continue;
             }
 
-            section = parseLinkSection(row)
+            section = parseLinkSection(row);
             modules.push(section);
 
             // 3b. Parse link data
