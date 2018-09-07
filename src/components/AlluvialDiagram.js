@@ -38,11 +38,23 @@ export default class AlluvialDiagram extends React.Component {
         this.componentDidUpdate(this.props);
     }
 
-    componentDidUpdate(prevProps) {
-        this.worker({
+    async componentDidUpdate(prevProps) {
+        const { modules, streamlines } = await this.worker({
             type: COORDINATES,
-            props: this.props,
-        }).then(coords => this.draw(coords, prevProps));
+            props: {
+                width: this.props.width,
+                height: this.props.height,
+                padding: this.props.padding,
+                streamlineFraction: this.props.streamlineFraction,
+                numModules: this.props.numModules,
+                streamlineThreshold: this.props.streamlineThreshold,
+                networks: this.props.networks,
+                parentModule: this.props.parentModule,
+                moduleFlows: this.props.moduleFlows,
+            },
+        });
+
+        this.draw(modules, streamlines, prevProps);
     }
 
     propsChanged(props, prevProps) {
@@ -56,7 +68,7 @@ export default class AlluvialDiagram extends React.Component {
         };
     }
 
-    draw({ modules, streamlines }, prevProps = this.props) {
+    draw(modules, streamlines, prevProps = this.props) {
         const {
             networkRemoved,
             networkAdded,
