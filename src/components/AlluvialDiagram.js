@@ -2,12 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as d3 from "d3";
 
-import diagram from "../models/diagram";
 import TreePath from "../lib/treepath";
+import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
+import { COORDINATES } from "../workers/actions";
+import workerPromise from "../workers/worker-promise";
 
 
 export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
+    worker = workerPromise(new Worker());
 
     static defaultProps = {
         width: 1200,
@@ -33,11 +36,14 @@ export default class AlluvialDiagram extends React.Component {
 
     componentDidMount() {
         this.svg = d3.select(this.node);
-        this.draw();
+        this.componentDidUpdate(this.props);
     }
 
     componentDidUpdate(prevProps) {
-        this.draw(prevProps);
+        this.worker({
+            type: COORDINATES,
+            props: this.props,
+        }).then(coords => this.draw(coords, prevProps));
     }
 
     propsChanged(props, prevProps) {
@@ -51,7 +57,7 @@ export default class AlluvialDiagram extends React.Component {
         };
     }
 
-    draw(prevProps = this.props) {
+    draw({ modules, streamlines }, prevProps = this.props) {
         const {
             networkRemoved,
             networkAdded,
@@ -59,8 +65,6 @@ export default class AlluvialDiagram extends React.Component {
             streamlineFractionChanged,
             parentModuleChanged,
         } = this.propsChanged(this.props, prevProps);
-
-        const { modules, streamlines } = diagram(this.props);
 
         const t = d3.transition().duration(200);
         const delay = 150;
@@ -91,7 +95,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("class", "modules");
 
         const modulesUpdate = modulesGroups.selectAll(".module")
-            .data(modules => modules.data, function key(d) {
+            .data(d => d, function key(d) {
                 return d ? d.path : this.id;
             });
 
@@ -160,7 +164,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("class", "streamlines");
 
         const streamlinesUpdate = streamlinesGroups.selectAll(".streamline")
-            .data(s => s.data, function key(d) {
+            .data(d => d, function key(d) {
                 return d ? TreePath.join(d.sourcePath, d.targetPath) : this.id;
             });
 

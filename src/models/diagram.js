@@ -43,5 +43,8 @@ export default function diagram(props) {
     const streamlines = pairwise(modules, (leftModules, rightModules, i) =>
         new StreamLines(leftModules, rightModules, moduleFlows[i][parent.level + 1], streamlineThreshold, streamlineWidth));
 
-    return { modules, streamlines };
+    return {
+        modules: modules.map(m => m.data),
+        streamlines: streamlines.map(s => s.data),
+    };
 }

@@ -8,7 +8,8 @@ import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 import { pairwise } from "../helpers/pairwise";
 import Worker from "worker-loader!../workers/worker.js"; // eslint-disable-line
-import { ACCUMULATE, ECHO } from "../workers/actions"; // eslint-disable-line
+import { ACCUMULATE } from "../workers/actions";
+import workerPromise from "../workers/worker-promise";
 
 
 export default class App extends React.Component {
@@ -62,16 +63,14 @@ export default class App extends React.Component {
             .then(networks => {
                 this.setState({ networks, visibleNetworks: networks });
 
-                return Promise.all(pairwise(networks, (left, right) =>
-                    new Promise(resolve => {
-                        const w = new Worker();
-                        w.postMessage({
-                            type: ACCUMULATE,
-                            sourceNodes: left.data.nodes,
-                            targetNodes: right.data.nodes,
-                        });
-                        w.onmessage = event => resolve(event.data);
-                    })));
+                return Promise.all(pairwise(networks, (left, right) => {
+                    const worker = workerPromise(new Worker());
+                    return worker({
+                        type: ACCUMULATE,
+                        sourceNodes: left.data.nodes,
+                        targetNodes: right.data.nodes,
+                    });
+                }));
             })
             .then(moduleFlows => this.setState({ moduleFlows }))
             .catch(console.error);
