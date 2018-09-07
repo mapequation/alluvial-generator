@@ -26,7 +26,7 @@ const parseExpanded = row => ({
 const parseNode = row => expanded(row) ? parseExpanded(row) : parse(row);
 
 const parseLinkSection = row => ({
-    path: new TreePath(row[1]),
+    path: row[1].toString(),
     exitFlow: row[2],
     numEdges: row[3],
     numChildren: row[4],

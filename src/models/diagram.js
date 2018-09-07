@@ -7,7 +7,7 @@ import { pairwise, pairwiseEach } from "../helpers/pairwise";
 const largestModulesBelowParent = (modules, numModules, parent) => modules
     .map(module => module
         .filter(m => !TreePath.isRoot(m.path))
-        .filter(m => m.path.parentPath().equal(parent))
+        .filter(m => parent.equal(TreePath.parentPath(m.path)))
         .filter(m => m.flow > 0)
         .sort((a, b) => b.flow - a.flow)
         .slice(0, numModules));
@@ -41,7 +41,7 @@ export default function diagram(props) {
     pairwiseEach(modules, (left, right) => right.moveToRightOf(left));
 
     const streamlines = pairwise(modules, (leftModules, rightModules, i) =>
-        new StreamLines(leftModules, rightModules, moduleFlows[i][parent.level+1], streamlineThreshold, streamlineWidth));
+        new StreamLines(leftModules, rightModules, moduleFlows[i][parent.level + 1], streamlineThreshold, streamlineWidth));
 
     return { modules, streamlines };
 }
