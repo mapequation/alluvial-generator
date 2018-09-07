@@ -35,10 +35,33 @@ export default class AlluvialDiagram extends React.Component {
 
     componentDidMount() {
         this.svg = d3.select(this.node);
-        this.componentDidUpdate(this.props);
+        this.draw();
     }
 
-    async componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps) {
+        this.draw(prevProps);
+    }
+
+    propsChanged(props, prevProps) {
+        return {
+            networkRemoved: props.networks.length < prevProps.networks.length,
+            networkAdded: props.networks.length > prevProps.networks.length,
+            widthChanged: props.width !== prevProps.width,
+            heightChanged: props.height !== prevProps.height,
+            streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
+            parentModuleChanged: props.parentModule !== prevProps.parentModule,
+        };
+    }
+
+    async draw(prevProps = this.props) {
+        const {
+            networkRemoved,
+            networkAdded,
+            widthChanged,
+            streamlineFractionChanged,
+            parentModuleChanged,
+        } = this.propsChanged(this.props, prevProps);
+
         const { modules, streamlines } = await this.worker({
             type: COORDINATES,
             props: {
@@ -53,29 +76,6 @@ export default class AlluvialDiagram extends React.Component {
                 moduleFlows: this.props.moduleFlows,
             },
         });
-
-        this.draw(modules, streamlines, prevProps);
-    }
-
-    propsChanged(props, prevProps) {
-        return {
-            networkRemoved: props.networks.length < prevProps.networks.length,
-            networkAdded: props.networks.length > prevProps.networks.length,
-            widthChanged: props.width !== prevProps.width,
-            heightChanged: props.height !== prevProps.height,
-            streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
-            parentModuleChanged: props.parentModule !== prevProps.parentModule,
-        };
-    }
-
-    draw(modules, streamlines, prevProps = this.props) {
-        const {
-            networkRemoved,
-            networkAdded,
-            widthChanged,
-            streamlineFractionChanged,
-            parentModuleChanged,
-        } = this.propsChanged(this.props, prevProps);
 
         const t = d3.transition().duration(200);
         const delay = 150;
