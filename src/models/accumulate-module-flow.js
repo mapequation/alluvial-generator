@@ -3,6 +3,29 @@ import { descending, map, nest } from "d3";
 import TreePath from "../lib/treepath";
 
 
+const accumulate = (accumulationLevel, getAccumulatedFlow, setAccumulatedFlow) =>
+    (sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes = 1) => {
+        const sourceAncestorPath = TreePath.ancestorAtLevel(sourcePath, accumulationLevel);
+        const targetAncestorPath = TreePath.ancestorAtLevel(targetPath, accumulationLevel);
+
+        const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
+        const found = getAccumulatedFlow(key);
+
+        if (found) {
+            found.sourceFlow += sourceFlow;
+            found.targetFlow += targetFlow;
+            found.accumulatedNodes += accumulatedNodes;
+        } else if (sourceFlow > 0 && targetFlow > 0) {
+            setAccumulatedFlow(key, {
+                sourcePath: sourceAncestorPath.path,
+                targetPath: targetAncestorPath.path,
+                sourceFlow: sourceFlow,
+                targetFlow: targetFlow,
+                accumulatedNodes: accumulatedNodes,
+            });
+        }
+    };
+
 const accumulateModuleFlow = (sourceNodes, targetNodes) => {
     const targetNodesByName = map(targetNodes, node => node.name);
 
@@ -32,55 +55,20 @@ const accumulateModuleFlow = (sourceNodes, targetNodes) => {
     for (const { key: nodeLevel, values: sourceNodes } of sourceNodesByLevel) {
         const accumulationLevel = nodeLevel - 1;
         const accumulatedFlow = map();
+        const accumulateToLevel = accumulate(accumulationLevel,
+            accumulatedFlow.get.bind(accumulatedFlow),
+            accumulatedFlow.set.bind(accumulatedFlow));
 
         sourceNodes.forEach(sourceNode => {
             const targetNode = targetNodesByName.get(sourceNode.name);
-
-            const sourceAncestorPath = TreePath.ancestorAtLevel(sourceNode.path, accumulationLevel);
-            const targetAncestorPath = TreePath.ancestorAtLevel(targetNode.path, accumulationLevel);
-
-            const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
-            const found = accumulatedFlow.get(key);
-
-            if (found) {
-                found.sourceFlow += sourceNode.flow;
-                found.targetFlow += targetNode.flow;
-                found.accumulatedNodes++;
-            } else if (sourceNode.flow > 0 && targetNode.flow > 0) {
-                accumulatedFlow.set(key, {
-                    sourcePath: sourceAncestorPath.path,
-                    targetPath: targetAncestorPath.path,
-                    sourceFlow: sourceNode.flow,
-                    targetFlow: targetNode.flow,
-                    accumulatedNodes: 1,
-                });
-            }
+            accumulateToLevel(sourceNode.path, targetNode.path, sourceNode.flow, targetNode.flow);
         });
 
         const subModules = accumulatedFlowPerLevel[nodeLevel];
 
         if (subModules) {
-            subModules.forEach(({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes }) => {
-                const sourceAncestorPath = TreePath.ancestorAtLevel(sourcePath, accumulationLevel);
-                const targetAncestorPath = TreePath.ancestorAtLevel(targetPath, accumulationLevel);
-
-                const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
-                const found = accumulatedFlow.get(key);
-
-                if (found) {
-                    found.sourceFlow += sourceFlow;
-                    found.targetFlow += targetFlow;
-                    found.accumulatedNodes += accumulatedNodes;
-                } else {
-                    accumulatedFlow.set(key, {
-                        sourcePath: sourceAncestorPath.path,
-                        targetPath: targetAncestorPath.path,
-                        sourceFlow,
-                        targetFlow,
-                        accumulatedNodes: accumulatedNodes,
-                    });
-                }
-            });
+            subModules.forEach(({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes }) =>
+                accumulateToLevel(sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes));
         }
 
         accumulatedFlowPerLevel[accumulationLevel] = accumulatedFlow.values()
