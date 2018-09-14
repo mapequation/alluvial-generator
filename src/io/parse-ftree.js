@@ -1,11 +1,3 @@
-/**
- * @file This file deals with parsing data in the
- * [FTree format]{@link http://www.mapequation.org/code.html#FTree-format}
- * to an object representation.
- * The data should be split into lines and fields.
- *
- * @author Anton Eriksson
- */
 
 const expanded = row => row.length === 5;
 
@@ -39,65 +31,6 @@ const parseLink = row => ({
     flow: row[2],
 });
 
-/**
- * Parse ftree data to object.
- *
- * The input can optionally have the Modules extension to the ftree format.
- *
- * @example
- *  // Input example
- *  [
- *      ["*Modules", 4], // optional section
- *      ["1", 0.5, "ModuleName 1", 0.4],
- *      // ...
- *      ["*Nodes", 10] // optional header
- *      ["1:1:1", 0.0564732, "Name 1", 29],
- *      ["1:1:2", 0.0066206, "Name 2", 286],
- *      ["1:1:3", 0.0025120, "Name 3", 146],
- *      ["1:1:4", 0.0024595, "Name 4", 155],
- *      // ...
- *      ["*Links", "directed"],
- *      ["*Links", "root", 0, 68, 208],
- *      [2, 1, 0.000107451],
- *      [1, 2, 0.0000830222],
- *      [3, 1, 0.00000900902],
- *      // ...
- *  ]
- *
- *
- * @example
- *  // Return value structure
- *  {
- *      data: {
- *          nodes: [
- *              { path, flow, name, stateNode?, node },
- *              // ...
- *          ],
- *          modules: [
- *              {
- *                  path,
- *                  name, // optional
- *                  exitFlow,
- *                  numEdges,
- *                  numChildren,
- *                  modules: [
- *                      { source, target, flow },
- *                      // ...
- *                  ],
- *              },
- *              // ...
- *          ],
- *          meta: {
- *              directed,
- *              expanded,
- *          },
- *      },
- *      errors: [],
- *  }
- *
- * @param {Array[]} rows ftree-file as array (rows) of arrays (fields)
- * @return {Object}
- */
 export default function parseFTree(rows) {
     const result = {
         data: {
@@ -115,9 +48,10 @@ export default function parseFTree(rows) {
 
     let i = 0;
 
+    const isLinkSection = field => /^\*Links/i.test(field.toString());
+
     // 1. Parse nodes section
-    // ftree-files has sections of *Links following the nodes data
-    for (; i < rows.length && !/\*Links/i.test(rows[i][0].toString()); i++) {
+    for (; i < rows.length && !isLinkSection(rows[i][0]); i++) {
         const row = rows[i];
 
         if (row.length !== 4 && row.length !== 5) {
@@ -151,13 +85,13 @@ export default function parseFTree(rows) {
         const row = rows[i];
 
         // 3a. Parse link header
-        if (/^\*Links/i.test(row[0].toString())) {
+        if (isLinkSection(row[0])) {
             if (row.length < 5) {
                 result.errors.push(`Malformed ftree link header: expected at least 5 fields, found ${row.length}.`);
                 continue;
             }
 
-            section = parseLinkSection(row);
+            section = parseModulesSection(row);
             modules.push(section);
 
             // 3b. Parse link data
