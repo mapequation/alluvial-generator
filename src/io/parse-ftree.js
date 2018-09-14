@@ -1,3 +1,5 @@
+import id from "../lib/id";
+
 
 const expanded = row => row.length === 5;
 
@@ -15,7 +17,8 @@ const parseExpanded = row => ({
 
 const parseNode = row => expanded(row) ? parseExpanded(row) : parse(row);
 
-const parseLinkSection = row => ({
+const createParseModulesSection = id => row => ({
+    id,
     path: row[1].toString(),
     exitFlow: row[2],
     numEdges: row[3],
@@ -37,6 +40,7 @@ export default function parseFTree(rows) {
             nodes: [],
             modules: [],
             meta: {
+                id: id(),
                 directed: true,
                 expanded: false,
             },
@@ -77,6 +81,8 @@ export default function parseFTree(rows) {
     } else {
         result.errors.push("Expected link type!");
     }
+
+    const parseModulesSection = createParseModulesSection(meta.id);
 
     let section = null;
 
