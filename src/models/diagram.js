@@ -8,7 +8,7 @@ import TreePath from "../lib/treepath";
 const largestModulesBelowParent = (modules, numModules, parent) =>
     modules
         .filter(m => !TreePath.isRoot(m.path))
-        .filter(m => parent.equal(TreePath.parentPath(m.path)))
+        .filter(m => parent.isParentOf(m.path))
         .filter(m => m.flow > 0)
         .sort((a, b) => b.flow - a.flow)
         .slice(0, numModules);

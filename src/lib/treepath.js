@@ -109,6 +109,14 @@ export default class TreePath {
         return TreePath.fromArray(TreePath.toArray(treePath).slice(0, level));
     }
 
+    isParentOf(child) {
+        return TreePath.isParentOf(this, child);
+    }
+
+    static isParentOf(parent, child) {
+        return TreePath.equal(parent, TreePath.parentPath(child));
+    }
+
     /**
      * Get the path to the node one step up in the hierarchy.
      *
