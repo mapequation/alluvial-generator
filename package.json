@@ -96,5 +96,8 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.80.0"
   }
 }
