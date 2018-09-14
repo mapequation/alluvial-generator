@@ -5,13 +5,13 @@ import StreamLines from "./StreamLines";
 import TreePath from "../lib/treepath";
 
 
-const largestModulesBelowParent = (modules, numModules, parent) => modules
-    .map(module => module
+const largestModulesBelowParent = (modules, numModules, parent) =>
+    modules
         .filter(m => !TreePath.isRoot(m.path))
         .filter(m => parent.equal(TreePath.parentPath(m.path)))
         .filter(m => m.flow > 0)
         .sort((a, b) => b.flow - a.flow)
-        .slice(0, numModules));
+        .slice(0, numModules);
 
 const calcMaxTotalFlow = modules => modules
     .map(module => module
@@ -29,7 +29,7 @@ export default function diagram(props) {
 
     const parent = new TreePath(parentModule);
 
-    const largestModules = largestModulesBelowParent(networks.map(n => n.data.modules), numModules, parent);
+    const largestModules = networks.map(n => largestModulesBelowParent(n.data.modules, numModules, parent));
 
     const maxTotalFlow = calcMaxTotalFlow(largestModules);
 
