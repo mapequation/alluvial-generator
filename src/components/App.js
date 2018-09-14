@@ -19,6 +19,7 @@ export default class App extends React.Component {
         height: 600,
         padding: 3,
         numModules: 15,
+        duration: 200,
         streamlineFraction: 1,
         streamlineThreshold: 0.001,
         parentModule: "root",
@@ -95,6 +96,8 @@ export default class App extends React.Component {
                        onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
                        streamlineThreshold={this.state.streamlineThreshold}
                        onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
+                       duration={this.state.duration}
+                       onDurationChange={duration => this.setState({ duration })}
                        parentModule={this.state.parentModule}
                        onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
             <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
@@ -108,6 +111,7 @@ export default class App extends React.Component {
                                      numModules={+this.state.numModules}
                                      streamlineFraction={+this.state.streamlineFraction}
                                      streamlineThreshold={+this.state.streamlineThreshold}
+                                     duration={+this.state.duration}
                                      parentModule={this.state.parentModule}/>
                 </ZoomableSvg>
                 }

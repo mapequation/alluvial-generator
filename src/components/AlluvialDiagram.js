@@ -19,6 +19,7 @@ export default class AlluvialDiagram extends React.Component {
         streamlineFraction: 1,
         streamlineThreshold: 0.005,
         parentModule: "root",
+        duration: 200,
     };
 
     static propTypes = {
@@ -31,6 +32,7 @@ export default class AlluvialDiagram extends React.Component {
         networks: PropTypes.arrayOf(PropTypes.object),
         moduleFlows: PropTypes.arrayOf(PropTypes.object),
         parentModule: PropTypes.string,
+        duration: PropTypes.number,
     };
 
     componentDidMount() {
@@ -54,6 +56,8 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     async draw(prevProps = this.props) {
+        const { duration } = this.props;
+
         const {
             networkRemoved,
             networkAdded,
@@ -77,8 +81,8 @@ export default class AlluvialDiagram extends React.Component {
             },
         });
 
-        const t = d3.transition().duration(200);
-        const delay = 150;
+        const t = d3.transition().duration(duration);
+        const delay = duration * 0.75;
         const g = this.svg.select(".alluvial-diagram");
 
         /**
@@ -192,7 +196,7 @@ export default class AlluvialDiagram extends React.Component {
             .remove();
 
         const streamlineDelay = delay => (d, index, elements) => {
-            const timeBudget = 100;
+            const timeBudget = duration * 0.5;
             const timePerElement = timeBudget / elements.length;
             return delay + timePerElement * index;
         };

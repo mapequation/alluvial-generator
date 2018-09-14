@@ -78,6 +78,16 @@ export default function MySidebar(props) {
                 onChange: props.onStreamlineThresholdChange,
             }}/>
         </Menu.Item>
+        <Menu.Item>
+            <Input type="text" label="Animation duration" labelPosition="left" value={props.duration}/>
+            <Slider discrete settings={{
+                start: props.duration,
+                min: 100,
+                max: 1000,
+                step: 100,
+                onChange: props.onDurationChange,
+            }}/>
+        </Menu.Item>
     </Sidebar>;
 }
 
@@ -100,4 +110,6 @@ MySidebar.propTypes = {
     onStreamlineThresholdChange: PropTypes.func,
     parentModule: PropTypes.string,
     onParentModuleChange: PropTypes.func,
+    duration: PropTypes.number,
+    onDurationChange: PropTypes.func,
 };
