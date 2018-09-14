@@ -1,23 +1,49 @@
+// @flow
 import id from "../lib/id";
 
 
+export type Node = {
+    path: string,
+    flow: number,
+    name: string,
+    node: number,
+    stateNode?: number,
+};
+
+export type Link = {
+    source: number,
+    target: number,
+    flow: number,
+};
+
+export type Module = {
+    id: string,
+    path: string,
+    exitFlow: number,
+    numEdges: number,
+    numChildren: number,
+    flow: number,
+    name: string,
+    links: Array<Link>,
+};
+
 const expanded = row => row.length === 5;
 
-const parse = row => ({
+const parse = (row: Array<any>): Node => ({
     path: row[0].toString(),
     flow: row[1],
     name: row[2].toString(),
     node: row[row.length - 1],
 });
 
-const parseExpanded = row => ({
+const parseExpanded = (row: Array<any>): Node => ({
     ...parse(row),
     stateNode: row[3],
 });
 
-const parseNode = row => expanded(row) ? parseExpanded(row) : parse(row);
+const parseNode = (row: Array<any>): Node => expanded(row) ? parseExpanded(row) : parse(row);
 
-const createParseModulesSection = id => row => ({
+const createParseModulesSection = id => (row: Array<any>): Module => ({
     id,
     path: row[1].toString(),
     exitFlow: row[2],
@@ -28,13 +54,26 @@ const createParseModulesSection = id => row => ({
     links: [],
 });
 
-const parseLink = row => ({
+const parseLink = (row: Array<number>): Link => ({
     source: row[0],
     target: row[1],
     flow: row[2],
 });
 
-export default function parseFTree(rows) {
+export type FTree = {
+    data: {
+        nodes: Array<Node>,
+        modules: Array<Module>,
+        meta: {
+            id: string,
+            directed: boolean,
+            expanded: boolean,
+        },
+    },
+    errors: Array<string>,
+};
+
+export default function parseFTree(rows: Array<any>): FTree {
     const result = {
         data: {
             nodes: [],
@@ -84,7 +123,7 @@ export default function parseFTree(rows) {
 
     const parseModulesSection = createParseModulesSection(meta.id);
 
-    let section = null;
+    let module: ?Module = null;
 
     // 3. Parse modules section
     for (; i < rows.length; i++) {
@@ -97,18 +136,18 @@ export default function parseFTree(rows) {
                 continue;
             }
 
-            section = parseModulesSection(row);
-            modules.push(section);
+            module = parseModulesSection(row);
+            modules.push(module);
 
             // 3b. Parse link data
-        } else if (section) {
+        } else if (module) {
             /*
             if (row.length < 3) {
                 result.errors.push(`Malformed ftree link data: expected at least 3 fields, found ${row.length}.`);
                 continue;
             }
 
-            section.links.push(parseLink(row));
+            module.links.push(parseLink(row));
             */
         }
     }
