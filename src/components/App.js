@@ -48,7 +48,7 @@ export default class App extends React.Component {
             comments: "#",
             delimiter: " ",
             quoteChar: "\"",
-            dynamicTyping: true,
+            dynamicTyping: false,
             skipEmptyLines: true,
             worker: true,
         };

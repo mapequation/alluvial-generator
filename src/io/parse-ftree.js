@@ -31,14 +31,14 @@ const expanded = row => row.length === 5;
 
 const parse = (row: Array<any>): Node => ({
     path: row[0].toString(),
-    flow: row[1],
+    flow: +row[1],
     name: row[2].toString(),
-    node: row[row.length - 1],
+    node: +row[row.length - 1],
 });
 
 const parseExpanded = (row: Array<any>): Node => ({
     ...parse(row),
-    stateNode: row[3],
+    stateNode: +row[3],
 });
 
 const parseNode = (row: Array<any>): Node => expanded(row) ? parseExpanded(row) : parse(row);
@@ -46,18 +46,18 @@ const parseNode = (row: Array<any>): Node => expanded(row) ? parseExpanded(row) 
 const createParseModulesSection = id => (row: Array<any>): Module => ({
     id,
     path: row[1].toString(),
-    exitFlow: row[2],
-    numEdges: row[3],
-    numChildren: row[4],
-    flow: row[5],
-    name: row[6],
+    exitFlow: +row[2],
+    numEdges: +row[3],
+    numChildren: +row[4],
+    flow: +row[5],
+    name: row[6].toString(),
     links: [],
 });
 
 const parseLink = (row: Array<number>): Link => ({
-    source: row[0],
-    target: row[1],
-    flow: row[2],
+    source: +row[0],
+    target: +row[1],
+    flow: +row[2],
 });
 
 export type FTree = {
@@ -73,7 +73,7 @@ export type FTree = {
     errors: Array<string>,
 };
 
-export default function parseFTree(rows: Array<any>): FTree {
+export default function parseFTree(rows: Array<Array<string>>): FTree {
     const result = {
         data: {
             nodes: [],
