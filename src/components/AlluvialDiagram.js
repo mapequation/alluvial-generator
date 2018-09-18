@@ -118,7 +118,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("class", "module")
             .attr("fill", "#ccccbb")
             .attr("opacity", 1)
-            .on("click", d => console.log(`${d.path}: ${d.flow} ${d.name}`));
+            .on("click", d => console.log(d));
 
         modulesUpdate.exit()
             .transition(t)
@@ -188,7 +188,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("fill", "#ccccbb")
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5)
-            .on("click", d => console.log(`${d.sourcePath} -> ${d.targetPath}`));
+            .on("click", d => console.log(d));
 
         streamlinesUpdate.exit()
             .transition(t)

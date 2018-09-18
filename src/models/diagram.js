@@ -40,7 +40,7 @@ export default function diagram(props) {
         new Modules(modules, maxTotalFlow, { barWidth, height, padding, streamlineWidth }));
 
     const modulePairs = pairs(modules);
-    
+
     modulePairs.forEach(([left, right]) => right.moveToRightOf(left));
 
     const streamlines = modulePairs.map(([leftModules, rightModules], i) =>
