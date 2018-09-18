@@ -15,12 +15,14 @@ export type ModuleFlow = {
 
 export type ModuleFlowsPerLevel = { [number]: ModuleFlow[] };
 
+const accumulatorKey = (sourcePath, targetPath) => `${sourcePath}-${targetPath}`;
+
 const createAccumulator = (accumulationLevel, accumulatedFlow) =>
     ({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes = 1 }: ModuleFlow) => {
         const sourceAncestorPath = TreePath.ancestorAtLevel(sourcePath, accumulationLevel);
         const targetAncestorPath = TreePath.ancestorAtLevel(targetPath, accumulationLevel);
 
-        const key = TreePath.join(sourceAncestorPath, targetAncestorPath);
+        const key = accumulatorKey(sourceAncestorPath, targetAncestorPath);
         const found = accumulatedFlow.get(key);
 
         if (found) {
