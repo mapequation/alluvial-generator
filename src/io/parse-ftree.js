@@ -2,6 +2,8 @@
 import id from "../lib/id";
 
 
+type Row = Array<string>;
+
 export type Node = {
     path: string,
     flow: number,
@@ -29,21 +31,21 @@ export type Module = {
 
 const expanded = row => row.length === 5;
 
-const parse = (row: Array<any>): Node => ({
+const parse = (row: Row): Node => ({
     path: row[0].toString(),
     flow: +row[1],
     name: row[2].toString(),
     node: +row[row.length - 1],
 });
 
-const parseExpanded = (row: Array<any>): Node => ({
+const parseExpanded = (row: Row): Node => ({
     ...parse(row),
     stateNode: +row[3],
 });
 
-const parseNode = (row: Array<any>): Node => expanded(row) ? parseExpanded(row) : parse(row);
+const parseNode = (row: Row): Node => expanded(row) ? parseExpanded(row) : parse(row);
 
-const createParseModulesSection = id => (row: Array<any>): Module => ({
+const createParseModulesSection = id => (row: Row): Module => ({
     id,
     path: row[1].toString(),
     exitFlow: +row[2],
@@ -54,7 +56,7 @@ const createParseModulesSection = id => (row: Array<any>): Module => ({
     links: [],
 });
 
-const parseLink = (row: Array<number>): Link => ({
+const parseLink = (row: Row): Link => ({
     source: +row[0],
     target: +row[1],
     flow: +row[2],
@@ -73,7 +75,7 @@ export type FTree = {
     errors: Array<string>,
 };
 
-export default function parseFTree(rows: Array<Array<string>>): FTree {
+export default function parseFTree(rows: Row[]): FTree {
     const result = {
         data: {
             nodes: [],
