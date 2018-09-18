@@ -1,10 +1,22 @@
+// @flow
 import { descending, map, nest } from "d3";
 
 import TreePath from "../lib/treepath";
+import type { Node } from "../io/parse-ftree";
 
+
+export type ModuleFlow = {
+    sourcePath: string,
+    targetPath: string,
+    sourceFlow: number,
+    targetFlow: number,
+    accumulatedNodes?: number,
+};
+
+export type ModuleFlowsPerLevel = { [number]: ModuleFlow[] };
 
 const createAccumulator = (accumulationLevel, accumulatedFlow) =>
-    ({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes = 1 }) => {
+    ({ sourcePath, targetPath, sourceFlow, targetFlow, accumulatedNodes = 1 }: ModuleFlow) => {
         const sourceAncestorPath = TreePath.ancestorAtLevel(sourcePath, accumulationLevel);
         const targetAncestorPath = TreePath.ancestorAtLevel(targetPath, accumulationLevel);
 
@@ -26,7 +38,7 @@ const createAccumulator = (accumulationLevel, accumulatedFlow) =>
         }
     };
 
-const accumulateModuleFlow = (sourceNodes, targetNodes) => {
+const accumulateModuleFlow = (sourceNodes: Node[], targetNodes: Node[]): ModuleFlowsPerLevel => {
     const targetNodesByName = map(targetNodes, node => node.name);
 
     const sourceNodesWithTarget = sourceNodes.filter(node => targetNodesByName.has(node.name));
@@ -50,7 +62,7 @@ const accumulateModuleFlow = (sourceNodes, targetNodes) => {
     // // repeat for other levels ...
     // ]
 
-    const accumulatedFlowPerLevel = {};
+    const accumulatedFlowPerLevel: ModuleFlowsPerLevel = {};
 
     for (const { key: nodeLevel, values: sourceNodes } of sourceNodesByLevel) {
         const accumulationLevel = nodeLevel - 1;
