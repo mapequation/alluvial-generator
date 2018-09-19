@@ -1,5 +1,5 @@
 // @flow
-import * as d3 from "d3";
+import { map } from "d3";
 import { streamlineHorizontal } from "../lib/streamline";
 import Modules from "./Modules";
 import type { ModuleFlow } from "./accumulate-module-flow";
@@ -32,10 +32,10 @@ export default class StreamLines {
     get data(): StreamLineCoordinates[] {
         const width = this.width;
         const xOffset = this.xOffset;
-        const accumulatedSourceOffsets = d3.map();
-        const accumulatedTargetOffsets = d3.map();
-        const sourceModulesByPath = d3.map(this.sourceModules.data, m => m.path);
-        const targetModulesByPath = d3.map(this.targetModules.data, m => m.path);
+        const accumulatedSourceOffsets = map();
+        const accumulatedTargetOffsets = map();
+        const sourceModulesByPath = map(this.sourceModules.data, m => m.path);
+        const targetModulesByPath = map(this.targetModules.data, m => m.path);
 
         return this.moduleFlows
             .filter(({ sourceFlow, targetFlow }) => (sourceFlow + targetFlow) / 2 > this.threshold)

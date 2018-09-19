@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import * as d3 from "d3";
+import { event, select, zoom as zoomBehavior, zoomIdentity } from "d3";
 
 
 export default class ZoomableSvg extends React.Component {
     static defaultProps = {
         width: "100vw",
         height: "100vh",
-        initialTransform: d3.zoomIdentity.translate(50, 50),
+        initialTransform: zoomIdentity.translate(50, 50),
     };
 
     static propTypes = {
@@ -18,10 +18,10 @@ export default class ZoomableSvg extends React.Component {
     componentDidMount() {
         const { width, height, initialTransform } = this.props;
 
-        const zoom = d3.zoom()
+        const zoom = zoomBehavior()
             .scaleExtent([0.1, 1000]);
 
-        const svg = d3.select(this.node)
+        const svg = select(this.node)
             .style("width", width)
             .attr("height", height)
             .call(zoom)
@@ -30,7 +30,7 @@ export default class ZoomableSvg extends React.Component {
         const zoomable = svg.select("#zoomable")
             .attr("transform", initialTransform);
 
-        zoom.on("zoom", () => zoomable.attr("transform", d3.event.transform));
+        zoom.on("zoom", () => zoomable.attr("transform", event.transform));
     }
 
     render() {

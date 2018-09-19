@@ -1,7 +1,7 @@
 import React from "react";
-import { Button, Menu, Icon, Input, Sidebar } from "semantic-ui-react";
+import PropTypes from "prop-types";
+import { Button, Icon, Input, Menu, Sidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
-import * as PropTypes from "prop-types";
 
 
 export default function MySidebar(props) {
