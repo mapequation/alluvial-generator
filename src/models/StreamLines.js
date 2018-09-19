@@ -1,30 +1,44 @@
+// @flow
 import * as d3 from "d3";
 import { streamlineHorizontal } from "../lib/streamline";
+import Modules from "./Modules";
+import type { ModuleFlow } from "./accumulate-module-flow";
 
+
+export type StreamLineCoordinates = ModuleFlow & {
+    svgEnterPath: string,
+    svgPath: string,
+    svgExitPath: string,
+};
 
 export default class StreamLines {
-    constructor(sourceModules, targetModules, moduleFlows, threshold, width) {
+    sourceModules: Modules;
+    targetModules: Modules;
+    moduleFlows: ModuleFlow[];
+    threshold: number;
+    width: number;
+    xOffset: number;
+    streamlineGenerator = streamlineHorizontal();
+
+    constructor(sourceModules: Modules, targetModules: Modules, moduleFlows: ModuleFlow[], threshold: number, width: number) {
         this.sourceModules = sourceModules;
         this.targetModules = targetModules;
-        this._moduleFlows = moduleFlows;
+        this.moduleFlows = moduleFlows;
         this.threshold = threshold;
         this.width = width;
         this.xOffset = sourceModules.rightSide;
-        this.streamlineGenerator = streamlineHorizontal();
     }
 
-    get data() {
-        return this._streamlinesWithCoordinates(this.sourceModules.data, this.targetModules.data, this._moduleFlows, this.threshold, this.width, this.xOffset);
-    }
-
-    _streamlinesWithCoordinates(sourceModules, targetModules, moduleFlows, threshold, width, xOffset) {
+    get data(): StreamLineCoordinates[] {
+        const width = this.width;
+        const xOffset = this.xOffset;
         const accumulatedSourceOffsets = d3.map();
         const accumulatedTargetOffsets = d3.map();
-        const sourceModulesByPath = d3.map(sourceModules, m => m.path);
-        const targetModulesByPath = d3.map(targetModules, m => m.path);
+        const sourceModulesByPath = d3.map(this.sourceModules.data, m => m.path);
+        const targetModulesByPath = d3.map(this.targetModules.data, m => m.path);
 
-        return moduleFlows
-            .filter(({ sourceFlow, targetFlow }) => (sourceFlow + targetFlow) / 2 > threshold)
+        return this.moduleFlows
+            .filter(({ sourceFlow, targetFlow }) => (sourceFlow + targetFlow) / 2 > this.threshold)
             .filter(({ sourcePath, targetPath }) =>
                 sourceModulesByPath.has(sourcePath) &&
                 targetModulesByPath.has(targetPath))
@@ -45,24 +59,26 @@ export default class StreamLines {
                 const { sourceFlow, targetFlow, sourceModule, targetModule } = moduleFlow;
                 const accumulatedSourceOffset = accumulatedSourceOffsets.get(sourceModule.path) || 0;
                 const accumulatedTargetOffset = accumulatedTargetOffsets.get(targetModule.path) || 0;
-                const streamlineSource = this._streamlineHeightOffset(sourceFlow, sourceModule, accumulatedSourceOffset);
-                const streamlineTarget = this._streamlineHeightOffset(targetFlow, targetModule, accumulatedTargetOffset);
-                accumulatedSourceOffsets.set(sourceModule.path, accumulatedSourceOffset - streamlineSource.height);
-                accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineTarget.height);
+                const streamlineSourceHeight = sourceFlow / sourceModule.flow * sourceModule.height;
+                const streamlineTargetHeight = targetFlow / targetModule.flow * targetModule.height;
+                const streamlineSourceOffset = sourceModule.y + sourceModule.height + accumulatedSourceOffset;
+                const streamlineTargetOffset = targetModule.y + targetModule.height + accumulatedTargetOffset;
+                accumulatedSourceOffsets.set(sourceModule.path, accumulatedSourceOffset - streamlineSourceHeight);
+                accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineTargetHeight);
                 return {
-                    enterPath: this.streamlineGenerator([
-                        [xOffset + width / 10, streamlineSource.offset],
-                        [xOffset + width / 10, streamlineSource.offset],
-                        [xOffset + width / 10, streamlineSource.offset - streamlineTarget.height],
-                        [xOffset + width / 10, streamlineSource.offset - streamlineTarget.height],
+                    svgEnterPath: this.streamlineGenerator([
+                        [xOffset + width / 10, streamlineSourceOffset],
+                        [xOffset + width / 10, streamlineSourceOffset],
+                        [xOffset + width / 10, streamlineSourceOffset - streamlineTargetHeight],
+                        [xOffset + width / 10, streamlineSourceOffset - streamlineTargetHeight],
                     ]),
-                    path: this.streamlineGenerator([
-                        [xOffset, streamlineSource.offset],
-                        [xOffset + width, streamlineTarget.offset],
-                        [xOffset + width, streamlineTarget.offset - streamlineTarget.height],
-                        [xOffset, streamlineSource.offset - streamlineSource.height],
+                    svgPath: this.streamlineGenerator([
+                        [xOffset, streamlineSourceOffset],
+                        [xOffset + width, streamlineTargetOffset],
+                        [xOffset + width, streamlineTargetOffset - streamlineTargetHeight],
+                        [xOffset, streamlineSourceOffset - streamlineSourceHeight],
                     ]),
-                    exitPath: this.streamlineGenerator([
+                    svgExitPath: this.streamlineGenerator([
                         [xOffset, 0],
                         [xOffset + width, 0],
                         [xOffset + width, 0],
@@ -71,12 +87,5 @@ export default class StreamLines {
                     ...moduleFlow,
                 };
             });
-    }
-
-    _streamlineHeightOffset(flow, module, accumulatedOffset) {
-        return {
-            height: flow / module.flow * module.height,
-            offset: module.y + module.height + accumulatedOffset,
-        };
     }
 }

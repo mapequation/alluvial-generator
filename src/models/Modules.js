@@ -1,38 +1,56 @@
+// @flow
+import type { Module } from "../io/parse-ftree";
+
+
+export type ModuleCoordinates = Module & {
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+};
+
 export default class Modules {
-    constructor(modules, maxTotalFlow, style) {
+    modules: Module[];
+    maxTotalFlow: number;
+    height: number;
+    padding: number;
+    barWidth: number;
+    streamlineWidth: number;
+    xOffset: number;
+
+    constructor(modules: Module[], maxTotalFlow: number, height: number, padding: number, barWidth: number, streamlineWidth: number) {
         this.modules = modules;
         this.maxTotalFlow = maxTotalFlow;
-        this.style = style;
+        this.height = height;
+        this.padding = padding;
+        this.barWidth = barWidth;
+        this.streamlineWidth = streamlineWidth;
         this.xOffset = 0;
     }
 
-    get rightSide() {
-        return this.xOffset + this.style.barWidth;
+    get rightSide(): number {
+        return this.xOffset + this.barWidth;
     }
 
-    moveToRightOf(leftModules) {
-        const { barWidth, streamlineWidth } = this.style;
-        this.xOffset += leftModules.xOffset + barWidth + streamlineWidth;
+    moveToRightOf(leftModules: Modules): void {
+        this.xOffset += leftModules.xOffset + this.barWidth + this.streamlineWidth;
     }
 
-    get data() {
-        const { height, padding } = this.style;
-        return this._modulesWithHeightY(this.modules, this.maxTotalFlow, height, padding);
-    }
+    get data(): ModuleCoordinates[] {
+        let accumulatedHeight = this.height; // Starting from the bottom, so we subtract from this
 
-    _modulesWithHeightY(modules, totalFlow, totalHeight, padding, minHeight = 0.1) {
-        let accumulatedHeight = totalHeight; // starting from the bottom, so we subtract from this
+        // Invisible modules introduce unwanted padding, we need to filter those.
+        const visibleModules = this._visibleModules();
 
-        const visibleModules = modules.filter(module =>
-            this._moduleHeight(module.flow, padding, modules.length, totalHeight, totalFlow) > minHeight);
+        let usableHeight = this._usableHeight(this.padding, this.height, visibleModules.length);
 
         return visibleModules
             .map(module => {
-                const height = this._moduleHeight(module.flow, padding, visibleModules.length, totalHeight, totalFlow);
+                const height = this._moduleHeight(module.flow, this.maxTotalFlow, usableHeight);
                 const y = accumulatedHeight - height;
-                accumulatedHeight -= height + padding;
+                accumulatedHeight -= height + this.padding;
                 return {
-                    width: this.style.barWidth,
+                    width: this.barWidth,
                     height,
                     x: this.xOffset,
                     y,
@@ -41,9 +59,13 @@ export default class Modules {
             });
     }
 
-    _moduleHeight(flow, padding, numModules, totalHeight, totalFlow) {
-        const totalPadding = padding * (numModules - 1);
-        const usableHeight = totalHeight - totalPadding;
-        return flow / totalFlow * usableHeight;
-    }
+    _visibleModules(minHeight: number = 0.1): Module[] {
+        let usableHeight = this._usableHeight(this.padding, this.height, this.modules.length);
+        return this.modules.filter(module =>
+            this._moduleHeight(module.flow, this.maxTotalFlow, usableHeight) > minHeight);
+    };
+
+    _usableHeight = (padding: number, totalHeight: number, numModules: number) => totalHeight - padding * (numModules - 1);
+
+    _moduleHeight = (flow: number, totalFlow: number, usableHeight: number): number => flow / totalFlow * usableHeight;
 }

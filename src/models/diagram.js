@@ -37,7 +37,7 @@ export default function diagram(props) {
     const streamlineWidth = streamlineFraction * barWidth;
 
     const modules = largestModules.map(modules =>
-        new Modules(modules, maxTotalFlow, { barWidth, height, padding, streamlineWidth }));
+        new Modules(modules, maxTotalFlow, height, padding, barWidth, streamlineWidth));
 
     const modulePairs = pairs(modules);
 

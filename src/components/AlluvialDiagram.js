@@ -159,8 +159,8 @@ export default class AlluvialDiagram extends React.Component {
         /**
          * Streamlines
          */
-        const streamlineEnterOpacityPath = selection => selection.attr("opacity", 0).attr("d", s => s.enterPath);
-        const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", s => s.path);
+        const streamlineEnterOpacityPath = selection => selection.attr("opacity", 0).attr("d", d => d.svgEnterPath);
+        const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", d => d.svgPath);
 
         let streamlinesGroups = g.selectAll(".streamlines")
             .data(streamlines);
@@ -168,7 +168,7 @@ export default class AlluvialDiagram extends React.Component {
         streamlinesGroups.exit()
             .selectAll(".streamline")
             .transition(t)
-            .attr("d", d => d.exitPath);
+            .attr("d", d => d.svgExitPath);
 
         streamlinesGroups.exit()
             .transition(t)
@@ -192,7 +192,7 @@ export default class AlluvialDiagram extends React.Component {
 
         streamlinesUpdate.exit()
             .transition(t)
-            .attr("d", d => d.exitPath)
+            .attr("d", d => d.svgExitPath)
             .remove();
 
         const streamlineDelay = delay => (d, index, elements) => {
