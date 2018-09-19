@@ -61,22 +61,22 @@ export default class StreamLines {
                 const accumulatedTargetOffset = accumulatedTargetOffsets.get(targetModule.path) || 0;
                 const streamlineSourceHeight = sourceFlow / sourceModule.flow * sourceModule.height;
                 const streamlineTargetHeight = targetFlow / targetModule.flow * targetModule.height;
-                const streamlineSourceOffset = sourceModule.y + sourceModule.height + accumulatedSourceOffset;
-                const streamlineTargetOffset = targetModule.y + targetModule.height + accumulatedTargetOffset;
+                const streamlineSourceY = sourceModule.y + sourceModule.height + accumulatedSourceOffset;
+                const streamlineTargetY = targetModule.y + targetModule.height + accumulatedTargetOffset;
                 accumulatedSourceOffsets.set(sourceModule.path, accumulatedSourceOffset - streamlineSourceHeight);
                 accumulatedTargetOffsets.set(targetModule.path, accumulatedTargetOffset - streamlineTargetHeight);
                 return {
                     svgEnterPath: this.streamlineGenerator([
-                        [xOffset + width / 10, streamlineSourceOffset],
-                        [xOffset + width / 10, streamlineSourceOffset],
-                        [xOffset + width / 10, streamlineSourceOffset - streamlineTargetHeight],
-                        [xOffset + width / 10, streamlineSourceOffset - streamlineTargetHeight],
+                        [xOffset + width / 2, (streamlineSourceY + streamlineTargetY) / 2],
+                        [xOffset + width / 2, (streamlineSourceY + streamlineTargetY) / 2],
+                        [xOffset + width / 2, (streamlineSourceY + streamlineTargetY) / 2 - streamlineTargetHeight],
+                        [xOffset + width / 2, (streamlineSourceY + streamlineTargetY) / 2 - streamlineTargetHeight],
                     ]),
                     svgPath: this.streamlineGenerator([
-                        [xOffset, streamlineSourceOffset],
-                        [xOffset + width, streamlineTargetOffset],
-                        [xOffset + width, streamlineTargetOffset - streamlineTargetHeight],
-                        [xOffset, streamlineSourceOffset - streamlineSourceHeight],
+                        [xOffset, streamlineSourceY],
+                        [xOffset + width, streamlineTargetY],
+                        [xOffset + width, streamlineTargetY - streamlineTargetHeight],
+                        [xOffset, streamlineSourceY - streamlineSourceHeight],
                     ]),
                     svgExitPath: this.streamlineGenerator([
                         [xOffset, 0],
