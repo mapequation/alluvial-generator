@@ -2,13 +2,13 @@
 import type { Module, Node } from "../io/parse-ftree";
 import id from "../lib/id";
 import TreePath from "../lib/treepath";
+import type { Predicate } from "../lib/types";
 import AlluvialNode from "./AlluvialNode";
+import type { IAlluvialBase } from "./IAlluvialBase";
 import Path from "./Path";
 
 
-type Predicate<T> = T => boolean;
-
-export default class AlluvialModule extends Path {
+export default class AlluvialModule extends Path implements IAlluvialBase {
     id: string = id();
     modules: AlluvialModule[];
     nodes: AlluvialNode[];

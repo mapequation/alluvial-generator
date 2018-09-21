@@ -1,10 +1,11 @@
 // @flow
 import type { Node } from "../io/parse-ftree";
 import AlluvialModule from "./AlluvialModule";
+import type { IAlluvialBase } from "./IAlluvialBase";
 import Path from "./Path";
 
 
-export default class AlluvialNode extends Path {
+export default class AlluvialNode extends Path implements IAlluvialBase {
     node: Node;
     left: ?AlluvialNode = null;
     right: ?AlluvialNode = null;
