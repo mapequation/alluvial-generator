@@ -2,7 +2,6 @@
 import type { Module, Node } from "../io/parse-ftree";
 import id from "../lib/id";
 import TreePath from "../lib/treepath";
-import type { Predicate } from "../lib/types";
 import AlluvialNode from "./AlluvialNode";
 import type { IAlluvialBase } from "./IAlluvialBase";
 import Path from "./Path";
