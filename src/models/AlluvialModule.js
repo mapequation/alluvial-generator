@@ -14,7 +14,7 @@ export default class AlluvialModule extends Path implements IAlluvialBase {
     left: ?AlluvialModule = null;
     right: ?AlluvialModule = null;
     parent: ?AlluvialModule;
-    flow: number = 0;
+    +flow: number;
 
     constructor(module: Module,
                 subModules: Module[],

@@ -2,7 +2,7 @@ import TreePath from "../lib/treepath";
 
 
 export default class Path {
-    path: TreePath;
+    +path: TreePath;
 
     constructor(path) {
         this.path = new TreePath(path);
