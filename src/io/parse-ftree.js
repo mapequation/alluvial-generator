@@ -1,32 +1,40 @@
 // @flow
-import id from "../lib/id";
-
-
 type Row = Array<string>;
 
 export type Node = {
-    path: string,
-    flow: number,
-    name: string,
-    node: number,
-    stateNode?: number,
+    +path: string,
+    +flow: number,
+    +name: string,
+    +node: number,
+    +stateNode?: number,
 };
 
 export type Link = {
-    source: number,
-    target: number,
-    flow: number,
+    +source: number,
+    +target: number,
+    +flow: number,
 };
 
 export type Module = {
-    id: string,
-    path: string,
-    exitFlow: number,
-    numEdges: number,
-    numChildren: number,
-    flow: number,
-    name: string,
-    links: Array<Link>,
+    +path: string,
+    +exitFlow: number,
+    +numEdges: number,
+    +numChildren: number,
+    +flow: number,
+    +name: string,
+    +links: Array<Link>,
+};
+
+export type FTree = {
+    +data: {
+        +nodes: Array<Node>,
+        +modules: Array<Module>,
+        +meta: {
+            +directed: boolean,
+            +expanded: boolean,
+        },
+    },
+    +errors: Array<string>,
 };
 
 const expanded = row => row.length === 5;
@@ -45,8 +53,7 @@ const parseExpanded = (row: Row): Node => ({
 
 const parseNode = (row: Row): Node => expanded(row) ? parseExpanded(row) : parse(row);
 
-const createParseModulesSection = id => (row: Row): Module => ({
-    id,
+const parseModulesSection = (row: Row): Module => ({
     path: row[1].toString(),
     exitFlow: +row[2],
     numEdges: +row[3],
@@ -62,26 +69,12 @@ const parseLink = (row: Row): Link => ({
     flow: +row[2],
 });
 
-export type FTree = {
-    data: {
-        nodes: Array<Node>,
-        modules: Array<Module>,
-        meta: {
-            id: string,
-            directed: boolean,
-            expanded: boolean,
-        },
-    },
-    errors: Array<string>,
-};
-
 export default function parseFTree(rows: Row[]): FTree {
     const result = {
         data: {
             nodes: [],
             modules: [],
             meta: {
-                id: id(),
                 directed: true,
                 expanded: false,
             },
@@ -122,8 +115,6 @@ export default function parseFTree(rows: Row[]): FTree {
     } else {
         result.errors.push("Expected link type!");
     }
-
-    const parseModulesSection = createParseModulesSection(meta.id);
 
     let module: ?Module = null;
 
