@@ -20,4 +20,8 @@ export default class AlluvialNode extends Path implements IAlluvialBase {
     get flow() {
         return this.node.flow;
     }
+
+    get name() {
+        return this.node.name;
+    }
 }

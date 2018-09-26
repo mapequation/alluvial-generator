@@ -9,19 +9,19 @@ import Path from "./Path";
 
 export default class AlluvialModule extends Path implements IAlluvialBase {
     id: string = id();
+    module: Module;
     modules: AlluvialModule[];
     nodes: AlluvialNode[];
     left: ?AlluvialModule = null;
     right: ?AlluvialModule = null;
     parent: ?AlluvialModule;
-    +flow: number;
 
     constructor(module: Module,
                 subModules: Module[],
                 nodes: Node[],
                 parent: ?AlluvialModule = null) {
         super(module.path);
-        this.flow = module.flow;
+        this.module = module;
         this.parent = parent;
 
         this.modules = subModules.filter(module => this.path.isParentOf(module.path))
@@ -51,5 +51,13 @@ export default class AlluvialModule extends Path implements IAlluvialBase {
     setLeft(left: AlluvialModule): void {
         this.left = left;
         this.modules.forEach(m => m.setLeft(left));
+    }
+    
+    get flow() {
+        return this.module.flow;
+    }
+
+    get name() {
+        return this.module.name;
     }
 }
