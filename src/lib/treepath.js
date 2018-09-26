@@ -78,12 +78,12 @@ export default class TreePath {
     static isAncestor(parent, child) {
         if (TreePath.isRoot(parent)) return true;
 
-        const childArr = TreePath.toArray(child);
-        const parentArr = TreePath.toArray(parent);
+        const p = parent.toString();
+        const c = child.toString();
 
-        if (parentArr.length >= childArr.length) return false;
+        if (p.length >= c.length) return false;
 
-        return parentArr.every((step, i) => step === childArr[i]);
+        return c.startsWith(p);
     }
 
     get level() {
