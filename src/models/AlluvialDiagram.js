@@ -11,22 +11,16 @@ export default class AlluvialDiagram {
     constructor(networks: FTree[]) {
         this.networks = networks;
 
-        const rootModule = {
-            path: "root",
-            exitFlow: 0,
-            flow: 1,
-            numEdges: 0,
-            numChildren: 0,
-            flow: 1,
-            name: "",
-            links: [],
-        };
+        this.roots = networks.map(n => {
+            const rootModule = n.data.modules.find(m => m.path === "root");
 
-        this.roots = networks.map(n =>
-            new AlluvialModule(
-                n.data.modules.find(m => m.path === "root") || rootModule,
+            if (!rootModule) throw new Error("Found no root module in network!");
+
+            return new AlluvialModule(
+                rootModule,
                 n.data.modules.filter(m => m.path !== "root"),
-                n.data.nodes));
+                n.data.nodes);
+        });
 
         pairs(this.roots).forEach(([left, right]) => {
             left.setRight(right);
