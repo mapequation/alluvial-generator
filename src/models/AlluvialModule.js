@@ -47,39 +47,33 @@ export default class AlluvialModule extends Path implements IAlluvialBase {
         this.nodesByName = new Map(this.nodes.map(node => [node.name, node]));
     }
 
-    setRight(right: AlluvialModule): void {
-        this.right = right;
-
-        const connectRight = this.connectNodes("right");
-
-        if (this.level !== right.level) {
-            right.subModulesAtLevel(this.level)
-                .forEach(subModule => connectRight(subModule));
-        } else {
-            connectRight(right);
-        }
-
-        this.modules.forEach(m => m.setRight(right));
+    setRight(module: AlluvialModule): void {
+        this.setSide("right", module);
     }
 
-    setLeft(left: AlluvialModule): void {
-        this.left = left;
-
-        const connectLeft = this.connectNodes("left");
-
-        if (this.level !== left.level) {
-            left.subModulesAtLevel(this.level)
-                .forEach(subModule => connectLeft(subModule));
-        } else {
-            connectLeft(left);
-        }
-
-        this.modules.forEach(m => m.setLeft(left));
+    setLeft(module: AlluvialModule): void {
+        this.setSide("left", module);
     }
 
-    connectNodes(side: Side) {
+    setSide(side: Side, module: AlluvialModule): void {
+        this[side] = module;
+
+        const connect = this.connectNodes(side);
+
+        if (this.level !== module.level) {
+            module.subModulesAtLevel(this.level)
+                .forEach(subModule => connect(subModule));
+        } else {
+            connect(module);
+        }
+
+        this.modules.forEach(subModule => subModule.setSide(side, module));
+    }
+
+    connectNodes(side: Side): (AlluvialModule) => void {
         const otherSide: Side = side === "left" ? "right" : "left";
-        return (module: AlluvialModule) =>
+
+        return (module: AlluvialModule): void =>
             this.nodes.forEach(node => {
                 const other = module.getNode(node.name);
                 if (other) {
