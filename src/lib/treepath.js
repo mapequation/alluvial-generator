@@ -150,7 +150,8 @@ export default class TreePath {
             return TreePath.root();
         }
 
-        return new TreePath(path.substr(0, path.lastIndexOf(":")));
+        const p = path.toString();
+        return new TreePath(p.substr(0, p.lastIndexOf(":")));
     }
 
     /**

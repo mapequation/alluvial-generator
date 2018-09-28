@@ -63,7 +63,7 @@ const parseModulesSection = (row: Row): Module => ({
     links: [],
 });
 
-const parseLink = (row: Row): Link => ({
+const parseLink = (row: Row): Link => ({ // eslint-disable-line no-unused-vars
     source: +row[0],
     target: +row[1],
     flow: +row[2],
