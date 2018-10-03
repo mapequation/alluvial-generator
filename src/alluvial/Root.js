@@ -6,8 +6,6 @@ import Node from "./Node";
 
 
 export default class Root {
-    +network: FTree;
-
     left: ?Root = null;
     right: ?Root = null;
 
@@ -20,7 +18,6 @@ export default class Root {
     visibleModules: Module[];
 
     constructor(network: FTree) {
-        this.network = network;
         const { nodes, modules } = network.data;
 
         this.nodes = nodes.map(node => new Node(node));
