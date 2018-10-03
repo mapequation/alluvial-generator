@@ -2,7 +2,7 @@ import React from "react";
 import { Sidebar } from "semantic-ui-react";
 import { pairs } from "d3";
 
-import MySidebar from "./MySidebar";
+import MySidebar from "./Sidebar";
 import AlluvialDiagram from "./AlluvialDiagram";
 import ZoomableSvg from "./ZoomableSvg";
 

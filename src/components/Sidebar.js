@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, Icon, Input, Menu, Sidebar } from "semantic-ui-react";
+import { Button, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
 
-export default function MySidebar(props) {
-    return <Sidebar as={Menu}
+export default function Sidebar(props) {
+    return <SemanticSidebar as={Menu}
                     animation="overlay"
                     width="wide"
                     direction="right"
@@ -88,10 +88,10 @@ export default function MySidebar(props) {
                 onChange: props.onDurationChange,
             }}/>
         </Menu.Item>
-    </Sidebar>;
+    </SemanticSidebar>;
 }
 
-MySidebar.propTypes = {
+Sidebar.propTypes = {
     numVisibleNetworks: PropTypes.number,
     onRemoveNetworkClick: PropTypes.func,
     onAddNetworkClick: PropTypes.func,
