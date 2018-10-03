@@ -1,5 +1,5 @@
 // @flow
-type Row = Array<string>;
+type Row = string[];
 
 export type Node = {
     +path: string,
@@ -22,19 +22,19 @@ export type Module = {
     +numChildren: number,
     +flow: number,
     +name: string,
-    +links: Array<Link>,
+    +links: Link[],
 };
 
 export type FTree = {
     +data: {
-        +nodes: Array<Node>,
-        +modules: Array<Module>,
+        +nodes: Node[],
+        +modules: Module[],
         +meta: {
             +directed: boolean,
             +expanded: boolean,
         },
     },
-    +errors: Array<string>,
+    +errors: string[],
 };
 
 const expanded = row => row.length === 5;
