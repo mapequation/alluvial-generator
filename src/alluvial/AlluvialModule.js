@@ -4,6 +4,6 @@ import TreeNode from "./TreeNode";
 
 
 export default class AlluvialModule extends TreeNode {
-    left = new AlluvialBranch(this);
-    right = new AlluvialBranch(this);
+    left = new AlluvialBranch();
+    right = new AlluvialBranch();
 }

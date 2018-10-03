@@ -1,10 +1,15 @@
+// @flow
 import TreePath from "../lib/treepath";
+import type { Node, Module } from "../io/parse-ftree";
 
 
 export default class TreeNode {
+    +node: Node | Module;
     +path: TreePath;
+    +rank: number;
+    +level: number;
 
-    constructor(node) {
+    constructor(node: Node | Module) {
         this.node = node;
         this.path = new TreePath(node.path);
         this.rank = this.path.rank;

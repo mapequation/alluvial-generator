@@ -5,6 +5,7 @@ import * as d3 from "d3";
 import TreePath from "../lib/treepath";
 import { COORDINATES } from "../workers/actions";
 import { createWorker, workerPromise } from "../workers/worker-utils";
+import Alluvial from "../alluvial/AlluvialDiagram";
 
 
 export default class AlluvialDiagram extends React.Component {
@@ -57,6 +58,8 @@ export default class AlluvialDiagram extends React.Component {
 
     async draw(prevProps = this.props) {
         const { duration } = this.props;
+
+        const alluvial = new Alluvial(this.props.networks);
 
         const {
             networkRemoved,

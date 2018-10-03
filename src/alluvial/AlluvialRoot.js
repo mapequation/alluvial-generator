@@ -1,4 +1,5 @@
-import type { FTree } from "../io/parse-ftree";
+// @flow
+import type { FTree, Node, Module } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
 import AlluvialModule from "./AlluvialModule";
 import AlluvialNode from "./AlluvialNode";
@@ -12,91 +13,65 @@ export default class AlluvialRoot {
     right: ?AlluvialRoot = null;
 
     nodes: AlluvialNode[];
-    nodeIndexByName: Map<string, number>;
+    nodesByName: Map<string, AlluvialNode>;
 
     root: AlluvialModule;
     modules: AlluvialModule[];
-    moduleIndexByPath: Map<string, number>;
+    modulesByPath: Map<string, AlluvialModule>;
     visibleModules: AlluvialModule[];
 
-    maxNumModules: number;
-    flowThreshold: number = 1e-7;
-    accumulationTarget: number;
-
-    constructor(network: FTree, maxNumModules: number) {
+    constructor(network: FTree) {
         this.network = network;
-        this.maxNumModules = maxNumModules;
-        const { nodes, modules } = network.data;
+        this.setNodes(network.data.nodes);
+        this.setModules(network.data.modules);
+        this.setVisibleModules();
+    }
 
+    setNodes(nodes: Node[]) {
         this.nodes = nodes.map(node => new AlluvialNode(node));
-        this.nodeIndexByName = new Map(this.nodes.map(({ name }, i) => [name, i]));
+        this.nodesByName = new Map(this.nodes.map(node => [node.name, node]));
+    }
 
+    setModules(modules: Module[]) {
         const root = modules.find(module => TreePath.isRoot(module.path));
 
-        if (root) {
-            this.root = new AlluvialModule(root);
-        } else {
+        if (!root) {
             throw new Error("No root module found!");
         }
+
+        this.root = new AlluvialModule(root);
 
         this.modules = modules
             .filter(module => !TreePath.isRoot(module.path))
             .map(module => new AlluvialModule(module));
-        this.moduleIndexByPath = new Map(this.modules.map(({ path }, i) => [path.toString(), i]));
 
-        this.accumulationTarget = 0.99 * this.root.flow;
+        this.modulesByPath = new Map(this.modules.map(module => [module.path.toString(), module]));
+    }
+
+    setVisibleModules() {
+        const flowThreshold = 1e-7;
+        const maxNumModules = 15;
+        const accumulationTarget = 0.99 * this.root.flow;
 
         this.visibleModules = this.modules
-            .filter(module => module.flow > this.flowThreshold)
+            .filter(module => module.flow > flowThreshold)
             .filter(module => module.level === 1)
             .sort((a, b) => b.flow - a.flow)
             .slice(0, maxNumModules)
-            .filter(AlluvialRoot.accumulateFlow(this.accumulationTarget));
+            .filter(AlluvialRoot.accumulateFlow(accumulationTarget));
     }
 
     setRight(right: AlluvialRoot): void {
         this.right = right;
         right.left = this;
 
-        this.connectNodes(right);
-
-        const nodePairs = this.nodes
-            .filter(node => node.right)
-            .map(node => [node, node.right]);
-
-        nodePairs.forEach(([leftNode, rightNode]) => {
-            const leftModule = this.findVisibleParentModule(leftNode.path);
-            const rightModule = right.findVisibleParentModule(rightNode.path);
-
-            if (leftModule && rightModule) {
-                leftModule.right.getStreamlineToRight(rightModule.left)
-                    .addNodePair(leftNode, rightNode);
-            }
-        });
-    }
-
-    connectNodes(right: AlluvialRoot): void {
         this.nodes.forEach(leftNode => {
-            const rightNode = right.getNode(leftNode.name);
+            const rightNode = right.nodesByName.get(leftNode.name);
             if (rightNode) {
                 leftNode.right = rightNode;
                 rightNode.left = leftNode;
             }
         });
-    }
-
-    getNode(name: string): ?AlluvialNode {
-        const index = this.nodeIndexByName.get(name);
-        return index ? this.nodes[index] : null;
-    }
-
-    getModule(path: string): ?AlluvialModule {
-        const index = this.moduleIndexByPath.get(path);
-        return index ? this.modules[index] : null;
-    }
-
-    findVisibleParentModule(childPath: string): ?AlluvialModule {
-        return this.visibleModules.find(m => m.path.isAncestor(childPath));
     }
 
     static accumulateFlow(target: number) {
