@@ -2,7 +2,7 @@
 import StreamlineNode from "./StreamlineNode";
 
 
-export default class Streamline {
+export default class StreamlineLink {
     left: StreamlineNode;
     right: StreamlineNode;
 

@@ -1,7 +1,7 @@
 // @flow
-import Streamline from "./Streamline";
+import StreamlineLink from "./StreamlineLink";
 
 
 export default class StreamlineNode {
-    streamline: Streamline;
+    link: StreamlineLink;
 }
