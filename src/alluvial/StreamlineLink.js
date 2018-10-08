@@ -6,8 +6,14 @@ export default class StreamlineLink {
     left: StreamlineNode;
     right: StreamlineNode;
 
-    constructor(left: StreamlineNode, right: StreamlineNode) {
-        this.left = left;
-        this.right = right;
+    constructor(left: StreamlineNode, right: StreamlineNode, reverse: boolean = false) {
+        this.left = reverse ? right : left;
+        this.right = reverse ? left : right;
+        left.link = this;
+        right.link = this;
+    }
+
+    static create(left: StreamlineNode, right: StreamlineNode, reverse: boolean = false) {
+        return new StreamlineLink(left, right, reverse);
     }
 }

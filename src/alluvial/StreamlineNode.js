@@ -1,17 +1,15 @@
 // @flow
-import Node from "./Node";
+import type { Node } from "../io/parse-ftree";
+import AlluvialNodeBase from "./AlluvialNodeBase";
 import StreamlineLink from "./StreamlineLink";
 
 
-export default class StreamlineNode {
+export default class StreamlineNode extends AlluvialNodeBase {
     link: ?StreamlineLink = null;
     nodes: Node[] = [];
 
-    add(node: Node): void {
+    addNode(node: Node): void {
         this.nodes.push(node);
-    }
-
-    get flow(): number {
-        return this.nodes.reduce((tot, node) => tot + node.flow, 0);
+        this.flow += node.flow;
     }
 }

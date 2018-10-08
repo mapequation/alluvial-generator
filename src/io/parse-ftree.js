@@ -7,6 +7,8 @@ export type Node = {
     +name: string,
     +node: number,
     +stateNode?: number,
+    +insignificant: boolean,
+    +highlightIndex: number,
 };
 
 export type Link = {
@@ -44,6 +46,8 @@ const parse = (row: Row): Node => ({
     flow: +row[1],
     name: row[2].toString(),
     node: +row[row.length - 1],
+    insignificant: false,
+    highlightIndex: -1,
 });
 
 const parseExpanded = (row: Row): Node => ({
