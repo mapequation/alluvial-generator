@@ -37,7 +37,6 @@ export default class Root {
 
         this.modulesByPath = new Map(this.modules.map(module => [module.path.toString(), module]));
 
-        const flowThreshold = 1e-7;
         const maxNumModules = 15;
         const accumulationTarget = 0.99 * this.root.flow;
 
@@ -47,7 +46,6 @@ export default class Root {
         };
 
         this.visibleModules = this.modules
-            .filter(module => module.flow > flowThreshold)
             .filter(module => module.level === 1)
             .sort((a, b) => b.flow - a.flow)
             .slice(0, maxNumModules)
@@ -65,5 +63,19 @@ export default class Root {
                 rightNode.left = leftNode;
             }
         });
+
+        const pairs: [Node, Node][] = this.nodes
+            .filter(node => node.right)
+            .map(node => [node, node.right]);
+
+        pairs.map(([leftNode, rightNode]) => {
+                const leftParent = this.visibleModules.find(module => module.path.isAncestor(leftNode.path));
+                const rightParent = right.visibleModules.find(module => module.path.isAncestor(rightNode.path));
+                return { leftNode, rightNode, leftParent, rightParent };
+            })
+            .filter(({ leftParent, rightParent }) => leftParent && rightParent)
+            .forEach(({ leftNode, rightNode, leftParent, rightParent }) => {
+
+            });
     }
 }
