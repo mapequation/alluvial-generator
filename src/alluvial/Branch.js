@@ -9,7 +9,7 @@ export const LEFT: Side = -1;
 export const RIGHT: Side = 1;
 
 export default class Branch extends AlluvialNodeBase {
-    streamlineNodes: StreamlineNode[] = [];
+    children: StreamlineNode[] = [];
     side: Side;
 
     constructor(side: Side, networkIndex: number) {
@@ -30,7 +30,15 @@ export default class Branch extends AlluvialNodeBase {
     }
 
     addStreamlineNode(streamlineNode: StreamlineNode): void {
-        this.streamlineNodes.push(streamlineNode);
+        this.children.push(streamlineNode);
+    }
+
+    get isLeft(): boolean {
+        return this.side === LEFT;
+    }
+
+    get isRight(): boolean {
+        return this.side === RIGHT;
     }
 
     get depth(): number {
@@ -39,9 +47,8 @@ export default class Branch extends AlluvialNodeBase {
 
     asObject(): Object {
         return {
-            depth: this.depth,
-            layout: this.layout,
-            children: this.streamlineNodes.map(g => g.asObject()),
+            ...super.asObject(),
+            side: this.isLeft ? "left" : "right",
         };
     }
 }

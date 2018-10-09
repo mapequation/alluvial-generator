@@ -1,16 +1,14 @@
-import React from "react";
-import PropTypes from "prop-types";
 import * as d3 from "d3";
+import PropTypes from "prop-types";
+import React from "react";
 
-import TreePath from "../lib/treepath";
-import { COORDINATES } from "../workers/actions";
-import { createWorker, workerPromise } from "../workers/worker-utils";
 import Diagram from "../alluvial/Diagram";
+import { streamlineHorizontal } from "../lib/streamline";
 
 
 export default class AlluvialDiagram extends React.Component {
     svg = d3.select(null);
-    worker = workerPromise(createWorker());
+    streamlineGenerator = streamlineHorizontal();
 
     static defaultProps = {
         width: 1200,
@@ -31,7 +29,6 @@ export default class AlluvialDiagram extends React.Component {
         streamlineFraction: PropTypes.number,
         streamlineThreshold: PropTypes.number,
         networks: PropTypes.arrayOf(PropTypes.object),
-        moduleFlows: PropTypes.arrayOf(PropTypes.object),
         parentModule: PropTypes.string,
         duration: PropTypes.number,
     };
@@ -59,8 +56,6 @@ export default class AlluvialDiagram extends React.Component {
     async draw(prevProps = this.props) {
         const { duration } = this.props;
 
-        const diagram = new Diagram(this.props.networks);
-
         const {
             networkRemoved,
             networkAdded,
@@ -69,159 +64,78 @@ export default class AlluvialDiagram extends React.Component {
             parentModuleChanged,
         } = this.propsChanged(this.props, prevProps);
 
-        const { modules, streamlines } = await this.worker({
-            type: COORDINATES,
-            props: {
-                width: this.props.width,
-                height: this.props.height,
-                padding: this.props.padding,
-                streamlineFraction: this.props.streamlineFraction,
-                numModules: this.props.numModules,
-                streamlineThreshold: this.props.streamlineThreshold,
-                networks: this.props.networks,
-                parentModule: this.props.parentModule,
-                moduleFlows: this.props.moduleFlows,
-            },
-        });
+        const diagram = new Diagram(this.props.networks);
+        const tree = diagram.asObject();
+        console.log(tree);
 
         const t = d3.transition().duration(duration);
         const delay = duration * 0.75;
+
+        this.svg
+            .attr("width", tree.layout.width)
+            .attr("height", tree.layout.height);
+
         const g = this.svg.select(".alluvial-diagram");
 
-        /**
-         * Modules
-         */
-        const moduleWidthX = selection => selection.attr("width", d => d.width).attr("x", d => d.x);
-        const moduleHeightY = selection => selection.attr("height", d => d.height).attr("y", d => d.y);
-        const moduleUpdateTransition = selection => selection.call(moduleWidthX).call(moduleHeightY);
-        const moduleExitTransition = selection => selection.attr("height", 0).attr("y", 0);
+        const roots = g.selectAll(".networkRoot")
+            .data(tree.children);
 
-        let modulesGroups = g.selectAll(".modules")
-            .data(modules);
+        const rootsEnter = roots.enter()
+            .append("g")
+            .attr("class", "networkRoot");
 
-        modulesGroups.exit()
-            .selectAll(".module")
-            .transition(t)
-            .call(moduleExitTransition);
+        const streamlines = rootsEnter.selectAll(".streamline")
+            .data(d => d.links);
 
-        modulesGroups.exit()
-            .transition(t)
-            .remove();
-
-        modulesGroups = modulesGroups.enter().append("g")
-            .merge(modulesGroups)
-            .attr("class", "modules");
-
-        const modulesUpdate = modulesGroups.selectAll(".module")
-            .data(d => d, function key(d) {
-                return d ? d.path : this.id;
-            });
-
-        const modulesEnter = modulesUpdate.enter().append("rect")
-            .attr("class", "module")
-            .attr("fill", "#ccccbb")
-            .attr("opacity", 1)
-            .on("click", d => console.log(d));
-
-        modulesUpdate.exit()
-            .transition(t)
-            .call(moduleExitTransition)
-            .remove();
-
-        const modulesEnterUpdate = modulesEnter.merge(modulesUpdate);
-
-        if (streamlineFractionChanged || widthChanged) {
-            modulesEnterUpdate
-                .transition(t)
-                .call(moduleUpdateTransition);
-        } else if (networkRemoved) {
-            modulesUpdate
-                .transition(t).delay(delay) // Wait for removed modules
-                .call(moduleUpdateTransition);
-        } else if (networkAdded) {
-            modulesUpdate
-                .transition(t)
-                .call(moduleUpdateTransition);
-            modulesEnter
-                .call(moduleWidthX)
-                .transition(t).delay(delay) // Wait for existing modules
-                .call(moduleHeightY);
-        } else if (parentModuleChanged) {
-            modulesEnter
-                .call(moduleWidthX)
-                .transition(t)
-                .delay(delay)
-                .call(moduleHeightY);
-        } else {
-            modulesEnterUpdate
-                .call(moduleWidthX)
-                .transition(t)
-                .call(moduleHeightY);
-        }
-
-        /**
-         * Streamlines
-         */
-        const streamlineEnterOpacityPath = selection => selection.attr("opacity", 0).attr("d", d => d.svgEnterPath);
-        const streamlineOpacityPath = selection => selection.attr("opacity", 0.8).attr("d", d => d.svgPath);
-
-        let streamlinesGroups = g.selectAll(".streamlines")
-            .data(streamlines);
-
-        streamlinesGroups.exit()
-            .selectAll(".streamline")
-            .transition(t)
-            .attr("d", d => d.svgExitPath);
-
-        streamlinesGroups.exit()
-            .transition(t)
-            .remove();
-
-        streamlinesGroups = streamlinesGroups.enter().append("g")
-            .merge(streamlinesGroups)
-            .attr("class", "streamlines");
-
-        const streamlinesUpdate = streamlinesGroups.selectAll(".streamline")
-            .data(d => d, function key(d) {
-                return d ? TreePath.join(d.sourcePath, d.targetPath) : this.id;
-            });
-
-        const streamlinesEnter = streamlinesUpdate.enter().append("path")
+        const streamlinesEnter = streamlines.enter()
+            .append("path")
             .attr("class", "streamline")
-            .attr("fill", "#ccccbb")
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 0.5)
+            .attr("opacity", 0.5)
+            .attr("d", this.streamlineGenerator);
+
+        const modules = rootsEnter.selectAll(".module")
+            .data(d => d.children);
+
+        const modulesEnter = modules.enter()
+            .append("g")
+            .attr("class", "module");
+
+        const groups = modulesEnter.selectAll(".group")
+            .data(d => d.children);
+
+        const groupsEnter = groups.enter()
+            .append("g")
+            .attr("class", "group");
+
+        groupsEnter.append("rect")
+            .attr("x", d => d.layout.x)
+            .attr("y", d => d.layout.y)
+            .attr("width", d => d.layout.width)
+            .attr("height", d => d.layout.height)
+            .attr("fill", "#B6B69F")
+            .attr("stroke", "white");
+
+        const branch = groupsEnter.selectAll(".branch")
+            .data(d => d.children);
+
+        const branchEnter = branch.enter()
+            .append("g")
+            .attr("class", d => `branch ${d.side}`);
+
+        const streamlineNode = branchEnter.selectAll(".streamlineNode")
+            .data(d => d.children);
+
+        const streamlineNodeEnter = streamlineNode.enter()
+            .append("g")
+            .attr("class", "streamlineNode");
+
+        streamlineNodeEnter.append("rect")
+            .attr("x", d => d.layout.x)
+            .attr("y", d => d.layout.y)
+            .attr("width", d => d.layout.width)
+            .attr("height", d => d.layout.height)
+            .attr("opacity", 0)
             .on("click", d => console.log(d));
-
-        streamlinesUpdate.exit()
-            .transition(t)
-            .attr("d", d => d.svgExitPath)
-            .remove();
-
-        const streamlineDelay = delay => (d, index, elements) => {
-            const timeBudget = duration * 0.5;
-            const timePerElement = timeBudget / elements.length;
-            return delay + timePerElement * index;
-        };
-
-        if (networkRemoved) {
-            streamlinesUpdate
-                .transition(t).delay(delay) // Wait for removed modules
-                .call(streamlineOpacityPath);
-        } else if (parentModuleChanged) {
-            streamlinesEnter
-                .call(streamlineEnterOpacityPath)
-                .transition(t).delay(streamlineDelay(2 * delay))
-                .call(streamlineOpacityPath);
-        } else {
-            streamlinesUpdate
-                .transition(t)
-                .call(streamlineOpacityPath);
-            streamlinesEnter
-                .call(streamlineEnterOpacityPath)
-                .transition(t).delay(streamlineDelay(delay))
-                .call(streamlineOpacityPath);
-        }
     }
 
     render() {

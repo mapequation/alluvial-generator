@@ -1,14 +1,14 @@
 // @flow
-import * as d3 from "d3";
+import sortBy from "lodash/sortBy";
 
 import type { FTree, Node } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
-import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
 import { LEFT } from "./Branch";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
+
 
 
 export default class Diagram {
@@ -19,35 +19,13 @@ export default class Diagram {
     constructor(networks: FTree[]) {
         this.networks = networks;
         this.networks.forEach((network, i) => {
-            //network.data.nodes.forEach(node => this.addNode(node, i));
+            network.data.nodes.forEach(node => this.addNode(node, i));
         });
-        this.addNode(networks[0].data.nodes[0], 0);
-        this.addNode(networks[1].data.nodes[0], 1);
         this.calcLayout();
-        console.log(this.asObject())
-    }
-
-    * traverseDepthFirst(): Iterable<AlluvialNodeBase> {
-        yield this.alluvialRoot;
-        for (let networkRoot of this.alluvialRoot.networkRoots) {
-            yield networkRoot;
-            for (let module of networkRoot.modules) {
-                yield module;
-                for (let group of module.groups) {
-                    yield group;
-                    for (let branch of group.branches()) {
-                        yield branch;
-                        for (let streamlineNode of branch.streamlineNodes) {
-                            yield streamlineNode;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     calcLayout() {
-        const height = 800;
+        const height = 600;
         const width = 1200;
 
         const numNetworks = this.networks.length;
@@ -60,8 +38,7 @@ export default class Diagram {
         let x = -networkWidth; // we add this the first time
         let y = height;
 
-        for (let node of this.traverseDepthFirst()) {
-            console.log(node);
+        for (let node of this.alluvialRoot.traverseDepthFirst()) {
             switch (node.depth) {
                 case 0: // alluvialRoot
                     node.layout = { x: 0, y: 0, width, height };
@@ -75,9 +52,14 @@ export default class Diagram {
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
                 case 3: // group
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    node.layout = { x, y: y - node.flow * height, width: barWidth, height: node.flow * height };
                     break;
                 case 4: // branch
+                    node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
+                    if (node.isRight) {
+                        // reset height because...
+                        y += node.flow * height;
+                    }
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
                 case 5: // slnode
@@ -106,6 +88,7 @@ export default class Diagram {
         const { left, right } = group;
 
         for (let branch of [left, right]) {
+            branch.flow += node.flow;
             const oppositeNode = this.getNodeByName(branch.neighborNetworkIndex, node.name);
             const streamlineId = this.getStreamlineNodeId(node, networkIndex, moduleLevel, branch.side, oppositeNode);
             let streamlineNode = this.streamlineNodesById.get(streamlineId);
@@ -114,7 +97,6 @@ export default class Diagram {
                 streamlineNode = new StreamlineNode(networkIndex, streamlineId);
                 this.streamlineNodesById.set(streamlineId, streamlineNode);
                 branch.addStreamlineNode(streamlineNode);
-                branch.flow += node.flow;
 
                 const [leftId, rightId] = streamlineId.split("--");
                 if (rightId) {

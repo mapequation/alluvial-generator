@@ -7,8 +7,10 @@ export const NOT_HIGHLIGHTED = -1;
 export const INSIGNIFICANT = -2;
 
 export default class HighlightGroup extends AlluvialNodeBase {
-    left = Branch.createLeft(this.networkIndex);
-    right = Branch.createRight(this.networkIndex);
+    children: Branch[] = [
+        Branch.createLeft(this.networkIndex),
+        Branch.createRight(this.networkIndex)
+    ];
 
     highlightIndex = NOT_HIGHLIGHTED;
 
@@ -20,19 +22,11 @@ export default class HighlightGroup extends AlluvialNodeBase {
         return 3;
     }
 
-    asObject(): Object {
-        return {
-            depth: this.depth,
-            layout: this.layout,
-            children: [
-                this.left.asObject(),
-                this.right.asObject(),
-            ],
-        };
+    get left() {
+        return this.children[0];
     }
 
-    * branches(): Iterable<Branch> {
-        yield this.left;
-        yield this.right;
+    get right() {
+        return this.children[1];
     }
 }

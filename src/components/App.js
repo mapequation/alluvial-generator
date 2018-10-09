@@ -25,7 +25,6 @@ export default class App extends React.Component {
         parentModule: "root",
         networks: [],
         visibleNetworks: [],
-        moduleFlows: [],
     };
 
     validNumber = (value) => Number.isNaN(+value) ? 0 : +value;
@@ -62,25 +61,13 @@ export default class App extends React.Component {
                 }));
                 return parsed.map(each => parseFTree(each.data));
             })
-            .then(networks => {
-                this.setState({ networks, visibleNetworks: networks });
-
-                return Promise.all(pairs(networks).map(([left, right]) => {
-                    const worker = workerPromise(createWorker());
-                    return worker({
-                        type: ACCUMULATE,
-                        sourceNodes: left.data.nodes,
-                        targetNodes: right.data.nodes,
-                    });
-                }));
-            })
-            .then(moduleFlows => this.setState({ moduleFlows }))
+            .then(networks => this.setState({ networks, visibleNetworks: networks }))
             .catch(console.error);
     }
 
     render() {
         const { networks, moduleFlows } = this.state;
-        const loadingComplete = networks.length > 0 && moduleFlows.length > 0;
+        const loadingComplete = networks.length > 0;
 
         return <Sidebar.Pushable>
             <MySidebar numVisibleNetworks={this.state.visibleNetworks.length}
@@ -104,7 +91,6 @@ export default class App extends React.Component {
                 {loadingComplete &&
                 <ZoomableSvg>
                     <AlluvialDiagram networks={this.state.visibleNetworks}
-                                     moduleFlows={this.state.moduleFlows}
                                      padding={+this.state.padding}
                                      width={this.state.width}
                                      height={this.state.height}

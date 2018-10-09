@@ -1,5 +1,4 @@
 // @flow
-
 type Position = {
     x: number,
     y: number,
@@ -12,6 +11,8 @@ type Size = {
 
 type Layout = Position & Size;
 
+export type Child = $Subtype<AlluvialNodeBase>;
+
 export default class AlluvialNodeBase {
     flow: number = 0;
     networkIndex: number;
@@ -21,6 +22,7 @@ export default class AlluvialNodeBase {
     y: number = 0;
     height: number = 0;
     width: number = 0;
+    +children: Child[] = [];
 
     constructor(networkIndex: number, id: string = "") {
         this.networkIndex = networkIndex;
@@ -32,17 +34,12 @@ export default class AlluvialNodeBase {
     }
 
     asObject(): Object {
-        return {};
-    }
-
-    set position([x, y]: Position): void {
-        this.x = x;
-        this.y = y;
-    }
-
-    set size({ width, height }: Size): void {
-        this.width = width;
-        this.height = height;
+        return {
+            id: this.id,
+            depth: this.depth,
+            layout: this.layout,
+            children: this.children.map(child => child.asObject()),
+        };
     }
 
     set layout({ x, y, width, height }: Layout) {
@@ -55,5 +52,9 @@ export default class AlluvialNodeBase {
     get layout(): Layout {
         const { x, y, width, height } = this;
         return { x, y, width, height };
+    }
+
+    get byFlow() {
+        return -this.flow;
     }
 }

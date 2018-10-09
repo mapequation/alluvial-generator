@@ -4,13 +4,13 @@ import NetworkRoot from "./NetworkRoot";
 
 
 export default class AlluvialRoot extends AlluvialNodeBase {
-    networkRoots: NetworkRoot[] = [];
+    children: NetworkRoot[] = [];
 
     getOrCreateNetworkRoot(node: Node, networkIndex): NetworkRoot {
-        let root = this.networkRoots.find(root => root.networkIndex === networkIndex);
+        let root = this.children.find(root => root.networkIndex === networkIndex);
         if (!root) {
             root = new NetworkRoot(networkIndex);
-            this.networkRoots.push(root);
+            this.children.push(root);
         }
         return root;
     }
@@ -19,12 +19,22 @@ export default class AlluvialRoot extends AlluvialNodeBase {
         return 0;
     }
 
-    asObject(): Object {
-        return {
-            depth: this.depth,
-            layout: this.layout,
-            children: this.networkRoots.map(r => r.asObject()),
-        };
+    * traverseDepthFirst(): Iterable<AlluvialNodeBase> {
+        yield this;
+        for (let networkRoot of this.children) {
+            yield networkRoot;
+            for (let module of networkRoot.children) {
+                yield module;
+                for (let group of module.children) {
+                    yield group;
+                    for (let branch of group.children) {
+                        yield branch;
+                        for (let streamlineNode of branch.children) {
+                            yield streamlineNode;
+                        }
+                    }
+                }
+            }
+        }
     }
-
 }

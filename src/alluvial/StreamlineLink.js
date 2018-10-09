@@ -18,9 +18,18 @@ export default class StreamlineLink {
     }
 
     asObject() {
+        const {
+            left: { layout: leftLayout },
+            right: { layout: rightLayout },
+        } = this;
+
         return {
-            left: this.left.layout,
-            right: this.right.layout,
+            x0: leftLayout.x + leftLayout.width,
+            x1: rightLayout.x,
+            y0: leftLayout.y,
+            y1: rightLayout.y,
+            h0: leftLayout.height,
+            h1: rightLayout.height,
         };
     }
 }
