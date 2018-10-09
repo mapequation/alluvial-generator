@@ -1,8 +1,8 @@
 // @flow
-import type { FTree, Node as FTreeNode } from "../io/parse-ftree";
+import type { FTree, Node } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
 import type { Side } from "./Branch";
-import { LEFT, RIGHT } from "./Branch";
+import { LEFT } from "./Branch";
 import Root from "./Root";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
@@ -20,7 +20,7 @@ export default class Diagram {
         this.addNode(networks[1].data.nodes[0], 1);
     }
 
-    addNode(node: FTreeNode, networkIndex: number, moduleLevel: number = 1) {
+    addNode(node: Node, networkIndex: number, moduleLevel: number = 1) {
         const root = this.roots[networkIndex];
         const module = root.getOrCreateModule(node, moduleLevel);
         const group = module.getOrCreateGroup(node, node.highlightIndex);
@@ -53,17 +53,17 @@ export default class Diagram {
         }
     }
 
-    getNodeByName(networkIndex: number, name: string): ?FTreeNode {
+    getNodeByName(networkIndex: number, name: string): ?Node {
         if (networkIndex < 0 || networkIndex >= this.networks.length) return null;
 
         return this.networks[networkIndex].data.nodes.find(node => node.name === name);
     }
 
-    getStreamlineNodeId(node: FTreeNode,
+    getStreamlineNodeId(node: Node,
                         networkIndex: number,
                         moduleLevel: number,
                         side: Side,
-                        oppositeNode: ?FTreeNode = null): string {
+                        oppositeNode: ?Node = null): string {
 
         const moduleId = node => TreePath.ancestorAtLevel(node.path, moduleLevel).toString();
         const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;

@@ -1,3 +1,5 @@
+// @flow
+
 export default class AlluvialNodeBase {
     flow: number = 0;
     networkIndex: number;

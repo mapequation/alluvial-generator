@@ -17,6 +17,14 @@ export default class Branch extends AlluvialNodeBase {
         this.side = side;
     }
 
+    static createLeft(networkIndex: number): Branch {
+        return new Branch(LEFT, networkIndex);
+    }
+
+    static createRight(networkIndex: number): Branch {
+        return new Branch(RIGHT, networkIndex);
+    }
+
     get neighborNetworkIndex(): number {
         return this.networkIndex + this.side;
     }

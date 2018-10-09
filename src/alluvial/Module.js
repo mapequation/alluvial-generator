@@ -1,5 +1,5 @@
 // @flow
-import type { Node as FTreeNode } from "../io/parse-ftree";
+import type { Node } from "../io/parse-ftree";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import HighlightGroup from "./HighlightGroup";
 
@@ -7,7 +7,7 @@ import HighlightGroup from "./HighlightGroup";
 export default class Module extends AlluvialNodeBase {
     groups: HighlightGroup[] = [];
 
-    getOrCreateGroup(node: FTreeNode, highlightIndex: number): HighlightGroup {
+    getOrCreateGroup(node: Node, highlightIndex: number): HighlightGroup {
         let group = this.groups.find(group => group.highlightIndex === highlightIndex);
         if (!group) {
             group = new HighlightGroup(this.networkIndex);
