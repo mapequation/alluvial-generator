@@ -16,4 +16,11 @@ export default class StreamlineLink {
     static create(left: StreamlineNode, right: StreamlineNode, reverse: boolean = false) {
         return new StreamlineLink(left, right, reverse);
     }
+
+    asObject() {
+        return {
+            left: this.left.layout,
+            right: this.right.layout,
+        };
+    }
 }

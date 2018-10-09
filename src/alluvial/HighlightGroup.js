@@ -15,4 +15,24 @@ export default class HighlightGroup extends AlluvialNodeBase {
     get insignificant(): boolean {
         return this.highlightIndex === INSIGNIFICANT;
     }
+
+    get depth(): number {
+        return 3;
+    }
+
+    asObject(): Object {
+        return {
+            depth: this.depth,
+            layout: this.layout,
+            children: [
+                this.left.asObject(),
+                this.right.asObject(),
+            ],
+        };
+    }
+
+    * branches(): Iterable<Branch> {
+        yield this.left;
+        yield this.right;
+    }
 }

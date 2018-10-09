@@ -12,4 +12,17 @@ export default class StreamlineNode extends AlluvialNodeBase {
         this.nodes.push(node);
         this.flow += node.flow;
     }
+
+    get depth(): number {
+        return 5;
+    }
+
+    asObject(): Object {
+        return {
+            depth: this.depth,
+            layout: this.layout,
+            children: this.nodes,
+            link: this.link ? this.link.asObject() : null,
+        };
+    }
 }

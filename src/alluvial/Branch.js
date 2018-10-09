@@ -32,4 +32,16 @@ export default class Branch extends AlluvialNodeBase {
     addStreamlineNode(streamlineNode: StreamlineNode): void {
         this.streamlineNodes.push(streamlineNode);
     }
+
+    get depth(): number {
+        return 4;
+    }
+
+    asObject(): Object {
+        return {
+            depth: this.depth,
+            layout: this.layout,
+            children: this.streamlineNodes.map(g => g.asObject()),
+        };
+    }
 }

@@ -5,7 +5,7 @@ import AlluvialNodeBase from "./AlluvialNodeBase";
 import Module from "./Module";
 
 
-export default class Root extends AlluvialNodeBase {
+export default class NetworkRoot extends AlluvialNodeBase {
     modules: Module[] = [];
 
     getOrCreateModule(node: Node, moduleLevel: number): Module {
@@ -16,5 +16,17 @@ export default class Root extends AlluvialNodeBase {
             this.modules.push(module);
         }
         return module;
+    }
+
+    get depth(): number {
+        return 1;
+    }
+
+    asObject(): Object {
+        return {
+            depth: this.depth,
+            layout: this.layout,
+            children: this.modules.map(m => m.asObject()),
+        };
     }
 }

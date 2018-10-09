@@ -15,4 +15,16 @@ export default class Module extends AlluvialNodeBase {
         }
         return group;
     }
+
+    get depth(): number {
+        return 2;
+    }
+
+    asObject(): Object {
+        return {
+            depth: this.depth,
+            layout: this.layout,
+            children: this.groups.map(g => g.asObject()),
+        };
+    }
 }
