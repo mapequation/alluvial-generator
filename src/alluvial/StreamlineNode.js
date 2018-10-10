@@ -32,7 +32,9 @@ export default class StreamlineNode extends AlluvialNodeBase {
     }
 
     get byLink() {
-        return this.link ? 0 : 1;
+        const opposite = this.oppositeStreamlineNode;
+        if (!opposite) return -Infinity;
+        return -opposite.layout.y;
     }
 
     static createId(node: LeafNode,

@@ -91,6 +91,8 @@ export default class AlluvialDiagram extends React.Component {
             .append("path")
             .attr("class", "streamline")
             .attr("opacity", 0.5)
+            .attr("fill", "#B6B69F")
+            .attr("stroke", "white")
             .attr("d", this.streamlineGenerator);
 
         const modules = rootsEnter.selectAll(".module")
