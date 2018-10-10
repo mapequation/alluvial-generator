@@ -11,7 +11,7 @@ type Size = {
 
 type Layout = Position & Size;
 
-export type AlluvialNode = $Subtype<AlluvialNodeBase>;
+export type AlluvialNode = $Subtype<AlluvialNodeBase>; // eslint-disable-line no-use-before-define
 
 export default class AlluvialNodeBase {
     flow: number = 0;

@@ -116,7 +116,7 @@ export default class Diagram {
                 branch.addChild(streamlineNode);
             }
 
-            const [_, targetId] = streamlineId.split("--");
+            const [_, targetId] = streamlineId.split("--"); // eslint-disable-line no-unused-vars
             const streamlineIdHasTarget = !!targetId;
 
             if (streamlineIdHasTarget) {
@@ -161,7 +161,6 @@ export default class Diagram {
                 const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
 
                 if (oppositeStreamlineNode) {
-                    // create link
                     const reverseLinkDirection = branch.isLeft;
                     StreamlineLink.create(streamlineNode, oppositeStreamlineNode, reverseLinkDirection);
                 }
@@ -219,9 +218,9 @@ export default class Diagram {
         if (streamlineNode.isEmpty) {
             const opposite = streamlineNode.oppositeStreamlineNode;
             if (opposite) {
-                this.streamlineNodesById.delete(opposite.id); // remove old id
+                this.streamlineNodesById.delete(opposite.id);
                 opposite.makeDangling();
-                this.streamlineNodesById.set(opposite.id, opposite); // add the dangling id
+                this.streamlineNodesById.set(opposite.id, opposite);
             }
 
             this.streamlineNodesById.delete(streamlineNode.id);

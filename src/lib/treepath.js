@@ -1,5 +1,5 @@
 // @flow
-type Path = TreePath | string;
+type Path = TreePath | string;  // eslint-disable-line no-use-before-define
 
 /**
  * Class that represents a path in a tree

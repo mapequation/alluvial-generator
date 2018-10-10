@@ -87,7 +87,7 @@ export default class AlluvialDiagram extends React.Component {
         const streamlines = rootsEnter.selectAll(".streamline")
             .data(d => d.links);
 
-        const streamlinesEnter = streamlines.enter()
+        streamlines.enter()
             .append("path")
             .attr("class", "streamline")
             .attr("opacity", 0.5)
