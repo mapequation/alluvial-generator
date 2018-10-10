@@ -11,7 +11,7 @@ type Size = {
 
 type Layout = Position & Size;
 
-export type Child = $Subtype<AlluvialNodeBase>;
+export type AlluvialNode = $Subtype<AlluvialNodeBase>;
 
 export default class AlluvialNodeBase {
     flow: number = 0;
@@ -22,10 +22,13 @@ export default class AlluvialNodeBase {
     y: number = 0;
     height: number = 0;
     width: number = 0;
-    +children: Child[] = [];
 
-    constructor(networkIndex: number, id: string = "") {
+    +children: AlluvialNode[] = [];
+    parent: ?AlluvialNode = null;
+
+    constructor(networkIndex: number, parent: ?AlluvialNode = null, id: string = "") {
         this.networkIndex = networkIndex;
+        this.parent = parent;
         this.id = id;
     }
 
@@ -33,9 +36,27 @@ export default class AlluvialNodeBase {
         return 0;
     }
 
+    get isEmpty(): boolean {
+        return this.children.length === 0;
+    }
+
+    addChild(node: AlluvialNode) {
+        this.children.push(node);
+    }
+
+    removeChild(node: AlluvialNode) {
+        const index = this.children.indexOf(node);
+        const found = index > -1;
+        if (found) {
+            this.children.splice(index, 1);
+        }
+        return found;
+    }
+
     asObject(): Object {
         return {
             id: this.id,
+            flow: this.flow,
             depth: this.depth,
             layout: this.layout,
             children: this.children.map(child => child.asObject()),

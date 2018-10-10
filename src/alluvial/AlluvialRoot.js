@@ -1,15 +1,19 @@
-import type { Node } from "../io/parse-ftree";
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
 
 
 export default class AlluvialRoot extends AlluvialNodeBase {
     children: NetworkRoot[] = [];
 
-    getOrCreateNetworkRoot(node: Node, networkIndex): NetworkRoot {
-        let root = this.children.find(root => root.networkIndex === networkIndex);
+    getNetworkRoot(node: LeafNode, networkIndex): ?NetworkRoot {
+        return this.children.find(root => root.networkIndex === networkIndex);
+    }
+
+    getOrCreateNetworkRoot(node: LeafNode, networkIndex): NetworkRoot {
+        let root = this.getNetworkRoot(node, networkIndex);
         if (!root) {
-            root = new NetworkRoot(networkIndex);
+            root = new NetworkRoot(networkIndex, this);
             this.children.push(root);
         }
         return root;

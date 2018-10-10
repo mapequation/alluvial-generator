@@ -1,27 +1,40 @@
 // @flow
 import sortBy from "lodash/sortBy";
 
-import type { FTree, Node } from "../io/parse-ftree";
-import TreePath from "../lib/treepath";
+import type { FTree } from "../io/parse-ftree";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
-import { LEFT } from "./Branch";
+import Branch, { LEFT, opposite, RIGHT } from "./Branch";
+import HighlightGroup from "./HighlightGroup";
+import LeafNode from "./LeafNode";
+import Module from "./Module";
+import NetworkRoot from "./NetworkRoot";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
 
 
-
 export default class Diagram {
     alluvialRoot = new AlluvialRoot();
-    networks: FTree[];
+    networks: FTree[] = [];
     streamlineNodesById: Map<string, StreamlineNode> = new Map();
+    nodesByName: Map<string, LeafNode>[] = [];
 
     constructor(networks: FTree[]) {
-        this.networks = networks;
-        this.networks.forEach((network, i) => {
-            network.data.nodes.forEach(node => this.addNode(node, i));
-        });
-        this.calcLayout();
+        networks.forEach(network => this.addNetwork(network));
+    }
+
+    addNetwork(network: FTree) {
+        const { data: { nodes } } = network;
+        const networkIndex = this.networks.length;
+
+        this.networks.push(network);
+        const nodesByName = new Map(nodes.map(node => [node.name, new LeafNode(node, networkIndex)]));
+
+        this.nodesByName.push(nodesByName);
+
+        for (let node of nodesByName.values()) {
+            this.addNode(node, networkIndex);
+        }
     }
 
     calcLayout() {
@@ -76,11 +89,14 @@ export default class Diagram {
         return this.alluvialRoot.asObject();
     }
 
-    addNode(node: Node, networkIndex: number, moduleLevel: number = 1) {
+    addNode(node: LeafNode, networkIndex: number, moduleLevel: number = 1) {
+        node.moduleLevel = moduleLevel;
+
         const root = this.alluvialRoot.getOrCreateNetworkRoot(node, networkIndex);
         const module = root.getOrCreateModule(node, moduleLevel);
         const group = module.getOrCreateGroup(node, node.highlightIndex);
 
+        this.alluvialRoot.flow += node.flow;
         root.flow += node.flow;
         module.flow += node.flow;
         group.flow += node.flow;
@@ -89,54 +105,141 @@ export default class Diagram {
 
         for (let branch of [left, right]) {
             branch.flow += node.flow;
-            const oppositeNode = this.getNodeByName(branch.neighborNetworkIndex, node.name);
-            const streamlineId = this.getStreamlineNodeId(node, networkIndex, moduleLevel, branch.side, oppositeNode);
+
+            const oppositeNode: ?LeafNode = this.getNodeByName(branch.neighborNetworkIndex, node.name);
+            const streamlineId = StreamlineNode.createId(node, networkIndex, moduleLevel, branch.side, oppositeNode);
             let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
             if (!streamlineNode) {
-                streamlineNode = new StreamlineNode(networkIndex, streamlineId);
+                streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
                 this.streamlineNodesById.set(streamlineId, streamlineNode);
-                branch.addStreamlineNode(streamlineNode);
+                branch.addChild(streamlineNode);
 
-                const [leftId, rightId] = streamlineId.split("--");
-                if (rightId) {
-                    const oppositeId = [leftId, rightId].reverse().join("--");
-                    const oppositeStreamline = this.streamlineNodesById.get(oppositeId);
-                    if (oppositeStreamline) {
-                        StreamlineLink.create(streamlineNode, oppositeStreamline, branch.side === LEFT);
+                // connect streamline nodes with a link if possible
+                const [sourceId, targetId] = streamlineId.split("--");
+                if (targetId) {
+                    // check if we already have an opposite streamline
+                    const oppositeId = [sourceId, targetId].reverse().join("--");
+                    const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
+                    // create link
+                    if (oppositeStreamlineNode) {
+                        const reverseLinkDirection = branch.isLeft;
+                        StreamlineLink.create(streamlineNode, oppositeStreamlineNode, reverseLinkDirection);
+                    } else if (oppositeNode) {
+                        // opposite streamline node is dangling but should be connected
+                        this.removeNodeFromSide(oppositeNode, opposite(branch.side));
+                        this.addNodeToSide(oppositeNode, opposite(branch.side));
+                    }
+                }
+            } else if (oppositeNode) {
+                // remove and re-add oppositeNode if oppositeStreamline is dangling
+                const [_, targetId] = streamlineId.split("--");
+                if (targetId) {
+                    const oppositeStreamlineNode = this.streamlineNodesById.get(targetId);
+                    if (oppositeStreamlineNode) {
+                        // opposite streamline node is dangling but should be connected
+                        this.removeNodeFromSide(oppositeNode, opposite(branch.side));
+                        this.addNodeToSide(oppositeNode, opposite(branch.side));
                     }
                 }
             }
 
-            streamlineNode.addNode(node);
+            streamlineNode.addChild(node);
+            streamlineNode.flow += node.flow;
+            node.setParent(streamlineNode, branch.side);
         }
     }
 
-    getNodeByName(networkIndex: number, name: string): ?Node {
+    addNodeToSide(node: LeafNode, side: Side) {
+        const { networkIndex, moduleLevel } = node;
+        const neighborNetworkIndex = networkIndex + side;
+
+        const oppositeNode: ?LeafNode = this.getNodeByName(neighborNetworkIndex, node.name);
+        const streamlineId = StreamlineNode.createId(node, networkIndex, moduleLevel, side, oppositeNode);
+        let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
+        console.log(networkIndex, streamlineId);
+
+        const oldStreamlineNode: StreamlineNode = node.getParent(side);
+        if (!oldStreamlineNode) return console.log("no old sl");
+        const branch: ?Branch = oldStreamlineNode.parent;
+
+        if (!streamlineNode) {
+            console.log("no streamline");
+            if (!branch) return console.log("no branch");
+            streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
+            this.streamlineNodesById.set(streamlineId, streamlineNode);
+            branch.addChild(streamlineNode);
+        }
+
+        streamlineNode.addChild(node);
+        streamlineNode.flow += node.flow;
+        node.setParent(streamlineNode, side);
+    }
+
+    removeNode(node: LeafNode) {
+        this.removeNodeFromSide(node, LEFT);
+        const group = this.removeNodeFromSide(node, RIGHT);
+        if (group) this.removeFromGroup(node, group);
+    }
+
+    removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
+        const streamlineNode = node.getParent(side);
+        if (!streamlineNode) return;
+        streamlineNode.removeChild(node);
+        streamlineNode.flow -= node.flow;
+
+        const branch: ?Branch = streamlineNode.parent;
+        if (!branch) return;
+        branch.flow -= node.flow;
+
+        if (streamlineNode.isEmpty) {
+            const opposite = streamlineNode.oppositeStreamlineNode;
+            if (opposite) {
+                this.streamlineNodesById.delete(opposite.id);
+                opposite.makeDangling();
+                this.streamlineNodesById.set(opposite.id, opposite);
+            } else {
+                this.streamlineNodesById.delete(streamlineNode.id);
+            }
+            if (streamlineNode.link) {
+                streamlineNode.link.remove();
+            }
+
+            branch.removeChild(streamlineNode);
+        }
+
+        return branch.parent;
+    }
+
+    removeFromGroup(node: LeafNode, group: HighlightGroup) {
+        group.flow -= node.flow;
+        // no need to remove branches here
+
+        const module: ?Module = group.parent;
+        if (!module) return;
+        module.flow -= node.flow;
+
+        if (group.isEmpty) {
+            module.removeChild(group);
+        }
+
+        const networkRoot: ?NetworkRoot = module.parent;
+        if (!networkRoot) return;
+        networkRoot.flow -= node.flow;
+
+        if (module.isEmpty) {
+            networkRoot.removeChild(module);
+        }
+
+        this.alluvialRoot.flow -= node.flow;
+
+        if (networkRoot.isEmpty) {
+            this.alluvialRoot.removeChild(networkRoot);
+        }
+    }
+
+    getNodeByName(networkIndex: number, name: string): ?LeafNode {
         if (networkIndex < 0 || networkIndex >= this.networks.length) return null;
-
-        return this.networks[networkIndex].data.nodes.find(node => node.name === name);
-    }
-
-    getStreamlineNodeId(node: Node,
-                        networkIndex: number,
-                        moduleLevel: number,
-                        side: Side,
-                        oppositeNode: ?Node = null): string {
-
-        const moduleId = node => TreePath.ancestorAtLevel(node.path, moduleLevel).toString();
-        const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
-        const createId = (networkIndex, node) => `${networkIndex}_m${moduleId(node)}_group${typeSuffix(node)}`;
-        const idPair = (id, oppositeId) => `${id}--${oppositeId}`;
-        const danglingId = id => `${id}${side === LEFT ? "LEFT" : "RIGHT"}`;
-
-        const id = createId(networkIndex, node);
-
-        if (oppositeNode) {
-            const oppositeId = createId(networkIndex + side, oppositeNode);
-            return idPair(id, oppositeId);
-        }
-
-        return danglingId(id);
+        return this.nodesByName[networkIndex].get(name);
     }
 }

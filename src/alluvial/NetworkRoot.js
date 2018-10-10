@@ -1,7 +1,6 @@
 // @flow
-import type { Node } from "../io/parse-ftree";
-import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
@@ -10,11 +9,15 @@ import StreamlineNode from "./StreamlineNode";
 export default class NetworkRoot extends AlluvialNodeBase {
     children: Module[] = [];
 
-    getOrCreateModule(node: Node, moduleLevel: number): Module {
-        const moduleId = TreePath.ancestorAtLevel(node.path, moduleLevel).toString();
-        let module = this.children.find(module => module.id === moduleId);
+    getModule(node: LeafNode, moduleId: string): ?Module {
+        return this.children.find(module => module.id === moduleId);
+    }
+
+    getOrCreateModule(node: LeafNode, moduleLevel: number): Module {
+        const moduleId = node.ancestorAtLevel(moduleLevel);
+        let module = this.getModule(node, moduleId);
         if (!module) {
-            module = new Module(this.networkIndex, moduleId);
+            module = new Module(this.networkIndex, this, moduleId);
             this.children.push(module);
         }
         return module;

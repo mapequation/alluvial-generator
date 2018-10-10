@@ -17,6 +17,11 @@ export default class StreamlineLink {
         return new StreamlineLink(left, right, reverse);
     }
 
+    remove() {
+        this.left.link = null;
+        this.right.link = null;
+    }
+
     asObject() {
         const {
             left: { layout: leftLayout },

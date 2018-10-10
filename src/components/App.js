@@ -1,16 +1,12 @@
 import React from "react";
 import { Sidebar } from "semantic-ui-react";
-import { pairs } from "d3";
-
-import MySidebar from "./Sidebar";
-import AlluvialDiagram from "./AlluvialDiagram";
-import ZoomableSvg from "./ZoomableSvg";
 
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
+import AlluvialDiagram from "./AlluvialDiagram";
 
-import { ACCUMULATE } from "../workers/actions";
-import { createWorker, workerPromise } from "../workers/worker-utils";
+import MySidebar from "./Sidebar";
+import ZoomableSvg from "./ZoomableSvg";
 
 
 export default class App extends React.Component {
@@ -66,7 +62,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const { networks, moduleFlows } = this.state;
+        const { networks } = this.state;
         const loadingComplete = networks.length > 0;
 
         return <Sidebar.Pushable>

@@ -1,6 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
+import Module from "./Module";
 
 
 export const NOT_HIGHLIGHTED = -1;
@@ -8,14 +9,15 @@ export const INSIGNIFICANT = -2;
 
 export default class HighlightGroup extends AlluvialNodeBase {
     children: Branch[] = [
-        Branch.createLeft(this.networkIndex),
-        Branch.createRight(this.networkIndex)
+        Branch.createLeft(this.networkIndex, this),
+        Branch.createRight(this.networkIndex, this),
     ];
 
-    highlightIndex = NOT_HIGHLIGHTED;
+    highlightIndex: number;
 
-    get insignificant(): boolean {
-        return this.highlightIndex === INSIGNIFICANT;
+    constructor(networkIndex: number, parent: Module, highlightIndex: number = NOT_HIGHLIGHTED) {
+        super(networkIndex, parent);
+        this.highlightIndex = highlightIndex;
     }
 
     get depth(): number {
@@ -28,5 +30,9 @@ export default class HighlightGroup extends AlluvialNodeBase {
 
     get right() {
         return this.children[1];
+    }
+
+    get isEmpty(): boolean {
+        return this.left.isEmpty && this.right.isEmpty;
     }
 }
