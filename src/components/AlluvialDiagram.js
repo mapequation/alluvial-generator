@@ -65,8 +65,9 @@ export default class AlluvialDiagram extends React.Component {
         } = this.propsChanged(this.props, prevProps);
 
         const diagram = new Diagram(this.props.networks);
+        diagram.calcLayout();
         const tree = diagram.asObject();
-        console.log(tree);
+        console.log(diagram);
 
         const t = d3.transition().duration(duration);
         const delay = duration * 0.75;
