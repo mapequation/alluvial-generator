@@ -37,11 +37,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
 
     static createId(node: LeafNode,
                     networkIndex: number,
-                    moduleLevel: number,
                     side: Side,
                     oppositeNode: ?LeafNode = null): string {
 
-        const moduleId = node => node.ancestorAtLevel(moduleLevel);
+        const moduleId = node => node.ancestorAtCurrentLevel;
 
         const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
 

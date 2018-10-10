@@ -107,40 +107,27 @@ export default class Diagram {
             branch.flow += node.flow;
 
             const oppositeNode: ?LeafNode = this.getNodeByName(branch.neighborNetworkIndex, node.name);
-            const streamlineId = StreamlineNode.createId(node, networkIndex, moduleLevel, branch.side, oppositeNode);
+            const streamlineId = StreamlineNode.createId(node, networkIndex, branch.side, oppositeNode);
             let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
             if (!streamlineNode) {
                 streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
                 this.streamlineNodesById.set(streamlineId, streamlineNode);
                 branch.addChild(streamlineNode);
+            }
 
-                // connect streamline nodes with a link if possible
-                const [sourceId, targetId] = streamlineId.split("--");
-                if (targetId) {
-                    // check if we already have an opposite streamline
-                    const oppositeId = [sourceId, targetId].reverse().join("--");
-                    const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
-                    // create link
-                    if (oppositeStreamlineNode) {
-                        const reverseLinkDirection = branch.isLeft;
-                        StreamlineLink.create(streamlineNode, oppositeStreamlineNode, reverseLinkDirection);
-                    } else if (oppositeNode) {
-                        // opposite streamline node is dangling but should be connected
-                        this.removeNodeFromSide(oppositeNode, opposite(branch.side));
-                        this.addNodeToSide(oppositeNode, opposite(branch.side));
-                    }
-                }
-            } else if (oppositeNode) {
-                // remove and re-add oppositeNode if oppositeStreamline is dangling
-                const [_, targetId] = streamlineId.split("--");
-                if (targetId) {
-                    const oppositeStreamlineNode = this.streamlineNodesById.get(targetId);
-                    if (oppositeStreamlineNode) {
-                        // opposite streamline node is dangling but should be connected
-                        this.removeNodeFromSide(oppositeNode, opposite(branch.side));
-                        this.addNodeToSide(oppositeNode, opposite(branch.side));
-                    }
+            const [_, targetId] = streamlineId.split("--");
+            const streamlineIdHasTarget = !!targetId;
+
+            if (streamlineIdHasTarget) {
+                const oppositeStreamlineIsDangling = this.streamlineNodesById.has(targetId);
+                if (oppositeStreamlineIsDangling && oppositeNode) {
+                    const oppositeSide = opposite(branch.side);
+                    this.removeNodeFromSide(oppositeNode, oppositeSide);
+                    this.addNodeToSide(oppositeNode, oppositeSide);
+                } else {
+                    throw new Error("Opposite streamline node for the opposite node must be dangling "
+                        + "before it has has this node to connect to.");
                 }
             }
 
@@ -151,25 +138,37 @@ export default class Diagram {
     }
 
     addNodeToSide(node: LeafNode, side: Side) {
-        const { networkIndex, moduleLevel } = node;
+        const { networkIndex } = node;
         const neighborNetworkIndex = networkIndex + side;
 
         const oppositeNode: ?LeafNode = this.getNodeByName(neighborNetworkIndex, node.name);
-        const streamlineId = StreamlineNode.createId(node, networkIndex, moduleLevel, side, oppositeNode);
+        const streamlineId = StreamlineNode.createId(node, networkIndex, side, oppositeNode);
         let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
-        console.log(networkIndex, streamlineId);
 
         const oldStreamlineNode: StreamlineNode = node.getParent(side);
-        if (!oldStreamlineNode) return console.log("no old sl");
+        if (!oldStreamlineNode) return;
         const branch: ?Branch = oldStreamlineNode.parent;
 
         if (!streamlineNode) {
-            console.log("no streamline");
-            if (!branch) return console.log("no branch");
+            if (!branch) return;
+
             streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
             this.streamlineNodesById.set(streamlineId, streamlineNode);
             branch.addChild(streamlineNode);
+
+            if (oppositeNode) {
+                const oppositeId = streamlineId.split("--").reverse().join("--");
+                const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
+
+                if (oppositeStreamlineNode) {
+                    // create link
+                    const reverseLinkDirection = branch.isLeft;
+                    StreamlineLink.create(streamlineNode, oppositeStreamlineNode, reverseLinkDirection);
+                }
+            }
         }
+
+        if (branch) branch.flow += node.flow;
 
         streamlineNode.addChild(node);
         streamlineNode.flow += node.flow;
@@ -179,39 +178,8 @@ export default class Diagram {
     removeNode(node: LeafNode) {
         this.removeNodeFromSide(node, LEFT);
         const group = this.removeNodeFromSide(node, RIGHT);
-        if (group) this.removeFromGroup(node, group);
-    }
 
-    removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
-        const streamlineNode = node.getParent(side);
-        if (!streamlineNode) return;
-        streamlineNode.removeChild(node);
-        streamlineNode.flow -= node.flow;
-
-        const branch: ?Branch = streamlineNode.parent;
-        if (!branch) return;
-        branch.flow -= node.flow;
-
-        if (streamlineNode.isEmpty) {
-            const opposite = streamlineNode.oppositeStreamlineNode;
-            if (opposite) {
-                this.streamlineNodesById.delete(opposite.id);
-                opposite.makeDangling();
-                this.streamlineNodesById.set(opposite.id, opposite);
-            } else {
-                this.streamlineNodesById.delete(streamlineNode.id);
-            }
-            if (streamlineNode.link) {
-                streamlineNode.link.remove();
-            }
-
-            branch.removeChild(streamlineNode);
-        }
-
-        return branch.parent;
-    }
-
-    removeFromGroup(node: LeafNode, group: HighlightGroup) {
+        if (!group) return;
         group.flow -= node.flow;
         // no need to remove branches here
 
@@ -236,6 +204,36 @@ export default class Diagram {
         if (networkRoot.isEmpty) {
             this.alluvialRoot.removeChild(networkRoot);
         }
+    }
+
+    removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
+        const streamlineNode = node.getParent(side);
+        if (!streamlineNode) return;
+        streamlineNode.removeChild(node);
+        streamlineNode.flow -= node.flow;
+
+        const branch: ?Branch = streamlineNode.parent;
+        if (!branch) return;
+        branch.flow -= node.flow;
+
+        if (streamlineNode.isEmpty) {
+            const opposite = streamlineNode.oppositeStreamlineNode;
+            if (opposite) {
+                this.streamlineNodesById.delete(opposite.id); // remove old id
+                opposite.makeDangling();
+                this.streamlineNodesById.set(opposite.id, opposite); // add the dangling id
+            }
+
+            this.streamlineNodesById.delete(streamlineNode.id);
+
+            if (streamlineNode.link) {
+                streamlineNode.link.remove();
+            }
+
+            branch.removeChild(streamlineNode);
+        }
+
+        return branch.parent;
     }
 
     getNodeByName(networkIndex: number, name: string): ?LeafNode {

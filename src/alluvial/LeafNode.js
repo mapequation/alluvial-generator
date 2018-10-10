@@ -26,6 +26,10 @@ export default class LeafNode extends AlluvialNodeBase {
         return TreePath.ancestorAtLevel(this.node.path, moduleLevel).toString();
     }
 
+    get ancestorAtCurrentLevel(): string {
+        return this.ancestorAtLevel(this.moduleLevel);
+    }
+
     getParent(side: Side): ?StreamlineNode {
         return side === LEFT ? this.leftParent : this.rightParent;
     }
