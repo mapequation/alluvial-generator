@@ -38,9 +38,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     * rightStreamlineNodes(): Iterable<StreamlineNode> {
         for (let module of this.children) {
             for (let group of module.children) {
-                for (let streamlineNode of group.right.children) {
-                    yield streamlineNode;
-                }
+                yield* group.right.children;
             }
         }
     }

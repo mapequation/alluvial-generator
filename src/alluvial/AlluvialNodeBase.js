@@ -63,6 +63,13 @@ export default class AlluvialNodeBase {
         };
     }
 
+    * traverseDepthFirst(): Iterable<AlluvialNodeBase> {
+        yield this;
+        for (let child of this.children) {
+            yield* child.traverseDepthFirst();
+        }
+    }
+
     set layout({ x, y, width, height }: Layout) {
         this.x = x;
         this.y = y;

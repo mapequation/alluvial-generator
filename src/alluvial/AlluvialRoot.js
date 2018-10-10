@@ -24,25 +24,6 @@ export default class AlluvialRoot extends AlluvialNodeBase {
         return ALLUVIAL_ROOT;
     }
 
-    * traverseDepthFirst(): Iterable<AlluvialNodeBase> {
-        yield this;
-        for (let networkRoot of this.children) {
-            yield networkRoot;
-            for (let module of networkRoot.children) {
-                yield module;
-                for (let group of module.children) {
-                    yield group;
-                    for (let branch of group.children) {
-                        yield branch;
-                        for (let streamlineNode of branch.children) {
-                            yield streamlineNode;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     * traverseDepthFirstUntil(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
         yield this;
         for (let networkRoot of this.children) {
