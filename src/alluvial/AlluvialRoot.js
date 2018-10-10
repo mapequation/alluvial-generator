@@ -1,6 +1,7 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
+import { ALLUVIAL_ROOT } from "./depth-constants";
 
 
 export default class AlluvialRoot extends AlluvialNodeBase {
@@ -20,7 +21,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 0;
+        return ALLUVIAL_ROOT;
     }
 
     * traverseDepthFirst(): Iterable<AlluvialNodeBase> {

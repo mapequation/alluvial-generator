@@ -3,6 +3,7 @@ import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { LEFT } from "./Branch";
 import type { Side } from "./Branch";
+import { LEAF_NODE } from "./depth-constants";
 import StreamlineNode from "./StreamlineNode";
 
 
@@ -38,6 +39,6 @@ export default class LeafNode extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 6;
+        return LEAF_NODE;
     }
 }

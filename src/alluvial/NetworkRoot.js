@@ -1,5 +1,6 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import { NETWORK_ROOT } from "./depth-constants";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
@@ -24,7 +25,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 1;
+        return NETWORK_ROOT;
     }
 
     asObject(): Object {

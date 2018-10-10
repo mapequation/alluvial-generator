@@ -5,6 +5,7 @@ import type { FTree } from "../io/parse-ftree";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
 import Branch, { LEFT, opposite, RIGHT } from "./Branch";
+import Depth from "./depth-constants";
 import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
@@ -53,29 +54,28 @@ export default class Diagram {
 
         for (let node of this.alluvialRoot.traverseDepthFirst()) {
             switch (node.depth) {
-                case 0: // alluvialRoot
+                case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
                     break;
-                case 1: //root
+                case Depth.NETWORK_ROOT:
                     x += networkWidth;
                     y = height;
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
-                case 2: // module
+                case Depth.MODULE:
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
-                case 3: // group
+                case Depth.HIGHLIGHT_GROUP:
                     node.layout = { x, y: y - node.flow * height, width: barWidth, height: node.flow * height };
                     break;
-                case 4: // branch
+                case Depth.BRANCH:
                     node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
                     if (node.isRight) {
-                        // reset height because...
                         y += node.flow * height;
                     }
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
-                case 5: // slnode
+                case Depth.STREAMLINE_NODE:
                     y -= node.flow * height;
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;

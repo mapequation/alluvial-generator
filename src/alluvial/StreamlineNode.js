@@ -2,6 +2,7 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import Branch, { opposite, sideToString } from "./Branch";
+import { STREAMLINE_NODE } from "./depth-constants";
 import LeafNode from "./LeafNode";
 import StreamlineLink from "./StreamlineLink";
 
@@ -27,7 +28,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 5;
+        return STREAMLINE_NODE;
     }
 
     get byLink() {

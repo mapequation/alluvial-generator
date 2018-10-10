@@ -1,6 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
+import { HIGHLIGHT_GROUP } from "./depth-constants";
 import Module from "./Module";
 
 
@@ -21,7 +22,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 3;
+        return HIGHLIGHT_GROUP;
     }
 
     get left() {

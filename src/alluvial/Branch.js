@@ -1,6 +1,7 @@
 // @flow
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import { BRANCH } from "./depth-constants";
 import StreamlineNode from "./StreamlineNode";
 
 
@@ -46,7 +47,7 @@ export default class Branch extends AlluvialNodeBase {
     }
 
     get depth(): number {
-        return 4;
+        return BRANCH;
     }
 
     asObject(): Object {
