@@ -49,8 +49,10 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     async draw(prevProps = this.props) {
+        const { width, height, padding, streamlineFraction } = this.props;
+
         const diagram = new Diagram(this.props.networks);
-        diagram.calcLayout();
+        diagram.calcLayout(width, height, padding, streamlineFraction);
         const tree = diagram.asObject();
         console.log(diagram);
 

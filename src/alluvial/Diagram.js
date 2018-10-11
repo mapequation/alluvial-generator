@@ -36,13 +36,8 @@ export default class Diagram {
         }
     }
 
-    calcLayout() {
-        const height = 600;
-        const width = 1200;
-        const moduleMargin = 15;
-
+    calcLayout(width: number, height: number, moduleMargin: number, streamlineFraction: number) {
         const numNetworks = this.networks.length;
-        const streamlineFraction = 2;
         const barWidth = width / (numNetworks + (numNetworks - 1) * streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
         const networkWidth = barWidth + streamlineWidth;
