@@ -70,6 +70,14 @@ export default class AlluvialNodeBase {
         }
     }
 
+    * traverseDepthFirstUntil(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
+        if (predicate(this)) return;
+        yield this;
+        for (let child of this.children) {
+            yield* child.traverseDepthFirstUntil(predicate);
+        }
+    }
+
     set layout({ x, y, width, height }: Layout) {
         this.x = x;
         this.y = y;
