@@ -14,10 +14,8 @@ export default class AlluvialDiagram extends React.Component {
         width: 1200,
         height: 600,
         padding: 3,
-        numModules: 15,
         streamlineFraction: 1,
         streamlineThreshold: 0.005,
-        parentModule: "root",
         duration: 200,
     };
 
@@ -25,11 +23,9 @@ export default class AlluvialDiagram extends React.Component {
         width: PropTypes.number,
         height: PropTypes.number,
         padding: PropTypes.number,
-        numModules: PropTypes.number,
         streamlineFraction: PropTypes.number,
         streamlineThreshold: PropTypes.number,
         networks: PropTypes.arrayOf(PropTypes.object),
-        parentModule: PropTypes.string,
         duration: PropTypes.number,
     };
 
@@ -49,28 +45,14 @@ export default class AlluvialDiagram extends React.Component {
             widthChanged: props.width !== prevProps.width,
             heightChanged: props.height !== prevProps.height,
             streamlineFractionChanged: props.streamlineFraction !== prevProps.streamlineFraction,
-            parentModuleChanged: props.parentModule !== prevProps.parentModule,
         };
     }
 
     async draw(prevProps = this.props) {
-        const { duration } = this.props;
-
-        const {
-            networkRemoved,
-            networkAdded,
-            widthChanged,
-            streamlineFractionChanged,
-            parentModuleChanged,
-        } = this.propsChanged(this.props, prevProps);
-
         const diagram = new Diagram(this.props.networks);
         diagram.calcLayout();
         const tree = diagram.asObject();
         console.log(diagram);
-
-        const t = d3.transition().duration(duration);
-        const delay = duration * 0.75;
 
         this.svg
             .attr("width", tree.layout.width)

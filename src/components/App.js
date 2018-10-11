@@ -14,11 +14,9 @@ export default class App extends React.Component {
         width: 1200,
         height: 600,
         padding: 3,
-        numModules: 15,
         duration: 200,
         streamlineFraction: 1,
         streamlineThreshold: 0.001,
-        parentModule: "root",
         networks: [],
         visibleNetworks: [],
     };
@@ -73,16 +71,13 @@ export default class App extends React.Component {
                        width={this.state.width} onWidthChange={this.handleWidthChange}
                        height={this.state.height} onHeightChange={this.handleHeightChange}
                        padding={this.state.padding} onPaddingChange={padding => this.setState({ padding })}
-                       numModules={this.state.numModules}
-                       onNumModulesChange={numModules => this.setState({ numModules })}
                        streamlineFraction={this.state.streamlineFraction}
                        onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
                        streamlineThreshold={this.state.streamlineThreshold}
                        onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
                        duration={this.state.duration}
                        onDurationChange={duration => this.setState({ duration })}
-                       parentModule={this.state.parentModule}
-                       onParentModuleChange={(e, { value }) => this.setState({ parentModule: value })}/>
+            />
             <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
                 {loadingComplete &&
                 <ZoomableSvg>
@@ -90,11 +85,10 @@ export default class App extends React.Component {
                                      padding={+this.state.padding}
                                      width={this.state.width}
                                      height={this.state.height}
-                                     numModules={+this.state.numModules}
                                      streamlineFraction={+this.state.streamlineFraction}
                                      streamlineThreshold={+this.state.streamlineThreshold}
                                      duration={+this.state.duration}
-                                     parentModule={this.state.parentModule}/>
+                    />
                 </ZoomableSvg>
                 }
                 {!loadingComplete &&

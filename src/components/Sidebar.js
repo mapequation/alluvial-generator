@@ -33,10 +33,6 @@ export default function Sidebar(props) {
                    onChange={props.onHeightChange}/>
         </Menu.Item>
         <Menu.Item>
-            <Input type="text" label="Parent module" labelPosition="left" value={props.parentModule}
-                   onChange={props.onParentModuleChange}/>
-        </Menu.Item>
-        <Menu.Item>
             <Input type="text" label="Streamline fraction" labelPosition="left"
                    value={props.streamlineFraction}/>
             <Slider settings={{
@@ -55,16 +51,6 @@ export default function Sidebar(props) {
                 max: 10,
                 step: 1,
                 onChange: props.onPaddingChange,
-            }}/>
-        </Menu.Item>
-        <Menu.Item>
-            <Input type="text" label="Num modules" labelPosition="left" value={props.numModules}/>
-            <Slider discrete settings={{
-                start: props.numModules,
-                min: 1,
-                max: 30,
-                step: 1,
-                onChange: props.onNumModulesChange,
             }}/>
         </Menu.Item>
         <Menu.Item>
@@ -104,12 +90,8 @@ Sidebar.propTypes = {
     onStreamlineFractionChange: PropTypes.func,
     padding: PropTypes.number,
     onPaddingChange: PropTypes.func,
-    numModules: PropTypes.number,
-    onNumModulesChange: PropTypes.func,
     streamlineThreshold: PropTypes.number,
     onStreamlineThresholdChange: PropTypes.func,
-    parentModule: PropTypes.string,
-    onParentModuleChange: PropTypes.func,
     duration: PropTypes.number,
     onDurationChange: PropTypes.func,
 };
