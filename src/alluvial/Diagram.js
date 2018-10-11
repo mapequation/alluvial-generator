@@ -1,6 +1,4 @@
 // @flow
-import sortBy from "lodash/sortBy";
-
 import type { FTree } from "../io/parse-ftree";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
@@ -107,7 +105,7 @@ export default class Diagram {
                     node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.BRANCH:
-                    node.children = sortBy(node.children, [child => child.byLink]);
+                    node.sortChildren();
                     if (node.isRight) {
                         y += node.flow * usableHeight;
                     }

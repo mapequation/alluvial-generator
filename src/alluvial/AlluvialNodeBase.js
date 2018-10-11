@@ -59,6 +59,10 @@ export default class AlluvialNodeBase {
         return found;
     }
 
+    sortChildren() {
+        // no-op
+    }
+
     asObject(): Object {
         return {
             id: this.id,

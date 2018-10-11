@@ -1,4 +1,6 @@
 // @flow
+import sortBy from "lodash/sortBy";
+
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { BRANCH } from "./depth-constants";
@@ -48,6 +50,10 @@ export default class Branch extends AlluvialNodeBase {
 
     get depth(): number {
         return BRANCH;
+    }
+
+    sortChildren() {
+        this.children = sortBy(this.children, [child => child.byLink]);
     }
 
     asObject(): Object {
