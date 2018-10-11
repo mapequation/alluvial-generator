@@ -62,6 +62,8 @@ export default class AlluvialDiagram extends React.Component {
         this.diagram.calcLayout(width, height, padding, streamlineFraction);
         const tree = this.diagram.asObject();
         console.log(this.diagram);
+        console.log('tree:');
+        console.log(tree);
 
         this.svg
             .attr("width", tree.layout.width)
@@ -71,9 +73,17 @@ export default class AlluvialDiagram extends React.Component {
 
 
         const onClick = (d) => {
-            this.diagram.event(d);
+            this.diagram.doubleClick(d);
+        }
+
+        const onDoubleClick = (d) => {
+            this.diagram.click(d);
             g.selectAll("*").remove();
             this.draw();
+        }
+
+        const onClickStreamline = (d) => {
+            console.log(`${d.idLeft} ==> ${d.idRight}`, d);
         }
 
         const roots = g.selectAll(".networkRoot")
@@ -92,7 +102,8 @@ export default class AlluvialDiagram extends React.Component {
             .attr("opacity", 0.5)
             .attr("fill", "#B6B69F")
             .attr("stroke", "white")
-            .attr("d", this.streamlineGenerator);
+            .attr("d", this.streamlineGenerator)
+            .on("click", onClickStreamline);
 
         const modules = rootsEnter.selectAll(".module")
             .data(d => d.children);
@@ -100,7 +111,8 @@ export default class AlluvialDiagram extends React.Component {
         const modulesEnter = modules.enter()
             .append("g")
             .attr("class", "module")
-            .on("click", onClick);
+            .on("click", onClick)
+            .on("dblclick", onDoubleClick);
 
         const groups = modulesEnter.selectAll(".group")
             .data(d => d.children);
@@ -115,7 +127,8 @@ export default class AlluvialDiagram extends React.Component {
             .attr("width", d => d.layout.width)
             .attr("height", d => d.layout.height)
             .attr("fill", "#B6B69F")
-            .attr("stroke", "white");
+            .attr("stroke", "black")
+            .attr("stroke-location", "outside");
 
         const branch = groupsEnter.selectAll(".branch")
             .data(d => d.children);
@@ -136,7 +149,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("y", d => d.layout.y)
             .attr("width", d => d.layout.width)
             .attr("height", d => d.layout.height)
-            .attr("opacity", 0);
+            .attr("fill-opacity", 0)
     }
 
     render() {

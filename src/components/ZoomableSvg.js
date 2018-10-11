@@ -25,6 +25,7 @@ export default class ZoomableSvg extends React.Component {
             .style("width", width)
             .attr("height", height)
             .call(zoom)
+            .on("dblclick.zoom", null)
             .call(zoom.transform, initialTransform);
 
         const zoomable = svg.select("#zoomable")

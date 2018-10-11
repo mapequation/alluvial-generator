@@ -36,7 +36,11 @@ export default class Diagram {
         }
     }
 
-    event(alluvialNode: Object) {
+    click(alluvialNode: Object) {
+        console.log("Click:", alluvialNode);
+    }
+
+    doubleClick(alluvialNode: Object) {
         switch (alluvialNode.depth) {
             case Depth.MODULE:
                 this.expandModule(alluvialNode.id, alluvialNode.networkIndex);
@@ -52,38 +56,49 @@ export default class Diagram {
         const streamlineWidth = streamlineFraction * barWidth;
         const networkWidth = barWidth + streamlineWidth;
 
-        let maxNumModules = -Infinity;
-        const threshold = 1e-5; // TODO
-
-        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node => node.depth <= Depth.NETWORK_ROOT)) {
-            if (node.depth === Depth.NETWORK_ROOT) {
-                maxNumModules = Math.max(maxNumModules, node.children.filter(node => node.flow > threshold).length);
-            }
+        const moduleMargins = [15, 10, 6, 3, 2];
+        let currentModuleLevel = -1;
+        const getModuleMargin = (level: number) => {
+            if (level > moduleMargins.length) return 2;
+            return moduleMargins[level];
         }
 
-        const totalMargin = (maxNumModules - 1) * moduleMargin;
-        const usableHeight = height - totalMargin;
+        let currentFlowThreshold = 0.0;
 
         let x = -networkWidth; // we add this the first time
         let y = height;
+        const networkMargins = [];
 
-        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node => node.depth <= Depth.MODULE)) {
+        // Use first pass to get order of modules to sort streamlines in second pass
+        // Y position of modules will be tuned in second pass from the module-level dependent margins
+        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node =>
+            node.depth < Depth.MODULE ||
+            (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)
+        )) {
             switch (node.depth) {
                 case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
                     break;
                 case Depth.NETWORK_ROOT:
+                    currentFlowThreshold = node.flowThreshold;
+                    networkMargins.push(0);
                     node.sortChildren();
                     x += networkWidth;
                     y = height;
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    node.layout = { x, y, width: barWidth, height: node.flow * height };
                     break;
                 case Depth.MODULE:
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    if (node.flow > threshold) {
-                        y -= moduleMargin;
-                        y -= node.flow * usableHeight;
+                    if (currentModuleLevel >= 0 && node.moduleLevel !== currentModuleLevel) {
+                        const dy = getModuleMargin(node.moduleLevel) - getModuleMargin(currentModuleLevel);
+                        y -= dy;
+                        networkMargins[networkMargins.length - 1] += dy;
                     }
+                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    const margin = getModuleMargin(node.moduleLevel);
+                    y -= margin;
+                    y -= node.flow * height;
+                    currentModuleLevel = node.moduleLevel;
+                    networkMargins[networkMargins.length - 1] += margin;
                     break;
                 default:
                     break;
@@ -93,19 +108,32 @@ export default class Diagram {
         x = -networkWidth; // we add this the first time
         y = height;
 
-        for (let node of this.alluvialRoot.traverseDepthFirst()) {
+        const totalMargin = Math.max(...networkMargins);
+        const usableHeight = height - totalMargin;
+        currentFlowThreshold = 0.0;
+        console.log(`totalMargin: ${totalMargin}, usableHeight: ${usableHeight}, height: ${height}`);
+
+        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node =>
+            node.depth !== Depth.MODULE ||
+            node.flow >= currentFlowThreshold
+        )) {
             switch (node.depth) {
                 case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
                     break;
                 case Depth.NETWORK_ROOT:
+                    currentFlowThreshold = node.flowThreshold;
                     x += networkWidth;
                     y = height;
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.MODULE:
+                    if (currentModuleLevel >= 0 && node.moduleLevel !== currentModuleLevel) {
+                        y -= getModuleMargin(node.moduleLevel) - getModuleMargin(currentModuleLevel);
+                    }
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    if (node.flow > threshold) y -= moduleMargin;
+                    y -= getModuleMargin(node.moduleLevel);
+                    currentModuleLevel = node.moduleLevel;
                     break;
                 case Depth.HIGHLIGHT_GROUP:
                     node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
@@ -168,7 +196,7 @@ export default class Diagram {
                     this.removeNodeFromSide(oppositeNode, oppositeSide);
                     this.addNodeToSide(oppositeNode, oppositeSide);
                 } else {
-                    throw new Error("Opposite streamline node for the opposite node must be dangling "
+                    throw new Error("Streamline node for the opposite node must be dangling "
                         + "before it has has this node to connect to.");
                 }
             }
