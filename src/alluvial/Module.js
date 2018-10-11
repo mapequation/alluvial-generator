@@ -9,10 +9,12 @@ import LeafNode from "./LeafNode";
 export default class Module extends AlluvialNodeBase {
     children: HighlightGroup[] = [];
     moduleLevel: number = 1;
+    path: number[] = [];
 
     constructor(networkIndex: number, parent: NetworkRoot, id: string = "", moduleLevel: number = 1) {
         super(networkIndex, parent, id);
         this.moduleLevel = moduleLevel;
+        this.path = id.split(":").map(childId => Number(childId));
     }
 
     getGroup(node: LeafNode, highlightIndex: number): ?HighlightGroup {
@@ -26,6 +28,13 @@ export default class Module extends AlluvialNodeBase {
             this.children.push(group);
         }
         return group;
+    }
+
+    asObject(): Object {
+        return {
+            moduleLevel: this.moduleLevel,
+            ...super.asObject(),
+        };
     }
 
     get depth(): number {

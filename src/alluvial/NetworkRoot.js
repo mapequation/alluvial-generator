@@ -39,33 +39,34 @@ export default class NetworkRoot extends AlluvialNodeBase {
         };
     }
 
-    * rightStreamlineNodes(): Iterable<StreamlineNode> {
+    * rightStreamlines(): Iterable<StreamlineLink> {
         for (let module of this.children) {
-            if (module.flow < this.flowThreshold) {
-                // Skip left module if below threshold
-                continue;
-            }
+            // Skip if left module if below threshold
+            if (module.flow < this.flowThreshold) continue;
             for (let group of module.children) {
                 for (let streamlineNode of group.right.children) {
-                    // Skip right streamline if right module is below threshold
+                    // Skip if right module is below threshold
                     const link: ?StreamlineLink = streamlineNode.link;
                     if (!link) continue;
                     const oppositeStreamlineNode: StreamlineNode = link.right;
                     const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(3);
                     if (oppositeModule && oppositeModule.flow < this.flowThreshold) continue;
-                    yield streamlineNode;
+                    if (streamlineNode.link) yield streamlineNode.link;
                 }
             }
         }
     }
 
-    * rightStreamlines(): Iterable<StreamlineLink> {
-        for (let streamlineNode of this.rightStreamlineNodes()) {
-            if (streamlineNode.link) yield streamlineNode.link;
-        }
-    }
-
     sortChildren() {
-        this.children.sort((a, b) => b.flow - a.flow);
+        this.children.sort((a: Module, b: Module) => {
+            let aSize = Math.max(1, a.path.length - 1);
+            let bSize = Math.max(1, b.path.length - 1);
+            let minSize = Math.min(aSize, bSize);
+            for (let i = 0; i < minSize; ++i) {
+                if (a.path[i] === b.path[i]) continue;
+                return a.path[i] - b.path[i];
+            }
+            return b.flow - a.flow;
+        });
     }
 }

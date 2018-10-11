@@ -37,7 +37,7 @@ export default class Diagram {
     }
 
     click(alluvialNode: Object) {
-        console.log("Click:", alluvialNode);
+        console.log("Click:", alluvialNode, "flow:", alluvialNode.flow);
     }
 
     doubleClick(alluvialNode: Object) {
@@ -56,101 +56,103 @@ export default class Diagram {
         const streamlineWidth = streamlineFraction * barWidth;
         const networkWidth = barWidth + streamlineWidth;
 
-        const moduleMargins = [15, 10, 6, 3, 2];
-        let currentModuleLevel = -1;
+        const moduleMargins = [20, 10, 6, 3, 2];
+        let moduleMarginScale = 1.0;
         const getModuleMargin = (level: number) => {
-            if (level > moduleMargins.length) return 2;
-            return moduleMargins[level];
+            if (level - 1 > moduleMargins.length) return 2;
+            return moduleMargins[level - 1];
         }
 
         let currentFlowThreshold = 0.0;
-
-        let x = -networkWidth; // we add this the first time
+        let x = 0;
         let y = height;
         const networkMargins = [];
 
         // Use first pass to get order of modules to sort streamlines in second pass
-        // Y position of modules will be tuned in second pass from the module-level dependent margins
-        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node =>
+        // Y position of modules will be tuned in second pass depending on max margins
+        this.alluvialRoot.forEachDepthFirstPreOrderWhile(node => 
             node.depth < Depth.MODULE ||
-            (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)
-        )) {
+            (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
+            (node, i, children, next) => {
             switch (node.depth) {
-                case Depth.ALLUVIAL_ROOT:
-                    node.layout = { x: 0, y: 0, width, height };
-                    break;
                 case Depth.NETWORK_ROOT:
                     currentFlowThreshold = node.flowThreshold;
                     networkMargins.push(0);
                     node.sortChildren();
-                    x += networkWidth;
-                    y = height;
                     node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    if (i > 0) {
+                        x += networkWidth;
+                    }
+                    y = height;
                     break;
                 case Depth.MODULE:
-                    if (currentModuleLevel >= 0 && node.moduleLevel !== currentModuleLevel) {
-                        const dy = getModuleMargin(node.moduleLevel) - getModuleMargin(currentModuleLevel);
-                        y -= dy;
-                        networkMargins[networkMargins.length - 1] += dy;
-                    }
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
-                    const margin = getModuleMargin(node.moduleLevel);
-                    y -= margin;
+                    const margin = next ? getModuleMargin(Math.min(next.moduleLevel, node.moduleLevel)) : 0;
+                    node.marginTop = margin;
                     y -= node.flow * height;
-                    currentModuleLevel = node.moduleLevel;
+                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    y -= margin;
                     networkMargins[networkMargins.length - 1] += margin;
                     break;
                 default:
                     break;
             }
-        }
+        });
 
-        x = -networkWidth; // we add this the first time
+
+        let totalMargin = Math.max(...networkMargins);
+        let usableHeight = height - totalMargin;
+        currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
+        x = 0;
         y = height;
-
-        const totalMargin = Math.max(...networkMargins);
-        const usableHeight = height - totalMargin;
-        currentFlowThreshold = 0.0;
         console.log(`totalMargin: ${totalMargin}, usableHeight: ${usableHeight}, height: ${height}`);
 
-        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node =>
+        const maxMarginFractionOfSpace = 0.5;
+        if (totalMargin / height > maxMarginFractionOfSpace) {
+            // Reduce margins to below 50% of vertical space
+            // Use moduleMarginScale such that 
+            //   moduleMarginScale * totalMargin / height == maxMarginFractionOfSpace
+            moduleMarginScale = maxMarginFractionOfSpace * height / totalMargin;
+            for (let module of this.alluvialRoot.traverseDepthFirst()) {
+                module.marginTop *=  moduleMarginScale;
+            }
+            totalMargin *= moduleMarginScale;
+            usableHeight = height - totalMargin;
+            console.log(`Scaling margin by ${moduleMarginScale} -> totalMargin: ${totalMargin}, usableHeight: ${usableHeight}`);
+        }
+
+        
+        for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(node =>
             node.depth !== Depth.MODULE ||
-            node.flow >= currentFlowThreshold
+            (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
         )) {
             switch (node.depth) {
-                case Depth.ALLUVIAL_ROOT:
-                    node.layout = { x: 0, y: 0, width, height };
-                    break;
-                case Depth.NETWORK_ROOT:
-                    currentFlowThreshold = node.flowThreshold;
-                    x += networkWidth;
-                    y = height;
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                case Depth.MODULE:
-                    if (currentModuleLevel >= 0 && node.moduleLevel !== currentModuleLevel) {
-                        y -= getModuleMargin(node.moduleLevel) - getModuleMargin(currentModuleLevel);
-                    }
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    y -= getModuleMargin(node.moduleLevel);
-                    currentModuleLevel = node.moduleLevel;
-                    break;
-                case Depth.HIGHLIGHT_GROUP:
-                    node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                case Depth.BRANCH:
-                    node.sortChildren();
-                    if (node.isRight) {
-                        y += node.flow * usableHeight;
-                    }
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                case Depth.STREAMLINE_NODE:
-                    y -= node.flow * usableHeight;
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                default:
-                    break;
+            case Depth.ALLUVIAL_ROOT:
+                node.layout = { x: 0, y: 0, width, height };
+                break;
+            case Depth.NETWORK_ROOT:
+                x += networkWidth;
+                y = height;
+                break;
+            case Depth.MODULE:
+                node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                y -= node.marginTop;
+                break;
+            case Depth.HIGHLIGHT_GROUP:
+                node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                break;
+            case Depth.BRANCH:
+                node.sortChildren(); // Sort streamline nodes
+                node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                if (node.isLeft) {
+                    y += node.flow * usableHeight;
+                }
+                break;
+            case Depth.STREAMLINE_NODE:
+                y -= node.flow * usableHeight;
+                node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                break;
+            default:
+                break;
             }
         }
     }
