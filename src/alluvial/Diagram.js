@@ -41,13 +41,25 @@ export default class Diagram {
     calcLayout() {
         const height = 600;
         const width = 1200;
+        const moduleMargin = 15;
 
         const numNetworks = this.networks.length;
         const streamlineFraction = 2;
         const barWidth = width / (numNetworks + (numNetworks - 1) * streamlineFraction);
         const streamlineWidth = streamlineFraction * barWidth;
-
         const networkWidth = barWidth + streamlineWidth;
+
+        let maxNumModules = -Infinity;
+        const threshold = 1e-5; // TODO
+
+        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node => node.depth <= Depth.NETWORK_ROOT)) {
+            if (node.depth === Depth.NETWORK_ROOT) {
+                maxNumModules = Math.max(maxNumModules, node.children.filter(node => node.flow > threshold).length);
+            }
+        }
+
+        const totalMargin = (maxNumModules - 1) * moduleMargin;
+        const usableHeight = height - totalMargin;
 
         let x = -networkWidth; // we add this the first time
         let y = height;
@@ -60,24 +72,61 @@ export default class Diagram {
                 case Depth.NETWORK_ROOT:
                     x += networkWidth;
                     y = height;
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.MODULE:
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    if (node.flow > threshold) y -= moduleMargin;
                     break;
                 case Depth.HIGHLIGHT_GROUP:
-                    node.layout = { x, y: y - node.flow * height, width: barWidth, height: node.flow * height };
+                    node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
+                    break;
+                case Depth.BRANCH:
+                    //node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
+                    if (node.isRight) {
+                        y += node.flow * usableHeight;
+                    }
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    break;
+                case Depth.STREAMLINE_NODE:
+                    y -= node.flow * usableHeight;
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        x = -networkWidth; // we add this the first time
+        y = height;
+
+        for (let node of this.alluvialRoot.traverseDepthFirst()) {
+            switch (node.depth) {
+                case Depth.ALLUVIAL_ROOT:
+                    node.layout = { x: 0, y: 0, width, height };
+                    break;
+                case Depth.NETWORK_ROOT:
+                    x += networkWidth;
+                    y = height;
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    break;
+                case Depth.MODULE:
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
+                    if (node.flow > threshold) y -= moduleMargin;
+                    break;
+                case Depth.HIGHLIGHT_GROUP:
+                    node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.BRANCH:
                     node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
                     if (node.isRight) {
-                        y += node.flow * height;
+                        y += node.flow * usableHeight;
                     }
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.STREAMLINE_NODE:
-                    y -= node.flow * height;
-                    node.layout = { x, y, width: barWidth, height: node.flow * height };
+                    y -= node.flow * usableHeight;
+                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 default:
                     break;
