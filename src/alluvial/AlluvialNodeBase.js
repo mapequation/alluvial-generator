@@ -14,6 +14,20 @@ type Layout = Position & Size;
 
 export type AlluvialNode = $Subtype<AlluvialNodeBase>; // eslint-disable-line no-use-before-define
 
+export type AlluvialNodeBaseIterator = {
+    child: AlluvialNode,
+    childIndex: number,
+    children: AlluvialNode[],
+    nextChild: ?AlluvialNode,
+};
+
+export type IteratorCallback = (
+    child: AlluvialNode,
+    childIndex: number,
+    children: AlluvialNode[],
+    nextChild: ?AlluvialNode,
+) => void;
+
 export default class AlluvialNodeBase {
     flow: number = 0;
     networkIndex: number;
@@ -23,6 +37,7 @@ export default class AlluvialNodeBase {
     y: number = 0;
     height: number = 0;
     width: number = 0;
+    marginTop: number = 0;
 
     +children: AlluvialNode[] = [];
     parent: ?AlluvialNode = null;
@@ -75,18 +90,149 @@ export default class AlluvialNodeBase {
         };
     }
 
-    * traverseDepthFirst(): Iterable<AlluvialNodeBase> {
+    * traverseDepthFirst(preOrder: boolean = true): Iterable<AlluvialNodeBase> {
+        if (preOrder) {
+            yield* this.traverseDepthFirstPreOrder();
+        } else {
+            yield* this.traverseDepthFirstPostOrder();
+        }
+    }
+
+    * traverseDepthFirstPreOrder(): Iterable<AlluvialNodeBase> {
         yield this;
         for (let child of this.children) {
             yield* child.traverseDepthFirst();
         }
     }
 
-    * traverseDepthFirstWhile(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
+    * traverseDepthFirstPostOrder(): Iterable<AlluvialNodeBase> {
+        for (let child of this.children) {
+            yield* child.traverseDepthFirstPostOrder();
+        }
+        yield this;
+    }
+
+    * traverseDepthFirstWhile(predicate: (AlluvialNodeBase) => boolean, preOrder: boolean = true): Iterable<AlluvialNodeBase> {
+        if (preOrder) {
+            yield* this.traverseDepthFirstPreOrderWhile(predicate);
+        } else {
+            yield* this.traverseDepthFirstPostOrderWhile(predicate);
+        }
+    }
+
+    * traverseDepthFirstPreOrderWhile(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
         if (!predicate(this)) return;
         yield this;
         for (let child of this.children) {
-            yield* child.traverseDepthFirstWhile(predicate);
+            yield* child.traverseDepthFirstPreOrderWhile(predicate);
+        }
+    }
+
+    * traverseDepthFirstPostOrderWhile(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
+        for (let child of this.children) {
+            yield* child.traverseDepthFirstPostOrderWhile(predicate);
+        }
+        if (!predicate(this)) return;
+        yield this;
+    }
+
+    * childrenDepthFirstPreOrder(): Iterable<AlluvialNodeBaseIterator> {
+        const { children } = this;
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            yield {
+                child,
+                childIndex: i,
+                children: children,
+                nextChild: i === children.length - 1 ? null : children[i + 1],
+            };
+            yield* child.childrenDepthFirstPreOrder();
+        }
+    }
+
+    * childrenDepthFirstPostOrder(): Iterable<AlluvialNodeBaseIterator> {
+        const { children } = this;
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            yield* child.childrenDepthFirstPostOrder();
+            yield {
+                child,
+                childIndex: i,
+                children: children,
+                nextChild: i === children.length - 1 ? null : children[i + 1],
+            };
+        }
+    }
+
+    forEachDepthFirst(callback: IteratorCallback, preOrder: boolean = true): void {
+        if (preOrder) {
+            this.forEachDepthFirstPreOrder(callback);
+        } else {
+            this.forEachDepthFirstPostOrder(callback);
+        }
+    }
+
+    forEachDepthFirstWhile(predicate: (AlluvialNodeBase) => boolean, callback: IteratorCallback, preOrder: boolean = true): void {
+        if (preOrder) {
+            this.forEachDepthFirstPreOrderWhile(predicate, callback);
+        } else {
+            this.forEachDepthFirstPostOrderWhile(predicate, callback);
+        }
+    }
+
+    forEachDepthFirstPreOrder(callback: IteratorCallback): void {
+        const children = this.children;
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            callback(
+                child,
+                i,
+                children,
+                i + 1 === children.length ? null : children[i + 1],
+            );
+            child.forEachDepthFirstPreOrder(callback);
+        }
+    }
+
+    forEachDepthFirstPostOrder(callback: IteratorCallback): void {
+        const children = this.children;
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            child.forEachDepthFirstPreOrder(callback);
+            callback(
+                child,
+                i,
+                children,
+                i + 1 === children.length ? null : children[i + 1],
+            );
+        }
+    }
+
+    forEachDepthFirstPreOrderWhile(predicate: (AlluvialNodeBase) => boolean, callback: IteratorCallback): void {
+        const children = this.children.filter(predicate);
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            callback(
+                child,
+                i,
+                children,
+                i + 1 === children.length ? null : children[i + 1],
+            );
+            child.forEachDepthFirstPreOrderWhile(predicate, callback);
+        }
+    }
+
+    forEachDepthFirstPostOrderWhile(predicate: (AlluvialNodeBase) => boolean, callback: IteratorCallback): void {
+        const children = this.children.filter(predicate);
+        for (let i = 0; i < children.length; ++i) {
+            const child = children[i];
+            child.forEachDepthFirstPreOrderWhile(predicate, callback);
+            callback(
+                child,
+                i,
+                children,
+                i + 1 === children.length ? null : children[i + 1],
+            );
         }
     }
 
