@@ -32,6 +32,12 @@ export default class AlluvialNodeBase {
         this.id = id;
     }
 
+    getAncestor(steps: number): ?AlluvialNodeBase {
+        if (steps === 0) return this;
+        if (!this.parent) return null;
+        return this.parent.getAncestor(steps - 1);
+    }
+
     get depth(): number {
         return 0;
     }

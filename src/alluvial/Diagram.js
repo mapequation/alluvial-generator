@@ -64,7 +64,7 @@ export default class Diagram {
         let x = -networkWidth; // we add this the first time
         let y = height;
 
-        for (let node of this.alluvialRoot.traverseDepthFirst()) {
+        for (let node of this.alluvialRoot.traverseDepthFirstWhile(node => node.depth <= Depth.MODULE)) {
             switch (node.depth) {
                 case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
@@ -76,21 +76,10 @@ export default class Diagram {
                     break;
                 case Depth.MODULE:
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    if (node.flow > threshold) y -= moduleMargin;
-                    break;
-                case Depth.HIGHLIGHT_GROUP:
-                    node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                case Depth.BRANCH:
-                    //node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
-                    if (node.isRight) {
-                        y += node.flow * usableHeight;
+                    if (node.flow > threshold) {
+                        y -= moduleMargin;
+                        y -= node.flow * usableHeight;
                     }
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    break;
-                case Depth.STREAMLINE_NODE:
-                    y -= node.flow * usableHeight;
-                    node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 default:
                     break;
@@ -118,7 +107,7 @@ export default class Diagram {
                     node.layout = { x, y: y - node.flow * usableHeight, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.BRANCH:
-                    node.children = sortBy(node.children, [n => n.byLink, n => n.byFlow]);
+                    node.children = sortBy(node.children, [child => child.byLink]);
                     if (node.isRight) {
                         y += node.flow * usableHeight;
                     }
