@@ -29,6 +29,11 @@ export default class AlluvialDiagram extends React.Component {
         duration: PropTypes.number,
     };
 
+    constructor(props) {
+        super(props);
+        this.diagram = null;
+    }
+
     componentDidMount() {
         this.svg = d3.select(this.node);
         this.draw();
@@ -51,16 +56,25 @@ export default class AlluvialDiagram extends React.Component {
     async draw(prevProps = this.props) {
         const { width, height, padding, streamlineFraction } = this.props;
 
-        const diagram = new Diagram(this.props.networks);
-        diagram.calcLayout(width, height, padding, streamlineFraction);
-        const tree = diagram.asObject();
-        console.log(diagram);
+        if (!this.diagram) {
+            this.diagram = new Diagram(this.props.networks);
+        }
+        this.diagram.calcLayout(width, height, padding, streamlineFraction);
+        const tree = this.diagram.asObject();
+        console.log(this.diagram);
 
         this.svg
             .attr("width", tree.layout.width)
             .attr("height", tree.layout.height);
 
         const g = this.svg.select(".alluvial-diagram");
+
+
+        const onClick = (d) => {
+            this.diagram.event(d);
+            g.selectAll("*").remove();
+            this.draw();
+        }
 
         const roots = g.selectAll(".networkRoot")
             .data(tree.children);
@@ -85,7 +99,8 @@ export default class AlluvialDiagram extends React.Component {
 
         const modulesEnter = modules.enter()
             .append("g")
-            .attr("class", "module");
+            .attr("class", "module")
+            .on("click", onClick);
 
         const groups = modulesEnter.selectAll(".group")
             .data(d => d.children);
@@ -121,8 +136,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("y", d => d.layout.y)
             .attr("width", d => d.layout.width)
             .attr("height", d => d.layout.height)
-            .attr("opacity", 0)
-            .on("click", d => console.log(d));
+            .attr("opacity", 0);
     }
 
     render() {

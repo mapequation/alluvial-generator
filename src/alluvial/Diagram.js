@@ -36,6 +36,16 @@ export default class Diagram {
         }
     }
 
+    event(alluvialNode: Object) {
+        switch (alluvialNode.depth) {
+            case Depth.MODULE:
+                this.expandModule(alluvialNode.id, alluvialNode.networkIndex);
+                break;
+            default:
+                break;
+        }
+    }
+
     calcLayout(width: number, height: number, moduleMargin: number, streamlineFraction: number) {
         const numNetworks = this.networks.length;
         const barWidth = width / (numNetworks + (numNetworks - 1) * streamlineFraction);
@@ -63,6 +73,7 @@ export default class Diagram {
                     node.layout = { x: 0, y: 0, width, height };
                     break;
                 case Depth.NETWORK_ROOT:
+                    node.sortChildren();
                     x += networkWidth;
                     y = height;
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
@@ -264,6 +275,23 @@ export default class Diagram {
         }
 
         return branch.parent;
+    }
+
+    expandModule(moduleId: string, networkIndex: number) {
+        const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkIndex);
+        if (!networkRoot) return;
+        const module: ?Module = networkRoot.getModule(moduleId);
+        if (!module) return;
+        console.log('Click on module:', module);
+        const leafNodes = Array.from(module.traverseLeafNodes());
+        if (leafNodes.length === 0) return;
+        const moduleLevel = leafNodes[0].moduleLevel; 
+        for (let leafNode of leafNodes) {
+            this.removeNode(leafNode);
+        }
+        for (let leafNode of leafNodes) {
+            this.addNode(leafNode, networkIndex, moduleLevel + 1);
+        }
     }
 
     getNodeByName(networkIndex: number, name: string): ?LeafNode {

@@ -10,13 +10,13 @@ import StreamlineNode from "./StreamlineNode";
 export default class NetworkRoot extends AlluvialNodeBase {
     children: Module[] = [];
 
-    getModule(node: LeafNode, moduleId: string): ?Module {
+    getModule(moduleId: string): ?Module {
         return this.children.find(module => module.id === moduleId);
     }
 
     getOrCreateModule(node: LeafNode, moduleLevel: number): Module {
         const moduleId = node.ancestorAtLevel(moduleLevel);
-        let module = this.getModule(node, moduleId);
+        let module = this.getModule(moduleId);
         if (!module) {
             module = new Module(this.networkIndex, this, moduleId);
             this.children.push(module);
@@ -47,5 +47,9 @@ export default class NetworkRoot extends AlluvialNodeBase {
         for (let streamlineNode of this.rightStreamlineNodes()) {
             if (streamlineNode.link) yield streamlineNode.link;
         }
+    }
+
+    sortChildren() {
+        this.children.sort((a, b) => b.flow - a.flow);
     }
 }
