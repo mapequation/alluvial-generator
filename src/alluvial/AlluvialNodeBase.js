@@ -70,11 +70,11 @@ export default class AlluvialNodeBase {
         }
     }
 
-    * traverseDepthFirstUntil(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
-        if (predicate(this)) return;
+    * traverseDepthFirstWhile(predicate: (AlluvialNodeBase) => boolean): Iterable<AlluvialNodeBase> {
+        if (!predicate(this)) return;
         yield this;
         for (let child of this.children) {
-            yield* child.traverseDepthFirstUntil(predicate);
+            yield* child.traverseDepthFirstWhile(predicate);
         }
     }
 
