@@ -54,6 +54,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
+    "flow": "$(npm bin)/flow",
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
@@ -99,6 +100,7 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "flow-bin": "^0.80.0"
+    "flow-bin": "^0.80.0",
+    "flow-typed": "^2.5.1"
   }
 }
