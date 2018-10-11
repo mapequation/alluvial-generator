@@ -1,3 +1,4 @@
+import Depth from './depth-constants';
 // @flow
 type Position = {
     x: number,
@@ -66,6 +67,7 @@ export default class AlluvialNodeBase {
     asObject(): Object {
         return {
             id: this.id,
+            networkIndex: this.networkIndex,
             flow: this.flow,
             depth: this.depth,
             layout: this.layout,
@@ -85,6 +87,22 @@ export default class AlluvialNodeBase {
         yield this;
         for (let child of this.children) {
             yield* child.traverseDepthFirstWhile(predicate);
+        }
+    }
+
+    /**
+    Traverse leaf nodes.
+    Note: If starting above the branching level, it only traverses leaf nodes
+    of the left branch to not duplicate leaf nodes.
+     */
+    * traverseLeafNodes(): Iterable<AlluvialNodeBase> {
+        if (this.depth === Depth.LEAF_NODE) {
+            yield this;
+        }
+        // Only traverse into left branch to not duplicate leaf nodes
+        const children = this.depth === Depth.HIGHLIGHT_GROUP ? [this.children[0]] : this.children;
+        for (let child of children) {
+            yield* child.traverseLeafNodes();
         }
     }
 
