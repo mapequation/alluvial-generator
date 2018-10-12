@@ -53,7 +53,7 @@ export default class Branch extends AlluvialNodeBase {
     }
 
     sortChildren() {
-        this.children = sortBy(this.children, [child => child.byLink]);
+        this.children = sortBy(this.children, [child => child.byOppositeStreamlinePosition]);
     }
 
     asObject(): Object {

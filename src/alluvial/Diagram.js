@@ -36,10 +36,6 @@ export default class Diagram {
         }
     }
 
-    click(alluvialNode: Object) {
-        console.log("Click:", alluvialNode);
-    }
-
     doubleClick(alluvialNode: Object) {
         switch (alluvialNode.depth) {
             case Depth.MODULE:

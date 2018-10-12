@@ -31,7 +31,7 @@ export default class AlluvialDiagram extends React.Component {
 
     constructor(props) {
         super(props);
-        this.diagram = null;
+        this.diagram = new Diagram(this.props.networks);
     }
 
     componentDidMount() {
@@ -56,9 +56,6 @@ export default class AlluvialDiagram extends React.Component {
     async draw(prevProps = this.props) {
         const { width, height, padding, streamlineFraction } = this.props;
 
-        if (!this.diagram) {
-            this.diagram = new Diagram(this.props.networks);
-        }
         this.diagram.calcLayout(width, height, padding, streamlineFraction);
         const tree = this.diagram.asObject();
 
@@ -72,7 +69,7 @@ export default class AlluvialDiagram extends React.Component {
         const g = this.svg.select(".alluvial-diagram");
 
         const onClick = (d) => {
-            this.diagram.click(d);
+            console.log(d);
         };
 
         const onDoubleClick = (d) => {
@@ -82,7 +79,7 @@ export default class AlluvialDiagram extends React.Component {
         };
 
         const onClickStreamline = (d) => {
-            console.log(`${d.leftId} ==> ${d.rightId}`, d);
+            console.log(d.leftId, d);
         };
 
         const roots = g.selectAll(".networkRoot")
@@ -96,6 +93,7 @@ export default class AlluvialDiagram extends React.Component {
             .data(d => d.links);
 
         streamlines.enter()
+            .filter(d => d.h0 + d.h1 > 3)
             .append("path")
             .attr("class", "streamline")
             .attr("opacity", 0.5)
@@ -126,7 +124,6 @@ export default class AlluvialDiagram extends React.Component {
             .attr("width", d => d.layout.width)
             .attr("height", d => d.layout.height)
             .attr("fill", "#B6B69F")
-            .attr("stroke", "black")
             .attr("stroke-location", "outside");
 
         const branch = groupsEnter.selectAll(".branch")

@@ -29,14 +29,14 @@ export default class StreamlineLink {
         } = this;
 
         return {
-            leftId: this.left.id,
-            rightId: this.right.id,
             x0: leftLayout.x + leftLayout.width,
             x1: rightLayout.x,
             y0: leftLayout.y,
             y1: rightLayout.y,
             h0: leftLayout.height,
             h1: rightLayout.height,
+            leftId: this.left.id,
+            rightId: this.right.id,
         };
     }
 }

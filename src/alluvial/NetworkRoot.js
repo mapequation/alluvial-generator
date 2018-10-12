@@ -3,8 +3,8 @@ import AlluvialNodeBase from "./AlluvialNodeBase";
 import { NETWORK_ROOT } from "./depth-constants";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
-import StreamlineNode from "./StreamlineNode";
 import StreamlineLink from "./StreamlineLink";
+import StreamlineNode from "./StreamlineNode";
 
 
 export default class NetworkRoot extends AlluvialNodeBase {
@@ -46,9 +46,8 @@ export default class NetworkRoot extends AlluvialNodeBase {
             for (let group of module.children) {
                 for (let streamlineNode of group.right.children) {
                     // Skip if right module is below threshold
-                    const link: ?StreamlineLink = streamlineNode.link;
-                    if (!link) continue;
-                    const oppositeStreamlineNode: StreamlineNode = link.right;
+                    const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.oppositeStreamlineNode;
+                    if (!oppositeStreamlineNode) continue;
                     const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(3);
                     if (oppositeModule && oppositeModule.flow < this.flowThreshold) continue;
                     if (streamlineNode.link) yield streamlineNode.link;
