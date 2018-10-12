@@ -56,13 +56,7 @@ export default class Diagram {
         const streamlineWidth = streamlineFraction * barWidth;
         const networkWidth = barWidth + streamlineWidth;
 
-        const moduleMargins = [20, 10, 6, 3, 2];
         let moduleMarginScale = 1.0;
-
-        const getModuleMargin = (level: number) => {
-            if (level - 1 > moduleMargins.length) return 2;
-            return moduleMargins[level - 1];
-        };
 
         let currentFlowThreshold = 0.0;
         let x = 0;
@@ -85,7 +79,7 @@ export default class Diagram {
                         y = height;
                         break;
                     case Depth.MODULE:
-                        const margin = next ? getModuleMargin(Math.min(next.moduleLevel, node.moduleLevel)) : 0;
+                        const margin = next ? Math.min(next.margin, node.margin) : 0;
                         node.marginTop = margin;
                         y -= node.flow * height;
                         node.layout = { x, y, width: barWidth, height: node.flow * height };

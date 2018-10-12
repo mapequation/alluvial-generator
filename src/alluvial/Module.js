@@ -41,4 +41,10 @@ export default class Module extends AlluvialNodeBase {
     get depth(): number {
         return MODULE;
     }
+
+    get margin(): number {
+        const margins = [20, 10, 6, 3, 2];
+        let index = Math.min(this.moduleLevel - 1, margins.length - 1);
+        return margins[index];
+    }
 }
