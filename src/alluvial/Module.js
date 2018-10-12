@@ -4,6 +4,7 @@ import { MODULE } from "./depth-constants";
 import HighlightGroup from "./HighlightGroup";
 import NetworkRoot from "./NetworkRoot";
 import LeafNode from "./LeafNode";
+import TreePath from "../lib/treepath";
 
 
 export default class Module extends AlluvialNodeBase {
@@ -14,7 +15,7 @@ export default class Module extends AlluvialNodeBase {
     constructor(networkIndex: number, parent: NetworkRoot, id: string = "", moduleLevel: number = 1) {
         super(networkIndex, parent, id);
         this.moduleLevel = moduleLevel;
-        this.path = id.split(":").map(childId => Number(childId));
+        this.path = TreePath.toArray(this.id);
     }
 
     getGroup(highlightIndex: number): ?HighlightGroup {
