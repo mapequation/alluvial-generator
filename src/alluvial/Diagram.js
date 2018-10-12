@@ -213,7 +213,7 @@ export default class Diagram {
         const streamlineId = StreamlineNode.createId(node, networkIndex, side, oppositeNode);
         let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
 
-        const oldStreamlineNode: StreamlineNode = node.getParent(side);
+        const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
         if (!oldStreamlineNode) return;
         const branch: ?Branch = oldStreamlineNode.parent;
 

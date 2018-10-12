@@ -1,3 +1,4 @@
+// @flow
 import type { Node as FTreeNode } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
@@ -9,7 +10,12 @@ import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {
     node: FTreeNode;
+    name: string;
+    insignificant: boolean;
+    highlightIndex: number;
+
     moduleLevel: number = 1;
+
     leftParent: ?StreamlineNode;
     rightParent: ?StreamlineNode;
 
