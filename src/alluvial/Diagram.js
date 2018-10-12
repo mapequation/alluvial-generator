@@ -69,12 +69,11 @@ export default class Diagram {
         let y = height;
         const networkTotalMargins = [];
 
-        const aboveModuleDepth = node => node.depth < Depth.MODULE;
-        const moduleAboveThreshold = node => node.depth === Depth.MODULE && node.flow >= currentFlowThreshold;
 
         // Use first pass to get order of modules to sort streamlines in second pass
         // Y position of modules will be tuned in second pass depending on max margins
-        this.alluvialRoot.forEachDepthFirstPreOrderWhile(node => aboveModuleDepth(node) || moduleAboveThreshold(node),
+        this.alluvialRoot.forEachDepthFirstPreOrderWhile(
+            node => node.depth < Depth.MODULE || node.depth === Depth.MODULE && node.flow >= currentFlowThreshold,
             (node, i, children, next) => {
                 switch (node.depth) {
                     case Depth.NETWORK_ROOT:
@@ -120,7 +119,7 @@ export default class Diagram {
         }
 
         for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
-            node => node.depth !== Depth.MODULE || moduleAboveThreshold(node))) {
+            node => node.depth !== Depth.MODULE || node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)) {
             switch (node.depth) {
                 case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
