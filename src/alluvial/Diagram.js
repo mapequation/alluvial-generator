@@ -67,7 +67,7 @@ export default class Diagram {
         // Y position of modules will be tuned in second pass depending on max margins
         this.alluvialRoot.forEachDepthFirstPreOrderWhile(
             node => node.depth < Depth.MODULE || (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
-            (node, i, children, next) => {
+            (node, i) => {
                 switch (node.depth) {
                     case Depth.NETWORK_ROOT:
                         currentFlowThreshold = node.flowThreshold;
@@ -78,6 +78,7 @@ export default class Diagram {
                         y = height;
                         break;
                     case Depth.MODULE:
+                        const next = node.parent.getChild(i + 1);
                         const margin = next ? Math.min(next.margin, node.margin) : 0;
                         node.margin = margin;
                         y -= node.flow * height;
