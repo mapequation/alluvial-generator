@@ -29,8 +29,8 @@ export default class StreamlineLink {
         } = this;
 
         return {
-            idLeft: this.left.id,
-            idRight: this.right.id,
+            leftId: this.left.id,
+            rightId: this.right.id,
             x0: leftLayout.x + leftLayout.width,
             x1: rightLayout.x,
             y0: leftLayout.y,

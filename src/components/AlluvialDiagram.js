@@ -61,8 +61,8 @@ export default class AlluvialDiagram extends React.Component {
         }
         this.diagram.calcLayout(width, height, padding, streamlineFraction);
         const tree = this.diagram.asObject();
+
         console.log(this.diagram);
-        console.log('tree:');
         console.log(tree);
 
         this.svg
@@ -71,20 +71,19 @@ export default class AlluvialDiagram extends React.Component {
 
         const g = this.svg.select(".alluvial-diagram");
 
-
         const onClick = (d) => {
             this.diagram.click(d);
-        }
+        };
 
         const onDoubleClick = (d) => {
             this.diagram.doubleClick(d);
             g.selectAll("*").remove();
             this.draw();
-        }
+        };
 
         const onClickStreamline = (d) => {
-            console.log(`${d.idLeft} ==> ${d.idRight}`, d);
-        }
+            console.log(`${d.leftId} ==> ${d.rightId}`, d);
+        };
 
         const roots = g.selectAll(".networkRoot")
             .data(tree.children);
@@ -149,7 +148,7 @@ export default class AlluvialDiagram extends React.Component {
             .attr("y", d => d.layout.y)
             .attr("width", d => d.layout.width)
             .attr("height", d => d.layout.height)
-            .attr("fill-opacity", 0)
+            .attr("fill-opacity", 0);
     }
 
     render() {

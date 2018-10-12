@@ -66,7 +66,7 @@ export default class Diagram {
         // Use first pass to get order of modules to sort streamlines in second pass
         // Y position of modules will be tuned in second pass depending on max margins
         this.alluvialRoot.forEachDepthFirstPreOrderWhile(
-            node => node.depth < Depth.MODULE || node.depth === Depth.MODULE && node.flow >= currentFlowThreshold,
+            node => node.depth < Depth.MODULE || (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
             (node, i, children, next) => {
                 switch (node.depth) {
                     case Depth.NETWORK_ROOT:
@@ -100,7 +100,8 @@ export default class Diagram {
             // Use moduleMarginScale such that
             //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfSpace
             moduleMarginScale = maxMarginFractionOfSpace * height / maxTotalMargin;
-            const forEachUntilModules = this.alluvialRoot.createForEachDepthFirstWhileIterator(node => node.depth <= Depth.MODULE);
+            const forEachUntilModules = this.alluvialRoot.createForEachDepthFirstWhileIterator(
+                node => node.depth <= Depth.MODULE);
 
             forEachUntilModules(node => {
                 if (node.depth === Depth.MODULE) {
@@ -119,7 +120,7 @@ export default class Diagram {
         currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
 
         for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
-            node => node.depth !== Depth.MODULE || node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)) {
+            node => node.depth !== Depth.MODULE || (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold))) {
             switch (node.depth) {
                 case Depth.ALLUVIAL_ROOT:
                     node.layout = { x: 0, y: 0, width, height };
@@ -136,7 +137,7 @@ export default class Diagram {
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     break;
                 case Depth.BRANCH:
-                    node.sortChildren(); // Sort streamline nodes
+                    node.sortChildren();
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
                     if (node.isLeft) {
                         y += node.flow * usableHeight;
