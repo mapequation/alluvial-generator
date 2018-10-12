@@ -93,6 +93,11 @@ export default class AlluvialNodeBase {
 
     }
 
+    getChild(index: number): ?AlluvialNode {
+        if (index < 0 || index > this.children.length - 1) return null;
+        return this.children[index];
+    }
+
     sortChildren() {
         // no-op
     }
@@ -158,12 +163,11 @@ export default class AlluvialNodeBase {
         const { children } = this;
         for (let i = 0; i < children.length; ++i) {
             const child = children[i];
-            const nextChild = i < children.length ? children[i + 1] : null;
             yield {
                 child,
                 childIndex: i,
                 children,
-                nextChild,
+                nextChild: this.getChild(i + 1),
             };
             yield* child.childrenDepthFirstPreOrder();
         }
@@ -173,13 +177,12 @@ export default class AlluvialNodeBase {
         const { children } = this;
         for (let i = 0; i < children.length; ++i) {
             const child = children[i];
-            const nextChild = i < children.length ? children[i + 1] : null;
             yield* child.childrenDepthFirstPostOrder();
             yield {
                 child,
                 childIndex: i,
                 children,
-                nextChild,
+                nextChild: this.getChild(i + 1),
             };
         }
     }
@@ -203,7 +206,7 @@ export default class AlluvialNodeBase {
     forEachDepthFirstPreOrder(callback: IteratorCallback) {
         const children = this.children;
         children.forEach((child, i) => {
-            const nextChild = i < children.length ? children[i + 1] : null;
+            const nextChild = this.getChild(i + 1);
             callback(child, i, children, nextChild);
             child.forEachDepthFirstPreOrder(callback);
         });
@@ -213,7 +216,7 @@ export default class AlluvialNodeBase {
         const children = this.children;
         children.forEach((child, i) => {
             child.forEachDepthFirstPostOrder(callback);
-            const nextChild = i < children.length ? children[i + 1] : null;
+            const nextChild = this.getChild(i + 1);
             callback(child, i, children, nextChild);
         });
     }
@@ -221,7 +224,7 @@ export default class AlluvialNodeBase {
     forEachDepthFirstPreOrderWhile(predicate: Predicate<AlluvialNode>, callback: IteratorCallback) {
         const children = this.children.filter(predicate);
         children.forEach((child, i) => {
-            const nextChild = i < children.length ? children[i + 1] : null;
+            const nextChild = this.getChild(i + 1);
             callback(child, i, children, nextChild);
             child.forEachDepthFirstPreOrderWhile(predicate, callback);
         });
@@ -231,7 +234,7 @@ export default class AlluvialNodeBase {
         const children = this.children.filter(predicate);
         children.forEach((child, i) => {
             child.forEachDepthFirstPostOrderWhile(predicate, callback);
-            const nextChild = i < children.length ? children[i + 1] : null;
+            const nextChild = this.getChild(i + 1);
             callback(child, i, children, nextChild);
         });
     }
