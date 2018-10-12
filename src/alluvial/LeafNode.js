@@ -1,8 +1,8 @@
 import type { Node as FTreeNode } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import { LEFT } from "./Branch";
 import type { Side } from "./Branch";
+import { LEFT } from "./Branch";
 import { LEAF_NODE } from "./depth-constants";
 import StreamlineNode from "./StreamlineNode";
 
@@ -28,6 +28,13 @@ export default class LeafNode extends AlluvialNodeBase {
 
     get ancestorAtCurrentLevel(): string {
         return this.ancestorAtLevel(this.moduleLevel);
+    }
+
+    getAncestor(steps: number): ?AlluvialNodeBase {
+        if (steps === 0) return this;
+        const parent = this.leftParent || this.rightParent;
+        if (parent) return parent.getAncestor(steps - 1);
+        return null;
     }
 
     getParent(side: Side): ?StreamlineNode {
