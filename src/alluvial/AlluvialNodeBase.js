@@ -240,6 +240,22 @@ export default class AlluvialNodeBase {
         });
     }
 
+    createForEachDepthFirstWhileIterator(predicate: Predicate<AlluvialNodeBase>, preOrder: boolean = true): (IteratorCallback) => void {
+        if (preOrder) {
+            return this.createForEachDepthFirstPreOderWhileIterator(predicate);
+        } else {
+            return this.createForEachDepthFirstPostOrderWhileIterator(predicate);
+        }
+    }
+
+    createForEachDepthFirstPreOderWhileIterator(predicate: Predicate<AlluvialNodeBase>): (IteratorCallback) => void {
+        return (callback: IteratorCallback) => this.forEachDepthFirstPreOrderWhile(predicate, callback);
+    }
+
+    createForEachDepthFirstPostOrderWhileIterator(predicate: Predicate<AlluvialNodeBase>): (IteratorCallback) => void {
+        return (callback: IteratorCallback) => this.forEachDepthFirstPostOrderWhile(predicate, callback);
+    }
+
     /**
      Traverse leaf nodes.
      Note: If starting above the branching level, it only traverses leaf nodes
