@@ -56,13 +56,12 @@ export default class Diagram {
         const streamlineWidth = streamlineFraction * barWidth;
         const networkWidth = barWidth + streamlineWidth;
 
-        let moduleMarginScale = 1.0;
-
-        let currentFlowThreshold = 0.0;
         let x = 0;
         let y = height;
-        const networkTotalMargins = [];
 
+        let currentFlowThreshold = 0.0;
+
+        const networkTotalMargins = [];
 
         // Use first pass to get order of modules to sort streamlines in second pass
         // Y position of modules will be tuned in second pass depending on max margins
@@ -93,10 +92,7 @@ export default class Diagram {
 
         let maxTotalMargin = Math.max(...networkTotalMargins);
         let usableHeight = height - maxTotalMargin;
-        currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
-        x = 0;
-        y = height;
-
+        let moduleMarginScale = 1.0;
         const maxMarginFractionOfSpace = 0.5;
 
         if (maxTotalMargin / height > maxMarginFractionOfSpace) {
@@ -111,6 +107,12 @@ export default class Diagram {
             usableHeight = height - maxTotalMargin;
             console.log(`Scaling margin by ${moduleMarginScale} -> totalMargin: ${maxTotalMargin}, usableHeight: ${usableHeight}`);
         }
+
+        x = 0;
+        y = height;
+
+        // We can't set this in the loop any more because of post order traversal
+        currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
 
         for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
             node => node.depth !== Depth.MODULE || node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)) {
