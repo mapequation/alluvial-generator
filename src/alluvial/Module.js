@@ -11,6 +11,7 @@ export default class Module extends AlluvialNodeBase {
     children: HighlightGroup[] = [];
     moduleLevel: number = 1;
     path: number[] = [];
+    margin: number = this.defaultMargin;
 
     constructor(networkIndex: number, parent: NetworkRoot, id: string = "", moduleLevel: number = 1) {
         super(networkIndex, parent, id);
@@ -42,7 +43,7 @@ export default class Module extends AlluvialNodeBase {
         return MODULE;
     }
 
-    get margin(): number {
+    get defaultMargin(): number {
         const margins = [20, 10, 6, 3, 2];
         let index = Math.min(this.moduleLevel - 1, margins.length - 1);
         return margins[index];

@@ -79,7 +79,7 @@ export default class Diagram {
                         break;
                     case Depth.MODULE:
                         const margin = next ? Math.min(next.margin, node.margin) : 0;
-                        node.marginTop = margin;
+                        node.margin = margin;
                         y -= node.flow * height;
                         node.layout = { x, y, width: barWidth, height: node.flow * height };
                         y -= margin;
@@ -100,9 +100,13 @@ export default class Diagram {
             // Use moduleMarginScale such that
             //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfSpace
             moduleMarginScale = maxMarginFractionOfSpace * height / maxTotalMargin;
-            for (let module of this.alluvialRoot.traverseDepthFirst()) {
-                module.marginTop *= moduleMarginScale;
-            }
+            const forEachUntilModules = this.alluvialRoot.createForEachDepthFirstWhileIterator(node => node.depth <= Depth.MODULE);
+
+            forEachUntilModules(node => {
+                if (node.depth === Depth.MODULE) {
+                    node.margin *= moduleMarginScale;
+                }
+            });
             maxTotalMargin *= moduleMarginScale;
             usableHeight = height - maxTotalMargin;
             console.log(`Scaling margin by ${moduleMarginScale} -> totalMargin: ${maxTotalMargin}, usableHeight: ${usableHeight}`);
@@ -126,7 +130,7 @@ export default class Diagram {
                     break;
                 case Depth.MODULE:
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
-                    y -= node.marginTop;
+                    y -= node.margin;
                     break;
                 case Depth.HIGHLIGHT_GROUP:
                     node.layout = { x, y, width: barWidth, height: node.flow * usableHeight };
