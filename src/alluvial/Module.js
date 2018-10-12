@@ -17,12 +17,12 @@ export default class Module extends AlluvialNodeBase {
         this.path = id.split(":").map(childId => Number(childId));
     }
 
-    getGroup(node: LeafNode, highlightIndex: number): ?HighlightGroup {
+    getGroup(highlightIndex: number): ?HighlightGroup {
         return this.children.find(group => group.highlightIndex === highlightIndex);
     }
 
     getOrCreateGroup(node: LeafNode, highlightIndex: number): HighlightGroup {
-        let group = this.getGroup(node, highlightIndex);
+        let group = this.getGroup(highlightIndex);
         if (!group) {
             group = new HighlightGroup(this.networkIndex, this, highlightIndex);
             this.children.push(group);
