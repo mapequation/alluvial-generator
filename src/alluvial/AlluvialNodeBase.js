@@ -1,5 +1,5 @@
 // @flow
-import { LEAF_NODE, HIGHLIGHT_GROUP } from "./depth-constants";
+import { HIGHLIGHT_GROUP, LEAF_NODE } from "./depth-constants";
 
 
 type Position = {

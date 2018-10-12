@@ -24,7 +24,7 @@ export default class Branch extends AlluvialNodeBase {
     side: Side;
 
     constructor(side: Side, networkIndex: number, parent: AlluvialNode) {
-        super(networkIndex, parent);
+        super(networkIndex, parent, sideToString[side]);
         this.side = side;
     }
 

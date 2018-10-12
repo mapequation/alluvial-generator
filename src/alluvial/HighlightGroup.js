@@ -17,7 +17,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     highlightIndex: number;
 
     constructor(networkIndex: number, parent: Module, highlightIndex: number = NOT_HIGHLIGHTED) {
-        super(networkIndex, parent);
+        super(networkIndex, parent, highlightIndex.toString());
         this.highlightIndex = highlightIndex;
     }
 

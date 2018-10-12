@@ -1,5 +1,6 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialRoot from "./AlluvialRoot";
 import { NETWORK_ROOT } from "./depth-constants";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
@@ -10,6 +11,10 @@ import StreamlineNode from "./StreamlineNode";
 export default class NetworkRoot extends AlluvialNodeBase {
     children: Module[] = [];
     flowThreshold: number = 1e-5;
+
+    constructor(networkIndex: number, parent: AlluvialRoot) {
+        super(networkIndex, parent, networkIndex.toString());
+    }
 
     getModule(moduleId: string): ?Module {
         return this.children.find(module => module.id === moduleId);

@@ -7,6 +7,10 @@ import { ALLUVIAL_ROOT } from "./depth-constants";
 export default class AlluvialRoot extends AlluvialNodeBase {
     children: NetworkRoot[] = [];
 
+    constructor() {
+        super(undefined, null, "root");
+    }
+
     getNetworkRoot(networkIndex): ?NetworkRoot {
         return this.children.find(root => root.networkIndex === networkIndex);
     }

@@ -2,8 +2,8 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { MODULE } from "./depth-constants";
 import HighlightGroup from "./HighlightGroup";
-import NetworkRoot from "./NetworkRoot";
 import LeafNode from "./LeafNode";
+import NetworkRoot from "./NetworkRoot";
 import TreePath from "../lib/treepath";
 
 
@@ -13,7 +13,7 @@ export default class Module extends AlluvialNodeBase {
     path: number[] = [];
     margin: number = this.defaultMargin;
 
-    constructor(networkIndex: number, parent: NetworkRoot, id: string = "", moduleLevel: number = 1) {
+    constructor(networkIndex: number, parent: NetworkRoot, id: string, moduleLevel: number = 1) {
         super(networkIndex, parent, id);
         this.moduleLevel = moduleLevel;
         this.path = TreePath.toArray(this.id);
