@@ -7,70 +7,71 @@ import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
 
-
 export default class NetworkRoot extends AlluvialNodeBase {
-    children: Module[] = [];
-    flowThreshold: number = 1e-5;
+  children: Module[] = [];
+  flowThreshold: number = 1e-5;
 
-    constructor(networkIndex: number, parent: AlluvialRoot) {
-        super(networkIndex, parent, networkIndex.toString());
+  constructor(networkIndex: number, parent: AlluvialRoot) {
+    super(networkIndex, parent, networkIndex.toString());
+  }
+
+  getModule(moduleId: string): ?Module {
+    return this.children.find(module => module.id === moduleId);
+  }
+
+  getOrCreateModule(node: LeafNode, moduleLevel: number): Module {
+    const moduleId = node.ancestorAtLevel(moduleLevel);
+    let module = this.getModule(moduleId);
+    if (!module) {
+      module = new Module(this.networkIndex, this, moduleId, moduleLevel);
+      this.children.push(module);
     }
+    return module;
+  }
 
-    getModule(moduleId: string): ?Module {
-        return this.children.find(module => module.id === moduleId);
-    }
+  get depth(): number {
+    return NETWORK_ROOT;
+  }
 
-    getOrCreateModule(node: LeafNode, moduleLevel: number): Module {
-        const moduleId = node.ancestorAtLevel(moduleLevel);
-        let module = this.getModule(moduleId);
-        if (!module) {
-            module = new Module(this.networkIndex, this, moduleId, moduleLevel);
-            this.children.push(module);
+  asObject(): Object {
+    return {
+      ...super.asObject(),
+      links: Array.from(this.rightStreamlines()).map(link => link.asObject()),
+      children: this.children
+        .filter(child => child.flow >= this.flowThreshold)
+        .map(child => child.asObject())
+    };
+  }
+
+  *rightStreamlines(): Iterable<StreamlineLink> {
+    for (let module of this.children) {
+      // Skip if left module if below threshold
+      if (module.flow < this.flowThreshold) continue;
+      for (let group of module.children) {
+        for (let streamlineNode of group.right.children) {
+          // Skip if right module is below threshold
+          const oppositeStreamlineNode: ?StreamlineNode =
+            streamlineNode.oppositeStreamlineNode;
+          if (!oppositeStreamlineNode) continue;
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(3);
+          if (oppositeModule && oppositeModule.flow < this.flowThreshold)
+            continue;
+          if (streamlineNode.link) yield streamlineNode.link;
         }
-        return module;
+      }
     }
+  }
 
-    get depth(): number {
-        return NETWORK_ROOT;
-    }
-
-    asObject(): Object {
-        return {
-            ...super.asObject(),
-            links: Array.from(this.rightStreamlines()).map(link => link.asObject()),
-            children: this.children
-                .filter(child => child.flow >= this.flowThreshold)
-                .map(child => child.asObject()),
-        };
-    }
-
-    * rightStreamlines(): Iterable<StreamlineLink> {
-        for (let module of this.children) {
-            // Skip if left module if below threshold
-            if (module.flow < this.flowThreshold) continue;
-            for (let group of module.children) {
-                for (let streamlineNode of group.right.children) {
-                    // Skip if right module is below threshold
-                    const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.oppositeStreamlineNode;
-                    if (!oppositeStreamlineNode) continue;
-                    const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(3);
-                    if (oppositeModule && oppositeModule.flow < this.flowThreshold) continue;
-                    if (streamlineNode.link) yield streamlineNode.link;
-                }
-            }
-        }
-    }
-
-    sortChildren() {
-        this.children.sort((a: Module, b: Module) => {
-            let aSize = Math.max(1, a.path.length - 1);
-            let bSize = Math.max(1, b.path.length - 1);
-            let minSize = Math.min(aSize, bSize);
-            for (let i = 0; i < minSize; ++i) {
-                if (a.path[i] === b.path[i]) continue;
-                return a.path[i] - b.path[i];
-            }
-            return b.flow - a.flow;
-        });
-    }
+  sortChildren() {
+    this.children.sort((a: Module, b: Module) => {
+      let aSize = Math.max(1, a.path.length - 1);
+      let bSize = Math.max(1, b.path.length - 1);
+      let minSize = Math.min(aSize, bSize);
+      for (let i = 0; i < minSize; ++i) {
+        if (a.path[i] === b.path[i]) continue;
+        return a.path[i] - b.path[i];
+      }
+      return b.flow - a.flow;
+    });
+  }
 }
