@@ -16,7 +16,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   getModule(moduleId: string): ?Module {
-    return this.children.find(module => module.id === moduleId);
+    return this.children.find(module => module.moduleId === moduleId);
   }
 
   getOrCreateModule(node: LeafNode, moduleLevel: number): Module {

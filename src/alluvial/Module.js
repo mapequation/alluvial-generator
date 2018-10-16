@@ -10,17 +10,19 @@ export default class Module extends AlluvialNodeBase {
   children: HighlightGroup[] = [];
   moduleLevel: number = 1;
   path: number[] = [];
+  moduleId: string;
   margin: number = this.defaultMargin;
 
   constructor(
     networkIndex: number,
     parent: NetworkRoot,
-    id: string,
+    moduleId: string,
     moduleLevel: number = 1
   ) {
-    super(networkIndex, parent, id);
+    super(networkIndex, parent, `${parent.id}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
-    this.path = TreePath.toArray(this.id);
+    this.moduleId = moduleId;
+    this.path = TreePath.toArray(moduleId);
   }
 
   getGroup(highlightIndex: number): ?HighlightGroup {
