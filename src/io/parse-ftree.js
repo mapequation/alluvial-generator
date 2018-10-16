@@ -68,13 +68,6 @@ const parseModulesSection = (row: Row): Module => ({
   links: []
 });
 
-const parseLink = (row: Row): Link => ({
-  // eslint-disable-line no-unused-vars
-  source: +row[0],
-  target: +row[1],
-  flow: +row[2]
-});
-
 export default function parseFTree(rows: Row[]): FTree {
   const result = {
     data: {
@@ -124,8 +117,6 @@ export default function parseFTree(rows: Row[]): FTree {
     result.errors.push("Expected link type!");
   }
 
-  let module: ?Module = null;
-
   // 3. Parse modules section
   for (; i < rows.length; i++) {
     const row = rows[i];
@@ -141,19 +132,8 @@ export default function parseFTree(rows: Row[]): FTree {
         continue;
       }
 
-      module = parseModulesSection(row);
+      let module = parseModulesSection(row);
       modules.push(module);
-
-      // 3b. Parse link data
-    } else if (module) {
-      /*
-            if (row.length < 3) {
-                result.errors.push(`Malformed ftree link data: expected at least 3 fields, found ${row.length}.`);
-                continue;
-            }
-
-            module.links.push(parseLink(row));
-            */
     }
   }
 
