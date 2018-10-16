@@ -54,17 +54,19 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   async draw(prevProps = this.props) {
-    const { width, height, padding, streamlineFraction } = this.props;
+    const { width, height, padding, streamlineFraction, duration } = this.props;
 
     this.diagram.calcLayout(width, height, padding, streamlineFraction);
-    const tree = this.diagram.asObject();
+    const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
-    console.log(tree);
+    console.log(alluvialRoot);
+
+    const t = d3.transition().duration(duration);
 
     this.svg
-      .attr("width", tree.layout.width)
-      .attr("height", tree.layout.height);
+      .attr("width", alluvialRoot.width)
+      .attr("height", alluvialRoot.height);
 
     const g = this.svg.select(".alluvial-diagram");
 
@@ -74,44 +76,120 @@ export default class AlluvialDiagram extends React.Component {
 
     const onDoubleClick = d => {
       this.diagram.doubleClick(d);
-      g.selectAll("*").remove();
-      this.draw();
+      //g.selectAll("*").remove();
+      this.draw(prevProps);
     };
 
-    const onClickStreamline = d => {
-      console.log(d.leftId, d);
-    };
+    let roots = g
+      .selectAll(".networkRoot")
+      .data(alluvialRoot.children, function key(d) {
+        console.log("root.id", d.id);
+        return d ? d.id : this.id;
+      });
 
-    const roots = g.selectAll(".networkRoot").data(tree.children);
+    roots.exit().remove();
 
-    const rootsEnter = roots
+    roots = roots
       .enter()
       .append("g")
+      .merge(roots)
       .attr("class", "networkRoot");
 
-    const streamlines = rootsEnter.selectAll(".streamline").data(d => d.links);
+    const streamlines = roots
+      .selectAll(".streamline")
+      .data(d => d.links, function key(d) {
+        console.log("streamline.leftId", d.leftId);
+        return d ? d.leftId : this.id;
+      });
+
+    streamlines
+      .exit()
+      .transition(t)
+      .attr("d", d => this.streamlineGenerator(d.transitionPath))
+      .attr("opacity", 0)
+      .remove();
+
+    const staggeredDelay = delay => (d, index, elements) => {
+      const timeBudget = duration * 0.5;
+      const timePerElement = timeBudget / elements.length;
+      return delay + timePerElement * index;
+    };
 
     streamlines
       .enter()
       .filter(d => d.h0 + d.h1 > 3)
       .append("path")
       .attr("class", "streamline")
-      .attr("opacity", 0.5)
+      .on("click", onClick)
       .attr("fill", "#B6B69F")
       .attr("stroke", "white")
-      .attr("d", this.streamlineGenerator)
-      .on("click", onClickStreamline);
+      .attr("opacity", 0)
+      .attr("d", d => this.streamlineGenerator(d.transitionPath))
+      .transition(t)
+      .attr("opacity", 0.5)
+      .delay(staggeredDelay(2 * duration))
+      .attr("d", this.streamlineGenerator);
 
-    const modules = rootsEnter.selectAll(".module").data(d => d.children);
+    let modules = roots
+      .selectAll(".module")
+      .data(d => d.children, function key(d) {
+        console.log("module.id", d.id);
+        return d ? d.id : this.id;
+      });
 
-    const modulesEnter = modules
+    modules
+      .exit()
+      .transition(t)
+      .remove();
+
+    modules = modules
       .enter()
       .append("g")
+      .merge(modules)
       .attr("class", "module")
       .on("click", onClick)
       .on("dblclick", onDoubleClick);
 
-    const groups = modulesEnter.selectAll(".group").data(d => d.children);
+    const groups = modules
+      .selectAll(".group")
+      .data(d => d.children, function key(d) {
+        console.log("group.id", d.id);
+        return d ? d.id : this.id;
+      });
+
+    const setX = d => d.attr("x", d => d.x);
+    const setY = d => d.attr("y", d => d.y);
+    const setWidth = d => d.attr("width", d => d.width);
+    const setHeight = d => d.attr("height", d => d.height);
+    const setWidthX = d => setWidth(setX(d));
+    const setHeightY = d => setHeight(setY(d));
+
+    groups
+      .exit()
+      .selectAll("rect")
+      .transition(t)
+      .attr("opacity", 0)
+      .remove();
+
+    console.warn(groups.exit().select("text"));
+
+    groups
+      .exit()
+      .selectAll("text")
+      .transition(t)
+      .attr("x", -1000000)
+      .attr("font-size", 0)
+      .remove();
+
+    groups
+      .exit()
+      .transition(t)
+      .remove();
+
+    groups
+      .select("rect")
+      .transition(t)
+      .call(setHeightY);
 
     const groupsEnter = groups
       .enter()
@@ -120,36 +198,24 @@ export default class AlluvialDiagram extends React.Component {
 
     groupsEnter
       .append("rect")
-      .attr("x", d => d.layout.x)
-      .attr("y", d => d.layout.y)
-      .attr("width", d => d.layout.width)
-      .attr("height", d => d.layout.height)
+      .call(setWidthX)
+      .call(setHeightY)
       .attr("fill", "#B6B69F")
-      .attr("stroke-location", "outside");
+      .attr("stroke-location", "outside")
+      .attr("opacity", 0)
+      .transition(t)
+      .delay(duration)
+      .attr("opacity", 1);
 
-    const branch = groupsEnter.selectAll(".branch").data(d => d.children);
-
-    const branchEnter = branch
-      .enter()
-      .append("g")
-      .attr("class", d => `branch ${d.side}`);
-
-    const streamlineNode = branchEnter
-      .selectAll(".streamlineNode")
-      .data(d => d.children);
-
-    const streamlineNodeEnter = streamlineNode
-      .enter()
-      .append("g")
-      .attr("class", "streamlineNode");
-
-    streamlineNodeEnter
-      .append("rect")
-      .attr("x", d => d.layout.x)
-      .attr("y", d => d.layout.y)
-      .attr("width", d => d.layout.width)
-      .attr("height", d => d.layout.height)
-      .attr("fill-opacity", 0);
+    groupsEnter
+      .filter(d => d.flow > 1e-2)
+      .append("text")
+      .text(d => d.id)
+      .attr("font-size", d => d.flow * 5 + 10)
+      .attr("x", d => d.x + d.width / 2)
+      .attr("y", d => d.y + d.height / 2)
+      .attr("dy", 4)
+      .attr("text-anchor", "middle");
   }
 
   render() {

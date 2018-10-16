@@ -41,6 +41,7 @@ export default class Module extends AlluvialNodeBase {
   asObject(): Object {
     return {
       moduleLevel: this.moduleLevel,
+      moduleId: this.moduleId,
       ...super.asObject()
     };
   }
@@ -50,7 +51,7 @@ export default class Module extends AlluvialNodeBase {
   }
 
   get defaultMargin(): number {
-    const margins = [20, 10, 6, 3, 2];
+    const margins = [10, 3, 2, 1];
     let index = Math.min(this.moduleLevel - 1, margins.length - 1);
     return margins[index];
   }

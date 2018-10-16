@@ -8,7 +8,6 @@ import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
-import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
 
 export default class Diagram {
@@ -42,7 +41,7 @@ export default class Diagram {
   doubleClick(alluvialNode: Object) {
     switch (alluvialNode.depth) {
       case Depth.MODULE:
-        this.expandModule(alluvialNode.id, alluvialNode.networkIndex);
+        this.expandModule(alluvialNode.moduleId, alluvialNode.networkIndex);
         break;
       default:
         break;
@@ -64,7 +63,8 @@ export default class Diagram {
     let x = 0;
     let y = height;
 
-    let currentFlowThreshold = 0.0;
+    //let currentFlowThreshold = 0.0;
+    let currentFlowThreshold = 1e-3;
 
     const networkTotalMargins = [];
 
@@ -77,7 +77,7 @@ export default class Diagram {
       (node, i) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
-            currentFlowThreshold = node.flowThreshold;
+            //currentFlowThreshold = node.flowThreshold;
             networkTotalMargins.push(0);
             node.sortChildren();
             node.layout = { x, y, width: barWidth, height: node.flow * height };
@@ -87,7 +87,7 @@ export default class Diagram {
           case Depth.MODULE:
             const next = node.parent.getChild(i + 1);
             const margin = next ? Math.min(next.margin, node.margin) : 0;
-            node.margin = margin;
+            //node.margin = margin;
             y -= node.flow * height;
             node.layout = { x, y, width: barWidth, height: node.flow * height };
             y -= margin;
@@ -100,10 +100,11 @@ export default class Diagram {
     );
 
     let maxTotalMargin = Math.max(...networkTotalMargins);
-    let usableHeight = height - maxTotalMargin;
+    let usableHeight = Math.max(height - maxTotalMargin, 0);
     let moduleMarginScale = 1.0;
     const maxMarginFractionOfSpace = 0.5;
 
+    /*
     if (maxTotalMargin / height > maxMarginFractionOfSpace) {
       // Reduce margins to below 50% of vertical space
       // Use moduleMarginScale such that
@@ -124,12 +125,13 @@ export default class Diagram {
         `Scaling margin by ${moduleMarginScale} -> totalMargin: ${maxTotalMargin}, usableHeight: ${usableHeight}`
       );
     }
+    */
 
     x = 0;
     y = height;
 
     // We can't set this in the loop any more because of post order traversal
-    currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
+    //currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
 
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
@@ -282,19 +284,11 @@ export default class Diagram {
       branch.addChild(streamlineNode);
 
       if (oppositeNode) {
-        const oppositeId = streamlineId
-          .split("--")
-          .reverse()
-          .join("--");
+        const oppositeId = StreamlineNode.oppositeId(streamlineId);
         const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
 
         if (oppositeStreamlineNode) {
-          const reverseLinkDirection = branch.isLeft;
-          StreamlineLink.create(
-            streamlineNode,
-            oppositeStreamlineNode,
-            reverseLinkDirection
-          );
+          streamlineNode.linkTo(oppositeStreamlineNode);
         }
       }
     }
@@ -371,13 +365,29 @@ export default class Diagram {
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
       networkIndex
     );
-    if (!networkRoot) return;
+    if (!networkRoot) {
+      console.warn(`No network index ${networkIndex}`);
+      return;
+    }
+
     const module: ?Module = networkRoot.getModule(moduleId);
-    if (!module) return;
+    if (!module) {
+      console.warn(
+        `No module found with id ${moduleId} in network ${networkIndex}`
+      );
+      return;
+    }
+
     console.log("Click on module:", module);
+
     const leafNodes: LeafNode[] = Array.from(module.traverseLeafNodes());
-    if (!leafNodes.length) return;
-    const moduleLevel = leafNodes[0].moduleLevel;
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return;
+    }
+
+    const moduleLevel = leafNodes[0].moduleLevel; // FIXME?
+
     leafNodes.forEach(node => this.removeNode(node));
     leafNodes.forEach(node =>
       this.addNode(node, networkIndex, moduleLevel + 1)

@@ -38,6 +38,16 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return -module.y;
   }
 
+  linkTo(opposite: StreamlineNode) {
+    let reverse = false;
+
+    if (this.parent) {
+      reverse = this.parent.isLeft;
+    }
+
+    StreamlineLink.linkNodes(this, opposite, reverse);
+  }
+
   static createId(
     node: LeafNode,
     networkIndex: number,
@@ -66,5 +76,12 @@ export default class StreamlineNode extends AlluvialNodeBase {
     }
 
     return id;
+  }
+
+  static oppositeId(id: string): string {
+    return id
+      .split("--")
+      .reverse()
+      .join("--");
   }
 }

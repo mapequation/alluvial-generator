@@ -16,7 +16,7 @@ export default class StreamlineLink {
     right.link = this;
   }
 
-  static create(
+  static linkNodes(
     left: StreamlineNode,
     right: StreamlineNode,
     reverse: boolean = false
@@ -35,13 +35,28 @@ export default class StreamlineLink {
       right: { layout: rightLayout }
     } = this;
 
+    const x0 = leftLayout.x + leftLayout.width;
+    const x1 = rightLayout.x;
+    const y0 = leftLayout.y;
+    const y1 = rightLayout.y;
+    const h0 = leftLayout.height;
+    const h1 = rightLayout.height;
+
     return {
-      x0: leftLayout.x + leftLayout.width,
-      x1: rightLayout.x,
-      y0: leftLayout.y,
-      y1: rightLayout.y,
-      h0: leftLayout.height,
-      h1: rightLayout.height,
+      x0,
+      x1,
+      y0,
+      y1,
+      h0,
+      h1,
+      transitionPath: {
+        x0: (x0 + x1) / 2,
+        x1: (x0 + x1) / 2,
+        y0: (y0 + y1) / 2,
+        y1: (y0 + y1) / 2,
+        h0,
+        h1
+      },
       leftId: this.left.id,
       rightId: this.right.id
     };

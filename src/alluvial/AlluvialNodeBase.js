@@ -108,7 +108,7 @@ export default class AlluvialNodeBase {
       networkIndex: this.networkIndex,
       flow: this.flow,
       depth: this.depth,
-      layout: this.layout,
+      ...this.layout,
       children: this.children.map(child => child.asObject())
     };
   }
