@@ -1,22 +1,29 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
-import Branch, { opposite, sideToString } from "./Branch";
+import Branch from "./Branch";
 import { STREAMLINE_NODE } from "./depth-constants";
-import LeafNode from "./LeafNode";
 import StreamlineLink from "./StreamlineLink";
+import StreamlineId from "./StreamlineId";
 
 export default class StreamlineNode extends AlluvialNodeBase {
   link: ?StreamlineLink = null;
   side: Side;
+  streamlineId: StreamlineId;
 
   constructor(networkIndex: number, parent: Branch, id: string) {
     super(networkIndex, parent, id);
     this.side = parent.side;
+    this.streamlineId = StreamlineId.fromString(id);
   }
 
   makeDangling() {
-    this.id = this.id.split("--")[0];
+    this.streamlineId = this.streamlineId.getDangling();
+    this.id = this.streamlineId.toString();
+  }
+
+  get targetId() {
+    return this.streamlineId.target;
   }
 
   get oppositeStreamlineNode(): ?StreamlineNode {
@@ -39,49 +46,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   linkTo(opposite: StreamlineNode) {
-    let reverse = false;
-
-    if (this.parent) {
-      reverse = this.parent.isLeft;
-    }
-
+    let reverse = this.parent ? this.parent.isLeft : false;
     StreamlineLink.linkNodes(this, opposite, reverse);
-  }
-
-  static createId(
-    node: LeafNode,
-    networkIndex: number,
-    side: Side,
-    oppositeNode: ?LeafNode = null
-  ): string {
-    const moduleId = node => node.ancestorAtCurrentLevel;
-
-    const typeSuffix = node =>
-      `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
-
-    const createId = (networkIndex, node, side) =>
-      `${networkIndex}_module${moduleId(node)}_group${typeSuffix(node)}_${
-        sideToString[side]
-      }`;
-
-    const id = createId(networkIndex, node, side);
-
-    if (oppositeNode) {
-      const oppositeId = createId(
-        networkIndex + side,
-        oppositeNode,
-        opposite(side)
-      );
-      return `${id}--${oppositeId}`;
-    }
-
-    return id;
-  }
-
-  static oppositeId(id: string): string {
-    return id
-      .split("--")
-      .reverse()
-      .join("--");
   }
 }

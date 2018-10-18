@@ -9,6 +9,7 @@ import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineNode from "./StreamlineNode";
+import StreamlineId from "./StreamlineId";
 
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
@@ -215,12 +216,12 @@ export default class Diagram {
         branch.neighborNetworkIndex,
         node.name
       );
-      const streamlineId = StreamlineNode.createId(
+      const streamlineId = StreamlineId.create(
         node,
         networkIndex,
         branch.side,
         oppositeNode
-      );
+      ).toString();
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
@@ -229,12 +230,11 @@ export default class Diagram {
         branch.addChild(streamlineNode);
       }
 
-      const [_, targetId] = streamlineId.split("--"); // eslint-disable-line no-unused-vars
-      const streamlineIdHasTarget = !!targetId;
+      const streamlineIdHasTarget = !!streamlineNode.targetId;
 
       if (streamlineIdHasTarget) {
         const oppositeStreamlineIsDangling = this.streamlineNodesById.has(
-          targetId
+          streamlineNode.targetId
         );
         if (oppositeStreamlineIsDangling && oppositeNode) {
           const oppositeSide = opposite(branch.side);
@@ -262,12 +262,12 @@ export default class Diagram {
       neighborNetworkIndex,
       node.name
     );
-    const streamlineId = StreamlineNode.createId(
+    const streamlineId = StreamlineId.create(
       node,
       networkIndex,
       side,
       oppositeNode
-    );
+    ).toString();
     let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(
       streamlineId
     );
@@ -284,7 +284,7 @@ export default class Diagram {
       branch.addChild(streamlineNode);
 
       if (oppositeNode) {
-        const oppositeId = StreamlineNode.oppositeId(streamlineId);
+        const oppositeId = StreamlineId.oppositeId(streamlineId);
         const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
 
         if (oppositeStreamlineNode) {
