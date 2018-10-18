@@ -52,10 +52,10 @@ export default class StreamlineLink {
       transitionPath: {
         x0: (x0 + x1) / 2,
         x1: (x0 + x1) / 2,
-        y0: (y0 + y1) / 2,
-        y1: (y0 + y1) / 2,
-        h0,
-        h1
+        y0: (y0 + y1) / 2 + h0 / 4,
+        y1: (y0 + y1) / 2 + h1 / 4,
+        h0: h0 / 2,
+        h1: h1 / 2
       },
       leftId: this.left.id,
       rightId: this.right.id
