@@ -380,7 +380,7 @@ export default class Diagram {
 
     console.log("Click on module:", module);
 
-    const leafNodes: LeafNode[] = Array.from(module.traverseLeafNodes());
+    const leafNodes: LeafNode[] = Array.from(module.leafNodes());
     if (!leafNodes.length) {
       console.warn(`No leaf nodes found`);
       return;

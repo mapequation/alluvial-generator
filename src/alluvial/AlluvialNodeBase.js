@@ -267,19 +267,18 @@ export default class AlluvialNodeBase {
       this.forEachDepthFirstPostOrderWhile(predicate, callback);
   }
 
-  /**
-     Traverse leaf nodes.
-     Note: If starting above the branching level, it only traverses leaf nodes
-     of the left branch to not duplicate leaf nodes.
-     */
-  *traverseLeafNodes(): Iterable<AlluvialNode> {
+  /*
+  Note: If starting above the branching level, it only traverses leaf nodes
+  of the left branch to not duplicate leaf nodes.
+  */
+  *leafNodes(): Iterable<AlluvialNode> {
     if (this.depth === LEAF_NODE) {
       yield this;
     }
     const children =
       this.depth === HIGHLIGHT_GROUP ? [this.children[0]] : this.children;
     for (let child of children) {
-      yield* child.traverseLeafNodes();
+      yield* child.leafNodes();
     }
   }
 }
