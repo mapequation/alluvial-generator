@@ -40,17 +40,6 @@ export default class AlluvialDiagram extends React.Component {
     this.draw(prevProps);
   }
 
-  propsChanged(props, prevProps) {
-    return {
-      networkRemoved: props.networks.length < prevProps.networks.length,
-      networkAdded: props.networks.length > prevProps.networks.length,
-      widthChanged: props.width !== prevProps.width,
-      heightChanged: props.height !== prevProps.height,
-      streamlineFractionChanged:
-        props.streamlineFraction !== prevProps.streamlineFraction
-    };
-  }
-
   async draw(prevProps = this.props) {
     const {
       width,
