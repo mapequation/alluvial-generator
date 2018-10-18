@@ -49,12 +49,7 @@ export default class Diagram {
     }
   }
 
-  calcLayout(
-    width: number,
-    height: number,
-    moduleMargin: number,
-    streamlineFraction: number
-  ) {
+  calcLayout(width: number, height: number, streamlineFraction: number) {
     const numNetworks = this.networks.length;
     const barWidth =
       width / (numNetworks + (numNetworks - 1) * streamlineFraction);
@@ -377,8 +372,6 @@ export default class Diagram {
       );
       return;
     }
-
-    console.log("Click on module:", module);
 
     const leafNodes: LeafNode[] = Array.from(module.leafNodes());
     if (!leafNodes.length) {

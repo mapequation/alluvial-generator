@@ -76,24 +76,6 @@ export default function Sidebar(props) {
       <Menu.Item>
         <Input
           type="text"
-          label="Padding"
-          labelPosition="left"
-          value={props.padding}
-        />
-        <Slider
-          discrete
-          settings={{
-            start: props.padding,
-            min: 0,
-            max: 10,
-            step: 1,
-            onChange: props.onPaddingChange
-          }}
-        />
-      </Menu.Item>
-      <Menu.Item>
-        <Input
-          type="text"
           label="Streamline threshold"
           labelPosition="left"
           value={props.streamlineThreshold}
@@ -141,8 +123,6 @@ Sidebar.propTypes = {
   onHeightChange: PropTypes.func,
   streamlineFraction: PropTypes.number,
   onStreamlineFractionChange: PropTypes.func,
-  padding: PropTypes.number,
-  onPaddingChange: PropTypes.func,
   streamlineThreshold: PropTypes.number,
   onStreamlineThresholdChange: PropTypes.func,
   duration: PropTypes.number,

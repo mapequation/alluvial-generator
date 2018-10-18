@@ -12,7 +12,6 @@ export default class App extends React.Component {
   state = {
     width: 1200,
     height: 600,
-    padding: 3,
     duration: 500,
     streamlineFraction: 1,
     streamlineThreshold: 0.001,
@@ -90,8 +89,6 @@ export default class App extends React.Component {
           onWidthChange={this.handleWidthChange}
           height={this.state.height}
           onHeightChange={this.handleHeightChange}
-          padding={this.state.padding}
-          onPaddingChange={padding => this.setState({ padding })}
           streamlineFraction={this.state.streamlineFraction}
           onStreamlineFractionChange={streamlineFraction =>
             this.setState({ streamlineFraction })
@@ -108,7 +105,6 @@ export default class App extends React.Component {
             <ZoomableSvg>
               <AlluvialDiagram
                 networks={this.state.visibleNetworks}
-                padding={+this.state.padding}
                 width={this.state.width}
                 height={this.state.height}
                 streamlineFraction={+this.state.streamlineFraction}

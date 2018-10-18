@@ -12,7 +12,6 @@ export default class AlluvialDiagram extends React.Component {
   static defaultProps = {
     width: 1200,
     height: 600,
-    padding: 3,
     streamlineFraction: 1,
     streamlineThreshold: 0.005,
     duration: 200
@@ -21,7 +20,6 @@ export default class AlluvialDiagram extends React.Component {
   static propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
-    padding: PropTypes.number,
     streamlineFraction: PropTypes.number,
     streamlineThreshold: PropTypes.number,
     networks: PropTypes.arrayOf(PropTypes.object),
@@ -54,9 +52,15 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   async draw(prevProps = this.props) {
-    const { width, height, padding, streamlineFraction, duration } = this.props;
+    const {
+      width,
+      height,
+      streamlineFraction,
+      duration,
+      networks
+    } = this.props;
 
-    this.diagram.calcLayout(width, height, padding, streamlineFraction);
+    this.diagram.calcLayout(width, height, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
