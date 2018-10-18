@@ -224,7 +224,7 @@ export default class AlluvialDiagram extends React.Component {
 
   render() {
     return (
-      <svg ref={node => (this.node = node)}>
+      <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
         <g className="alluvial-diagram" />
       </svg>
     );
