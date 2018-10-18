@@ -342,7 +342,7 @@ export default class Diagram {
     branch.flow -= node.flow;
 
     if (streamlineNode.isEmpty) {
-      const opposite = streamlineNode.oppositeStreamlineNode;
+      const opposite = streamlineNode.getOppositeStreamlineNode();
       if (opposite) {
         this.streamlineNodesById.delete(opposite.id);
         opposite.makeDangling();
