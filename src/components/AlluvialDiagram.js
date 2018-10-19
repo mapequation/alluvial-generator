@@ -13,7 +13,6 @@ export default class AlluvialDiagram extends React.Component {
     width: 1200,
     height: 600,
     streamlineFraction: 1,
-    streamlineThreshold: 0.005,
     duration: 200
   };
 
@@ -21,7 +20,6 @@ export default class AlluvialDiagram extends React.Component {
     width: PropTypes.number,
     height: PropTypes.number,
     streamlineFraction: PropTypes.number,
-    streamlineThreshold: PropTypes.number,
     networks: PropTypes.arrayOf(PropTypes.object),
     duration: PropTypes.number
   };

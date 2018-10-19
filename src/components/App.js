@@ -14,7 +14,6 @@ export default class App extends React.Component {
     height: 600,
     duration: 500,
     streamlineFraction: 1,
-    streamlineThreshold: 0.001,
     networks: [],
     visibleNetworks: []
   };
@@ -93,10 +92,6 @@ export default class App extends React.Component {
           onStreamlineFractionChange={streamlineFraction =>
             this.setState({ streamlineFraction })
           }
-          streamlineThreshold={this.state.streamlineThreshold}
-          onStreamlineThresholdChange={streamlineThreshold =>
-            this.setState({ streamlineThreshold })
-          }
           duration={this.state.duration}
           onDurationChange={duration => this.setState({ duration })}
         />
@@ -108,7 +103,6 @@ export default class App extends React.Component {
                 width={this.state.width}
                 height={this.state.height}
                 streamlineFraction={+this.state.streamlineFraction}
-                streamlineThreshold={+this.state.streamlineThreshold}
                 duration={+this.state.duration}
               />
             </ZoomableSvg>

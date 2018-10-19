@@ -76,23 +76,6 @@ export default function Sidebar(props) {
       <Menu.Item>
         <Input
           type="text"
-          label="Streamline threshold"
-          labelPosition="left"
-          value={props.streamlineThreshold}
-        />
-        <Slider
-          settings={{
-            start: props.streamlineThreshold,
-            min: 0.00000001,
-            max: 0.05,
-            step: 0.0001,
-            onChange: props.onStreamlineThresholdChange
-          }}
-        />
-      </Menu.Item>
-      <Menu.Item>
-        <Input
-          type="text"
           label="Animation duration"
           labelPosition="left"
           value={props.duration}
@@ -123,8 +106,6 @@ Sidebar.propTypes = {
   onHeightChange: PropTypes.func,
   streamlineFraction: PropTypes.number,
   onStreamlineFractionChange: PropTypes.func,
-  streamlineThreshold: PropTypes.number,
-  onStreamlineThresholdChange: PropTypes.func,
   duration: PropTypes.number,
   onDurationChange: PropTypes.func
 };
