@@ -85,7 +85,7 @@ export default function Sidebar(props) {
           settings={{
             start: props.duration,
             min: 100,
-            max: 1000,
+            max: 2000,
             step: 100,
             onChange: props.onDurationChange
           }}
