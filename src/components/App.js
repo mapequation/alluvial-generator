@@ -13,7 +13,7 @@ export default class App extends React.Component {
     width: 1200,
     height: 600,
     duration: 500,
-    streamlineFraction: 1,
+    streamlineFraction: 2,
     networks: [],
     visibleNetworks: []
   };

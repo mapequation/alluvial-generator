@@ -12,7 +12,7 @@ export default class AlluvialDiagram extends React.Component {
   static defaultProps = {
     width: 1200,
     height: 600,
-    streamlineFraction: 1,
+    streamlineFraction: 2,
     duration: 200
   };
 
