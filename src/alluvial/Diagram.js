@@ -59,8 +59,7 @@ export default class Diagram {
     let x = 0;
     let y = height;
 
-    //let currentFlowThreshold = 0.0;
-    let currentFlowThreshold = 1e-3;
+    let currentFlowThreshold = 0.0;
 
     const networkTotalMargins = [];
 
@@ -73,7 +72,7 @@ export default class Diagram {
       (node, i) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
-            //currentFlowThreshold = node.flowThreshold;
+            currentFlowThreshold = node.flowThreshold;
             networkTotalMargins.push(0);
             node.sortChildren();
             node.layout = { x, y, width: barWidth, height: node.flow * height };
@@ -83,7 +82,7 @@ export default class Diagram {
           case Depth.MODULE:
             const next = node.parent.getChild(i + 1);
             const margin = next ? Math.min(next.margin, node.margin) : 0;
-            //node.margin = margin;
+            node.margin = margin;
             y -= node.flow * height;
             node.layout = { x, y, width: barWidth, height: node.flow * height };
             y -= margin;
@@ -97,10 +96,14 @@ export default class Diagram {
 
     let maxTotalMargin = Math.max(...networkTotalMargins);
     let usableHeight = Math.max(height - maxTotalMargin, 0);
+
+    if (usableHeight === 0) {
+      console.warn("Usable height is 0");
+    }
+
     let moduleMarginScale = 1.0;
     const maxMarginFractionOfSpace = 0.5;
 
-    /*
     if (maxTotalMargin / height > maxMarginFractionOfSpace) {
       // Reduce margins to below 50% of vertical space
       // Use moduleMarginScale such that
@@ -121,13 +124,12 @@ export default class Diagram {
         `Scaling margin by ${moduleMarginScale} -> totalMargin: ${maxTotalMargin}, usableHeight: ${usableHeight}`
       );
     }
-    */
 
     x = 0;
     y = height;
 
     // We can't set this in the loop any more because of post order traversal
-    //currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
+    currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
 
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
@@ -379,7 +381,7 @@ export default class Diagram {
       return;
     }
 
-    const moduleLevel = leafNodes[0].moduleLevel; // FIXME?
+    const moduleLevel = leafNodes[0].moduleLevel;
 
     leafNodes.forEach(node => this.removeNode(node));
     leafNodes.forEach(node =>
