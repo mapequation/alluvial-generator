@@ -9,11 +9,19 @@ export default class StreamlineId {
   constructor(source: string, target: ?string = null) {
     this.source = source;
     this.target = target;
+
+    if (!this.isValid()) {
+      const andTarget = target ? ` and target ${target}` : "";
+      throw new Error(`Incorrect id with source ${source}${andTarget}.`);
+    }
   }
 
-  static fromString(linkId): StreamlineId {
-    const [source, target] = linkId.split("--");
-    return new StreamlineId(source, target);
+  isValid() {
+    const { source, target } = this;
+
+    const valid = /^d+_module(\d+:)*\d+_group(i)?-?\d+/;
+
+    return source && valid.test(source) && target ? valid.test(target) : true;
   }
 
   static create(
@@ -50,6 +58,11 @@ export default class StreamlineId {
       .split("--")
       .reverse()
       .join("--");
+  }
+
+  static fromString(id): StreamlineId {
+    const [source, target] = id.split("--");
+    return new StreamlineId(source, target);
   }
 
   toString(): string {
