@@ -64,11 +64,9 @@ export default class AlluvialDiagram extends React.Component {
       .attr("width", alluvialRoot.width)
       .attr("height", alluvialRoot.height);
 
-    const g = this.svg.select(".alluvial-diagram");
+    const alluvialDiagram = this.svg.select(".alluvialDiagram");
 
-    const onClick = d => {
-      console.log(d);
-    };
+    const onClick = d => console.log(d);
 
     const onDoubleClick = d => {
       this.diagram.doubleClick(d);
@@ -79,51 +77,70 @@ export default class AlluvialDiagram extends React.Component {
       return d ? d.id : this.id;
     }
 
-    let roots = g.selectAll(".networkRoot").data(alluvialRoot.children, key);
+    const setWidthX = d => d.attr("x", d => d.x).attr("width", d => d.width);
+    const setHeightY = d => d.attr("y", d => d.y).attr("height", d => d.height);
+    const setTextPosition = d =>
+      d.attr("x", d => d.x + d.width / 2).attr("y", d => d.y + d.height / 2);
+    const setOpacity = (d, opacity) => d.attr("opacity", opacity);
+    const makeTransparent = d => setOpacity(d, 0);
+    const makeOpaque = d => setOpacity(d, 1);
 
-    roots.exit().remove();
+    let networkRoots = alluvialDiagram
+      .selectAll(".networkRoot")
+      .data(alluvialRoot.children, key);
 
-    roots = roots
+    networkRoots.exit().remove();
+
+    networkRoots = networkRoots
       .enter()
       .append("g")
-      .merge(roots)
-      .attr("class", "networkRoot");
+      .attr("class", "networkRoot")
+      .merge(networkRoots);
 
-    const streamlines = roots.selectAll(".streamline").data(d => d.links, key);
+    const streamlines = networkRoots
+      .selectAll(".streamline")
+      .data(d => d.links, key);
 
-    streamlines
-      .exit()
-      .transition(t)
-      .attr("d", d => this.streamlineGenerator(d.transitionPath))
-      .attr("opacity", 0)
-      .remove();
-
-    const staggeredDelay = delay => (d, index, elements) => {
+    const streamlineDelay = (delay = 0) => (d, index, elements) => {
       const timeBudget = duration * 0.5;
       const timePerElement = timeBudget / elements.length;
       return delay + timePerElement * index;
     };
 
+    streamlines
+      .exit()
+      .transition(t)
+      .delay(streamlineDelay())
+      .call(makeTransparent)
+      .attr("d", d => this.streamlineGenerator(d.transitionPath))
+      .remove();
+
     streamlines.transition(t).attr("d", this.streamlineGenerator);
 
     streamlines
       .enter()
-      .filter(d => d.h0 + d.h1 > 3)
+      .filter(d => d.h0 + d.h1 > 2)
       .append("path")
       .attr("class", "streamline")
       .on("click", onClick)
       .attr("fill", "#B6B69F")
       .attr("stroke", "white")
-      .attr("opacity", 0)
+      .call(makeTransparent)
       .attr("d", d => this.streamlineGenerator(d.transitionPath))
       .transition(t)
-      .attr("opacity", 0.5)
-      .delay(staggeredDelay(1.5 * delay))
+      .delay(streamlineDelay(1.5 * delay))
+      .call(setOpacity, 0.5)
       .attr("d", this.streamlineGenerator);
 
-    let modules = roots.selectAll(".module").data(d => d.children, key);
+    let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
     const groupExit = modules.exit().selectAll(".group");
+
+    groupExit
+      .selectAll("text")
+      .transition(t)
+      .call(makeTransparent)
+      .attr("font-size", 0);
 
     groupExit
       .selectAll("rect")
@@ -131,14 +148,7 @@ export default class AlluvialDiagram extends React.Component {
       .delay(delay)
       .attr("y", d => d.y - d.height * 0.1)
       .attr("height", d => d.height * 1.2)
-      .attr("opacity", 0);
-
-    groupExit
-      .selectAll("text")
-      .transition(t)
-      .delay(delay)
-      .attr("opacity", 0)
-      .attr("font-size", 0);
+      .call(makeTransparent);
 
     modules
       .exit()
@@ -149,13 +159,10 @@ export default class AlluvialDiagram extends React.Component {
     modules = modules
       .enter()
       .append("g")
-      .merge(modules)
       .attr("class", "module")
       .on("click", onClick)
-      .on("dblclick", onDoubleClick);
-
-    const setWidthX = d => d.attr("x", d => d.x).attr("width", d => d.width);
-    const setHeightY = d => d.attr("y", d => d.y).attr("height", d => d.height);
+      .on("dblclick", onDoubleClick)
+      .merge(modules);
 
     const groups = modules.selectAll(".group").data(d => d.children, key);
 
@@ -170,8 +177,7 @@ export default class AlluvialDiagram extends React.Component {
     groups
       .select("text")
       .transition(t)
-      .attr("x", d => d.x + d.width / 2)
-      .attr("y", d => d.y + d.height / 2);
+      .call(setTextPosition);
 
     const groupsEnter = groups
       .enter()
@@ -182,21 +188,20 @@ export default class AlluvialDiagram extends React.Component {
       .append("rect")
       .call(setWidthX)
       .call(setHeightY)
+      .call(makeTransparent)
       .attr("fill", "#B6B69F")
-      .attr("opacity", 0)
       .transition(t)
       .delay(delay)
-      .attr("opacity", 1);
+      .call(makeOpaque);
 
     groupsEnter
       .filter(d => d.flow > 1e-3)
       .append("text")
       .text(d => d.id)
-      .attr("x", d => d.x + d.width / 2)
-      .attr("y", d => d.y + d.height / 2)
+      .call(setTextPosition)
+      .call(makeOpaque)
       .attr("dy", 4)
       .attr("text-anchor", "middle")
-      .attr("opacity", 1)
       .attr("font-size", 0)
       .transition(t)
       .delay(delay)
@@ -206,7 +211,7 @@ export default class AlluvialDiagram extends React.Component {
   render() {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
-        <g className="alluvial-diagram" />
+        <g className="alluvialDiagram" />
       </svg>
     );
   }
