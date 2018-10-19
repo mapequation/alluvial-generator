@@ -57,6 +57,7 @@ export default class StreamlineLink {
         h0: h0 / 2,
         h1: h1 / 2
       },
+      id: this.left.id,
       leftId: this.left.id,
       rightId: this.right.id
     };

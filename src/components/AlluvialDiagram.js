@@ -77,11 +77,11 @@ export default class AlluvialDiagram extends React.Component {
       this.draw();
     };
 
-    let roots = g
-      .selectAll(".networkRoot")
-      .data(alluvialRoot.children, function key(d) {
-        return d ? d.id : this.id;
-      });
+    function key(d) {
+      return d ? d.id : this.id;
+    }
+
+    let roots = g.selectAll(".networkRoot").data(alluvialRoot.children, key);
 
     roots.exit().remove();
 
@@ -91,11 +91,7 @@ export default class AlluvialDiagram extends React.Component {
       .merge(roots)
       .attr("class", "networkRoot");
 
-    const streamlines = roots
-      .selectAll(".streamline")
-      .data(d => d.links, function key(d) {
-        return d ? d.leftId : this.id;
-      });
+    const streamlines = roots.selectAll(".streamline").data(d => d.links, key);
 
     streamlines
       .exit()
@@ -127,11 +123,7 @@ export default class AlluvialDiagram extends React.Component {
       .delay(staggeredDelay(1.5 * delay))
       .attr("d", this.streamlineGenerator);
 
-    let modules = roots
-      .selectAll(".module")
-      .data(d => d.children, function key(d) {
-        return d ? d.id : this.id;
-      });
+    let modules = roots.selectAll(".module").data(d => d.children, key);
 
     const groupExit = modules.exit().selectAll(".group");
 
@@ -167,11 +159,7 @@ export default class AlluvialDiagram extends React.Component {
     const setWidthX = d => d.attr("x", d => d.x).attr("width", d => d.width);
     const setHeightY = d => d.attr("y", d => d.y).attr("height", d => d.height);
 
-    const groups = modules
-      .selectAll(".group")
-      .data(d => d.children, function key(d) {
-        return d ? d.id : this.id;
-      });
+    const groups = modules.selectAll(".group").data(d => d.children, key);
 
     groups.exit().remove();
 
