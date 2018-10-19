@@ -51,7 +51,7 @@ export default class Module extends AlluvialNodeBase {
   }
 
   get defaultMargin(): number {
-    const margins = [10, 3, 2, 1];
+    const margins = [20, 10, 5, 2];
     let index = Math.min(this.moduleLevel - 1, margins.length - 1);
     return margins[index];
   }
