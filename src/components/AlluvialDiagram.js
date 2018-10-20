@@ -8,6 +8,7 @@ import { streamlineHorizontal } from "../lib/streamline";
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
+  diagram = null;
 
   static defaultProps = {
     width: 1200,
@@ -23,11 +24,6 @@ export default class AlluvialDiagram extends React.Component {
     networks: PropTypes.arrayOf(PropTypes.object),
     duration: PropTypes.number
   };
-
-  constructor(props) {
-    super(props);
-    this.diagram = new Diagram(this.props.networks);
-  }
 
   componentDidMount() {
     this.svg = d3.select(this.node);
@@ -47,8 +43,8 @@ export default class AlluvialDiagram extends React.Component {
       networks
     } = this.props;
 
-    if (prevProps.networks.length !== networks.length) {
-      this.diagram = new Diagram(networks);
+    if (!this.diagram || prevProps.networks.length !== networks.length) {
+      this.diagram = new Diagram(networks.map(n => n.data.nodes));
     }
 
     this.diagram.calcLayout(width, height, streamlineFraction);

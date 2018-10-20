@@ -1,5 +1,4 @@
 // @flow
-import type { Node as FTreeNode } from "../io/parse-ftree";
 import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
@@ -8,7 +7,7 @@ import { LEAF_NODE } from "./depth-constants";
 import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {
-  node: FTreeNode;
+  node: Node;
   name: string;
   insignificant: boolean;
   highlightIndex: number;
@@ -18,13 +17,13 @@ export default class LeafNode extends AlluvialNodeBase {
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
 
-  constructor(node: FTreeNode, networkIndex: number) {
+  constructor(node: Node, networkIndex: number) {
     super(networkIndex, null, node.path);
     this.node = node;
     this.name = node.name;
     this.flow = node.flow;
-    this.insignificant = node.insignificant;
-    this.highlightIndex = node.highlightIndex;
+    this.insignificant = node.insignificant || true;
+    this.highlightIndex = node.highlightIndex || -1;
   }
 
   ancestorAtLevel(moduleLevel: number): string {

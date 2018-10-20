@@ -1,5 +1,4 @@
 // @flow
-import type { FTree } from "../io/parse-ftree";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
 import Branch, { LEFT, opposite, RIGHT } from "./Branch";
@@ -11,23 +10,21 @@ import NetworkRoot from "./NetworkRoot";
 import StreamlineNode from "./StreamlineNode";
 import StreamlineId from "./StreamlineId";
 
+type Network = Node[];
+
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
-  networks: FTree[] = [];
+  numNetworks: number = 0;
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
   nodesByName: Map<string, LeafNode>[] = [];
 
-  constructor(networks: FTree[]) {
-    networks.forEach(network => this.addNetwork(network));
+  constructor(networks: Network[]) {
+    networks.forEach(nodes => this.addNodes(nodes));
   }
 
-  addNetwork(network: FTree) {
-    const {
-      data: { nodes }
-    } = network;
-    const networkIndex = this.networks.length;
+  addNodes(nodes: Node[]) {
+    const networkIndex = this.numNetworks++;
 
-    this.networks.push(network);
     const nodesByName = new Map(
       nodes.map(node => [node.name, new LeafNode(node, networkIndex)])
     );
@@ -50,9 +47,8 @@ export default class Diagram {
   }
 
   calcLayout(width: number, height: number, streamlineFraction: number) {
-    const numNetworks = this.networks.length;
     const barWidth =
-      width / (numNetworks + (numNetworks - 1) * streamlineFraction);
+      width / (this.numNetworks + (this.numNetworks - 1) * streamlineFraction);
     const streamlineWidth = streamlineFraction * barWidth;
     const networkWidth = barWidth + streamlineWidth;
 
@@ -390,7 +386,8 @@ export default class Diagram {
   }
 
   getNodeByName(networkIndex: number, name: string): ?LeafNode {
-    if (networkIndex < 0 || networkIndex >= this.networks.length) return null;
+    if (networkIndex < 0 || networkIndex >= this.nodesByName.length)
+      return null;
     return this.nodesByName[networkIndex].get(name);
   }
 }
