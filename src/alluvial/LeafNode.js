@@ -26,11 +26,15 @@ export default class LeafNode extends AlluvialNodeBase {
     this.highlightIndex = node.highlightIndex || -1;
   }
 
+  get level(): number {
+    return TreePath.level(this.node.path);
+  }
+
   ancestorAtLevel(moduleLevel: number): string {
     return TreePath.ancestorAtLevel(this.node.path, moduleLevel).toString();
   }
 
-  get ancestorAtCurrentLevel(): string {
+  getAncestorAtCurrentLevel(): string {
     return this.ancestorAtLevel(this.moduleLevel);
   }
 

@@ -375,12 +375,19 @@ export default class Diagram {
       return;
     }
 
-    const moduleLevel = leafNodes[0].moduleLevel;
+    const newModuleLevel = module.moduleLevel + 1;
+
+    const alreadyExpanded = leafNodes.some(node => node.level < newModuleLevel);
+    if (alreadyExpanded) {
+      console.warn(
+        `Module can't be expanded to level ${newModuleLevel} ` +
+          `because some nodes are at level ${newModuleLevel - 1}`
+      );
+      return;
+    }
 
     leafNodes.forEach(node => this.removeNode(node));
-    leafNodes.forEach(node =>
-      this.addNode(node, networkIndex, moduleLevel + 1)
-    );
+    leafNodes.forEach(node => this.addNode(node, networkIndex, newModuleLevel));
   }
 
   getNodeByName(networkIndex: number, name: string): ?LeafNode {

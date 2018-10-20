@@ -30,7 +30,7 @@ export default class StreamlineId {
     side: Side,
     oppositeNode: ?LeafNode = null
   ): StreamlineId {
-    const moduleId = node => node.ancestorAtCurrentLevel;
+    const moduleId = node => node.getAncestorAtCurrentLevel();
 
     const typeSuffix = node =>
       `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
