@@ -70,7 +70,11 @@ export default class NetworkRoot extends AlluvialNodeBase {
         if (a.path[i] === b.path[i]) continue;
         return a.path[i] - b.path[i];
       }
-      return b.flow - a.flow;
+      const byFlow = b.flow - a.flow;
+      if (byFlow < 1e-16 && a.moduleLevel === b.moduleLevel) {
+        return a.rank - b.rank;
+      }
+      return byFlow;
     });
   }
 }
