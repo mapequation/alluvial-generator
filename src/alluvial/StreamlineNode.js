@@ -26,6 +26,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return this.streamlineId.target;
   }
 
+  hasTarget(): boolean {
+    return !!this.targetId;
+  }
+
   getOppositeStreamlineNode(): ?StreamlineNode {
     if (this.link) {
       return this.link.left === this ? this.link.right : this.link.left;

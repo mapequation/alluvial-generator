@@ -223,9 +223,7 @@ export default class Diagram {
         branch.addChild(streamlineNode);
       }
 
-      const streamlineIdHasTarget = !!streamlineNode.targetId;
-
-      if (streamlineIdHasTarget) {
+      if (streamlineNode.hasTarget()) {
         const oppositeStreamlineIsDangling = this.streamlineNodesById.has(
           streamlineNode.targetId
         );
