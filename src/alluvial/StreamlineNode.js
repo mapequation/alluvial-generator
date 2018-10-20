@@ -44,7 +44,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   get byOppositeStreamlinePosition() {
     const opposite = this.getOppositeStreamlineNode();
     if (!opposite) return -Infinity;
-    const module = this.getAncestor(3);
+    const module = opposite.getAncestor(3);
     if (!module) return -Infinity;
     return -module.y;
   }

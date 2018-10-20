@@ -123,6 +123,14 @@ export default class Diagram {
       );
     }
 
+    for (let node of this.alluvialRoot.traverseDepthFirstWhile(
+      node => node.depth <= Depth.BRANCH
+    )) {
+      if (node.depth === Depth.BRANCH) {
+        node.sortChildren();
+      }
+    }
+
     x = 0;
     y = height;
 
@@ -160,7 +168,6 @@ export default class Diagram {
           };
           break;
         case Depth.BRANCH:
-          node.sortChildren();
           node.layout = {
             x,
             y,
