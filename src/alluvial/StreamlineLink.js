@@ -43,12 +43,15 @@ export default class StreamlineLink {
     const h1 = rightLayout.height;
 
     return {
-      x0,
-      x1,
-      y0,
-      y1,
-      h0,
-      h1,
+      avgHeight: (h0 + h1) / 2,
+      path: {
+        x0,
+        x1,
+        y0,
+        y1,
+        h0,
+        h1
+      },
       transitionPath: {
         x0: (x0 + x1) / 2,
         x1: (x0 + x1) / 2,

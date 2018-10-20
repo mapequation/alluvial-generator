@@ -84,6 +84,10 @@ export default class AlluvialDiagram extends React.Component {
     const setOpacity = (d, opacity) => d.attr("opacity", opacity);
     const makeTransparent = d => setOpacity(d, 0);
     const makeOpaque = d => setOpacity(d, 1);
+    const setStreamlinePath = (d, path = "path") =>
+      d.attr("d", d => this.streamlineGenerator(d[path]));
+    const setStreamlineTransitionPath = d =>
+      setStreamlinePath(d, "transitionPath");
 
     let networkRoots = alluvialDiagram
       .selectAll(".networkRoot")
@@ -112,25 +116,25 @@ export default class AlluvialDiagram extends React.Component {
       .transition(t)
       .delay(streamlineDelay())
       .call(makeTransparent)
-      .attr("d", d => this.streamlineGenerator(d.transitionPath))
+      .call(setStreamlineTransitionPath)
       .remove();
 
-    streamlines.transition(t).attr("d", this.streamlineGenerator);
+    streamlines.transition(t).call(setStreamlinePath);
 
     streamlines
       .enter()
-      .filter(d => d.h0 + d.h1 > 2)
+      .filter(d => d.avgHeight > 2)
       .append("path")
       .attr("class", "streamline")
       .on("click", onClick)
       .attr("fill", "#B6B69F")
       .attr("stroke", "white")
       .call(makeTransparent)
-      .attr("d", d => this.streamlineGenerator(d.transitionPath))
+      .call(setStreamlineTransitionPath)
       .transition(t)
       .delay(streamlineDelay(1.5 * delay))
       .call(setOpacity, 0.5)
-      .attr("d", this.streamlineGenerator);
+      .call(setStreamlinePath);
 
     let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
