@@ -43,7 +43,10 @@ export default class AlluvialDiagram extends React.Component {
       networks
     } = this.props;
 
-    if (!this.diagram || prevProps.networks.length !== networks.length) {
+    const networkAdded = networks.length < prevProps.networks.length;
+    const networkRemoved = networks.length > prevProps.networks.length;
+
+    if (!this.diagram || networkAdded || networkRemoved) {
       this.diagram = new Diagram(networks.map(n => n.data.nodes));
     }
 
@@ -55,10 +58,18 @@ export default class AlluvialDiagram extends React.Component {
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    this.svg
-      .transition(t)
-      .attr("width", alluvialRoot.width)
-      .attr("height", alluvialRoot.height);
+    if (networkAdded) {
+      this.svg
+        .transition(t)
+        .delay(duration)
+        .attr("width", alluvialRoot.width)
+        .attr("height", alluvialRoot.height);
+    } else {
+      this.svg
+        .transition(t)
+        .attr("width", alluvialRoot.width)
+        .attr("height", alluvialRoot.height);
+    }
 
     const alluvialDiagram = this.svg.select(".alluvialDiagram");
 
@@ -85,11 +96,38 @@ export default class AlluvialDiagram extends React.Component {
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
 
+    const textExitTransition = d =>
+      d
+        .selectAll("text")
+        .transition(t)
+        .call(makeTransparent)
+        .attr("font-size", 0);
+
+    const rectExitTransition = d =>
+      d
+        .selectAll("rect")
+        .transition(t)
+        .delay(delay)
+        .attr("y", d => d.y - d.height * 0.1)
+        .attr("height", d => d.height * 1.2)
+        .call(makeTransparent);
+
     let networkRoots = alluvialDiagram
       .selectAll(".networkRoot")
       .data(alluvialRoot.children, key);
 
-    networkRoots.exit().remove();
+    networkRoots
+      .exit()
+      .selectAll(".module")
+      .selectAll(".group")
+      .call(textExitTransition)
+      .call(rectExitTransition);
+
+    networkRoots
+      .exit()
+      .transition(t)
+      .delay(delay)
+      .remove();
 
     networkRoots = networkRoots
       .enter()
@@ -134,21 +172,11 @@ export default class AlluvialDiagram extends React.Component {
 
     let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
-    const groupExit = modules.exit().selectAll(".group");
-
-    groupExit
-      .selectAll("text")
-      .transition(t)
-      .call(makeTransparent)
-      .attr("font-size", 0);
-
-    groupExit
-      .selectAll("rect")
-      .transition(t)
-      .delay(delay)
-      .attr("y", d => d.y - d.height * 0.1)
-      .attr("height", d => d.height * 1.2)
-      .call(makeTransparent);
+    modules
+      .exit()
+      .selectAll(".group")
+      .call(textExitTransition)
+      .call(rectExitTransition);
 
     modules
       .exit()
