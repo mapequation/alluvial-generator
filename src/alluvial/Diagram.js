@@ -46,11 +46,12 @@ export default class Diagram {
     }
   }
 
-  calcLayout(width: number, height: number, streamlineFraction: number) {
-    const barWidth =
-      width / (this.numNetworks + (this.numNetworks - 1) * streamlineFraction);
-    const streamlineWidth = streamlineFraction * barWidth;
-    const networkWidth = barWidth + streamlineWidth;
+  calcLayout(totalWidth: number, height: number, streamlineFraction: number) {
+    const numStreamlines = this.numNetworks - 1;
+    const width =
+      totalWidth / (this.numNetworks + numStreamlines * streamlineFraction);
+    const streamlineWidth = streamlineFraction * width;
+    const networkWidth = width + streamlineWidth;
 
     let x = 0;
     let y = height;
@@ -71,7 +72,7 @@ export default class Diagram {
             currentFlowThreshold = node.flowThreshold;
             networkTotalMargins.push(0);
             node.sortChildren();
-            node.layout = { x, y, width: barWidth, height: node.flow * height };
+            node.layout = { x, y, width, height: node.flow * height };
             if (i > 0) x += networkWidth;
             y = height;
             break;
@@ -82,7 +83,7 @@ export default class Diagram {
               : 0;
             node.margin = margin;
             y -= node.flow * height;
-            node.layout = { x, y, width: barWidth, height: node.flow * height };
+            node.layout = { x, y, width, height: node.flow * height };
             y -= margin;
             networkTotalMargins[networkTotalMargins.length - 1] += margin;
             break;
@@ -107,15 +108,16 @@ export default class Diagram {
       // Use moduleMarginScale such that
       //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfSpace
       moduleMarginScale = (maxMarginFractionOfSpace * height) / maxTotalMargin;
-      const forEachUntilModules = this.alluvialRoot.createForEachDepthFirstWhileIterator(
-        node => node.depth <= Depth.MODULE
+
+      this.alluvialRoot.forEachDepthFirstWhile(
+        node => node.depth <= Depth.MODULE,
+        node => {
+          if (node.depth === Depth.MODULE) {
+            node.margin *= moduleMarginScale;
+          }
+        }
       );
 
-      forEachUntilModules(node => {
-        if (node.depth === Depth.MODULE) {
-          node.margin *= moduleMarginScale;
-        }
-      });
       maxTotalMargin *= moduleMarginScale;
       usableHeight = height - maxTotalMargin;
       console.log(
@@ -144,48 +146,28 @@ export default class Diagram {
     )) {
       switch (node.depth) {
         case Depth.ALLUVIAL_ROOT:
-          node.layout = { x: 0, y: 0, width, height };
+          node.layout = { x: 0, y: 0, width: totalWidth, height };
           break;
         case Depth.NETWORK_ROOT:
           x += networkWidth;
           y = height;
           break;
         case Depth.MODULE:
-          node.layout = {
-            x,
-            y,
-            width: barWidth,
-            height: node.flow * usableHeight
-          };
+          node.layout = { x, y, width, height: node.flow * usableHeight };
           y -= node.margin;
           break;
         case Depth.HIGHLIGHT_GROUP:
-          node.layout = {
-            x,
-            y,
-            width: barWidth,
-            height: node.flow * usableHeight
-          };
+          node.layout = { x, y, width, height: node.flow * usableHeight };
           break;
         case Depth.BRANCH:
-          node.layout = {
-            x,
-            y,
-            width: barWidth,
-            height: node.flow * usableHeight
-          };
+          node.layout = { x, y, width, height: node.flow * usableHeight };
           if (node.isLeft) {
             y += node.flow * usableHeight;
           }
           break;
         case Depth.STREAMLINE_NODE:
           y -= node.flow * usableHeight;
-          node.layout = {
-            x,
-            y,
-            width: barWidth,
-            height: node.flow * usableHeight
-          };
+          node.layout = { x, y, width, height: node.flow * usableHeight };
           break;
         default:
           break;
