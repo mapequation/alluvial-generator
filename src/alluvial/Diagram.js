@@ -77,7 +77,9 @@ export default class Diagram {
             break;
           case Depth.MODULE:
             const next = node.parent.getChild(i + 1);
-            const margin = next ? Math.min(next.margin, node.margin) : 0;
+            const margin = next
+              ? Math.min(next.getDefaultMargin(), node.getDefaultMargin())
+              : 0;
             node.margin = margin;
             y -= node.flow * height;
             node.layout = { x, y, width: barWidth, height: node.flow * height };

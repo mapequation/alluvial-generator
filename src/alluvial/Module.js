@@ -11,7 +11,7 @@ export default class Module extends AlluvialNodeBase {
   moduleLevel: number = 1;
   path: number[] = [];
   moduleId: string;
-  margin: number = this.defaultMargin;
+  margin: number = this.getDefaultMargin();
 
   constructor(
     networkIndex: number,
@@ -50,7 +50,7 @@ export default class Module extends AlluvialNodeBase {
     return MODULE;
   }
 
-  get defaultMargin(): number {
+  getDefaultMargin(): number {
     const margins = [20, 10, 5, 2];
     let index = Math.min(this.moduleLevel - 1, margins.length - 1);
     return margins[index];
