@@ -108,8 +108,6 @@ export default class AlluvialDiagram extends React.Component {
         .selectAll("rect")
         .transition(t)
         .delay(delay)
-        .attr("y", d => d.y - d.height * 0.1)
-        .attr("height", d => d.height * 1.2)
         .call(makeTransparent);
 
     let networkRoots = alluvialDiagram
