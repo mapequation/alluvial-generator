@@ -29,7 +29,7 @@ export type IteratorCallback = (
 
 export default class AlluvialNodeBase {
   flow: number = 0;
-  networkIndex: number;
+  networkId: string;
   id: string;
 
   x: number = 0;
@@ -41,11 +41,11 @@ export default class AlluvialNodeBase {
   parent: ?AlluvialNode = null;
 
   constructor(
-    networkIndex: number,
+    networkId: string,
     parent: ?AlluvialNode = null,
     id: string = ""
   ) {
-    this.networkIndex = networkIndex;
+    this.networkId = networkId;
     this.parent = parent;
     this.id = id;
   }
@@ -105,7 +105,7 @@ export default class AlluvialNodeBase {
   asObject(): Object {
     return {
       id: this.id,
-      networkIndex: this.networkIndex,
+      networkId: this.networkId,
       flow: this.flow,
       depth: this.depth,
       ...this.layout,

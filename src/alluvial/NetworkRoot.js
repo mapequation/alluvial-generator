@@ -11,8 +11,8 @@ export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
   flowThreshold: number = 1e-5;
 
-  constructor(networkIndex: number, parent: AlluvialRoot) {
-    super(networkIndex, parent, networkIndex.toString());
+  constructor(networkId: string, parent: AlluvialRoot) {
+    super(networkId, parent, networkId);
   }
 
   getModule(moduleId: string): ?Module {
@@ -23,7 +23,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     const moduleId = node.ancestorAtLevel(moduleLevel);
     let module = this.getModule(moduleId);
     if (!module) {
-      module = new Module(this.networkIndex, this, moduleId, moduleLevel);
+      module = new Module(this.networkId, this, moduleId, moduleLevel);
       this.children.push(module);
     }
     return module;

@@ -19,14 +19,13 @@ export default class StreamlineId {
   isValid() {
     const { source, target } = this;
 
-    const valid = /^d+_module(\d+:)*\d+_group(i)?-?\d+/;
+    const valid = /^_.+_module(\d+:)*\d+_group(i)?-?\d+/;
 
     return source && valid.test(source) && target ? valid.test(target) : true;
   }
 
   static create(
     node: LeafNode,
-    networkIndex: number,
     side: Side,
     oppositeNode: ?LeafNode = null
   ): StreamlineId {
@@ -35,16 +34,14 @@ export default class StreamlineId {
     const typeSuffix = node =>
       `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
 
-    const createId = (networkIndex, node, side) =>
-      `${networkIndex}_module${moduleId(node)}_group${typeSuffix(node)}_${
+    const createId = (node, side) =>
+      `${node.networkId}_module${moduleId(node)}_group${typeSuffix(node)}_${
         sideToString[side]
       }`;
 
-    const source = createId(networkIndex, node, side);
+    const source = createId(node, side);
 
-    const target = oppositeNode
-      ? createId(networkIndex + side, oppositeNode, opposite(side))
-      : null;
+    const target = oppositeNode ? createId(oppositeNode, opposite(side)) : null;
 
     return new StreamlineId(source, target);
   }

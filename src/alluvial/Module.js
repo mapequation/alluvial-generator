@@ -14,12 +14,12 @@ export default class Module extends AlluvialNodeBase {
   margin: number = this.getDefaultMargin();
 
   constructor(
-    networkIndex: number,
+    networkId: string,
     parent: NetworkRoot,
     moduleId: string,
     moduleLevel: number = 1
   ) {
-    super(networkIndex, parent, `${parent.id}_module${moduleId}`);
+    super(networkId, parent, `${parent.id}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
@@ -32,7 +32,7 @@ export default class Module extends AlluvialNodeBase {
   getOrCreateGroup(node: LeafNode, highlightIndex: number): HighlightGroup {
     let group = this.getGroup(highlightIndex);
     if (!group) {
-      group = new HighlightGroup(this.networkIndex, this, highlightIndex);
+      group = new HighlightGroup(this.networkId, this, highlightIndex);
       this.children.push(group);
     }
     return group;

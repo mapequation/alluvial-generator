@@ -1,3 +1,4 @@
+// @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
@@ -7,17 +8,17 @@ export default class AlluvialRoot extends AlluvialNodeBase {
   children: NetworkRoot[] = [];
 
   constructor() {
-    super(undefined, null, "root");
+    super("", null, "root");
   }
 
-  getNetworkRoot(networkIndex): ?NetworkRoot {
-    return this.children.find(root => root.networkIndex === networkIndex);
+  getNetworkRoot(networkId: string): ?NetworkRoot {
+    return this.children.find(root => root.networkId === networkId);
   }
 
-  getOrCreateNetworkRoot(node: LeafNode, networkIndex): NetworkRoot {
-    let root = this.getNetworkRoot(networkIndex);
+  getOrCreateNetworkRoot(node: LeafNode, networkId: string): NetworkRoot {
+    let root = this.getNetworkRoot(networkId);
     if (!root) {
-      root = new NetworkRoot(networkIndex, this);
+      root = new NetworkRoot(networkId, this);
       this.children.push(root);
     }
     return root;

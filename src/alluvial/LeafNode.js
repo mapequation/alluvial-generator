@@ -1,5 +1,6 @@
 // @flow
 import TreePath from "../lib/treepath";
+import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { LEFT } from "./Branch";
@@ -17,12 +18,12 @@ export default class LeafNode extends AlluvialNodeBase {
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
 
-  constructor(node: Node, networkIndex: number) {
-    super(networkIndex, null, node.path);
+  constructor(node: Node, networkId: string) {
+    super(networkId, null, node.path);
     this.node = node;
     this.name = node.name;
     this.flow = node.flow;
-    this.insignificant = node.insignificant || true;
+    this.insignificant = node.insignificant || false;
     this.highlightIndex = node.highlightIndex || -1;
   }
 
@@ -38,7 +39,7 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.ancestorAtLevel(this.moduleLevel);
   }
 
-  getAncestor(steps: number): ?AlluvialNodeBase {
+  getAncestor(steps: number): ?AlluvialNode {
     if (steps === 0) return this;
     const parent = this.leftParent || this.rightParent;
     if (parent) return parent.getAncestor(steps - 1);

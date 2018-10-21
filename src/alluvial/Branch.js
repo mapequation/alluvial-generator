@@ -22,21 +22,17 @@ export default class Branch extends AlluvialNodeBase {
   children: StreamlineNode[] = [];
   side: Side;
 
-  constructor(side: Side, networkIndex: number, parent: AlluvialNode) {
-    super(networkIndex, parent, sideToString[side]);
+  constructor(side: Side, networkId: string, parent: AlluvialNode) {
+    super(networkId, parent, sideToString[side]);
     this.side = side;
   }
 
-  static createLeft(networkIndex: number, parent: AlluvialNode): Branch {
-    return new Branch(LEFT, networkIndex, parent);
+  static createLeft(networkId: string, parent: AlluvialNode): Branch {
+    return new Branch(LEFT, networkId, parent);
   }
 
-  static createRight(networkIndex: number, parent: AlluvialNode): Branch {
-    return new Branch(RIGHT, networkIndex, parent);
-  }
-
-  get neighborNetworkIndex(): number {
-    return this.networkIndex + this.side;
+  static createRight(networkId: string, parent: AlluvialNode): Branch {
+    return new Branch(RIGHT, networkId, parent);
   }
 
   get isLeft(): boolean {

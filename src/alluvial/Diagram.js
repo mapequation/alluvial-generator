@@ -9,37 +9,41 @@ import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineNode from "./StreamlineNode";
 import StreamlineId from "./StreamlineId";
+import id from "../lib/id";
 
 type Network = Node[];
 
+type NodesByName = Map<string, LeafNode>;
+
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
-  numNetworks: number = 0;
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  nodesByName: Map<string, LeafNode>[] = [];
+  nodesByNetworkId: Map<string, NodesByName> = new Map();
+  networkIndices: string[] = [];
 
   constructor(networks: Network[]) {
     networks.forEach(nodes => this.addNodes(nodes));
   }
 
-  addNodes(nodes: Node[]) {
-    const networkIndex = this.numNetworks++;
+  addNodes(nodes: Network) {
+    const networkId = id();
 
     const nodesByName = new Map(
-      nodes.map(node => [node.name, new LeafNode(node, networkIndex)])
+      nodes.map(node => [node.name, new LeafNode(node, networkId)])
     );
 
-    this.nodesByName.push(nodesByName);
+    this.networkIndices.push(networkId);
+    this.nodesByNetworkId.set(networkId, nodesByName);
 
     for (let node of nodesByName.values()) {
-      this.addNode(node, networkIndex);
+      this.addNode(node, networkId);
     }
   }
 
   doubleClick(alluvialNode: Object) {
     switch (alluvialNode.depth) {
       case Depth.MODULE:
-        this.expandModule(alluvialNode.moduleId, alluvialNode.networkIndex);
+        this.expandModule(alluvialNode.moduleId, alluvialNode.networkId);
         break;
       default:
         break;
@@ -47,9 +51,9 @@ export default class Diagram {
   }
 
   calcLayout(totalWidth: number, height: number, streamlineFraction: number) {
-    const numStreamlines = this.numNetworks - 1;
+    const numNetworks = this.networkIndices.length;
     const width =
-      totalWidth / (this.numNetworks + numStreamlines * streamlineFraction);
+      totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction);
     const streamlineWidth = streamlineFraction * width;
     const networkWidth = width + streamlineWidth;
 
@@ -137,7 +141,9 @@ export default class Diagram {
     y = height;
 
     // We can't set this in the loop any more because of post order traversal
-    currentFlowThreshold = this.alluvialRoot.getNetworkRoot(0).flowThreshold;
+    const first = this.networkIndices[0];
+    currentFlowThreshold = this.alluvialRoot.getNetworkRoot(first)
+      .flowThreshold;
 
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
@@ -179,10 +185,10 @@ export default class Diagram {
     return this.alluvialRoot.asObject();
   }
 
-  addNode(node: LeafNode, networkIndex: number, moduleLevel: number = 1) {
+  addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
-    const root = this.alluvialRoot.getOrCreateNetworkRoot(node, networkIndex);
+    const root = this.alluvialRoot.getOrCreateNetworkRoot(node, networkId);
     const module = root.getOrCreateModule(node, moduleLevel);
     const group = module.getOrCreateGroup(node, node.highlightIndex);
 
@@ -191,25 +197,20 @@ export default class Diagram {
     module.flow += node.flow;
     group.flow += node.flow;
 
-    const { left, right } = group;
-
-    for (let branch of [left, right]) {
+    for (let branch of group.children) {
       branch.flow += node.flow;
 
-      const oppositeNode: ?LeafNode = this.getNodeByName(
-        branch.neighborNetworkIndex,
-        node.name
-      );
+      const oppositeNode = this.getOppositeNode(node, branch.side);
+
       const streamlineId = StreamlineId.create(
         node,
-        networkIndex,
         branch.side,
         oppositeNode
       ).toString();
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
-        streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
+        streamlineNode = new StreamlineNode(networkId, branch, streamlineId);
         this.streamlineNodesById.set(streamlineId, streamlineNode);
         branch.addChild(streamlineNode);
       }
@@ -237,16 +238,12 @@ export default class Diagram {
   }
 
   addNodeToSide(node: LeafNode, side: Side) {
-    const { networkIndex } = node;
-    const neighborNetworkIndex = networkIndex + side;
+    const { networkId } = node;
 
-    const oppositeNode: ?LeafNode = this.getNodeByName(
-      neighborNetworkIndex,
-      node.name
-    );
+    const oppositeNode: ?LeafNode = this.getOppositeNode(node, side);
+
     const streamlineId = StreamlineId.create(
       node,
-      networkIndex,
       side,
       oppositeNode
     ).toString();
@@ -255,13 +252,21 @@ export default class Diagram {
     );
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
-    if (!oldStreamlineNode) return;
+    if (!oldStreamlineNode) {
+      console.warn(`Node ${node.name} has no parent on side ${side}`);
+      return;
+    }
     const branch: ?Branch = oldStreamlineNode.parent;
 
     if (!streamlineNode) {
-      if (!branch) return;
+      if (!branch) {
+        console.warn(
+          `Streamline node with id ${oldStreamlineNode.id} has no parent`
+        );
+        return;
+      }
 
-      streamlineNode = new StreamlineNode(networkIndex, branch, streamlineId);
+      streamlineNode = new StreamlineNode(networkId, branch, streamlineId);
       this.streamlineNodesById.set(streamlineId, streamlineNode);
       branch.addChild(streamlineNode);
 
@@ -315,12 +320,20 @@ export default class Diagram {
 
   removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
     const streamlineNode = node.getParent(side);
-    if (!streamlineNode) return;
+    if (!streamlineNode) {
+      console.warn(`Leaf node ${node.name} has no parent on side ${side}`);
+      return;
+    }
     streamlineNode.removeChild(node);
     streamlineNode.flow -= node.flow;
 
     const branch: ?Branch = streamlineNode.parent;
-    if (!branch) return;
+    if (!branch) {
+      console.warn(
+        `Streamline node with id ${streamlineNode.id} has no parent`
+      );
+      return;
+    }
     branch.flow -= node.flow;
 
     if (streamlineNode.isEmpty) {
@@ -343,19 +356,19 @@ export default class Diagram {
     return branch.parent;
   }
 
-  expandModule(moduleId: string, networkIndex: number) {
+  expandModule(moduleId: string, networkId: string) {
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkIndex
+      networkId
     );
     if (!networkRoot) {
-      console.warn(`No network index ${networkIndex}`);
+      console.warn(`No network id ${networkId}`);
       return;
     }
 
     const module: ?Module = networkRoot.getModule(moduleId);
     if (!module) {
       console.warn(
-        `No module found with id ${moduleId} in network ${networkIndex}`
+        `No module found with id ${moduleId} in network ${networkId}`
       );
       return;
     }
@@ -378,12 +391,32 @@ export default class Diagram {
     }
 
     leafNodes.forEach(node => this.removeNode(node));
-    leafNodes.forEach(node => this.addNode(node, networkIndex, newModuleLevel));
+    leafNodes.forEach(node => this.addNode(node, networkId, newModuleLevel));
   }
 
-  getNodeByName(networkIndex: number, name: string): ?LeafNode {
-    if (networkIndex < 0 || networkIndex >= this.nodesByName.length)
-      return null;
-    return this.nodesByName[networkIndex].get(name);
+  getNodeByName(networkId: string, name: string): ?LeafNode {
+    const nodesByName = this.nodesByNetworkId.get(networkId);
+    if (!nodesByName) return;
+    return nodesByName.get(name);
+  }
+
+  getNeighborNetworkId(networkId: string, side: Side): ?string {
+    const networkIndex = this.networkIndices.indexOf(networkId);
+    if (networkIndex === -1) return;
+    const neighborNetworkIndex = networkIndex + side;
+    if (
+      neighborNetworkIndex < 0 ||
+      neighborNetworkIndex === this.networkIndices.length
+    )
+      return;
+    return this.networkIndices[neighborNetworkIndex];
+  }
+
+  getOppositeNode(node: LeafNode, side: Side): ?LeafNode {
+    const neighborNetworkId = this.getNeighborNetworkId(node.networkId, side);
+
+    return neighborNetworkId
+      ? this.getNodeByName(neighborNetworkId, node.name)
+      : null;
   }
 }
