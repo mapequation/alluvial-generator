@@ -90,6 +90,9 @@ export default class AlluvialNodeBase {
     if (found) {
       this.children.splice(index, 1);
     }
+    if (!this.children.length) {
+      this.flow = 0;
+    }
     return found;
   }
 

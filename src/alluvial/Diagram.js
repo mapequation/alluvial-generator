@@ -15,17 +15,17 @@ type NodesByName = Map<string, LeafNode>;
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  nodesByNetworkId: Map<string, NodesByName> = new Map();
+  networksById: Map<string, NodesByName> = new Map();
   networkIndices: string[] = [];
 
   constructor(networks: Network[]) {
-    networks.forEach(network => this.addNodes(network));
+    networks.forEach(network => this.addNetwork(network));
   }
 
-  addNodes(network: Network) {
+  addNetwork(network: Network) {
     const { nodes, id } = network;
 
-    if (this.nodesByNetworkId.has(id)) {
+    if (this.networksById.has(id)) {
       throw new Error(`Network with id ${id} already exists`);
     }
 
@@ -34,11 +34,32 @@ export default class Diagram {
     );
 
     this.networkIndices.push(id);
-    this.nodesByNetworkId.set(id, nodesByName);
+    this.networksById.set(id, nodesByName);
 
     for (let node of nodesByName.values()) {
       this.addNode(node, id);
     }
+  }
+
+  removeNetwork(networkId: string) {
+    const networkIndex = this.networkIndices.indexOf(networkId);
+    const nodesByName = this.networksById.get(networkId);
+
+    if (networkIndex === -1 || nodesByName == null) {
+      console.warn(`No network exists with id ${networkId}`);
+      return;
+    }
+
+    for (let node of nodesByName.values()) {
+      this.removeNode(node);
+    }
+
+    this.networkIndices.splice(networkIndex, 1);
+    this.networksById.delete(networkId);
+  }
+
+  hasNetwork(networkId: string): boolean {
+    return this.networksById.has(networkId);
   }
 
   doubleClick(alluvialNode: Object) {
@@ -53,6 +74,9 @@ export default class Diagram {
 
   calcLayout(totalWidth: number, height: number, streamlineFraction: number) {
     const numNetworks = this.networkIndices.length;
+
+    if (!numNetworks) return;
+
     const width =
       totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction);
     const streamlineWidth = streamlineFraction * width;
@@ -338,11 +362,35 @@ export default class Diagram {
     branch.flow -= node.flow;
 
     if (streamlineNode.isEmpty) {
-      const opposite = streamlineNode.getOppositeStreamlineNode();
-      if (opposite) {
-        this.streamlineNodesById.delete(opposite.id);
-        opposite.makeDangling();
-        this.streamlineNodesById.set(opposite.id, opposite);
+      const oppositeStreamlineNode = streamlineNode.getOppositeStreamlineNode();
+      if (oppositeStreamlineNode) {
+        this.streamlineNodesById.delete(oppositeStreamlineNode.id);
+        oppositeStreamlineNode.makeDangling();
+
+        const duplicate = this.streamlineNodesById.get(
+          oppositeStreamlineNode.id
+        );
+
+        // Does the (new) dangling id already exist? Move nodes from it.
+        // Note: as we move nodes around we don't need to propagate flow.
+        if (duplicate) {
+          duplicate.children.forEach((node: LeafNode) => {
+            oppositeStreamlineNode.addChild(node);
+            oppositeStreamlineNode.flow += node.flow;
+            node.setParent(oppositeStreamlineNode, opposite(side));
+          });
+
+          const oppositeBranch: ?Branch = oppositeStreamlineNode.parent;
+          if (!oppositeBranch) {
+            throw new Error("No parent found for opposite streamline node");
+          }
+          oppositeBranch.removeChild(duplicate);
+        }
+
+        this.streamlineNodesById.set(
+          oppositeStreamlineNode.id,
+          oppositeStreamlineNode
+        );
       }
 
       this.streamlineNodesById.delete(streamlineNode.id);
@@ -396,7 +444,7 @@ export default class Diagram {
   }
 
   getNodeByName(networkId: string, name: string): ?LeafNode {
-    const nodesByName = this.nodesByNetworkId.get(networkId);
+    const nodesByName = this.networksById.get(networkId);
     if (!nodesByName) return;
     return nodesByName.get(name);
   }
