@@ -25,7 +25,7 @@ export default function Sidebar(props) {
           <Button
             icon
             onClick={props.onRemoveNetworkClick}
-            disabled={props.numVisibleNetworks === 1}
+            disabled={props.numVisibleNetworks === 0}
           >
             <Icon name="minus" />
           </Button>

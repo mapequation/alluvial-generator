@@ -29,7 +29,7 @@ export default class App extends React.Component {
     visibleNetworks:
       visibleNetworks.length + amount > networks.length
         ? networks
-        : visibleNetworks.length + amount < 1
+        : visibleNetworks.length + amount < 0
           ? visibleNetworks
           : networks.slice(0, visibleNetworks.length + amount)
   });
