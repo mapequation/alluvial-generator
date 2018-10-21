@@ -24,6 +24,13 @@ export default class HighlightGroup extends AlluvialNodeBase {
     this.highlightIndex = highlightIndex;
   }
 
+  asObject() {
+    return {
+      ...super.asObject(),
+      highlightIndex: this.highlightIndex
+    };
+  }
+
   get depth(): number {
     return HIGHLIGHT_GROUP;
   }
