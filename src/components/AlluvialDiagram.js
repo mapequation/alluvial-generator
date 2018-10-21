@@ -101,7 +101,8 @@ export default class AlluvialDiagram extends React.Component {
     const textExitTransition = d =>
       d
         .selectAll("text")
-        .transition(t)
+        .transition()
+        .duration(0.75 * duration)
         .call(makeTransparent)
         .attr("font-size", 0);
 
@@ -139,7 +140,7 @@ export default class AlluvialDiagram extends React.Component {
       .selectAll(".streamline")
       .data(d => d.links, key);
 
-    const streamlineDelay = (delay = 0) => (d, index, elements) => {
+    const streamlineDelay = delay => (d, index, elements) => {
       const timeBudget = duration * 0.5;
       const timePerElement = timeBudget / elements.length;
       return delay + timePerElement * index;
@@ -148,7 +149,7 @@ export default class AlluvialDiagram extends React.Component {
     streamlines
       .exit()
       .transition(t)
-      .delay(streamlineDelay())
+      .delay(streamlineDelay(0))
       .call(makeTransparent)
       .call(setStreamlineTransitionPath)
       .remove();
