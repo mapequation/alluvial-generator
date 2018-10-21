@@ -43,8 +43,8 @@ export default class AlluvialDiagram extends React.Component {
       networks
     } = this.props;
 
-    const networkAdded = networks.length < prevProps.networks.length;
-    const networkRemoved = networks.length > prevProps.networks.length;
+    const networkAdded = networks.length > prevProps.networks.length;
+    const networkRemoved = networks.length < prevProps.networks.length;
 
     if (!this.diagram || networkAdded || networkRemoved) {
       this.diagram = new Diagram(
@@ -60,7 +60,7 @@ export default class AlluvialDiagram extends React.Component {
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    if (networkAdded) {
+    if (networkRemoved) {
       this.svg
         .transition(t)
         .delay(duration)
