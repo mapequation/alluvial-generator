@@ -36,7 +36,10 @@ export default class NetworkRoot extends AlluvialNodeBase {
   asObject(): Object {
     return {
       ...super.asObject(),
-      links: Array.from(this.rightStreamlines()).map(link => link.asObject()),
+      links: Array.from(this.rightStreamlines())
+        .map(link => link.asObject())
+        .filter(link => link.avgHeight > 2)
+        .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
         .filter(child => child.flow >= this.flowThreshold)
         .map(child => child.asObject())

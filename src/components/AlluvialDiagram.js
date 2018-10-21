@@ -158,7 +158,6 @@ export default class AlluvialDiagram extends React.Component {
 
     streamlines
       .enter()
-      .filter(d => d.avgHeight > 2)
       .append("path")
       .attr("class", "streamline")
       .on("click", onClick)
