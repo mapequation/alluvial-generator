@@ -25,6 +25,10 @@ export default class Diagram {
   addNodes(network: Network) {
     const { nodes, id } = network;
 
+    if (this.nodesByNetworkId.has(id)) {
+      throw new Error(`Network with id ${id} already exists`);
+    }
+
     const nodesByName = new Map(
       nodes.map(node => [node.name, new LeafNode(node, id)])
     );
