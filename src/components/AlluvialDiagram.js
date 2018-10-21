@@ -47,7 +47,9 @@ export default class AlluvialDiagram extends React.Component {
     const networkRemoved = networks.length > prevProps.networks.length;
 
     if (!this.diagram || networkAdded || networkRemoved) {
-      this.diagram = new Diagram(networks.map(n => n.data.nodes));
+      this.diagram = new Diagram(
+        networks.map(({ data }) => ({ nodes: data.nodes, id: data.meta.id }))
+      );
     }
 
     this.diagram.calcLayout(width, height, streamlineFraction);

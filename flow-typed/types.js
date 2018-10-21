@@ -10,3 +10,8 @@ declare interface Node {
   +insignificant?: boolean;
   +highlightIndex?: number;
 }
+
+declare interface Network {
+  +nodes: Node[];
+  +id: string;
+}

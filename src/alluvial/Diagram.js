@@ -9,9 +9,6 @@ import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineNode from "./StreamlineNode";
 import StreamlineId from "./StreamlineId";
-import id from "../lib/id";
-
-type Network = Node[];
 
 type NodesByName = Map<string, LeafNode>;
 
@@ -22,21 +19,21 @@ export default class Diagram {
   networkIndices: string[] = [];
 
   constructor(networks: Network[]) {
-    networks.forEach(nodes => this.addNodes(nodes));
+    networks.forEach(network => this.addNodes(network));
   }
 
-  addNodes(nodes: Network) {
-    const networkId = id();
+  addNodes(network: Network) {
+    const { nodes, id } = network;
 
     const nodesByName = new Map(
-      nodes.map(node => [node.name, new LeafNode(node, networkId)])
+      nodes.map(node => [node.name, new LeafNode(node, id)])
     );
 
-    this.networkIndices.push(networkId);
-    this.nodesByNetworkId.set(networkId, nodesByName);
+    this.networkIndices.push(id);
+    this.nodesByNetworkId.set(id, nodesByName);
 
     for (let node of nodesByName.values()) {
-      this.addNode(node, networkId);
+      this.addNode(node, id);
     }
   }
 

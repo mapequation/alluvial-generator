@@ -1,4 +1,6 @@
 // @flow
+import id from "../lib/id";
+
 type Row = string[];
 
 export type Node = {
@@ -30,6 +32,7 @@ export type FTree = {
     +nodes: Node[],
     +modules: Module[],
     +meta: {
+      id: string,
       +directed: boolean,
       +expanded: boolean
     }
@@ -70,6 +73,7 @@ export default function parseFTree(rows: Row[]): FTree {
       nodes: [],
       modules: [],
       meta: {
+        id: id(),
         directed: true,
         expanded: false
       }
