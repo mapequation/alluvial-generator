@@ -101,15 +101,22 @@ export default class Diagram {
             currentFlowThreshold = node.flowThreshold;
             networkTotalMargins.push(0);
             node.sortChildren();
-            node.layout = { x, y, width, height: node.flow * height };
             if (i > 0) x += networkWidth;
             y = height;
             break;
           case Depth.MODULE:
             const next = node.parent.getChild(i + 1);
-            const margin = next
-              ? Math.min(next.getDefaultMargin(), node.getDefaultMargin())
-              : 0;
+            let margin = 0;
+            if (next) {
+              let differenceIndex = 0;
+              let minLength = Math.min(node.path.length, next.path.length);
+              for (let j = 0; j < minLength; j++) {
+                if (node.path[j] === next.path[j]) continue;
+                differenceIndex = j;
+                break;
+              }
+              margin = 2 ** (5 - differenceIndex);
+            }
             node.margin = margin;
             y -= node.flow * height;
             node.layout = { x, y, width, height: node.flow * height };
@@ -122,21 +129,17 @@ export default class Diagram {
       }
     );
 
-    let maxTotalMargin = Math.max(...networkTotalMargins);
-    let usableHeight = Math.max(height - maxTotalMargin, 0);
+    const maxTotalMargin = Math.max(...networkTotalMargins);
+    let usableHeight = height - maxTotalMargin;
+    const maxMarginFractionOfHeight = 0.5;
+    const marginFractionOfHeight = maxTotalMargin / height;
 
-    if (usableHeight === 0) {
-      console.warn("Usable height is 0");
-    }
-
-    let moduleMarginScale = 1.0;
-    const maxMarginFractionOfSpace = 0.5;
-
-    if (maxTotalMargin / height > maxMarginFractionOfSpace) {
+    if (marginFractionOfHeight > maxMarginFractionOfHeight) {
       // Reduce margins to below 50% of vertical space
       // Use moduleMarginScale such that
-      //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfSpace
-      moduleMarginScale = (maxMarginFractionOfSpace * height) / maxTotalMargin;
+      //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfHeight
+      const moduleMarginScale =
+        (maxMarginFractionOfHeight * height) / maxTotalMargin;
 
       this.alluvialRoot.forEachDepthFirstWhile(
         node => node.depth <= Depth.MODULE,
@@ -147,10 +150,10 @@ export default class Diagram {
         }
       );
 
-      maxTotalMargin *= moduleMarginScale;
-      usableHeight = height - maxTotalMargin;
+      const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
+      usableHeight = height - scaledTotalMargin;
       console.log(
-        `Scaling margin by ${moduleMarginScale} -> totalMargin: ${maxTotalMargin}, usableHeight: ${usableHeight}`
+        `Scaling margin by ${moduleMarginScale} -> totalMargin: ${scaledTotalMargin}, usableHeight: ${usableHeight}`
       );
     }
 
@@ -180,6 +183,7 @@ export default class Diagram {
           node.layout = { x: 0, y: 0, width: totalWidth, height };
           break;
         case Depth.NETWORK_ROOT:
+          node.layout = { x, y: 0, width, height };
           x += networkWidth;
           y = height;
           break;
