@@ -113,11 +113,28 @@ export default class AlluvialDiagram extends React.Component {
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
 
+    const textNetworkExitTransition = d =>
+      d
+        .selectAll("text")
+        .transition(t)
+        .delay(delay)
+        .call(makeTransparent)
+        .attr("y", 0)
+        .attr("font-size", 0);
+
+    const rectNetworkExitTransition = d =>
+      d
+        .selectAll("rect")
+        .transition(t)
+        .delay(delay)
+        .attr("y", 0)
+        .attr("height", 0)
+        .call(makeTransparent);
+
     const textExitTransition = d =>
       d
         .selectAll("text")
-        .transition()
-        .duration(0.75 * duration)
+        .transition(t)
         .call(makeTransparent)
         .attr("font-size", 0);
 
@@ -125,7 +142,6 @@ export default class AlluvialDiagram extends React.Component {
       d
         .selectAll("rect")
         .transition(t)
-        .delay(delay)
         .call(makeTransparent);
 
     let networkRoots = alluvialDiagram
@@ -136,8 +152,8 @@ export default class AlluvialDiagram extends React.Component {
       .exit()
       .selectAll(".module")
       .selectAll(".group")
-      .call(textExitTransition)
-      .call(rectExitTransition);
+      .call(textNetworkExitTransition)
+      .call(rectNetworkExitTransition);
 
     networkRoots
       .exit()
@@ -227,17 +243,14 @@ export default class AlluvialDiagram extends React.Component {
       .append("g")
       .attr("class", "group");
 
-    groupsEnter
+    const rect = groupsEnter
       .append("rect")
       .call(setWidthX)
       .call(setHeightY)
       .call(makeTransparent)
-      .attr("fill", "#B6B69F")
-      .transition(t)
-      .delay(delay)
-      .call(makeOpaque);
+      .attr("fill", "#B6B69F");
 
-    groupsEnter
+    const text = groupsEnter
       .filter(d => d.flow > 1e-3)
       .append("text")
       .text(d => d.id)
@@ -245,10 +258,34 @@ export default class AlluvialDiagram extends React.Component {
       .call(makeOpaque)
       .attr("dy", 4)
       .attr("text-anchor", "middle")
-      .attr("font-size", 0)
-      .transition(t)
-      .delay(delay)
-      .attr("font-size", d => d.flow * 5 + 8);
+      .attr("font-size", 0);
+
+    if (networkAdded) {
+      rect
+        .attr("y", 0)
+        .attr("height", 0)
+        .transition(t)
+        .delay(delay)
+        .call(setHeightY)
+        .call(makeOpaque);
+
+      text
+        .attr("y", 0)
+        .transition(t)
+        .delay(delay)
+        .call(setTextPosition)
+        .attr("font-size", d => d.flow * 5 + 8);
+    } else {
+      rect
+        .transition(t)
+        .delay(delay)
+        .call(makeOpaque);
+
+      text
+        .transition(t)
+        .delay(delay)
+        .attr("font-size", d => d.flow * 5 + 8);
+    }
   }
 
   render() {
