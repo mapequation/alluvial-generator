@@ -93,7 +93,7 @@ export default class AlluvialDiagram extends React.Component {
     const onClick = d => console.log(d);
 
     const onDoubleClick = d => {
-      this.diagram.doubleClick(d);
+      this.diagram.doubleClick(d, d3.event.shiftKey);
       this.draw();
     };
 

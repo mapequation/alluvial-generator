@@ -62,13 +62,13 @@ export default class Diagram {
     return this.networksById.has(networkId);
   }
 
-  doubleClick(alluvialNode: Object) {
-    switch (alluvialNode.depth) {
-      case Depth.MODULE:
+  doubleClick(alluvialNode: Object, shiftKey: boolean = false) {
+    if (alluvialNode.depth === Depth.MODULE) {
+      if (shiftKey) {
+        this.regroupModule(alluvialNode.moduleId, alluvialNode.networkId);
+      } else {
         this.expandModule(alluvialNode.moduleId, alluvialNode.networkId);
-        break;
-      default:
-        break;
+      }
     }
   }
 
@@ -439,6 +439,49 @@ export default class Diagram {
       return;
     }
 
+    leafNodes.forEach(node => this.removeNode(node));
+    leafNodes.forEach(node => this.addNode(node, networkId, newModuleLevel));
+  }
+
+  regroupModule(moduleId: string, networkId: string) {
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
+      networkId
+    );
+    if (!networkRoot) {
+      console.warn(`No network id ${networkId}`);
+      return;
+    }
+
+    const module: ?Module = networkRoot.getModule(moduleId);
+    if (!module) {
+      console.warn(
+        `No module found with id ${moduleId} in network ${networkId}`
+      );
+      return;
+    }
+
+    if (module.moduleLevel <= 1) {
+      console.warn(
+        `Module with id ${moduleId} is already at module level ${
+          module.moduleLevel
+        }`
+      );
+      return;
+    }
+
+    const modules = networkRoot.getSiblings(moduleId);
+
+    const leafNodes = [].concat.apply(
+      [],
+      modules.map(module => [...module.leafNodes()])
+    );
+
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return;
+    }
+
+    const newModuleLevel = module.moduleLevel - 1;
     leafNodes.forEach(node => this.removeNode(node));
     leafNodes.forEach(node => this.addNode(node, networkId, newModuleLevel));
   }

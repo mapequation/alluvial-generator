@@ -6,6 +6,7 @@ import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
+import TreePath from "../lib/treepath";
 
 export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
@@ -27,6 +28,15 @@ export default class NetworkRoot extends AlluvialNodeBase {
       this.children.push(module);
     }
     return module;
+  }
+
+  getSiblings(moduleId: string): Module[] {
+    const moduleLevel = TreePath.level(moduleId) - 1;
+    if (moduleLevel < 1) return this.children;
+    const parentPath = TreePath.ancestorAtLevel(moduleId, moduleLevel);
+    return this.children.filter(module =>
+      parentPath.isAncestor(module.moduleId)
+    );
   }
 
   get depth(): number {
