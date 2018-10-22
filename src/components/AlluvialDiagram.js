@@ -28,23 +28,25 @@ export default class AlluvialDiagram extends React.Component {
   componentDidMount() {
     this.svg = d3.select(this.node);
 
-    const shadowColor = d3
+    this.shadowColor = d3
       .scaleLinear()
       .domain([1, 5])
       .range(["#222", "#ccc"]);
 
     this.svg
-      .append("defs")
+      .select("defs")
       .selectAll("filter")
       .data([1, 2, 3, 4, 5])
       .enter()
       .append("filter")
       .attr("id", d => `shadow${d}`)
+      .attr("height", "130%")
       .append("feDropShadow")
-      .attr("dx", d => d)
-      .attr("dy", d => d)
-      .attr("stdDeviation", d => d)
-      .style("flood-color", shadowColor);
+      .attr("id", d => `drop-shadow${d}`)
+      .attr("dx", 1)
+      .attr("dy", 1)
+      .attr("stdDeviation", 1)
+      .style("flood-color", this.shadowColor(1));
 
     this.draw();
   }
@@ -132,15 +134,21 @@ export default class AlluvialDiagram extends React.Component {
       d.attr("d", d => this.streamlineGenerator(d[path]));
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
+
     const setShadow = d =>
-      d.style(
-        "filter",
-        d =>
-          `url(#shadow${Math.max(
-            alluvialRoot.maxModuleLevel + 1 - d.moduleLevel,
-            1
-          )})`
-      );
+      d.style("filter", d => `url(#shadow${Math.min(d.moduleLevel, 5)})`);
+
+    const maxModuleLevel = Math.min(alluvialRoot.maxModuleLevel, 5);
+    for (let level = 1; level <= maxModuleLevel; level++) {
+      const value = maxModuleLevel + 1 - level;
+      this.svg
+        .select(`#drop-shadow${level}`)
+        .transition(t)
+        .attr("dx", value)
+        .attr("dy", value)
+        .attr("stdDeviation", value)
+        .style("flood-color", this.shadowColor(value));
+    }
 
     const textNetworkExitTransition = d =>
       d
@@ -263,7 +271,6 @@ export default class AlluvialDiagram extends React.Component {
 
     groups
       .select("rect")
-      .call(setShadow)
       .transition(t)
       .call(makeOpaque)
       .call(setHeightY)
@@ -330,6 +337,7 @@ export default class AlluvialDiagram extends React.Component {
   render() {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
+        <defs />
         <g className="alluvialDiagram" />
       </svg>
     );
