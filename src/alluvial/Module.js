@@ -49,8 +49,4 @@ export default class Module extends AlluvialNodeBase {
   get depth(): number {
     return MODULE;
   }
-
-  get rank(): number {
-    return this.path[this.path.length - 1];
-  }
 }

@@ -27,6 +27,25 @@ export default class AlluvialDiagram extends React.Component {
 
   componentDidMount() {
     this.svg = d3.select(this.node);
+
+    const shadowColor = d3
+      .scaleLinear()
+      .domain([1, 5])
+      .range(["#222", "#ccc"]);
+
+    this.svg
+      .append("defs")
+      .selectAll("filter")
+      .data([1, 2, 3, 4, 5])
+      .enter()
+      .append("filter")
+      .attr("id", d => `shadow${d}`)
+      .append("feDropShadow")
+      .attr("dx", d => d)
+      .attr("dy", d => d)
+      .attr("stdDeviation", d => d)
+      .style("flood-color", shadowColor);
+
     this.draw();
   }
 
@@ -67,7 +86,7 @@ export default class AlluvialDiagram extends React.Component {
       }
     }
 
-    this.diagram.calcLayout(width, height, streamlineFraction);
+    this.diagram.calcLayout(width - 20, height - 20, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
@@ -79,13 +98,13 @@ export default class AlluvialDiagram extends React.Component {
       this.svg
         .transition(t)
         .delay(duration)
-        .attr("width", alluvialRoot.width)
-        .attr("height", alluvialRoot.height);
+        .attr("width", width)
+        .attr("height", height);
     } else {
       this.svg
         .transition(t)
-        .attr("width", alluvialRoot.width)
-        .attr("height", alluvialRoot.height);
+        .attr("width", width)
+        .attr("height", height);
     }
 
     const alluvialDiagram = this.svg.select(".alluvialDiagram");
@@ -113,6 +132,15 @@ export default class AlluvialDiagram extends React.Component {
       d.attr("d", d => this.streamlineGenerator(d[path]));
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
+    const setShadow = d =>
+      d.style(
+        "filter",
+        d =>
+          `url(#shadow${Math.max(
+            alluvialRoot.maxModuleLevel + 1 - d.moduleLevel,
+            1
+          )})`
+      );
 
     const textNetworkExitTransition = d =>
       d
@@ -187,6 +215,7 @@ export default class AlluvialDiagram extends React.Component {
       .remove();
 
     streamlines
+      .lower()
       .transition(t)
       .call(setOpacity, 0.5)
       .call(setStreamlinePath);
@@ -194,6 +223,7 @@ export default class AlluvialDiagram extends React.Component {
     streamlines
       .enter()
       .append("path")
+      .lower()
       .attr("class", "streamline")
       .on("click", onClick)
       .attr("fill", "#B6B69F")
@@ -233,6 +263,7 @@ export default class AlluvialDiagram extends React.Component {
 
     groups
       .select("rect")
+      .call(setShadow)
       .transition(t)
       .call(makeOpaque)
       .call(setHeightY)
@@ -255,12 +286,13 @@ export default class AlluvialDiagram extends React.Component {
       .call(setWidthX)
       .call(setHeightY)
       .call(makeTransparent)
+      .call(setShadow)
       .attr("fill", "#B6B69F");
 
     const text = groupsEnter
       .filter(d => d.flow > 1e-3)
       .append("text")
-      .text(d => d.id)
+      .text(d => d.id.slice(17).slice(0, -8))
       .call(setTextPosition)
       .call(makeOpaque)
       .attr("dy", 4)

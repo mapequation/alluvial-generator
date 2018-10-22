@@ -76,10 +76,6 @@ export default class AlluvialNodeBase {
     return { x, y, width, height };
   }
 
-  get byFlow() {
-    return -this.flow;
-  }
-
   addChild(node: AlluvialNode) {
     this.children.push(node);
   }

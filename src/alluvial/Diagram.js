@@ -7,8 +7,8 @@ import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
-import StreamlineNode from "./StreamlineNode";
 import StreamlineId from "./StreamlineId";
+import StreamlineNode from "./StreamlineNode";
 
 type NodesByName = Map<string, LeafNode>;
 
@@ -160,8 +160,15 @@ export default class Diagram {
     for (let node of this.alluvialRoot.traverseDepthFirstWhile(
       node => node.depth <= Depth.BRANCH
     )) {
-      if (node.depth === Depth.BRANCH) {
-        node.sortChildren();
+      switch (node.depth) {
+        case Depth.NETWORK_ROOT:
+          currentFlowThreshold = node.flowThreshold;
+          break;
+        case Depth.BRANCH:
+          node.sortChildren(currentFlowThreshold);
+          break;
+        default:
+          break;
       }
     }
 
@@ -172,6 +179,8 @@ export default class Diagram {
     const first = this.networkIndices[0];
     currentFlowThreshold = this.alluvialRoot.getNetworkRoot(first)
       .flowThreshold;
+
+    let maxModuleLevel = 1;
 
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
@@ -188,6 +197,7 @@ export default class Diagram {
           y = height;
           break;
         case Depth.MODULE:
+          maxModuleLevel = Math.max(maxModuleLevel, node.moduleLevel);
           node.layout = { x, y, width, height: node.flow * usableHeight };
           y -= node.margin;
           break;
@@ -208,6 +218,8 @@ export default class Diagram {
           break;
       }
     }
+
+    this.alluvialRoot.maxModuleLevel = maxModuleLevel;
   }
 
   asObject(): Object {

@@ -1,11 +1,12 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import { ALLUVIAL_ROOT } from "./depth-constants";
 import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
-import { ALLUVIAL_ROOT } from "./depth-constants";
 
 export default class AlluvialRoot extends AlluvialNodeBase {
   children: NetworkRoot[] = [];
+  maxModuleLevel: number = 1;
 
   constructor() {
     super("", null, "root");
@@ -26,5 +27,12 @@ export default class AlluvialRoot extends AlluvialNodeBase {
 
   get depth(): number {
     return ALLUVIAL_ROOT;
+  }
+
+  asObject(): Object {
+    return {
+      maxModuleLevel: this.maxModuleLevel,
+      ...super.asObject()
+    };
   }
 }

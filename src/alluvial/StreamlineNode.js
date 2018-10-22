@@ -7,6 +7,7 @@ import StreamlineLink from "./StreamlineLink";
 import StreamlineId from "./StreamlineId";
 
 export default class StreamlineNode extends AlluvialNodeBase {
+  parent: ?Branch;
   link: ?StreamlineLink = null;
   side: Side;
   streamlineId: StreamlineId;
@@ -41,11 +42,11 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return STREAMLINE_NODE;
   }
 
-  get byOppositeStreamlinePosition() {
+  byOppositeStreamlinePosition(moduleFlowThreshold: number = 1e-2) {
     const opposite = this.getOppositeStreamlineNode();
     if (!opposite) return -Infinity;
     const module = opposite.getAncestor(3);
-    if (!module) return -Infinity;
+    if (!module || module.flow < moduleFlowThreshold) return -Infinity;
     return -module.y;
   }
 

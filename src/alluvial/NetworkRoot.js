@@ -10,7 +10,7 @@ import TreePath from "../lib/treepath";
 
 export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
-  flowThreshold: number = 1e-5;
+  flowThreshold: number = 1e-2;
 
   constructor(networkId: string, parent: AlluvialRoot) {
     super(networkId, parent, networkId);
@@ -48,7 +48,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
       ...super.asObject(),
       links: Array.from(this.rightStreamlines())
         .map(link => link.asObject())
-        .filter(link => link.avgHeight > 2)
+        .filter(link => link.avgHeight > 1)
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
         .filter(child => child.flow >= this.flowThreshold)
@@ -75,19 +75,51 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   sortChildren() {
-    this.children.sort((a: Module, b: Module) => {
-      let aSize = Math.max(1, a.path.length - 1);
-      let bSize = Math.max(1, b.path.length - 1);
-      let minSize = Math.min(aSize, bSize);
-      for (let i = 0; i < minSize; ++i) {
-        if (a.path[i] === b.path[i]) continue;
-        return a.path[i] - b.path[i];
+    function flatten(arr) {
+      return arr.nodes.reduce(function(flat, toFlatten) {
+        return flat.concat(
+          Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten
+        );
+      }, []);
+    }
+
+    const tree = {
+      path: "",
+      flow: 0,
+      nodes: []
+    };
+
+    this.children.forEach(module => {
+      let parent = tree;
+
+      for (let path of module.path) {
+        let node = parent.nodes.find(node => node.path === path);
+
+        if (!node) {
+          node = {
+            path,
+            flow: 0,
+            nodes: []
+          };
+
+          parent.nodes.push(node);
+        }
+
+        node.flow += module.flow;
+        parent = node;
       }
-      const byFlow = b.flow - a.flow;
-      if (byFlow < 1e-16 && a.moduleLevel === b.moduleLevel) {
-        return a.rank - b.rank;
-      }
-      return byFlow;
+
+      parent.nodes.push(module);
     });
+
+    const sortDepthFirst = node => {
+      if (!node.nodes) return;
+      node.nodes.sort((a, b) => b.flow - a.flow);
+      node.nodes.forEach(node => sortDepthFirst(node));
+    };
+
+    sortDepthFirst(tree);
+
+    this.children = flatten(tree);
   }
 }
