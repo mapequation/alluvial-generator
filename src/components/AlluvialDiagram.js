@@ -134,6 +134,8 @@ export default class AlluvialDiagram extends React.Component {
       d.attr("d", d => this.streamlineGenerator(d[path]));
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
+    const setStreamlineNetworkTransitionPath = d =>
+      setStreamlinePath(d, "networkTransitionPath");
 
     const setShadow = d =>
       d.style("filter", d => `url(#shadow${Math.min(d.moduleLevel, 5)})`);
@@ -214,13 +216,23 @@ export default class AlluvialDiagram extends React.Component {
       return delay + timePerElement * index;
     };
 
-    streamlines
-      .exit()
-      .transition(t)
-      .delay(streamlineDelay(0))
-      .call(makeTransparent)
-      .call(setStreamlineTransitionPath)
-      .remove();
+    if (networkRemoved) {
+      streamlines
+        .exit()
+        .transition(t)
+        .delay(delay)
+        .call(makeTransparent)
+        .call(setStreamlineNetworkTransitionPath)
+        .remove();
+    } else {
+      streamlines
+        .exit()
+        .transition(t)
+        .delay(streamlineDelay(0))
+        .call(makeTransparent)
+        .call(setStreamlineTransitionPath)
+        .remove();
+    }
 
     streamlines
       .lower()
