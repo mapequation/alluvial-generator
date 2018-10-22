@@ -105,8 +105,12 @@ export default class Diagram {
             y = height;
             break;
           case Depth.MODULE:
-            const next = node.parent.getChild(i + 1);
             let margin = 0;
+            let j = i + 1;
+            let next = node.parent.getChild(j);
+            while (next && next.flow < currentFlowThreshold) {
+              next = node.parent.getChild(++j);
+            }
             if (next) {
               let differenceIndex = 0;
               let minLength = Math.min(node.path.length, next.path.length);
