@@ -233,7 +233,9 @@ export default class AlluvialDiagram extends React.Component {
       .lower()
       .attr("class", "streamline")
       .on("click", onClick)
-      .attr("fill", "#B6B69F")
+      .attr("fill", d =>
+        LinearGradients.getUrl(d.leftHighlightIndex, d.rightHighlightIndex)
+      )
       .attr("stroke", "white")
       .call(makeTransparent)
       .call(setStreamlineTransitionPath)
