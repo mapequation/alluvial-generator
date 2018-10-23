@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
+import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 import { streamlineHorizontal } from "../lib/streamline";
 
@@ -34,28 +35,17 @@ export default class AlluvialDiagram extends React.Component {
       .ticks(0, 1, this.numColors)
       .map(d3.interpolateRainbow);
     this.defaultColor = "#b6b69f";
+
+    this.state = { maxModuleLevel: 1 };
   }
 
   componentDidMount() {
     this.svg = d3.select(this.node);
-
-    this.svg
-      .select("defs")
-      .selectAll("filter")
-      .data([1, 2, 3, 4, 5])
-      .enter()
-      .append("filter")
-      .attr("id", d => `shadow${d}`)
-      .attr("x", "-50%")
-      .attr("y", "-100%")
-      .attr("width", "200%")
-      .attr("height", "400%")
-      .append("feDropShadow");
-
     this.draw();
   }
 
   componentDidUpdate(prevProps) {
+    if (this.state.maxModuleLevel !== prevProps.maxModuleLevel) return;
     this.draw(prevProps);
   }
 
@@ -94,6 +84,7 @@ export default class AlluvialDiagram extends React.Component {
 
     this.diagram.calcLayout(width - 50, height - 50, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
+    this.setState({ maxModuleLevel: alluvialRoot.maxModuleLevel });
 
     console.log(this.diagram);
 
@@ -142,23 +133,6 @@ export default class AlluvialDiagram extends React.Component {
       setStreamlinePath(d, "transitionPath");
     const setStreamlineNetworkTransitionPath = d =>
       setStreamlinePath(d, "networkTransitionPath");
-
-    const setShadow = d =>
-      d.style("filter", d => `url(#shadow${Math.min(d.moduleLevel, 5)})`);
-
-    const maxModuleLevel = Math.min(alluvialRoot.maxModuleLevel, 5);
-    for (let level = 1; level <= maxModuleLevel; level++) {
-      const x = maxModuleLevel + 1 - level;
-
-      this.svg
-        .select(`#shadow${level}`)
-        .select("feDropShadow")
-        .transition(t)
-        .attr("dx", 0.5 * x)
-        .attr("dy", 0.5 * x)
-        .attr("stdDeviation", 0.5 * x)
-        .attr("flood-opacity", -0.05 * x + 0.95);
-    }
 
     const textNetworkExitTransition = d =>
       d
@@ -341,7 +315,7 @@ export default class AlluvialDiagram extends React.Component {
       .call(setWidthX)
       .call(setHeightY)
       .call(makeTransparent)
-      .call(setShadow)
+      .style("filter", d => DropShadows.getShadowUrl(d.moduleLevel))
       .attr("rx", 1)
       .attr("ry", 1)
       .attr("fill", "#B6B69F");
@@ -386,7 +360,7 @@ export default class AlluvialDiagram extends React.Component {
   render() {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
-        <defs />
+        <DropShadows maxLevel={this.state.maxModuleLevel} />
         <LinearGradients
           defaultColor={this.defaultColor}
           highlightColors={this.highlightColors}
