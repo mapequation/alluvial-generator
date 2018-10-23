@@ -25,14 +25,14 @@ export default class LinearGradients extends React.PureComponent {
     const id = pair => `gradient_${pair[0]}_${pair[1]}`;
 
     return (
-      <defs>
+      <React.Fragment>
         {pairs.map((pair, key) => (
           <linearGradient key={key} id={id(pair)}>
             <stop offset="5%" stopColor={color(pair[0])} />
             <stop offset="95%" stopColor={color(pair[1])} />
           </linearGradient>
         ))}
-      </defs>
+      </React.Fragment>
     );
   }
 }

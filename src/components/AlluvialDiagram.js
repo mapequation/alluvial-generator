@@ -357,11 +357,13 @@ export default class AlluvialDiagram extends React.Component {
   render() {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
-        <DropShadows maxLevel={this.maxModuleLevel} />
-        <LinearGradients
-          defaultColor={this.defaultColor}
-          highlightColors={this.highlightColors}
-        />
+        <defs>
+          <DropShadows maxLevel={this.maxModuleLevel} />
+          <LinearGradients
+            defaultColor={this.defaultColor}
+            highlightColors={this.highlightColors}
+          />
+        </defs>
         <g className="alluvialDiagram" />
       </svg>
     );
