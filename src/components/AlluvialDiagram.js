@@ -35,8 +35,7 @@ export default class AlluvialDiagram extends React.Component {
       .ticks(0, 1, this.numColors)
       .map(d3.interpolateRainbow);
     this.defaultColor = "#b6b69f";
-
-    this.state = { maxModuleLevel: 1 };
+    this.maxModuleLevel = 5;
   }
 
   componentDidMount() {
@@ -45,7 +44,6 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.state.maxModuleLevel !== prevProps.maxModuleLevel) return;
     this.draw(prevProps);
   }
 
@@ -84,7 +82,6 @@ export default class AlluvialDiagram extends React.Component {
 
     this.diagram.calcLayout(width - 50, height - 50, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
-    this.setState({ maxModuleLevel: alluvialRoot.maxModuleLevel });
 
     console.log(this.diagram);
 
@@ -315,7 +312,7 @@ export default class AlluvialDiagram extends React.Component {
       .call(setWidthX)
       .call(setHeightY)
       .call(makeTransparent)
-      .style("filter", d => DropShadows.getShadowUrl(d.moduleLevel))
+      .style("filter", d => DropShadows.getUrl(d.moduleLevel))
       .attr("rx", 1)
       .attr("ry", 1)
       .attr("fill", "#B6B69F");
@@ -360,7 +357,7 @@ export default class AlluvialDiagram extends React.Component {
   render() {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
-        <DropShadows maxLevel={this.state.maxModuleLevel} />
+        <DropShadows maxLevel={this.maxModuleLevel} />
         <LinearGradients
           defaultColor={this.defaultColor}
           highlightColors={this.highlightColors}
