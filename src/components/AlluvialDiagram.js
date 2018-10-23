@@ -153,7 +153,7 @@ export default class AlluvialDiagram extends React.Component {
       d
         .selectAll("text")
         .transition(t)
-        .delay(delay)
+        .delay(0)
         .call(makeTransparent)
         .attr("y", 0)
         .attr("font-size", 0);
@@ -162,7 +162,7 @@ export default class AlluvialDiagram extends React.Component {
       d
         .selectAll("rect")
         .transition(t)
-        .delay(delay)
+        .delay(0)
         .attr("y", 0)
         .attr("height", 0)
         .call(makeTransparent);
@@ -208,7 +208,7 @@ export default class AlluvialDiagram extends React.Component {
       .data(d => d.links, key);
 
     const streamlineDelay = delay => (d, index, elements) => {
-      const timeBudget = duration * 0.5;
+      const timeBudget = duration * 0.3;
       const timePerElement = timeBudget / elements.length;
       return delay + timePerElement * index;
     };
@@ -217,10 +217,17 @@ export default class AlluvialDiagram extends React.Component {
       streamlines
         .exit()
         .transition(t)
-        .delay(delay)
+        .delay(0)
         .call(makeTransparent)
         .call(setStreamlineNetworkTransitionPath)
         .remove();
+
+      streamlines
+        .lower()
+        .transition(t)
+        .delay(delay)
+        .call(setOpacity, 0.5)
+        .call(setStreamlinePath);
     } else {
       streamlines
         .exit()
@@ -229,13 +236,14 @@ export default class AlluvialDiagram extends React.Component {
         .call(makeTransparent)
         .call(setStreamlineTransitionPath)
         .remove();
-    }
 
-    streamlines
-      .lower()
-      .transition(t)
-      .call(setOpacity, 0.5)
-      .call(setStreamlinePath);
+      streamlines
+        .lower()
+        .transition(t)
+        .delay(0.5 * delay)
+        .call(setOpacity, 0.5)
+        .call(setStreamlinePath);
+    }
 
     streamlines
       .enter()
@@ -278,19 +286,39 @@ export default class AlluvialDiagram extends React.Component {
 
     groups.exit().remove();
 
-    groups
-      .select("rect")
-      .transition(t)
-      .call(makeOpaque)
-      .call(setHeightY)
-      .call(setWidthX);
+    if (networkRemoved) {
+      groups
+        .select("rect")
+        .transition(t)
+        .delay(delay)
+        .call(makeOpaque)
+        .call(setHeightY)
+        .call(setWidthX);
 
-    groups
-      .select("text")
-      .transition(t)
-      .call(makeOpaque)
-      .call(setTextFontSize)
-      .call(setTextPosition);
+      groups
+        .select("text")
+        .transition(t)
+        .delay(delay)
+        .call(makeOpaque)
+        .call(setTextFontSize)
+        .call(setTextPosition);
+    } else {
+      groups
+        .select("rect")
+        .transition(t)
+        .delay(0.5 * delay)
+        .call(makeOpaque)
+        .call(setHeightY)
+        .call(setWidthX);
+
+      groups
+        .select("text")
+        .transition(t)
+        .delay(0.5 * delay)
+        .call(makeOpaque)
+        .call(setTextFontSize)
+        .call(setTextPosition);
+    }
 
     const groupsEnter = groups
       .enter()
