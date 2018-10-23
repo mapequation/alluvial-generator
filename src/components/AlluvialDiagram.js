@@ -28,8 +28,9 @@ export default class AlluvialDiagram extends React.Component {
   componentDidMount() {
     this.svg = d3.select(this.node);
 
-    this.svg
-      .select("defs")
+    const defs = this.svg.select("defs");
+
+    defs
       .selectAll("filter")
       .data([1, 2, 3, 4, 5])
       .enter()
@@ -40,6 +41,30 @@ export default class AlluvialDiagram extends React.Component {
       .attr("width", "200%")
       .attr("height", "400%")
       .append("feDropShadow");
+
+    const numColors = 5;
+    const highlightColors = d3
+      .ticks(0, 1, numColors)
+      .map(d3.interpolateRainbow);
+    const highlightIndices = [-1, ...highlightColors.keys()];
+    const pairs = d3.cross(highlightIndices, highlightIndices);
+    const color = index => (index === -1 ? "#B6B69F" : highlightColors[index]);
+
+    defs
+      .selectAll("linearGradient")
+      .data(pairs)
+      .enter()
+      .append("linearGradient")
+      .attr("id", d => `gradient_${d[0]}_${d[1]}`)
+      .selectAll("stop")
+      .data(d => [
+        { offset: "5%", color: color(d[0]) },
+        { offset: "95%", color: color(d[1]) }
+      ])
+      .enter()
+      .append("stop")
+      .attr("offset", d => d.offset)
+      .attr("stop-color", d => d.color);
 
     this.draw();
   }
