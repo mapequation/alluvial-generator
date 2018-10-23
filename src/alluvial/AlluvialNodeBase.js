@@ -158,10 +158,10 @@ export default class AlluvialNodeBase {
   *traverseDepthFirstPostOrderWhile(
     predicate: Predicate<AlluvialNode>
   ): Iterable<AlluvialNode> {
+    if (!predicate(this)) return;
     for (let child of this.children) {
       yield* child.traverseDepthFirstPostOrderWhile(predicate);
     }
-    if (!predicate(this)) return;
     yield this;
   }
 
@@ -223,8 +223,9 @@ export default class AlluvialNodeBase {
     predicate: Predicate<AlluvialNode>,
     callback: IteratorCallback
   ) {
-    const children = this.children.filter(predicate);
+    const children = this.children;
     children.forEach((child, childIndex) => {
+      if (!predicate(child)) return;
       callback(child, childIndex, children);
       child.forEachDepthFirstPreOrderWhile(predicate, callback);
     });
@@ -234,8 +235,9 @@ export default class AlluvialNodeBase {
     predicate: Predicate<AlluvialNode>,
     callback: IteratorCallback
   ) {
-    const children = this.children.filter(predicate);
+    const children = this.children;
     children.forEach((child, childIndex) => {
+      if (!predicate(child)) return;
       child.forEachDepthFirstPostOrderWhile(predicate, callback);
       callback(child, childIndex, children);
     });
