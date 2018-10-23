@@ -223,9 +223,8 @@ export default class AlluvialNodeBase {
     predicate: Predicate<AlluvialNode>,
     callback: IteratorCallback
   ) {
-    const children = this.children;
+    const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {
-      if (!predicate(child)) return;
       callback(child, childIndex, children);
       child.forEachDepthFirstPreOrderWhile(predicate, callback);
     });
@@ -235,9 +234,8 @@ export default class AlluvialNodeBase {
     predicate: Predicate<AlluvialNode>,
     callback: IteratorCallback
   ) {
-    const children = this.children;
+    const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {
-      if (!predicate(child)) return;
       child.forEachDepthFirstPostOrderWhile(predicate, callback);
       callback(child, childIndex, children);
     });
