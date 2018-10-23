@@ -28,11 +28,6 @@ export default class AlluvialDiagram extends React.Component {
   componentDidMount() {
     this.svg = d3.select(this.node);
 
-    this.shadowColor = d3
-      .scaleLinear()
-      .domain([1, 5])
-      .range(["#222", "#ccc"]);
-
     this.svg
       .select("defs")
       .selectAll("filter")
@@ -40,13 +35,11 @@ export default class AlluvialDiagram extends React.Component {
       .enter()
       .append("filter")
       .attr("id", d => `shadow${d}`)
-      .attr("height", "130%")
-      .append("feDropShadow")
-      .attr("id", d => `drop-shadow${d}`)
-      .attr("dx", 1)
-      .attr("dy", 1)
-      .attr("stdDeviation", 1)
-      .style("flood-color", this.shadowColor(1));
+      .attr("x", "-50%")
+      .attr("y", "-100%")
+      .attr("width", "200%")
+      .attr("height", "400%")
+      .append("feDropShadow");
 
     this.draw();
   }
@@ -88,7 +81,7 @@ export default class AlluvialDiagram extends React.Component {
       }
     }
 
-    this.diagram.calcLayout(width - 20, height - 20, streamlineFraction);
+    this.diagram.calcLayout(width - 50, height - 50, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
@@ -109,7 +102,9 @@ export default class AlluvialDiagram extends React.Component {
         .attr("height", height);
     }
 
-    const alluvialDiagram = this.svg.select(".alluvialDiagram");
+    const alluvialDiagram = this.svg
+      .select(".alluvialDiagram")
+      .attr("transform", "translate(25 25)");
 
     const onClick = d => console.log(d);
 
@@ -126,7 +121,7 @@ export default class AlluvialDiagram extends React.Component {
     const setHeightY = d => d.attr("y", d => d.y).attr("height", d => d.height);
     const setTextPosition = d =>
       d.attr("x", d => d.x + d.width / 2).attr("y", d => d.y + d.height / 2);
-    const setTextFontSize = d => d.attr("font-size", d => d.flow * 5 + 8);
+    const setTextFontSize = d => d.attr("font-size", d => d.flow * 7 + 5);
     const setOpacity = (d, opacity) => d.attr("opacity", opacity);
     const makeTransparent = d => setOpacity(d, 0);
     const makeOpaque = d => setOpacity(d, 1);
@@ -142,14 +137,16 @@ export default class AlluvialDiagram extends React.Component {
 
     const maxModuleLevel = Math.min(alluvialRoot.maxModuleLevel, 5);
     for (let level = 1; level <= maxModuleLevel; level++) {
-      const value = maxModuleLevel + 1 - level;
+      const x = maxModuleLevel + 1 - level;
+
       this.svg
-        .select(`#drop-shadow${level}`)
+        .select(`#shadow${level}`)
+        .select("feDropShadow")
         .transition(t)
-        .attr("dx", value)
-        .attr("dy", value)
-        .attr("stdDeviation", value)
-        .style("flood-color", this.shadowColor(value));
+        .attr("dx", 0.5 * x)
+        .attr("dy", 0.5 * x)
+        .attr("stdDeviation", 0.5 * x)
+        .attr("flood-opacity", -0.05 * x + 0.95);
     }
 
     const textNetworkExitTransition = d =>
@@ -306,15 +303,16 @@ export default class AlluvialDiagram extends React.Component {
       .call(setHeightY)
       .call(makeTransparent)
       .call(setShadow)
+      .attr("rx", 1)
+      .attr("ry", 1)
       .attr("fill", "#B6B69F");
 
     const text = groupsEnter
-      .filter(d => d.flow > 1e-3)
       .append("text")
       .text(d => d.id.slice(17).slice(0, -8))
       .call(setTextPosition)
       .call(makeOpaque)
-      .attr("dy", 4)
+      .attr("dy", 2)
       .attr("text-anchor", "middle")
       .attr("font-size", 0);
 
