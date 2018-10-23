@@ -95,7 +95,7 @@ export default class Diagram {
       node =>
         node.depth < Depth.MODULE ||
         (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
-      (node, i) => {
+      (node, i, children) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
             currentFlowThreshold = node.flowThreshold;
@@ -106,11 +106,7 @@ export default class Diagram {
             break;
           case Depth.MODULE:
             let margin = 0;
-            let j = i + 1;
-            let next = node.parent.getChild(j);
-            while (next && next.flow < currentFlowThreshold) {
-              next = node.parent.getChild(++j);
-            }
+            const next = i + 1 !== children.length ? children[i + 1] : null;
             if (next) {
               let differenceIndex = 0;
               let minLength = Math.min(node.path.length, next.path.length);
