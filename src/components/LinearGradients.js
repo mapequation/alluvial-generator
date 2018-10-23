@@ -15,6 +15,11 @@ export default class LinearGradients extends React.PureComponent {
 
   static getUrl = (from, to) => `url(#gradient_${from}_${to})`;
 
+  static fill = d =>
+    d.attr("fill", d =>
+      LinearGradients.getUrl(d.leftHighlightIndex, d.rightHighlightIndex)
+    );
+
   render() {
     const { defaultColor, highlightColors } = this.props;
 

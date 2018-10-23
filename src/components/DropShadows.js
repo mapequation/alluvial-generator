@@ -13,6 +13,9 @@ export default class DropShadows extends React.PureComponent {
 
   static getUrl = level => `url(#shadow${level})`;
 
+  static filter = d =>
+    d.style("filter", d => DropShadows.getUrl(d.moduleLevel));
+
   render() {
     const { maxLevel } = this.props;
 
