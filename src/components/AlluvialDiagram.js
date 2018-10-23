@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
+import LinearGradients from "./LinearGradients";
 import { streamlineHorizontal } from "../lib/streamline";
 
 export default class AlluvialDiagram extends React.Component {
@@ -25,12 +26,21 @@ export default class AlluvialDiagram extends React.Component {
     duration: PropTypes.number
   };
 
+  constructor(props) {
+    super(props);
+
+    this.numColors = 5;
+    this.highlightColors = d3
+      .ticks(0, 1, this.numColors)
+      .map(d3.interpolateRainbow);
+    this.defaultColor = "#b6b69f";
+  }
+
   componentDidMount() {
     this.svg = d3.select(this.node);
 
-    const defs = this.svg.select("defs");
-
-    defs
+    this.svg
+      .select("defs")
       .selectAll("filter")
       .data([1, 2, 3, 4, 5])
       .enter()
@@ -41,30 +51,6 @@ export default class AlluvialDiagram extends React.Component {
       .attr("width", "200%")
       .attr("height", "400%")
       .append("feDropShadow");
-
-    const numColors = 5;
-    const highlightColors = d3
-      .ticks(0, 1, numColors)
-      .map(d3.interpolateRainbow);
-    const highlightIndices = [-1, ...highlightColors.keys()];
-    const pairs = d3.cross(highlightIndices, highlightIndices);
-    const color = index => (index === -1 ? "#B6B69F" : highlightColors[index]);
-
-    defs
-      .selectAll("linearGradient")
-      .data(pairs)
-      .enter()
-      .append("linearGradient")
-      .attr("id", d => `gradient_${d[0]}_${d[1]}`)
-      .selectAll("stop")
-      .data(d => [
-        { offset: "5%", color: color(d[0]) },
-        { offset: "95%", color: color(d[1]) }
-      ])
-      .enter()
-      .append("stop")
-      .attr("offset", d => d.offset)
-      .attr("stop-color", d => d.color);
 
     this.draw();
   }
@@ -401,6 +387,10 @@ export default class AlluvialDiagram extends React.Component {
     return (
       <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
         <defs />
+        <LinearGradients
+          defaultColor={this.defaultColor}
+          highlightColors={this.highlightColors}
+        />
         <g className="alluvialDiagram" />
       </svg>
     );
