@@ -11,7 +11,7 @@ export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
   diagram = null;
-  numColors = 5;
+  numColors = 8;
   highlightColors = d3.ticks(0, 1, this.numColors).map(d3.interpolateRainbow);
   defaultColor = "#b6b69f";
   maxModuleLevel = 3;

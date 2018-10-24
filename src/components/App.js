@@ -12,7 +12,7 @@ export default class App extends React.Component {
   state = {
     width: 1200,
     height: 600,
-    duration: 500,
+    duration: 400,
     streamlineFraction: 2,
     networks: [],
     visibleNetworks: []
