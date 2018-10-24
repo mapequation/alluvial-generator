@@ -36,8 +36,9 @@ export default class StreamlineLink {
       right: { layout: rightLayout, parent: rightBranch }
     } = this;
 
-    const x0 = leftLayout.x + leftLayout.width;
-    const x1 = rightLayout.x;
+    const stroke = 3;
+    const x0 = leftLayout.x + leftLayout.width - stroke;
+    const x1 = rightLayout.x + stroke;
     const y0 = leftLayout.y;
     const y1 = rightLayout.y;
     const h0 = leftLayout.height;
