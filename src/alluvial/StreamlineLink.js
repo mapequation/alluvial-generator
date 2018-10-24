@@ -36,13 +36,14 @@ export default class StreamlineLink {
       right: { layout: rightLayout, parent: rightBranch }
     } = this;
 
-    const stroke = 3;
-    const x0 = leftLayout.x + leftLayout.width - stroke;
-    const x1 = rightLayout.x + stroke;
-    const y0 = leftLayout.y;
-    const y1 = rightLayout.y;
-    const h0 = leftLayout.height;
-    const h1 = rightLayout.height;
+    const hideStrokeNextToModules = 3;
+    const strokeWidth = 2;
+    const x0 = leftLayout.x + leftLayout.width - hideStrokeNextToModules;
+    const x1 = rightLayout.x + hideStrokeNextToModules;
+    const y0 = leftLayout.y + strokeWidth / 2;
+    const y1 = rightLayout.y + strokeWidth / 2;
+    const h0 = leftLayout.height - strokeWidth;
+    const h1 = rightLayout.height - strokeWidth;
     const xAvg = (x0 + x1) / 2;
     const yAvg = (y0 + y1) / 2;
 
@@ -79,7 +80,8 @@ export default class StreamlineLink {
         h1: 0
       },
       leftHighlightIndex,
-      rightHighlightIndex
+      rightHighlightIndex,
+      strokeWidth
     };
   }
 }

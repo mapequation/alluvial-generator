@@ -13,11 +13,17 @@ export default class LinearGradients extends React.PureComponent {
     highlightColors: PropTypes.arrayOf(PropTypes.string)
   };
 
-  static getUrl = (left, right) => `url(#gradient_${left}_${right})`;
-
   static fill = d =>
-    d.attr("fill", d =>
-      LinearGradients.getUrl(d.leftHighlightIndex, d.rightHighlightIndex)
+    d.attr(
+      "fill",
+      d => `url(#gradient_${d.leftHighlightIndex}_${d.rightHighlightIndex})`
+    );
+
+  static stroke = d =>
+    d.attr(
+      "stroke",
+      d =>
+        `url(#gradient-stroke_${d.leftHighlightIndex}_${d.rightHighlightIndex})`
     );
 
   render() {
@@ -28,16 +34,25 @@ export default class LinearGradients extends React.PureComponent {
     const color = index =>
       index === -1 ? defaultColor : highlightColors[index];
     const id = (left, right) => `gradient_${left}_${right}`;
+    const stroke = color => d3.color(color).darker(0.6);
+    const strokeId = (left, right) => `gradient-stroke_${left}_${right}`;
+
     const leftOffset = "15%";
     const rightOffset = "85%";
 
     return (
       <React.Fragment>
         {pairs.map(([left, right], key) => (
-          <linearGradient key={key} id={id(left, right)}>
-            <stop offset={leftOffset} stopColor={color(left)} />
-            <stop offset={rightOffset} stopColor={color(right)} />
-          </linearGradient>
+          <React.Fragment key={key}>
+            <linearGradient id={id(left, right)}>
+              <stop offset={leftOffset} stopColor={color(left)} />
+              <stop offset={rightOffset} stopColor={color(right)} />
+            </linearGradient>
+            <linearGradient id={strokeId(left, right)}>
+              <stop offset={leftOffset} stopColor={stroke(color(left))} />
+              <stop offset={rightOffset} stopColor={stroke(color(right))} />
+            </linearGradient>
+          </React.Fragment>
         ))}
       </React.Fragment>
     );
