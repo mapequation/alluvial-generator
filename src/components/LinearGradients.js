@@ -28,13 +28,15 @@ export default class LinearGradients extends React.PureComponent {
     const color = index =>
       index === -1 ? defaultColor : highlightColors[index];
     const id = (left, right) => `gradient_${left}_${right}`;
+    const leftOffset = "15%";
+    const rightOffset = "85%";
 
     return (
       <React.Fragment>
         {pairs.map(([left, right], key) => (
           <linearGradient key={key} id={id(left, right)}>
-            <stop offset="15%" stopColor={color(left)} />
-            <stop offset="85%" stopColor={color(right)} />
+            <stop offset={leftOffset} stopColor={color(left)} />
+            <stop offset={rightOffset} stopColor={color(right)} />
           </linearGradient>
         ))}
       </React.Fragment>
