@@ -13,7 +13,7 @@ export default class LinearGradients extends React.PureComponent {
     highlightColors: PropTypes.arrayOf(PropTypes.string)
   };
 
-  static getUrl = (from, to) => `url(#gradient_${from}_${to})`;
+  static getUrl = (left, right) => `url(#gradient_${left}_${right})`;
 
   static fill = d =>
     d.attr("fill", d =>
@@ -27,14 +27,14 @@ export default class LinearGradients extends React.PureComponent {
     const pairs = d3.cross(highlightIndices, highlightIndices);
     const color = index =>
       index === -1 ? defaultColor : highlightColors[index];
-    const id = pair => `gradient_${pair[0]}_${pair[1]}`;
+    const id = (left, right) => `gradient_${left}_${right}`;
 
     return (
       <React.Fragment>
-        {pairs.map((pair, key) => (
-          <linearGradient key={key} id={id(pair)}>
-            <stop offset="5%" stopColor={color(pair[0])} />
-            <stop offset="95%" stopColor={color(pair[1])} />
+        {pairs.map(([left, right], key) => (
+          <linearGradient key={key} id={id(left, right)}>
+            <stop offset="15%" stopColor={color(left)} />
+            <stop offset="85%" stopColor={color(right)} />
           </linearGradient>
         ))}
       </React.Fragment>
