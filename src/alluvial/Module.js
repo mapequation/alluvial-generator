@@ -1,4 +1,6 @@
 // @flow
+import sortBy from "lodash/sortBy";
+
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { MODULE } from "./depth-constants";
 import HighlightGroup from "./HighlightGroup";
@@ -36,6 +38,10 @@ export default class Module extends AlluvialNodeBase {
       this.children.push(group);
     }
     return group;
+  }
+
+  sortChildren() {
+    this.children = sortBy(this.children, [child => child.highlightIndex]);
   }
 
   asObject(): Object {

@@ -3,14 +3,18 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
+import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
-import { streamlineHorizontal } from "../lib/streamline";
 
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
   diagram = null;
+  numColors = 5;
+  highlightColors = d3.ticks(0, 1, this.numColors).map(d3.interpolateRainbow);
+  defaultColor = "#b6b69f";
+  maxModuleLevel = 3;
 
   static defaultProps = {
     width: 1200,
@@ -26,17 +30,6 @@ export default class AlluvialDiagram extends React.Component {
     networks: PropTypes.arrayOf(PropTypes.object),
     duration: PropTypes.number
   };
-
-  constructor(props) {
-    super(props);
-
-    this.numColors = 5;
-    this.highlightColors = d3
-      .ticks(0, 1, this.numColors)
-      .map(d3.interpolateRainbow);
-    this.defaultColor = "#b6b69f";
-    this.maxModuleLevel = 5;
-  }
 
   componentDidMount() {
     this.svg = d3.select(this.node);
@@ -61,7 +54,7 @@ export default class AlluvialDiagram extends React.Component {
 
     if (!this.diagram) {
       this.diagram = new Diagram(
-        networks.map(({ data }) => ({ nodes: data.nodes, id: data.meta.id }))
+        networks.map(({ data: { nodes, meta } }) => ({ nodes, id: meta.id }))
       );
     }
 
@@ -260,7 +253,7 @@ export default class AlluvialDiagram extends React.Component {
       .enter()
       .append("g")
       .attr("class", "module")
-      .on("click", onClick)
+      .call(DropShadows.filter)
       .on("dblclick", onDoubleClick)
       .merge(modules);
 
@@ -307,19 +300,24 @@ export default class AlluvialDiagram extends React.Component {
       .append("g")
       .attr("class", "group");
 
+    const highlightColor = d =>
+      d.highlightIndex === -1
+        ? this.defaultColor
+        : this.highlightColors[d.highlightIndex];
+
     const rect = groupsEnter
       .append("rect")
       .call(setWidthX)
       .call(setHeightY)
       .call(makeTransparent)
-      .call(DropShadows.filter)
+      .on("click", onClick)
       .attr("rx", 1)
       .attr("ry", 1)
-      .attr("fill", "#B6B69F");
+      .attr("fill", highlightColor);
 
     const text = groupsEnter
       .append("text")
-      .text(d => d.id.slice(17).slice(0, -8))
+      .text(d => d.id.slice(17))
       .call(setTextPosition)
       .call(makeOpaque)
       .attr("dy", 2)

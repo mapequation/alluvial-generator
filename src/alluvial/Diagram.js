@@ -105,6 +105,7 @@ export default class Diagram {
             y = height;
             break;
           case Depth.MODULE:
+            node.sortChildren();
             let margin = 0;
             const next = i + 1 !== children.length ? children[i + 1] : null;
             if (next) {

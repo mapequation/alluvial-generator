@@ -52,11 +52,4 @@ export default class Branch extends AlluvialNodeBase {
       child => child.byOppositeStreamlinePosition(moduleFlowThreshold)
     ]);
   }
-
-  asObject(): Object {
-    return {
-      ...super.asObject(),
-      side: this.isLeft ? "left" : "right"
-    };
-  }
 }

@@ -24,7 +24,10 @@ export default class LeafNode extends AlluvialNodeBase {
     this.name = node.name;
     this.flow = node.flow;
     this.insignificant = node.insignificant || false;
-    this.highlightIndex = node.highlightIndex || -1;
+    this.highlightIndex =
+      node.highlightIndex != null && Number.isInteger(node.highlightIndex)
+        ? node.highlightIndex
+        : -1;
   }
 
   get level(): number {
@@ -42,8 +45,8 @@ export default class LeafNode extends AlluvialNodeBase {
   getAncestor(steps: number): ?AlluvialNode {
     if (steps === 0) return this;
     const parent = this.leftParent || this.rightParent;
-    if (parent) return parent.getAncestor(steps - 1);
-    return null;
+    if (!parent) return null;
+    return parent.getAncestor(steps - 1);
   }
 
   getParent(side: Side): ?StreamlineNode {
@@ -56,6 +59,13 @@ export default class LeafNode extends AlluvialNodeBase {
     } else {
       this.rightParent = parent;
     }
+  }
+
+  asObject(): Object {
+    return {
+      ...super.asObject(),
+      name: this.name
+    };
   }
 
   get depth(): number {

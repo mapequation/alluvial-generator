@@ -28,7 +28,6 @@ export default class HighlightGroup extends AlluvialNodeBase {
   asObject() {
     return {
       ...super.asObject(),
-      moduleLevel: this.parent ? this.parent.moduleLevel : 1,
       highlightIndex: this.highlightIndex
     };
   }
