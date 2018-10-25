@@ -23,7 +23,7 @@ export default class Diagram {
   }
 
   addNetwork(network: Network) {
-    const { nodes, id } = network;
+    const { nodes, id, name } = network;
 
     if (this.networksById.has(id)) {
       throw new Error(`Network with id ${id} already exists`);
@@ -35,6 +35,7 @@ export default class Diagram {
 
     this.networkIndices.push(id);
     this.networksById.set(id, nodesByName);
+    this.alluvialRoot.createNetworkRoot(id, name);
 
     for (let node of nodesByName.values()) {
       this.addNode(node, id);
@@ -153,9 +154,6 @@ export default class Diagram {
 
       const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
       usableHeight = height - scaledTotalMargin;
-      console.log(
-        `Scaling margin by ${moduleMarginScale} -> totalMargin: ${scaledTotalMargin}, usableHeight: ${usableHeight}`
-      );
     }
 
     for (let node of this.alluvialRoot.traverseDepthFirstWhile(
@@ -177,9 +175,12 @@ export default class Diagram {
     y = height;
 
     // We can't set this in the loop any more because of post order traversal
-    const first = this.networkIndices[0];
-    currentFlowThreshold = this.alluvialRoot.getNetworkRoot(first)
-      .flowThreshold;
+    const networkRoot = this.alluvialRoot.getNetworkRoot(
+      this.networkIndices[0]
+    );
+    currentFlowThreshold = networkRoot
+      ? networkRoot.flowThreshold
+      : currentFlowThreshold;
 
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
@@ -225,9 +226,14 @@ export default class Diagram {
   addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
-    const root = this.alluvialRoot.getOrCreateNetworkRoot(node, networkId);
+    const root: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!root) {
+      console.warn(`No network id ${networkId}`);
+      return;
+    }
+
     const module = root.getOrCreateModule(node, moduleLevel);
-    const group = module.getOrCreateGroup(node, node.highlightIndex);
+    const group = module.getOrCreateGroup(node.highlightIndex);
 
     this.alluvialRoot.flow += node.flow;
     root.flow += node.flow;

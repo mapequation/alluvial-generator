@@ -14,4 +14,5 @@ declare interface Node {
 declare interface Network {
   +nodes: Node[];
   +id: string;
+  +name: string;
 }

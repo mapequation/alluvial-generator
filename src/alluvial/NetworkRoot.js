@@ -11,9 +11,11 @@ import TreePath from "../lib/treepath";
 export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
   flowThreshold: number = 8e-3;
+  name: string;
 
-  constructor(networkId: string, parent: AlluvialRoot) {
+  constructor(networkId: string, parent: AlluvialRoot, name: string) {
     super(networkId, parent, networkId);
+    this.name = name;
   }
 
   getModule(moduleId: string): ?Module {
@@ -46,6 +48,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
   asObject(): Object {
     return {
       ...super.asObject(),
+      name: this.name,
       bracket: {
         x: this.x,
         y: this.height + 5,

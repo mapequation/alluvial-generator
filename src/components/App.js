@@ -63,7 +63,10 @@ export default class App extends React.Component {
             throw err;
           })
         );
-        return parsed.map(each => parseFTree(each.data));
+        return parsed.map((each, i) => ({
+          name: networks[i],
+          ...parseFTree(each.data)
+        }));
       })
       .then(networks => this.setState({ networks, visibleNetworks: networks }))
       .catch(console.error);

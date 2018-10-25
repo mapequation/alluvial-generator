@@ -4,7 +4,6 @@ import sortBy from "lodash/sortBy";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { MODULE } from "./depth-constants";
 import HighlightGroup from "./HighlightGroup";
-import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
 import TreePath from "../lib/treepath";
 
@@ -21,7 +20,7 @@ export default class Module extends AlluvialNodeBase {
     moduleId: string,
     moduleLevel: number = 1
   ) {
-    super(networkId, parent, `${parent.id}_module${moduleId}`);
+    super(networkId, parent, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
@@ -31,7 +30,7 @@ export default class Module extends AlluvialNodeBase {
     return this.children.find(group => group.highlightIndex === highlightIndex);
   }
 
-  getOrCreateGroup(node: LeafNode, highlightIndex: number): HighlightGroup {
+  getOrCreateGroup(highlightIndex: number): HighlightGroup {
     let group = this.getGroup(highlightIndex);
     if (!group) {
       group = new HighlightGroup(this.networkId, this, highlightIndex);
