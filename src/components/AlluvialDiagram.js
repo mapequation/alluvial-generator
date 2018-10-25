@@ -75,7 +75,7 @@ export default class AlluvialDiagram extends React.Component {
       }
     }
 
-    this.diagram.calcLayout(width - 50, height - 50, streamlineFraction);
+    this.diagram.calcLayout(width - 50, height - 60, streamlineFraction);
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
@@ -157,12 +157,20 @@ export default class AlluvialDiagram extends React.Component {
         .transition(t)
         .call(makeTransparent);
 
+    const networkNameExitTransition = d =>
+      d
+        .select(".networkName")
+        .transition(t)
+        .delay(0)
+        .call(makeTransparent);
+
     let networkRoots = alluvialDiagram
       .selectAll(".networkRoot")
       .data(alluvialRoot.children, key);
 
     networkRoots
       .exit()
+      .call(networkNameExitTransition)
       .selectAll(".module")
       .selectAll(".group")
       .call(textNetworkExitTransition)
@@ -179,16 +187,10 @@ export default class AlluvialDiagram extends React.Component {
       .append("g")
       .attr("class", "networkRoot");
 
-    networkRoots
-      .selectAll(".networkName")
-      .selectAll(".bracket")
-      .transition(t)
-      .attr("stroke", "red")
-      .attr("d", d => this.bracketHorizontal(d.bracket));
-
     const networkNames = networkRootsEnter
       .append("g")
-      .attr("class", "networkName");
+      .attr("class", "networkName")
+      .call(makeTransparent);
 
     networkNames
       .append("path")
@@ -196,6 +198,43 @@ export default class AlluvialDiagram extends React.Component {
       .attr("fill", "transparent")
       .attr("stroke", "#999")
       .attr("d", d => this.bracketHorizontal(d.bracket));
+
+    networkNames
+      .append("text")
+      .attr("class", "name")
+      .text(d => d.id)
+      .attr("x", d => d.bracket.textX)
+      .attr("y", d => d.bracket.textY)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#999")
+      .attr("stroke", "white")
+      .attr("stroke-width", 5)
+      .attr("paint-order", "stroke")
+      .attr("font-size", 12)
+      .attr("dy", 3);
+
+    const networkNameUpdateDelay =
+      networkAdded || !networkRemoved ? 0.5 * delay : delay;
+
+    networkRoots
+      .select(".networkName")
+      .select(".bracket")
+      .transition(t)
+      .delay(networkNameUpdateDelay)
+      .attr("d", d => this.bracketHorizontal(d.bracket));
+
+    networkRoots
+      .select(".networkName")
+      .select(".name")
+      .transition(t)
+      .delay(networkNameUpdateDelay)
+      .attr("x", d => d.bracket.textX)
+      .attr("y", d => d.bracket.textY);
+
+    networkNames
+      .transition(t)
+      .delay(delay)
+      .call(makeOpaque);
 
     networkRoots = networkRoots.merge(networkRootsEnter);
 

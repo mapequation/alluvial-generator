@@ -51,7 +51,9 @@ export default class NetworkRoot extends AlluvialNodeBase {
         y: this.height + 5,
         width: this.width,
         height: 15,
-        textGap: Math.min(150, this.width - 30)
+        textGap: Math.min(100, this.width - 30),
+        textX: this.x + this.width / 2,
+        textY: this.height + 15 + 5
       },
       links: Array.from(this.rightStreamlines())
         .map(link => link.asObject())
