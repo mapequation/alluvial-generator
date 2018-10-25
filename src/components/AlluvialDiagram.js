@@ -83,18 +83,16 @@ export default class AlluvialDiagram extends React.Component {
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    if (networkRemoved) {
-      this.svg
-        .transition(t)
-        .delay(duration)
-        .attr("width", width)
-        .attr("height", height);
-    } else {
-      this.svg
-        .transition(t)
-        .attr("width", width)
-        .attr("height", height);
-    }
+    const svgTransitionDelay =
+      width !== prevProps.width || height !== prevProps.height
+        ? 0.5 * delay
+        : 0;
+
+    this.svg
+      .transition(t)
+      .delay(svgTransitionDelay)
+      .attr("width", width)
+      .attr("height", height);
 
     const alluvialDiagram = this.svg
       .select(".alluvialDiagram")
