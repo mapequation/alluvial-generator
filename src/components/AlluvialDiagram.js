@@ -42,7 +42,7 @@ export default class AlluvialDiagram extends React.Component {
     this.draw(prevProps);
   }
 
-  async draw(prevProps = this.props) {
+  draw(prevProps = this.props) {
     const {
       width,
       height,
@@ -123,17 +123,13 @@ export default class AlluvialDiagram extends React.Component {
 
     const rectNetworkExitTransition = d =>
       d
+        .selectAll(".module")
+        .selectAll(".group")
         .selectAll("rect")
         .transition(t)
         .delay(0)
         .attr("y", 0)
         .attr("height", 0)
-        .call(makeTransparent);
-
-    const rectExitTransition = d =>
-      d
-        .selectAll("rect")
-        .transition(t)
         .call(makeTransparent);
 
     const networkNameExitTransition = d =>
@@ -150,12 +146,7 @@ export default class AlluvialDiagram extends React.Component {
     networkRoots
       .exit()
       .call(networkNameExitTransition)
-      .selectAll(".module")
-      .selectAll(".group")
-      .call(rectNetworkExitTransition);
-
-    networkRoots
-      .exit()
+      .call(rectNetworkExitTransition)
       .transition(t)
       .delay(delay)
       .remove();
@@ -226,37 +217,26 @@ export default class AlluvialDiagram extends React.Component {
       return delay + timePerElement * index;
     };
 
-    if (networkRemoved) {
-      streamlines
-        .exit()
-        .transition(t)
-        .delay(0)
-        .call(makeTransparent)
-        .call(setStreamlineNetworkTransitionPath)
-        .remove();
+    const streamlineUpdateDelay = networkRemoved ? delay : 0.5 * delay;
+    const streamlineExitDelay = networkRemoved ? 0 : streamlineDelay(0);
+    const streamlineTransition = networkRemoved
+      ? setStreamlineNetworkTransitionPath
+      : setStreamlineTransitionPath;
 
-      streamlines
-        .lower()
-        .transition(t)
-        .delay(delay)
-        .call(setOpacity, 0.5)
-        .call(setStreamlinePath);
-    } else {
-      streamlines
-        .exit()
-        .transition(t)
-        .delay(streamlineDelay(0))
-        .call(makeTransparent)
-        .call(setStreamlineTransitionPath)
-        .remove();
+    streamlines
+      .exit()
+      .transition(t)
+      .delay(streamlineExitDelay)
+      .call(makeTransparent)
+      .call(streamlineTransition)
+      .remove();
 
-      streamlines
-        .lower()
-        .transition(t)
-        .delay(0.5 * delay)
-        .call(setOpacity, 0.5)
-        .call(setStreamlinePath);
-    }
+    streamlines
+      .lower()
+      .transition(t)
+      .delay(streamlineUpdateDelay)
+      .call(setOpacity, 0.5)
+      .call(setStreamlinePath);
 
     streamlines
       .enter()
@@ -277,13 +257,16 @@ export default class AlluvialDiagram extends React.Component {
 
     let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
-    modules
-      .exit()
-      .selectAll(".group")
-      .call(rectExitTransition);
+    const rectGroupExitTransition = d =>
+      d
+        .selectAll(".group")
+        .selectAll("rect")
+        .transition(t)
+        .call(makeTransparent);
 
     modules
       .exit()
+      .call(rectGroupExitTransition)
       .transition(t)
       .delay(delay)
       .remove();
@@ -300,23 +283,15 @@ export default class AlluvialDiagram extends React.Component {
 
     groups.exit().remove();
 
-    if (networkRemoved) {
-      groups
-        .select("rect")
-        .transition(t)
-        .delay(delay)
-        .call(makeOpaque)
-        .call(setHeightY)
-        .call(setWidthX);
-    } else {
-      groups
-        .select("rect")
-        .transition(t)
-        .delay(0.5 * delay)
-        .call(makeOpaque)
-        .call(setHeightY)
-        .call(setWidthX);
-    }
+    const rectUpdateDelay = networkRemoved ? delay : 0.5 * delay;
+
+    groups
+      .select("rect")
+      .transition(t)
+      .delay(rectUpdateDelay)
+      .call(makeOpaque)
+      .call(setHeightY)
+      .call(setWidthX);
 
     const groupsEnter = groups
       .enter()
@@ -337,19 +312,14 @@ export default class AlluvialDiagram extends React.Component {
       .attr("fill", highlightColor);
 
     if (networkAdded) {
-      rect
-        .attr("y", 0)
-        .attr("height", 0)
-        .transition(t)
-        .delay(delay)
-        .call(setHeightY)
-        .call(makeOpaque);
-    } else {
-      rect
-        .transition(t)
-        .delay(delay)
-        .call(makeOpaque);
+      rect.attr("y", 0).attr("height", 0);
     }
+
+    rect
+      .transition(t)
+      .delay(delay)
+      .call(setHeightY)
+      .call(makeOpaque);
   }
 
   render() {
