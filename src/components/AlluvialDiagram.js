@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
+import { bracketHorizontal, bracketVertical } from "../lib/bracket";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -10,6 +11,8 @@ import LinearGradients from "./LinearGradients";
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
+  bracketHorizontal = bracketHorizontal();
+  bracketVertical = bracketVertical();
   diagram = null;
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
@@ -171,11 +174,30 @@ export default class AlluvialDiagram extends React.Component {
       .delay(delay)
       .remove();
 
-    networkRoots = networkRoots
+    const networkRootsEnter = networkRoots
       .enter()
       .append("g")
-      .attr("class", "networkRoot")
-      .merge(networkRoots);
+      .attr("class", "networkRoot");
+
+    networkRoots
+      .selectAll(".networkName")
+      .selectAll(".bracket")
+      .transition(t)
+      .attr("stroke", "red")
+      .attr("d", d => this.bracketHorizontal(d.bracket));
+
+    const networkNames = networkRootsEnter
+      .append("g")
+      .attr("class", "networkName");
+
+    networkNames
+      .append("path")
+      .attr("class", "bracket")
+      .attr("fill", "transparent")
+      .attr("stroke", "#999")
+      .attr("d", d => this.bracketHorizontal(d.bracket));
+
+    networkRoots = networkRoots.merge(networkRootsEnter);
 
     const streamlines = networkRoots
       .selectAll(".streamline")

@@ -46,6 +46,13 @@ export default class NetworkRoot extends AlluvialNodeBase {
   asObject(): Object {
     return {
       ...super.asObject(),
+      bracket: {
+        x: this.x,
+        y: this.height + 5,
+        width: this.width,
+        height: 15,
+        textGap: Math.min(150, this.width - 30)
+      },
       links: Array.from(this.rightStreamlines())
         .map(link => link.asObject())
         .filter(link => link.avgHeight > 1)
