@@ -11,8 +11,7 @@ export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
   diagram = null;
-  numColors = 8;
-  highlightColors = d3.ticks(0, 1, this.numColors).map(d3.interpolateRainbow);
+  highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
   maxModuleLevel = 3;
 
@@ -313,8 +312,6 @@ export default class AlluvialDiagram extends React.Component {
       .call(setHeightY)
       .call(makeTransparent)
       .on("click", onClick)
-      .attr("rx", 1)
-      .attr("ry", 1)
       .attr("fill", highlightColor);
 
     const text = groupsEnter

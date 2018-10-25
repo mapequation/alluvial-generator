@@ -34,7 +34,12 @@ export default class LinearGradients extends React.PureComponent {
     const color = index =>
       index === -1 ? defaultColor : highlightColors[index];
     const id = (left, right) => `gradient_${left}_${right}`;
-    const stroke = color => d3.color(color).darker(0.6);
+    const stroke = color => {
+      const hsl = d3.hsl(color);
+      hsl.s += 0.2;
+      hsl.l -= 0.2;
+      return hsl.toString();
+    };
     const strokeId = (left, right) => `gradient-stroke_${left}_${right}`;
 
     const leftOffset = "15%";
