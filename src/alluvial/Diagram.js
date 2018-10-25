@@ -181,8 +181,6 @@ export default class Diagram {
     currentFlowThreshold = this.alluvialRoot.getNetworkRoot(first)
       .flowThreshold;
 
-    let maxModuleLevel = 1;
-
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
@@ -198,7 +196,6 @@ export default class Diagram {
           y = height;
           break;
         case Depth.MODULE:
-          maxModuleLevel = Math.max(maxModuleLevel, node.moduleLevel);
           node.layout = { x, y, width, height: node.flow * usableHeight };
           y -= node.margin;
           break;
@@ -219,8 +216,6 @@ export default class Diagram {
           break;
       }
     }
-
-    this.alluvialRoot.maxModuleLevel = maxModuleLevel;
   }
 
   asObject(): Object {
