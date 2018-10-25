@@ -170,6 +170,7 @@ export default class AlluvialDiagram extends React.Component {
       .attr("class", "bracket")
       .attr("fill", "transparent")
       .attr("stroke", "#999")
+      .attr("stroke-linecap", "round")
       .attr("d", d => this.bracketHorizontal(d.bracket));
 
     networkNames
