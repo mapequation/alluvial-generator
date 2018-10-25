@@ -111,9 +111,6 @@ export default class AlluvialDiagram extends React.Component {
 
     const setWidthX = d => d.attr("x", d => d.x).attr("width", d => d.width);
     const setHeightY = d => d.attr("y", d => d.y).attr("height", d => d.height);
-    const setTextPosition = d =>
-      d.attr("x", d => d.x + d.width / 2).attr("y", d => d.y + d.height / 2);
-    const setTextFontSize = d => d.attr("font-size", d => d.flow * 7 + 5);
     const setOpacity = (d, opacity) => d.attr("opacity", opacity);
     const makeTransparent = d => setOpacity(d, 0);
     const makeOpaque = d => setOpacity(d, 1);
@@ -124,15 +121,6 @@ export default class AlluvialDiagram extends React.Component {
     const setStreamlineNetworkTransitionPath = d =>
       setStreamlinePath(d, "networkTransitionPath");
 
-    const textNetworkExitTransition = d =>
-      d
-        .selectAll("text")
-        .transition(t)
-        .delay(0)
-        .call(makeTransparent)
-        .attr("y", 0)
-        .attr("font-size", 0);
-
     const rectNetworkExitTransition = d =>
       d
         .selectAll("rect")
@@ -141,13 +129,6 @@ export default class AlluvialDiagram extends React.Component {
         .attr("y", 0)
         .attr("height", 0)
         .call(makeTransparent);
-
-    const textExitTransition = d =>
-      d
-        .selectAll("text")
-        .transition(t)
-        .call(makeTransparent)
-        .attr("font-size", 0);
 
     const rectExitTransition = d =>
       d
@@ -171,7 +152,6 @@ export default class AlluvialDiagram extends React.Component {
       .call(networkNameExitTransition)
       .selectAll(".module")
       .selectAll(".group")
-      .call(textNetworkExitTransition)
       .call(rectNetworkExitTransition);
 
     networkRoots
@@ -300,7 +280,6 @@ export default class AlluvialDiagram extends React.Component {
     modules
       .exit()
       .selectAll(".group")
-      .call(textExitTransition)
       .call(rectExitTransition);
 
     modules
@@ -329,14 +308,6 @@ export default class AlluvialDiagram extends React.Component {
         .call(makeOpaque)
         .call(setHeightY)
         .call(setWidthX);
-
-      groups
-        .select("text")
-        .transition(t)
-        .delay(delay)
-        .call(makeOpaque)
-        .call(setTextFontSize)
-        .call(setTextPosition);
     } else {
       groups
         .select("rect")
@@ -345,14 +316,6 @@ export default class AlluvialDiagram extends React.Component {
         .call(makeOpaque)
         .call(setHeightY)
         .call(setWidthX);
-
-      groups
-        .select("text")
-        .transition(t)
-        .delay(0.5 * delay)
-        .call(makeOpaque)
-        .call(setTextFontSize)
-        .call(setTextPosition);
     }
 
     const groupsEnter = groups
@@ -373,15 +336,6 @@ export default class AlluvialDiagram extends React.Component {
       .on("click", onClick)
       .attr("fill", highlightColor);
 
-    const text = groupsEnter
-      .append("text")
-      .text(d => d.id.slice(17))
-      .call(setTextPosition)
-      .call(makeOpaque)
-      .attr("dy", 2)
-      .attr("text-anchor", "middle")
-      .attr("font-size", 0);
-
     if (networkAdded) {
       rect
         .attr("y", 0)
@@ -390,23 +344,11 @@ export default class AlluvialDiagram extends React.Component {
         .delay(delay)
         .call(setHeightY)
         .call(makeOpaque);
-
-      text
-        .attr("y", 0)
-        .transition(t)
-        .delay(delay)
-        .call(setTextPosition)
-        .call(setTextFontSize);
     } else {
       rect
         .transition(t)
         .delay(delay)
         .call(makeOpaque);
-
-      text
-        .transition(t)
-        .delay(delay)
-        .call(setTextFontSize);
     }
   }
 
