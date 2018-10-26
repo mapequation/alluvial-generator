@@ -67,7 +67,11 @@ export default class AlluvialDiagram extends React.Component {
     if (networkAdded) {
       for (let { data, name } of networks) {
         if (!this.diagram.hasNetwork(data.meta.id)) {
-          this.diagram.addNetwork({ nodes: data.nodes, id: data.meta.id, name });
+          this.diagram.addNetwork({
+            nodes: data.nodes,
+            id: data.meta.id,
+            name
+          });
         }
       }
     } else if (networkRemoved) {
@@ -80,7 +84,12 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     const maxModuleWidth = 300;
-    this.diagram.calcLayout(width - 50, height - 60, streamlineFraction, maxModuleWidth);
+    this.diagram.calcLayout(
+      width - 50,
+      height - 60,
+      streamlineFraction,
+      maxModuleWidth
+    );
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
@@ -126,6 +135,9 @@ export default class AlluvialDiagram extends React.Component {
     const setStreamlineNetworkTransitionPath = d =>
       setStreamlinePath(d, "networkTransitionPath");
 
+    /**
+     * Network Roots
+     */
     const rectNetworkExitTransition = d =>
       d
         .selectAll(".module")
@@ -213,6 +225,9 @@ export default class AlluvialDiagram extends React.Component {
 
     networkRoots = networkRoots.merge(networkRootsEnter);
 
+    /**
+     * Streamlines
+     */
     const streamlines = networkRoots
       .selectAll(".streamline")
       .data(d => d.links, key);
@@ -261,6 +276,9 @@ export default class AlluvialDiagram extends React.Component {
       .call(setOpacity, 0.5)
       .call(setStreamlinePath);
 
+    /**
+     * Modules
+     */
     let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
     const rectGroupExitTransition = d =>
@@ -285,6 +303,9 @@ export default class AlluvialDiagram extends React.Component {
       .on("dblclick", onDoubleClick)
       .merge(modules);
 
+    /**
+     * Groups
+     */
     const groups = modules.selectAll(".group").data(d => d.children, key);
 
     groups.exit().remove();
