@@ -31,21 +31,33 @@ export function bracketHorizontal() {
   };
 }
 
-export function bracketVertical(rightFacing = true) {
-  const sign = (-1) ** Number(rightFacing);
-  return function bracket({ x, y, width, height, textGap = 0 }) {
-    const x1 = x + sign * width;
-    const y1 = y + height;
+export function bracketVertical() {
+  return function bracket({ x, y, width, height, textGap = 0, radius = 2 }) {
+    const r = Math.min(width, radius);
+    const gap = Math.min(height - 2 * r, textGap);
+
+    const x1 = x - width + r;
+    const y1 = y;
+    const x2 = x - width;
+    const y2 = y + r;
+    const x3 = x2;
+    const y3 = y + height - r;
+    const x4 = x1;
+    const y4 = y + height;
+    const x5 = x;
+    const y5 = y4;
 
     const context = path();
     context.moveTo(x, y);
-    context.lineTo(x1, y);
-    if (textGap > 0) {
-      context.lineTo(x1, y + (height - textGap) / 2);
-      context.moveTo(x1, y + (height + textGap) / 2);
-    }
     context.lineTo(x1, y1);
-    context.lineTo(x, y1);
+    context.arcTo(x2, y1, x2, y2, r);
+    if (gap > 0) {
+      context.lineTo(x2, y + (height - gap) / 2);
+      context.moveTo(x2, y + (height + gap) / 2);
+    }
+    context.lineTo(x3, y3);
+    context.arcTo(x3, y4, x4, y4, r);
+    context.lineTo(x5, y5);
     return context.toString();
   };
 }

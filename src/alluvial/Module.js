@@ -13,6 +13,7 @@ export default class Module extends AlluvialNodeBase {
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
+  name: ?string = null;
 
   constructor(
     networkId: string,
@@ -43,11 +44,29 @@ export default class Module extends AlluvialNodeBase {
     this.children = sortBy(this.children, [child => child.highlightIndex]);
   }
 
+  getLargestLeafNodeNames() {
+    return [...this.leafNodes()]
+      .sort((a, b) => b.flow - a.flow)
+      .map(node => node.name)
+      .slice(0, 10);
+  }
+
   asObject(): Object {
     return {
+      ...super.asObject(),
       moduleLevel: this.moduleLevel,
       moduleId: this.moduleId,
-      ...super.asObject()
+      name: this.name,
+      largestLeafNodes: this.getLargestLeafNodeNames(),
+      moduleName: {
+        x: this.x - 5,
+        y: this.y,
+        width: 15,
+        height: this.height,
+        textGap: Math.min(50, this.height - 30),
+        textX: this.x - 15 - 5,
+        textY: this.y + this.height / 2
+      }
     };
   }
 

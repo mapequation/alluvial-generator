@@ -85,7 +85,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const maxModuleWidth = 300;
     this.diagram.calcLayout(
-      width - 50,
+      width - 300,
       height - 60,
       streamlineFraction,
       maxModuleWidth
@@ -110,7 +110,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const alluvialDiagram = this.svg
       .select(".alluvialDiagram")
-      .attr("transform", "translate(25 25)");
+      .attr("transform", "translate(200 10)");
 
     const onClick = d => console.log(d);
 
@@ -136,8 +136,12 @@ export default class AlluvialDiagram extends React.Component {
       setStreamlinePath(d, "networkTransitionPath");
 
     /**
-     * Network Roots
+     * Network roots
      */
+    let networkRoots = alluvialDiagram
+      .selectAll(".networkRoot")
+      .data(alluvialRoot.children, key);
+
     const rectNetworkExitTransition = d =>
       d
         .selectAll(".module")
@@ -156,14 +160,19 @@ export default class AlluvialDiagram extends React.Component {
         .delay(0)
         .call(makeTransparent);
 
-    let networkRoots = alluvialDiagram
-      .selectAll(".networkRoot")
-      .data(alluvialRoot.children, key);
+    const moduleNameNetworkExitTransition = d =>
+      d
+        .selectAll(".module")
+        .selectAll(".moduleName")
+        .transition(t)
+        .delay(0)
+        .call(makeTransparent);
 
     networkRoots
       .exit()
       .call(networkNameExitTransition)
       .call(rectNetworkExitTransition)
+      .call(moduleNameNetworkExitTransition)
       .transition(t)
       .delay(delay)
       .remove();
@@ -173,6 +182,9 @@ export default class AlluvialDiagram extends React.Component {
       .append("g")
       .attr("class", "networkRoot");
 
+    /**
+     * Network names
+     */
     const networkNames = networkRootsEnter
       .append("g")
       .attr("class", "networkName")
@@ -184,17 +196,18 @@ export default class AlluvialDiagram extends React.Component {
       .attr("fill", "transparent")
       .attr("stroke", "#999")
       .attr("stroke-linecap", "round")
-      .attr("d", d => this.bracketHorizontal(d.bracket));
+      .attr("d", d => this.bracketHorizontal(d.networkName));
 
     networkNames
       .append("text")
       .attr("class", "name")
       .text(d => d.name)
-      .attr("x", d => d.bracket.textX)
-      .attr("y", d => d.bracket.textY)
+      .attr("x", d => d.networkName.textX)
+      .attr("y", d => d.networkName.textY)
       .attr("text-anchor", "middle")
       .attr("fill", "#999")
       .attr("stroke", "white")
+      .attr("stroke-linejoin", "round")
       .attr("stroke-width", 5)
       .attr("paint-order", "stroke")
       .attr("font-size", 12)
@@ -208,15 +221,15 @@ export default class AlluvialDiagram extends React.Component {
       .select(".bracket")
       .transition(t)
       .delay(networkNameUpdateDelay)
-      .attr("d", d => this.bracketHorizontal(d.bracket));
+      .attr("d", d => this.bracketHorizontal(d.networkName));
 
     networkRoots
       .select(".networkName")
       .select(".name")
       .transition(t)
       .delay(networkNameUpdateDelay)
-      .attr("x", d => d.bracket.textX)
-      .attr("y", d => d.bracket.textY);
+      .attr("x", d => d.networkName.textX)
+      .attr("y", d => d.networkName.textY);
 
     networkNames
       .transition(t)
@@ -281,27 +294,116 @@ export default class AlluvialDiagram extends React.Component {
      */
     let modules = networkRoots.selectAll(".module").data(d => d.children, key);
 
-    const rectGroupExitTransition = d =>
+    const rectModuleExitTransition = d =>
       d
         .selectAll(".group")
         .selectAll("rect")
         .transition(t)
         .call(makeTransparent);
 
+    const moduleNameExitTransition = d =>
+      d
+        .selectAll(".moduleName")
+        .transition(t)
+        .call(makeTransparent);
+
     modules
       .exit()
-      .call(rectGroupExitTransition)
+      .call(rectModuleExitTransition)
+      .call(moduleNameExitTransition)
       .transition(t)
       .delay(delay)
       .remove();
 
-    modules = modules
+    const modulesEnter = modules
       .enter()
       .append("g")
       .attr("class", "module")
-      .call(DropShadows.filter)
+      //.call(DropShadows.filter)
       .on("dblclick", onDoubleClick)
-      .merge(modules);
+      .on("click", onClick);
+
+    /**
+     * Module names
+     */
+    const moduleNames = modulesEnter
+      .append("g")
+      .attr("class", "moduleName")
+      .call(makeTransparent);
+
+    moduleNames
+      .append("path")
+      .attr("class", "bracket")
+      .attr("fill", "transparent")
+      .attr("stroke", "#999")
+      .attr("stroke-linecap", "round")
+      .attr("d", d => this.bracketVertical(d.moduleName));
+
+    const numVisibleModuleNames = d3
+      .scaleQuantize()
+      .domain([20, 150])
+      .range([1, 2, 3, 4]);
+
+    moduleNames
+      .append("text")
+      .attr("class", "name")
+      .attr("x", d => d.moduleName.textX)
+      .attr("y", d => d.moduleName.textY)
+      .attr("text-anchor", "end")
+      .attr("fill", "#999")
+      .attr("stroke", "white")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-width", 5)
+      .attr("paint-order", "stroke")
+      .attr("font-size", 9)
+      .attr("dominant-baseline", "central")
+      .selectAll("tspan")
+      .data(d => {
+        const numNodes = numVisibleModuleNames(d.height);
+        return d.largestLeafNodes.slice(0, numNodes).map(name => ({
+          name,
+          x: d.moduleName.textX
+        }));
+      })
+      .enter()
+      .append("tspan")
+      .text(d => d.name)
+      .attr("x", d => d.x)
+      .attr("dx", 3)
+      .attr("dy", (d, i, el) => (i === 0 ? (el.length - 1) * -5 : 10));
+
+    modules
+      .select(".moduleName")
+      .select(".bracket")
+      .transition(t)
+      .delay(networkNameUpdateDelay)
+      .attr("d", d => this.bracketVertical(d.moduleName));
+
+    modules
+      .select(".moduleName")
+      .select(".name")
+      .transition(t)
+      .delay(networkNameUpdateDelay)
+      .attr("x", d => d.moduleName.textX)
+      .attr("y", d => d.moduleName.textY);
+
+    modules
+      .select(".moduleName")
+      .select(".name")
+      .each(function(d) {
+        d3.select(this)
+          .selectAll("tspan")
+          .transition(t)
+          .delay(networkNameUpdateDelay)
+          .attr("x", d.moduleName.textX);
+      });
+
+    moduleNames
+      .transition(t)
+      .delay(delay)
+      .call(makeOpaque);
+
+    modules = modules.merge(modulesEnter);
 
     /**
      * Groups
