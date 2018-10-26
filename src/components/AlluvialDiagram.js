@@ -79,7 +79,8 @@ export default class AlluvialDiagram extends React.Component {
       }
     }
 
-    this.diagram.calcLayout(width - 50, height - 60, streamlineFraction);
+    const maxModuleWidth = 300;
+    this.diagram.calcLayout(width - 50, height - 60, streamlineFraction, maxModuleWidth);
     const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);

@@ -73,13 +73,20 @@ export default class Diagram {
     }
   }
 
-  calcLayout(totalWidth: number, height: number, streamlineFraction: number) {
+  calcLayout(
+    totalWidth: number,
+    height: number,
+    streamlineFraction: number,
+    maxModuleWidth: number
+  ) {
     const numNetworks = this.networkIndices.length;
 
     if (!numNetworks) return;
 
-    const width =
-      totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction);
+    const width = Math.min(
+      totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
+      maxModuleWidth
+    );
     const streamlineWidth = streamlineFraction * width;
     const networkWidth = width + streamlineWidth;
 
