@@ -17,6 +17,7 @@ export default class AlluvialDiagram extends React.Component {
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
   maxModuleLevel = 3;
+  scale = 1;
 
   static defaultProps = {
     width: 1200,
@@ -35,6 +36,26 @@ export default class AlluvialDiagram extends React.Component {
 
   componentDidMount() {
     this.svg = d3.select(this.node);
+
+    const zoom = d3.zoom().scaleExtent([0.1, 1000]);
+    const initialTransform = d3.zoomIdentity.translate(50, 50);
+
+    this.svg
+      .call(zoom)
+      .on("dblclick.zoom", null)
+      .call(zoom.transform, initialTransform);
+
+    const zoomable = this.svg
+      .select("#zoomable")
+      .attr("transform", initialTransform);
+
+    zoom.on("zoom", () => {
+      const { transform } = d3.event;
+      this.scale = transform.k;
+      zoomable.attr("transform", transform);
+      this.draw();
+    });
+
     this.update();
     this.draw();
   }
@@ -113,17 +134,17 @@ export default class AlluvialDiagram extends React.Component {
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    const svgTransitionDelay = widthChanged || heightChanged ? 0.5 * delay : 0;
-
-    this.svg
-      .transition(t)
-      .delay(svgTransitionDelay)
-      .attr("width", width)
-      .attr("height", height);
+    const sizeTransitionDelay = widthChanged || heightChanged ? 0.5 * delay : 0;
 
     const alluvialDiagram = this.svg
       .select(".alluvialDiagram")
       .attr("transform", "translate(200 10)");
+
+    alluvialDiagram
+      .transition(t)
+      .delay(sizeTransitionDelay)
+      .attr("width", width)
+      .attr("height", height);
 
     const onClick = d => console.log(d);
 
@@ -255,9 +276,21 @@ export default class AlluvialDiagram extends React.Component {
     /**
      * Streamlines
      */
+    const visibleStreamlineHeight = d3
+      .scaleSqrt()
+      .domain([1, 1.4])
+      .range([1, 0.2])
+      .clamp(true);
+
     const streamlines = networkRoots
       .selectAll(".streamline")
-      .data(d => d.links, key);
+      .data(
+        d =>
+          d.links.filter(
+            link => link.avgHeight > visibleStreamlineHeight(this.scale)
+          ),
+        key
+      );
 
     const streamlineDelay = delay => (d, index, elements) => {
       const timeBudget = duration * 0.3;
@@ -294,7 +327,8 @@ export default class AlluvialDiagram extends React.Component {
       .on("click", onClick)
       .call(LinearGradients.fill)
       .call(LinearGradients.stroke)
-      .attr("stroke-width", d => d.strokeWidth)
+      .attr("stroke-width", 1)
+      .attr("vector-effect", "non-scaling-stroke")
       .attr("paint-order", "stroke")
       .call(makeTransparent)
       .call(setStreamlineTransitionPath)
@@ -467,7 +501,12 @@ export default class AlluvialDiagram extends React.Component {
 
   render() {
     return (
-      <svg ref={node => (this.node = node)} xmlns={d3.namespaces.svg}>
+      <svg
+        width="100vw"
+        height="100vh"
+        ref={node => (this.node = node)}
+        xmlns={d3.namespaces.svg}
+      >
         <defs>
           <DropShadows maxLevel={this.maxModuleLevel} />
           <LinearGradients
@@ -475,7 +514,9 @@ export default class AlluvialDiagram extends React.Component {
             highlightColors={this.highlightColors}
           />
         </defs>
-        <g className="alluvialDiagram" />
+        <g id="zoomable">
+          <g className="alluvialDiagram" />
+        </g>
       </svg>
     );
   }

@@ -4,9 +4,7 @@ import { Sidebar } from "semantic-ui-react";
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 import AlluvialDiagram from "./AlluvialDiagram";
-
 import MySidebar from "./Sidebar";
-import ZoomableSvg from "./ZoomableSvg";
 
 export default class App extends React.Component {
   state = {
@@ -100,15 +98,13 @@ export default class App extends React.Component {
         />
         <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
           {loadingComplete && (
-            <ZoomableSvg>
-              <AlluvialDiagram
-                networks={this.state.visibleNetworks}
-                width={this.state.width}
-                height={this.state.height}
-                streamlineFraction={+this.state.streamlineFraction}
-                duration={+this.state.duration}
-              />
-            </ZoomableSvg>
+            <AlluvialDiagram
+              networks={this.state.visibleNetworks}
+              width={this.state.width}
+              height={this.state.height}
+              streamlineFraction={+this.state.streamlineFraction}
+              duration={+this.state.duration}
+            />
           )}
           {!loadingComplete && <div>Loading...</div>}
         </Sidebar.Pusher>
