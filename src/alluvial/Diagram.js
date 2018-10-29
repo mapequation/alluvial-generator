@@ -81,11 +81,11 @@ export default class Diagram {
     streamlineFraction: number,
     maxModuleWidth: number
   ) {
+    this.dirty = true;
+
     const numNetworks = this.networkIndices.length;
 
     if (!numNetworks) return;
-
-    this.dirty = true;
 
     const width = Math.min(
       totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
