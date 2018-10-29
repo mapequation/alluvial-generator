@@ -53,9 +53,10 @@ export default class AlluvialDiagram extends React.Component {
 
     zoom.on("zoom", () => {
       const { transform } = d3.event;
-      this.scale = transform.k;
       zoomable.attr("transform", transform);
-      this.draw();
+      const scaleChanged = this.scale !== transform.k;
+      this.scale = transform.k;
+      if (scaleChanged) this.draw();
     });
 
     this.update();
