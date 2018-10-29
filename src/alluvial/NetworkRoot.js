@@ -48,8 +48,8 @@ export default class NetworkRoot extends AlluvialNodeBase {
   asObject(): Object {
     return {
       ...super.asObject(),
-      name: this.name,
       networkName: {
+        name: this.name,
         x: this.x,
         y: this.height + 5,
         width: this.width,

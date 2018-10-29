@@ -224,33 +224,46 @@ export default class AlluvialDiagram extends React.Component {
       .delay(delay)
       .remove();
 
-    const networkRootsEnter = networkRoots
+    networkRoots = networkRoots
       .enter()
       .append("g")
-      .attr("class", "networkRoot");
+      .attr("class", "networkRoot")
+      .merge(networkRoots);
 
     /**
      * Network names
      */
-    const networkNames = networkRootsEnter
+    const networkNames = networkRoots
+      .selectAll(".networkName")
+      .data(d => [d.networkName]);
+
+    networkNames.exit().remove();
+
+    const networkNamesEnter = networkNames
+      .enter()
       .append("g")
       .attr("class", "networkName")
       .call(makeTransparent);
 
-    networkNames
+    networkNamesEnter
+      .transition(t)
+      .delay(delay)
+      .call(makeOpaque);
+
+    networkNamesEnter
       .append("path")
       .attr("class", "bracket")
       .attr("fill", "transparent")
       .attr("stroke", "#999")
       .attr("stroke-linecap", "round")
-      .attr("d", d => this.bracketHorizontal(d.networkName));
+      .attr("d", this.bracketHorizontal);
 
-    networkNames
+    networkNamesEnter
       .append("text")
       .attr("class", "name")
       .text(d => d.name)
-      .attr("x", d => d.networkName.textX)
-      .attr("y", d => d.networkName.textY)
+      .attr("x", d => d.textX)
+      .attr("y", d => d.textY)
       .attr("text-anchor", "middle")
       .attr("fill", "#999")
       .attr("stroke", "white")
@@ -263,27 +276,18 @@ export default class AlluvialDiagram extends React.Component {
     const networkNameUpdateDelay =
       networkAdded || !networkRemoved ? 0.5 * delay : delay;
 
-    networkRoots
-      .select(".networkName")
+    networkNames
       .select(".bracket")
       .transition(t)
       .delay(networkNameUpdateDelay)
-      .attr("d", d => this.bracketHorizontal(d.networkName));
+      .attr("d", this.bracketHorizontal);
 
-    networkRoots
-      .select(".networkName")
+    networkNames
       .select(".name")
       .transition(t)
       .delay(networkNameUpdateDelay)
-      .attr("x", d => d.networkName.textX)
-      .attr("y", d => d.networkName.textY);
-
-    networkNames
-      .transition(t)
-      .delay(delay)
-      .call(makeOpaque);
-
-    networkRoots = networkRoots.merge(networkRootsEnter);
+      .attr("x", d => d.textX)
+      .attr("y", d => d.textY);
 
     /**
      * Streamlines
