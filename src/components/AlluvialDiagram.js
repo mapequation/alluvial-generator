@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
-import { bracketHorizontal, bracketVertical } from "../lib/bracket";
+import {
+  bracketHorizontal,
+  bracketVerticalLeft,
+  bracketVerticalRight
+} from "../lib/bracket";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -12,7 +16,7 @@ export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
   bracketHorizontal = bracketHorizontal();
-  bracketVertical = bracketVertical();
+  bracketVertical = [bracketVerticalLeft(), bracketVerticalRight()];
   diagram = null;
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
@@ -209,7 +213,6 @@ export default class AlluvialDiagram extends React.Component {
 
     const moduleNameNetworkExitTransition = d =>
       d
-        .selectAll(".module")
         .selectAll(".moduleName")
         .transition(t)
         .delay(0)
@@ -365,109 +368,126 @@ export default class AlluvialDiagram extends React.Component {
         .transition(t)
         .call(makeTransparent);
 
-    const moduleNameExitTransition = d =>
-      d
-        .selectAll(".moduleName")
-        .transition(t)
-        .call(makeTransparent);
-
     modules
       .exit()
       .call(rectModuleExitTransition)
-      .call(moduleNameExitTransition)
       .transition(t)
       .delay(delay)
       .remove();
 
-    const modulesEnter = modules
+    modules = modules
       .enter()
       .append("g")
       .attr("class", "module")
       //.call(DropShadows.filter)
       .on("dblclick", onDoubleClick)
-      .on("click", onClick);
+      .on("click", onClick)
+      .merge(modules);
 
     /**
      * Module names
      */
-    const moduleNames = modulesEnter
-      .append("g")
-      .attr("class", "moduleName")
-      .call(makeTransparent);
+    const leftModuleNames = networkRoots
+      .filter((d, i) => i === 0)
+      .selectAll(".moduleName")
+      .data(d => d.children, key);
 
-    moduleNames
-      .append("path")
-      .attr("class", "bracket")
-      .attr("fill", "transparent")
-      .attr("stroke", "#999")
-      .attr("stroke-linecap", "round")
-      .attr("d", d => this.bracketVertical(d.moduleName));
+    const rightModuleNames = networkRoots
+      .filter((d, i, el) => el.length > 1 && i === el.length - 1)
+      .selectAll(".moduleName")
+      .data(d => d.children, key);
+
+    networkRoots
+      .filter((d, i, el) => i > 0 && i < el.length - 1)
+      .selectAll(".moduleName")
+      .transition(t)
+      .call(makeTransparent)
+      .remove();
 
     const numVisibleModuleNames = d3
       .scaleQuantize()
       .domain([20, 150])
       .range([1, 2, 3, 4]);
 
-    moduleNames
-      .append("text")
-      .attr("class", "name")
-      .attr("x", d => d.moduleName.textX)
-      .attr("y", d => d.moduleName.textY)
-      .attr("text-anchor", "end")
-      .attr("fill", "#999")
-      .attr("stroke", "white")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-width", 5)
-      .attr("paint-order", "stroke")
-      .attr("font-size", 9)
-      .attr("dominant-baseline", "central")
-      .selectAll("tspan")
-      .data(d => {
-        const numNodes = numVisibleModuleNames(d.height);
-        return d.largestLeafNodes.slice(0, numNodes).map(name => ({
-          name,
-          x: d.moduleName.textX
-        }));
-      })
-      .enter()
-      .append("tspan")
-      .text(d => d.name)
-      .attr("x", d => d.x)
-      .attr("dx", 3)
-      .attr("dy", (d, i, el) => (i === 0 ? (el.length - 1) * -5 : 10));
+    const bracketVertical = index => d =>
+      this.bracketVertical[index](d.moduleName.bracket[index]);
 
-    modules
-      .select(".moduleName")
-      .select(".bracket")
-      .transition(t)
-      .delay(networkNameUpdateDelay)
-      .attr("d", d => this.bracketVertical(d.moduleName));
+    for (let [index, moduleNames] of [
+      leftModuleNames,
+      rightModuleNames
+    ].entries()) {
+      moduleNames
+        .exit()
+        .transition(t)
+        .call(makeTransparent)
+        .remove();
 
-    modules
-      .select(".moduleName")
-      .select(".name")
-      .transition(t)
-      .delay(networkNameUpdateDelay)
-      .attr("x", d => d.moduleName.textX)
-      .attr("y", d => d.moduleName.textY);
+      const moduleNamesEnter = moduleNames
+        .enter()
+        .append("g")
+        .attr("class", "moduleName")
+        .call(makeTransparent);
 
-    modules
-      .select(".moduleName")
-      .select(".name")
-      .each(function(d) {
-        d3.select(this)
-          .selectAll("tspan")
-          .transition(t)
-          .delay(networkNameUpdateDelay)
-          .attr("x", d.moduleName.textX);
-      });
+      moduleNamesEnter
+        .transition(t)
+        .delay(delay)
+        .call(makeOpaque);
 
-    moduleNames
-      .transition(t)
-      .delay(delay)
-      .call(makeOpaque);
+      moduleNamesEnter
+        .append("path")
+        .attr("class", "bracket")
+        .attr("fill", "transparent")
+        .attr("stroke", "#999")
+        .attr("stroke-linecap", "round")
+        .attr("d", bracketVertical(index));
 
-    modules = modules.merge(modulesEnter);
+      moduleNamesEnter
+        .append("text")
+        .attr("text-anchor", index === 0 ? "end" : "start")
+        .attr("class", "name")
+        .attr("y", d => d.moduleName.textY)
+        .attr("fill", "#999")
+        .attr("stroke", "white")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 5)
+        .attr("paint-order", "stroke")
+        .attr("font-size", 9)
+        .attr("dominant-baseline", "central")
+        .selectAll("tspan")
+        .data(d =>
+          d.moduleName.largestLeafNodes
+            .slice(0, numVisibleModuleNames(d.height))
+            .map(name => ({
+              name,
+              x: d.moduleName.textX[index]
+            }))
+        )
+        .enter()
+        .append("tspan")
+        .text(d => d.name)
+        .attr("x", d => d.x)
+        .attr("dx", index === 0 ? 3 : -3)
+        .attr("dy", (d, i, el) => (i === 0 ? (el.length - 1) * -5 : 10));
+
+      moduleNames
+        .select(".bracket")
+        .transition(t)
+        .delay(networkNameUpdateDelay)
+        .attr("d", bracketVertical(index));
+
+      moduleNames
+        .select(".name")
+        .each(function(d) {
+          d3.select(this)
+            .selectAll("tspan")
+            .transition(t)
+            .delay(networkNameUpdateDelay)
+            .attr("x", d.moduleName.textX[index]);
+        })
+        .transition(t)
+        .delay(networkNameUpdateDelay)
+        .attr("y", d => d.moduleName.textY);
+    }
 
     /**
      * Groups

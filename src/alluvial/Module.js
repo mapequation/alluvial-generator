@@ -52,20 +52,39 @@ export default class Module extends AlluvialNodeBase {
   }
 
   asObject(): Object {
+    const { name, x: x1, y, height } = this;
+
+    const x2 = x1 + this.width;
+    const padding = 5;
+    const width = 15;
+    const textOffset = width + padding;
+    const textGap = Math.min(50, height - 30);
+
     return {
       ...super.asObject(),
       moduleLevel: this.moduleLevel,
       moduleId: this.moduleId,
-      name: this.name,
-      largestLeafNodes: this.getLargestLeafNodeNames(),
       moduleName: {
-        x: this.x - 5,
-        y: this.y,
-        width: 15,
-        height: this.height,
-        textGap: Math.min(50, this.height - 30),
-        textX: this.x - 15 - 5,
-        textY: this.y + this.height / 2
+        name: name,
+        largestLeafNodes: this.getLargestLeafNodeNames(),
+        bracket: [
+          {
+            x: x1 - padding,
+            y,
+            width,
+            height,
+            textGap
+          },
+          {
+            x: x2 + padding,
+            y,
+            width,
+            height,
+            textGap
+          }
+        ],
+        textX: [x1 - textOffset, x2 + textOffset],
+        textY: y + height / 2
       }
     };
   }

@@ -31,14 +31,15 @@ export function bracketHorizontal() {
   };
 }
 
-export function bracketVertical() {
+function bracketVertical(left = true) {
+  const sign = (-1) ** Number(left);
   return function bracket({ x, y, width, height, textGap = 0, radius = 2 }) {
     const r = Math.max(Math.min(width, height / 2, radius), 0);
     const gap = Math.min(height - 2 * r, textGap);
 
-    const x1 = x - width + r;
+    const x1 = x + sign * (width - r);
     const y1 = y;
-    const x2 = x - width;
+    const x2 = x + sign * width;
     const y2 = y + r;
     const x3 = x2;
     const y3 = y + height - r;
@@ -60,4 +61,12 @@ export function bracketVertical() {
     context.lineTo(x5, y5);
     return context.toString();
   };
+}
+
+export function bracketVerticalLeft() {
+  return bracketVertical();
+}
+
+export function bracketVerticalRight() {
+  return bracketVertical(false);
 }
