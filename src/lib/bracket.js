@@ -2,7 +2,7 @@ import { path } from "d3";
 
 export function bracketHorizontal() {
   return function bracket({ x, y, width, height, textGap = 0, radius = 2 }) {
-    const r = Math.min(height, radius);
+    const r = Math.max(Math.min(width / 2, height, radius), 0);
     const gap = Math.min(width - 2 * r, textGap);
 
     const x1 = x;
@@ -33,7 +33,7 @@ export function bracketHorizontal() {
 
 export function bracketVertical() {
   return function bracket({ x, y, width, height, textGap = 0, radius = 2 }) {
-    const r = Math.min(width, radius);
+    const r = Math.max(Math.min(width, height / 2, radius), 0);
     const gap = Math.min(height - 2 * r, textGap);
 
     const x1 = x - width + r;
