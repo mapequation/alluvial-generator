@@ -2,7 +2,7 @@
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
 import Branch, { LEFT, opposite, RIGHT } from "./Branch";
-import Depth from "./depth-constants";
+import Depth from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";

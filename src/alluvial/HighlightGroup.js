@@ -1,7 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
-import { HIGHLIGHT_GROUP } from "./depth-constants";
+import { HIGHLIGHT_GROUP } from "./Depth";
 import Module from "./Module";
 
 export const NOT_HIGHLIGHTED = -1;

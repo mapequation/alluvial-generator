@@ -3,7 +3,7 @@ import sortBy from "lodash/sortBy";
 
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import { BRANCH } from "./depth-constants";
+import { BRANCH } from "./Depth";
 import StreamlineNode from "./StreamlineNode";
 
 export type Side = -1 | 1;

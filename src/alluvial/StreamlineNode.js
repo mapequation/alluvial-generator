@@ -2,7 +2,7 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import Branch from "./Branch";
-import { STREAMLINE_NODE } from "./depth-constants";
+import { STREAMLINE_NODE } from "./Depth";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineId from "./StreamlineId";
 

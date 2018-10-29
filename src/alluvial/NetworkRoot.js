@@ -1,7 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
-import { NETWORK_ROOT } from "./depth-constants";
+import { NETWORK_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";

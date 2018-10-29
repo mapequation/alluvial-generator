@@ -2,7 +2,7 @@
 import sortBy from "lodash/sortBy";
 
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import { MODULE } from "./depth-constants";
+import { MODULE } from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import NetworkRoot from "./NetworkRoot";
 import TreePath from "../lib/treepath";

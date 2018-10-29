@@ -4,7 +4,7 @@ import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { LEFT } from "./Branch";
-import { LEAF_NODE } from "./depth-constants";
+import { LEAF_NODE } from "./Depth";
 import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {

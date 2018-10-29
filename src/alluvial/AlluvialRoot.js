@@ -1,6 +1,6 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import { ALLUVIAL_ROOT } from "./depth-constants";
+import { ALLUVIAL_ROOT } from "./Depth";
 import NetworkRoot from "./NetworkRoot";
 
 export default class AlluvialRoot extends AlluvialNodeBase {
