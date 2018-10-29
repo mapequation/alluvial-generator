@@ -23,6 +23,7 @@ export default class AlluvialDiagram extends React.Component {
     width: 1200,
     height: 600,
     streamlineFraction: 2,
+    maxModuleWidth: 300,
     duration: 200
   };
 
@@ -31,6 +32,7 @@ export default class AlluvialDiagram extends React.Component {
     height: PropTypes.number,
     streamlineFraction: PropTypes.number,
     networks: PropTypes.arrayOf(PropTypes.object),
+    maxModuleWidth: PropTypes.number,
     duration: PropTypes.number
   };
 
@@ -76,7 +78,13 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   update(prevProps = this.props) {
-    const { width, height, streamlineFraction, networks } = this.props;
+    const {
+      width,
+      height,
+      streamlineFraction,
+      networks,
+      maxModuleWidth
+    } = this.props;
     const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
     if (!this.diagram) {
@@ -107,8 +115,6 @@ export default class AlluvialDiagram extends React.Component {
         }
       }
     }
-
-    const maxModuleWidth = 300;
 
     this.diagram.calcLayout(
       width - 300,
