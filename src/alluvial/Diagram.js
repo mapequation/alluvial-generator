@@ -17,6 +17,8 @@ export default class Diagram {
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
   networksById: Map<string, NodesByName> = new Map();
   networkIndices: string[] = [];
+  dirty: boolean = true;
+  _asObject: Object = {};
 
   constructor(networks: Network[]) {
     networks.forEach(network => this.addNetwork(network));
@@ -82,6 +84,8 @@ export default class Diagram {
     const numNetworks = this.networkIndices.length;
 
     if (!numNetworks) return;
+
+    this.dirty = true;
 
     const width = Math.min(
       totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
@@ -227,7 +231,11 @@ export default class Diagram {
   }
 
   asObject(): Object {
-    return this.alluvialRoot.asObject();
+    if (this.dirty) {
+      this._asObject = this.alluvialRoot.asObject();
+      this.dirty = false;
+    }
+    return this._asObject;
   }
 
   addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {

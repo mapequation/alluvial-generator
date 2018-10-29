@@ -35,24 +35,28 @@ export default class AlluvialDiagram extends React.Component {
 
   componentDidMount() {
     this.svg = d3.select(this.node);
+    this.update();
     this.draw();
   }
 
   componentDidUpdate(prevProps) {
+    this.update(prevProps);
     this.draw(prevProps);
   }
 
-  draw(prevProps = this.props) {
-    const {
-      width,
-      height,
-      streamlineFraction,
-      duration,
-      networks
-    } = this.props;
+  propsChanged(prevProps) {
+    const { width, height, networks } = this.props;
+    return {
+      networkAdded: networks.length > prevProps.networks.length,
+      networkRemoved: networks.length < prevProps.networks.length,
+      widthChanged: width !== prevProps.width,
+      heightChanged: height !== prevProps.height
+    };
+  }
 
-    const networkAdded = networks.length > prevProps.networks.length;
-    const networkRemoved = networks.length < prevProps.networks.length;
+  update(prevProps = this.props) {
+    const { width, height, streamlineFraction, networks } = this.props;
+    const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
     if (!this.diagram) {
       this.diagram = new Diagram(
@@ -84,23 +88,32 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     const maxModuleWidth = 300;
+
     this.diagram.calcLayout(
       width - 300,
       height - 60,
       streamlineFraction,
       maxModuleWidth
     );
-    const alluvialRoot = this.diagram.asObject();
 
     console.log(this.diagram);
+  }
+
+  draw(prevProps = this.props) {
+    const { width, height, duration } = this.props;
+    const {
+      networkAdded,
+      networkRemoved,
+      widthChanged,
+      heightChanged
+    } = this.propsChanged(prevProps);
+
+    const alluvialRoot = this.diagram.asObject();
 
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    const svgTransitionDelay =
-      width !== prevProps.width || height !== prevProps.height
-        ? 0.5 * delay
-        : 0;
+    const svgTransitionDelay = widthChanged || heightChanged ? 0.5 * delay : 0;
 
     this.svg
       .transition(t)
@@ -116,6 +129,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const onDoubleClick = d => {
       this.diagram.doubleClick(d, d3.event.shiftKey);
+      this.update();
       this.draw();
     };
 
