@@ -51,10 +51,10 @@ export default class AlluvialNodeBase {
     this.id = id;
   }
 
-  getAncestor(steps: number): ?AlluvialNode {
-    if (steps === 0) return this;
-    if (!this.parent) return null;
-    return this.parent.getAncestor(steps - 1);
+  getAncestor(depth: Depth): ?AlluvialNode {
+    if (this.depth === depth) return this;
+    if (!this.parent || this.depth < depth) return null;
+    return this.parent.getAncestor(depth);
   }
 
   get depth(): number {

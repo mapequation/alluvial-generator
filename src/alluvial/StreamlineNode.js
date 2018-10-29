@@ -2,7 +2,7 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import Branch from "./Branch";
-import { STREAMLINE_NODE } from "./Depth";
+import { STREAMLINE_NODE, MODULE } from "./Depth";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineId from "./StreamlineId";
 
@@ -45,7 +45,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   byOppositeStreamlinePosition(moduleFlowThreshold: number = 1e-2) {
     const opposite = this.getOppositeStreamlineNode();
     if (!opposite) return -Infinity;
-    const module = opposite.getAncestor(3);
+    const module = opposite.getAncestor(MODULE);
     if (!module || module.flow < moduleFlowThreshold) return -Infinity;
     return -module.y;
   }

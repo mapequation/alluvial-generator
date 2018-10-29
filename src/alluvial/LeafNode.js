@@ -1,6 +1,5 @@
 // @flow
 import TreePath from "../lib/treepath";
-import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { LEFT } from "./Branch";
@@ -42,11 +41,12 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.ancestorAtLevel(this.moduleLevel);
   }
 
-  getAncestor(steps: number): ?AlluvialNode {
-    if (steps === 0) return this;
-    const parent = this.leftParent || this.rightParent;
-    if (!parent) return null;
-    return parent.getAncestor(steps - 1);
+  set parent(parent: ?StreamlineNode) {
+    this.leftParent = this.rightParent = parent;
+  }
+
+  get parent(): ?StreamlineNode {
+    return this.leftParent || this.rightParent;
   }
 
   getParent(side: Side): ?StreamlineNode {

@@ -1,7 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
-import { NETWORK_ROOT } from "./Depth";
+import { NETWORK_ROOT, MODULE } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
@@ -77,7 +77,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
           if (!oppositeStreamlineNode) continue;
-          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(3);
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)
             continue;
           if (streamlineNode.link) yield streamlineNode.link;
