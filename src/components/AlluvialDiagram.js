@@ -332,7 +332,6 @@ export default class AlluvialDiagram extends React.Component {
       .remove();
 
     streamlines
-      .lower()
       .transition(t)
       .delay(streamlineUpdateDelay)
       .call(setOpacity, 0.5)
@@ -341,7 +340,6 @@ export default class AlluvialDiagram extends React.Component {
     streamlines
       .enter()
       .append("path")
-      .lower()
       .attr("class", "streamline")
       .on("click", onClick)
       .call(LinearGradients.fill)
