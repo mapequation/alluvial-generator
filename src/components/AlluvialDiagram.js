@@ -443,14 +443,10 @@ export default class AlluvialDiagram extends React.Component {
 
       moduleNamesEnter
         .append("text")
-        .attr("text-anchor", index === 0 ? "end" : "start")
+        .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
         .attr("y", d => d.moduleName.textY)
         .attr("fill", "#999")
-        .attr("stroke", "white")
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-width", 5)
-        .attr("paint-order", "stroke")
         .attr("font-size", 9)
         .attr("dominant-baseline", "central")
         .selectAll("tspan")
@@ -466,7 +462,7 @@ export default class AlluvialDiagram extends React.Component {
         .append("tspan")
         .text(d => d.name)
         .attr("x", d => d.x)
-        .attr("dx", index === 0 ? 3 : -3)
+        .attr("dx", [3, -3][index])
         .attr("dy", (d, i, el) => (i === 0 ? (el.length - 1) * -5 : 10));
 
       moduleNames

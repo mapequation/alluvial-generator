@@ -58,7 +58,7 @@ export default class Module extends AlluvialNodeBase {
     const padding = 5;
     const width = 15;
     const textOffset = width + padding;
-    const textGap = Math.min(50, height - 30);
+    const size = { y, width, height };
 
     return {
       ...super.asObject(),
@@ -67,22 +67,7 @@ export default class Module extends AlluvialNodeBase {
       moduleName: {
         name: name,
         largestLeafNodes: this.getLargestLeafNodeNames(),
-        bracket: [
-          {
-            x: x1 - padding,
-            y,
-            width,
-            height,
-            textGap
-          },
-          {
-            x: x2 + padding,
-            y,
-            width,
-            height,
-            textGap
-          }
-        ],
+        bracket: [{ x: x1 - padding, ...size }, { x: x2 + padding, ...size }],
         textX: [x1 - textOffset, x2 + textOffset],
         textY: y + height / 2
       }
