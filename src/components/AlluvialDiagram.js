@@ -458,7 +458,6 @@ export default class AlluvialDiagram extends React.Component {
         .attr("y", d => d.moduleName.textY)
         .attr("fill", "#999")
         .attr("font-size", 9)
-        .attr("dominant-baseline", "central")
         .selectAll("tspan")
         .data(d =>
           d.moduleName.largestLeafNodes
@@ -473,7 +472,14 @@ export default class AlluvialDiagram extends React.Component {
         .text(d => d.name)
         .attr("x", d => d.x)
         .attr("dx", [3, -3][index])
-        .attr("dy", (d, i, el) => (i === 0 ? (el.length - 1) * -5 : 10));
+        .attr("dy", (d, i, nodes) => {
+          const n = nodes.length;
+          return n === 1
+            ? "0.35em"
+            : i === 0
+              ? `${-0.6 * (n - 1) + 0.35}em`
+              : "1.2em";
+        });
 
       moduleNames
         .select(".bracket")
