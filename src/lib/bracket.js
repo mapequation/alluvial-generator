@@ -41,7 +41,7 @@ function bracketVertical(left = true) {
     const maxRadius = Math.min(width, height / 2);
     radius = clamp(radius, 1, maxRadius);
 
-    let gap = Math.min(60, height - 2 * radius);
+    let gap = clamp(height - 2 * radius, 0, 60);
 
     const x1 = x + sign * (width - radius);
     const y1 = y;
@@ -56,24 +56,15 @@ function bracketVertical(left = true) {
 
     const context = path();
 
-    if (height < width + 3) {
-      const textPadding = sign * 4;
-      context.moveTo(x, y);
-      context.lineTo(x1 - textPadding, y1);
-      context.moveTo(x1 - textPadding, y4);
-      context.lineTo(x5, y5);
-    } else {
-      context.moveTo(x, y);
-      context.lineTo(x1, y1);
-      context.arcTo(x2, y1, x2, y2, radius);
-      if (gap > 0) {
-        context.lineTo(x2, y + (height - gap) / 2);
-        context.moveTo(x2, y + (height + gap) / 2);
-      }
-      context.lineTo(x3, y3);
-      context.arcTo(x3, y4, x4, y4, radius);
-      context.lineTo(x5, y5);
-    }
+    context.moveTo(x, y);
+    context.lineTo(x1, y1);
+    context.arcTo(x2, y1, x2, y2, radius);
+    context.lineTo(x2, y + (height - gap) / 2);
+
+    context.moveTo(x5, y5);
+    context.lineTo(x4, y4);
+    context.arcTo(x3, y4, x3, y3, radius);
+    context.lineTo(x2, y + (height + gap) / 2);
 
     return context.toString();
   };

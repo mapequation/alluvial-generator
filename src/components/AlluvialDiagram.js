@@ -406,11 +406,20 @@ export default class AlluvialDiagram extends React.Component {
 
     const numVisibleModuleNames = d3
       .scaleQuantize()
-      .domain([20, 150])
+      .domain([20, 120])
       .range([1, 2, 3, 4]);
 
     const bracketVertical = index => d =>
       this.bracketVertical[index](d.moduleName.bracket[index]);
+
+    const bracketDasharray = index => d => {
+      const { width, height } = d.moduleName.bracket[index];
+      const array =
+        height < width + 3
+          ? [width - 5, height + 10, width - 5, 0, height]
+          : [width + height / 2, 0, width + height / 2, 0, width];
+      return array.join(" ");
+    };
 
     for (let [index, moduleNames] of [
       leftModuleNames,
@@ -439,6 +448,7 @@ export default class AlluvialDiagram extends React.Component {
         .attr("fill", "transparent")
         .attr("stroke", "#999")
         .attr("stroke-linecap", "round")
+        .attr("stroke-dasharray", bracketDasharray(index))
         .attr("d", bracketVertical(index));
 
       moduleNamesEnter
@@ -469,6 +479,7 @@ export default class AlluvialDiagram extends React.Component {
         .select(".bracket")
         .transition(t)
         .delay(networkNameUpdateDelay)
+        .attr("stroke-dasharray", bracketDasharray(index))
         .attr("d", bracketVertical(index));
 
       moduleNames
