@@ -12,6 +12,11 @@ import StreamlineNode from "./StreamlineNode";
 
 type NodesByName = Map<string, LeafNode>;
 
+type Event = {
+  altKey: boolean,
+  shiftKey: boolean
+};
+
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
@@ -65,13 +70,16 @@ export default class Diagram {
     return this.networksById.has(networkId);
   }
 
-  doubleClick(alluvialNode: Object, shiftKey: boolean = false) {
+  doubleClick(alluvialNode: Object, event: Event) {
+    const { shiftKey, altKey } = event;
     if (alluvialNode.depth === Depth.MODULE) {
-      if (shiftKey) {
-        this.regroupModule(alluvialNode.moduleId, alluvialNode.networkId);
-      } else {
-        this.expandModule(alluvialNode.moduleId, alluvialNode.networkId);
-      }
+      const regroupOrExpand = (shiftKey
+        ? this.regroupModule
+        : this.expandModule
+      ).bind(this);
+
+      const ids = altKey ? this.networkIndices : [alluvialNode.networkId];
+      ids.forEach(id => regroupOrExpand(alluvialNode.moduleId, id));
     }
   }
 
