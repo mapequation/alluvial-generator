@@ -406,7 +406,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const numVisibleModuleNames = d3
       .scaleQuantize()
-      .domain([20, 120])
+      .domain([20, 100])
       .range([1, 2, 3, 4]);
 
     const bracketVertical = index => d =>
@@ -420,6 +420,13 @@ export default class AlluvialDiagram extends React.Component {
           : [width + height / 2, 0, width + height / 2, 0, width];
       return array.join(" ");
     };
+
+    const tspanDy = (d, i, nodes) =>
+      nodes.length === 1
+        ? "0.35em"
+        : i === 0
+          ? `${-0.6 * (nodes.length - 1) + 0.35}em`
+          : "1.2em";
 
     for (let [index, moduleNames] of [
       leftModuleNames,
@@ -457,29 +464,7 @@ export default class AlluvialDiagram extends React.Component {
         .attr("class", "name")
         .attr("y", d => d.moduleName.textY)
         .attr("fill", "#999")
-        .attr("font-size", 9)
-        .selectAll("tspan")
-        .data(d =>
-          d.moduleName.largestLeafNodes
-            .slice(0, numVisibleModuleNames(d.height))
-            .map(name => ({
-              name,
-              x: d.moduleName.textX[index]
-            }))
-        )
-        .enter()
-        .append("tspan")
-        .text(d => d.name)
-        .attr("x", d => d.x)
-        .attr("dx", [3, -3][index])
-        .attr("dy", (d, i, nodes) => {
-          const n = nodes.length;
-          return n === 1
-            ? "0.35em"
-            : i === 0
-              ? `${-0.6 * (n - 1) + 0.35}em`
-              : "1.2em";
-        });
+        .attr("font-size", 9);
 
       moduleNames
         .select(".bracket")
@@ -500,6 +485,43 @@ export default class AlluvialDiagram extends React.Component {
         .transition(t)
         .delay(networkNameUpdateDelay)
         .attr("y", d => d.moduleName.textY);
+
+      moduleNames = moduleNamesEnter.merge(moduleNames);
+
+      const moduleNamesTspan = moduleNames
+        .selectAll(".name")
+        .selectAll("tspan")
+        .data(
+          d =>
+            d.moduleName.largestLeafNodes
+              .slice(0, numVisibleModuleNames(d.height))
+              .map(name => ({
+                name,
+                x: d.moduleName.textX[index]
+              })),
+          function(d) {
+            return d ? d.name : this.id;
+          }
+        );
+
+      moduleNamesTspan
+        .exit()
+        .transition(t)
+        .call(makeTransparent)
+        .remove();
+
+      moduleNamesTspan
+        .enter()
+        .append("tspan")
+        .text(d => d.name)
+        .attr("x", d => d.x)
+        .attr("dx", [3, -3][index])
+        .attr("dy", tspanDy)
+        .call(makeTransparent)
+        .merge(moduleNamesTspan)
+        .transition(t)
+        .call(makeOpaque)
+        .attr("dy", tspanDy);
     }
 
     /**
