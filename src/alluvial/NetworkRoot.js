@@ -1,7 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
-import { NETWORK_ROOT, MODULE } from "./Depth";
+import { MODULE, NETWORK_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
@@ -79,7 +79,9 @@ export default class NetworkRoot extends AlluvialNodeBase {
           // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
           if (!oppositeStreamlineNode) continue;
-          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(
+            MODULE
+          );
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)
             continue;
           if (streamlineNode.link) yield streamlineNode.link;
@@ -89,7 +91,13 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   sortChildren() {
-    function flatten(arr) {
+    type TreeNode = {
+      path: number,
+      flow: number,
+      nodes: Array<any>
+    };
+
+    function flatten(arr: TreeNode) {
       return arr.nodes.reduce(function(flat, toFlatten) {
         return flat.concat(
           Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten
@@ -97,8 +105,8 @@ export default class NetworkRoot extends AlluvialNodeBase {
       }, []);
     }
 
-    const tree = {
-      path: "",
+    const tree: TreeNode = {
+      path: 0,
       flow: 0,
       nodes: []
     };
