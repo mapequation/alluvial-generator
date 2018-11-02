@@ -404,7 +404,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const numVisibleModuleNames = d3
       .scaleQuantize()
-      .domain([20, 100])
+      .domain([0, 100])
       .range([1, 2, 3, 4]);
 
     const bracketVertical = index => d =>
