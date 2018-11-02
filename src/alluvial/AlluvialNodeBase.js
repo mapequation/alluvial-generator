@@ -102,6 +102,13 @@ export default class AlluvialNodeBase {
     // no-op
   }
 
+  /*:: @@iterator(): Iterator<AlluvialNode> { return this.children.values() } */
+
+  // $FlowFixMe - computed property
+  [Symbol.iterator](): Iterator<AlluvialNode> {
+    return this.children.values();
+  }
+
   asObject(): Object {
     return {
       id: this.id,
@@ -123,13 +130,13 @@ export default class AlluvialNodeBase {
 
   *traverseDepthFirstPreOrder(): Iterable<AlluvialNode> {
     yield this;
-    for (let child of this.children) {
+    for (let child of this) {
       yield* child.traverseDepthFirstPreOrder();
     }
   }
 
   *traverseDepthFirstPostOrder(): Iterable<AlluvialNode> {
-    for (let child of this.children) {
+    for (let child of this) {
       yield* child.traverseDepthFirstPostOrder();
     }
     yield this;
@@ -151,7 +158,7 @@ export default class AlluvialNodeBase {
   ): Iterable<AlluvialNode> {
     if (!predicate(this)) return;
     yield this;
-    for (let child of this.children) {
+    for (let child of this) {
       yield* child.traverseDepthFirstPreOrderWhile(predicate);
     }
   }
@@ -160,7 +167,7 @@ export default class AlluvialNodeBase {
     predicate: Predicate<AlluvialNode>
   ): Iterable<AlluvialNode> {
     if (!predicate(this)) return;
-    for (let child of this.children) {
+    for (let child of this) {
       yield* child.traverseDepthFirstPostOrderWhile(predicate);
     }
     yield this;

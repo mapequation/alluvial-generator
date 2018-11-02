@@ -263,7 +263,7 @@ export default class Diagram {
     module.flow += node.flow;
     group.flow += node.flow;
 
-    for (let branch of group.children) {
+    for (let branch of group) {
       branch.flow += node.flow;
 
       const oppositeNode = this.getOppositeNode(node, branch.side);

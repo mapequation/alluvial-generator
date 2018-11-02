@@ -71,11 +71,11 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   *rightStreamlines(): Iterable<StreamlineLink> {
-    for (let module of this.children) {
+    for (let module of this) {
       // Skip if left module if below threshold
       if (module.flow < this.flowThreshold) continue;
-      for (let group of module.children) {
-        for (let streamlineNode of group.right.children) {
+      for (let group of module) {
+        for (let streamlineNode of group.right) {
           // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
           if (!oppositeStreamlineNode) continue;
