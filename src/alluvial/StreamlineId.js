@@ -12,7 +12,9 @@ export default class StreamlineId {
 
     if (!this.isValid()) {
       const andTarget = target ? ` and target ${target}` : "";
-      throw new Error(`Incorrect id with source ${source}${andTarget}.`);
+      throw new Error(
+        `Invalid streamline id with source ${source}${andTarget}.`
+      );
     }
   }
 
