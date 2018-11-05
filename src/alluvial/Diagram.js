@@ -109,13 +109,24 @@ export default class Diagram {
 
     const networkTotalMargins = [];
 
+    const differenceIndex = (array1, array2) => {
+      let differenceIndex = 0;
+      const minLength = Math.min(array1.length, array2.length);
+      for (let i = 0; i < minLength; i++) {
+        if (array1[i] === array2[i]) continue;
+        differenceIndex = i;
+        break;
+      }
+      return differenceIndex;
+    };
+
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
     this.alluvialRoot.forEachDepthFirstPreOrderWhile(
       node =>
         node.depth < Depth.MODULE ||
         (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
-      (node, i, children) => {
+      (node, i, nodes) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
             currentFlowThreshold = node.flowThreshold;
@@ -126,20 +137,12 @@ export default class Diagram {
             break;
           case Depth.MODULE:
             node.sortChildren();
-            let margin = 0;
-            const next = i + 1 !== children.length ? children[i + 1] : null;
-            if (next) {
-              let differenceIndex = 0;
-              let minLength = Math.min(node.path.length, next.path.length);
-              for (let j = 0; j < minLength; j++) {
-                if (node.path[j] === next.path[j]) continue;
-                differenceIndex = j;
-                break;
-              }
-              margin = 2 ** (5 - differenceIndex);
-            }
-            node.margin = margin;
+            const margin =
+              i + 1 < nodes.length
+                ? 2 ** (5 - differenceIndex(node.path, nodes[i + 1].path))
+                : 0;
             y -= node.flow * height;
+            node.margin = margin;
             node.layout = { x, y, width, height: node.flow * height };
             y -= margin;
             networkTotalMargins[networkTotalMargins.length - 1] += margin;
