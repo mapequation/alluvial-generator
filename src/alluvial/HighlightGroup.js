@@ -1,4 +1,5 @@
 // @flow
+import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP } from "./Depth";
@@ -50,5 +51,9 @@ export default class HighlightGroup extends AlluvialNodeBase {
 
   get isEmpty(): boolean {
     return this.left.isEmpty && this.right.isEmpty;
+  }
+
+  *leafNodes(): Iterable<AlluvialNode> {
+    yield* this.left.leafNodes();
   }
 }

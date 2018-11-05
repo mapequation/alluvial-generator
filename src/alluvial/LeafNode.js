@@ -1,5 +1,6 @@
 // @flow
 import TreePath from "../lib/treepath";
+import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { LEFT } from "./Branch";
@@ -70,5 +71,9 @@ export default class LeafNode extends AlluvialNodeBase {
 
   get depth(): number {
     return LEAF_NODE;
+  }
+
+  *leafNodes(): Iterable<AlluvialNode> {
+    yield this;
   }
 }

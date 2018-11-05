@@ -1,5 +1,4 @@
 // @flow
-import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
 import type { Depth } from "./Depth";
 
 type Position = {
@@ -274,17 +273,8 @@ export default class AlluvialNodeBase {
       this.forEachDepthFirstPostOrderWhile(predicate, callback);
   }
 
-  /*
-  Note: If starting above the branching level, it only traverses leaf nodes
-  of the left branch to not duplicate leaf nodes.
-  */
   *leafNodes(): Iterable<AlluvialNode> {
-    if (this.depth === LEAF_NODE) {
-      yield this;
-    }
-    const children =
-      this.depth === HIGHLIGHT_GROUP ? [this.children[0]] : this.children;
-    for (let child of children) {
+    for (let child of this) {
       yield* child.leafNodes();
     }
   }
