@@ -1,7 +1,7 @@
 // @flow
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Branch";
-import Branch, { LEFT, opposite, RIGHT } from "./Branch";
+import Branch, { LEFT, opposite, RIGHT, sideToString } from "./Branch";
 import Depth from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
@@ -326,7 +326,7 @@ export default class Diagram {
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
     if (!oldStreamlineNode) {
-      console.warn(`Node ${node.name} has no parent on side ${side}`);
+      console.warn(`Node ${node.id} has no ${sideToString[side]} parent`);
       return;
     }
     const branch: ?Branch = oldStreamlineNode.parent;
@@ -365,9 +365,7 @@ export default class Diagram {
     const group = this.removeNodeFromSide(node, RIGHT);
 
     if (!group) {
-      console.warn(
-        `Node ${node.name} was removed without belonging to a group.`
-      );
+      console.warn(`Node ${node.id} was removed without belonging to a group.`);
       return;
     }
     group.flow -= node.flow;
@@ -376,7 +374,7 @@ export default class Diagram {
     const module: ?Module = group.parent;
     if (!module) {
       console.warn(
-        `Node ${node.name} was removed without belonging to a module.`
+        `Node ${node.id} was removed without belonging to a module.`
       );
       return;
     }
@@ -389,7 +387,7 @@ export default class Diagram {
     const networkRoot: ?NetworkRoot = module.parent;
     if (!networkRoot) {
       console.warn(
-        `Node ${node.name} was removed without belonging to a network root.`
+        `Node ${node.id} was removed without belonging to a network root.`
       );
       return;
     }
@@ -409,7 +407,7 @@ export default class Diagram {
   removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
     const streamlineNode = node.getParent(side);
     if (!streamlineNode) {
-      console.warn(`Node ${node.name} has no parent on side ${side}`);
+      console.warn(`Node ${node.id} has no ${sideToString[side]} parent`);
       return;
     }
     streamlineNode.removeChild(node);
