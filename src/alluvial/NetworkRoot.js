@@ -2,7 +2,6 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
-import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
@@ -22,8 +21,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.children.find(module => module.moduleId === moduleId);
   }
 
-  getOrCreateModule(node: LeafNode, moduleLevel: number): Module {
-    const moduleId = node.ancestorAtLevel(moduleLevel);
+  getOrCreateModule(moduleId: string, moduleLevel: number): Module {
     let module = this.getModule(moduleId);
     if (!module) {
       module = new Module(this.networkId, this, moduleId, moduleLevel);

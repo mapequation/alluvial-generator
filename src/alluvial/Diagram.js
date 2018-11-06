@@ -258,7 +258,8 @@ export default class Diagram {
       return;
     }
 
-    const module = root.getOrCreateModule(node, moduleLevel);
+    const moduleId = node.ancestorAtLevel(moduleLevel);
+    const module = root.getOrCreateModule(moduleId, moduleLevel);
     const group = module.getOrCreateGroup(node.highlightIndex);
 
     this.alluvialRoot.flow += node.flow;
