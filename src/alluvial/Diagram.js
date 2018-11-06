@@ -252,18 +252,21 @@ export default class Diagram {
   addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
-    const root: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!root) {
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
+      networkId
+    );
+    if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;
     }
 
+    this.alluvialRoot.flow += node.flow;
+    networkRoot.flow += node.flow;
+
     const moduleId = node.ancestorAtLevel(moduleLevel);
-    const module = root.getOrCreateModule(moduleId, moduleLevel);
+    const module = networkRoot.getOrCreateModule(moduleId, moduleLevel);
     const group = module.getOrCreateGroup(node.highlightIndex);
 
-    this.alluvialRoot.flow += node.flow;
-    root.flow += node.flow;
     module.flow += node.flow;
     group.flow += node.flow;
 
@@ -361,12 +364,22 @@ export default class Diagram {
     this.removeNodeFromSide(node, LEFT);
     const group = this.removeNodeFromSide(node, RIGHT);
 
-    if (!group) return;
+    if (!group) {
+      console.warn(
+        `Node ${node.name} was removed without belonging to a group.`
+      );
+      return;
+    }
     group.flow -= node.flow;
     // No need to remove branches here
 
     const module: ?Module = group.parent;
-    if (!module) return;
+    if (!module) {
+      console.warn(
+        `Node ${node.name} was removed without belonging to a module.`
+      );
+      return;
+    }
     module.flow -= node.flow;
 
     if (group.isEmpty) {
@@ -374,7 +387,12 @@ export default class Diagram {
     }
 
     const networkRoot: ?NetworkRoot = module.parent;
-    if (!networkRoot) return;
+    if (!networkRoot) {
+      console.warn(
+        `Node ${node.name} was removed without belonging to a network root.`
+      );
+      return;
+    }
     networkRoot.flow -= node.flow;
 
     if (module.isEmpty) {
@@ -391,7 +409,7 @@ export default class Diagram {
   removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
     const streamlineNode = node.getParent(side);
     if (!streamlineNode) {
-      console.warn(`Leaf node ${node.name} has no parent on side ${side}`);
+      console.warn(`Node ${node.name} has no parent on side ${side}`);
       return;
     }
     streamlineNode.removeChild(node);
