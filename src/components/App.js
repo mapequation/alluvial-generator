@@ -28,8 +28,8 @@ export default class App extends React.Component {
       visibleNetworks.length + amount > networks.length
         ? networks
         : visibleNetworks.length + amount < 0
-          ? visibleNetworks
-          : networks.slice(0, visibleNetworks.length + amount)
+        ? visibleNetworks
+        : networks.slice(0, visibleNetworks.length + amount)
   });
 
   componentDidMount() {
@@ -56,11 +56,13 @@ export default class App extends React.Component {
         Promise.all(files.map(file => papaParsePromise(file, parseOpts)))
       )
       .then(parsed => {
-        parsed.map(_ => _.errors).forEach(_ =>
-          _.forEach(err => {
-            throw err;
-          })
-        );
+        parsed
+          .map(_ => _.errors)
+          .forEach(_ =>
+            _.forEach(err => {
+              throw err;
+            })
+          );
         return parsed.map((each, i) => ({
           name: networks[i],
           ...parseFTree(each.data)

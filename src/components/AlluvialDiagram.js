@@ -423,8 +423,8 @@ export default class AlluvialDiagram extends React.Component {
       nodes.length === 1
         ? "0.35em"
         : i === 0
-          ? `${-0.6 * (nodes.length - 1) + 0.35}em`
-          : "1.2em";
+        ? `${-0.6 * (nodes.length - 1) + 0.35}em`
+        : "1.2em";
 
     const moduleNameUpdateDelay = networkNameUpdateDelay;
 

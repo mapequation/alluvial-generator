@@ -78,7 +78,7 @@ export default class StreamlineLink {
         h1: 0
       },
       leftHighlightIndex,
-      rightHighlightIndex,
+      rightHighlightIndex
     };
   }
 }
