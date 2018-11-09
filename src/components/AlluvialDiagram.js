@@ -426,6 +426,8 @@ export default class AlluvialDiagram extends React.Component {
           ? `${-0.6 * (nodes.length - 1) + 0.35}em`
           : "1.2em";
 
+    const moduleNameUpdateDelay = networkNameUpdateDelay;
+
     for (let [index, moduleNames] of [
       leftModuleNames,
       rightModuleNames
@@ -467,7 +469,7 @@ export default class AlluvialDiagram extends React.Component {
       moduleNames
         .select(".bracket")
         .transition(t)
-        .delay(networkNameUpdateDelay)
+        .delay(moduleNameUpdateDelay)
         .attr("stroke-dasharray", bracketDasharray(index))
         .attr("d", bracketVertical(index));
 
@@ -477,11 +479,11 @@ export default class AlluvialDiagram extends React.Component {
           d3.select(this)
             .selectAll("tspan")
             .transition(t)
-            .delay(networkNameUpdateDelay)
+            .delay(moduleNameUpdateDelay)
             .attr("x", d.moduleName.textX[index]);
         })
         .transition(t)
-        .delay(networkNameUpdateDelay)
+        .delay(moduleNameUpdateDelay)
         .attr("y", d => d.moduleName.textY);
 
       moduleNames = moduleNamesEnter.merge(moduleNames);
