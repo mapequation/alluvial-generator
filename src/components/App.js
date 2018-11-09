@@ -100,13 +100,15 @@ export default class App extends React.Component {
         />
         <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
           {loadingComplete && (
-            <AlluvialDiagram
-              networks={this.state.visibleNetworks}
-              width={this.state.width}
-              height={this.state.height}
-              streamlineFraction={+this.state.streamlineFraction}
-              duration={+this.state.duration}
-            />
+            <React.StrictMode>
+              <AlluvialDiagram
+                networks={this.state.visibleNetworks}
+                width={this.state.width}
+                height={this.state.height}
+                streamlineFraction={+this.state.streamlineFraction}
+                duration={+this.state.duration}
+              />
+            </React.StrictMode>
           )}
           {!loadingComplete && <div>Loading...</div>}
         </Sidebar.Pusher>
