@@ -57,13 +57,16 @@ const parseExpanded = (row: Row): Node => ({
 const parseNode = (row: Row): Node =>
   expanded(row) ? parseExpanded(row) : parse(row);
 
+const toStringOrDefault = (value, defaultValue = "") =>
+  value ? value.toString() : defaultValue.toString();
+
 const parseModulesSection = (row: Row): Module => ({
   path: row[1].toString(),
   exitFlow: +row[2],
   numEdges: +row[3],
   numChildren: +row[4],
-  flow: +row[5],
-  name: row[6].toString(),
+  flow: +row[5] || 0,
+  name: toStringOrDefault(row[6]),
   links: []
 });
 
