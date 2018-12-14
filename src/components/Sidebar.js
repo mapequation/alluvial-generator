@@ -9,6 +9,8 @@ import {
 } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 
+export const { Pushable, Pusher } = SemanticSidebar;
+
 export default function Sidebar(props) {
   return (
     <SemanticSidebar

@@ -1,10 +1,9 @@
 import React from "react";
-import { Sidebar } from "semantic-ui-react";
 
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 import AlluvialDiagram from "./AlluvialDiagram";
-import MySidebar from "./Sidebar";
+import MySidebar, { Pushable, Pusher } from "./Sidebar";
 
 export default class App extends React.Component {
   state = {
@@ -77,7 +76,7 @@ export default class App extends React.Component {
     const loadingComplete = networks.length > 0;
 
     return (
-      <Sidebar.Pushable>
+      <Pushable>
         <MySidebar
           numVisibleNetworks={this.state.visibleNetworks.length}
           numNetworks={this.state.networks.length}
@@ -98,7 +97,7 @@ export default class App extends React.Component {
           duration={this.state.duration}
           onDurationChange={duration => this.setState({ duration })}
         />
-        <Sidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
+        <Pusher style={{ overflow: "hidden", height: "100vh" }}>
           {loadingComplete && (
             <React.StrictMode>
               <AlluvialDiagram
@@ -111,8 +110,8 @@ export default class App extends React.Component {
             </React.StrictMode>
           )}
           {!loadingComplete && <div>Loading...</div>}
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
+        </Pusher>
+      </Pushable>
     );
   }
 }
