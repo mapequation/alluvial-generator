@@ -4,6 +4,8 @@ import { Button, Divider, Icon, Segment, Table } from "semantic-ui-react";
 
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
+import parseTree from "../io/parse-tree";
+import parseMap from "../io/parse-map";
 
 function humanFileSize(bytes, si) {
   const thresh = si ? 1000 : 1024;
@@ -46,7 +48,13 @@ export default class FileLoadingScreen extends React.Component {
     loading: false
   };
 
-  validExtensions = ["ftree"];
+  validExtensions = ["map", "tree", "ftree"];
+
+  networkParsers = {
+    map: parseMap,
+    tree: parseTree,
+    ftree: parseFTree
+  };
 
   exampleNetworks = [
     "science1998_2y.ftree",
@@ -110,12 +118,20 @@ export default class FileLoadingScreen extends React.Component {
   parseNetworks = () => {
     const { files } = this.state;
 
-    const networks = files.map(file => ({
-      name: file.name,
-      size: file.size,
-      format: file.format,
-      ...parseFTree(file.parsed.data)
-    }));
+    const networks = files.map(file => {
+      try {
+        const parser = this.networkParsers[file.format];
+
+        return {
+          name: file.name,
+          size: file.size,
+          format: file.format,
+          ...parser(file.parsed.data)
+        };
+      } catch (e) {
+        throw `No parser found for format ${file.format}`;
+      }
+    });
 
     this.props.onSubmit(networks);
   };

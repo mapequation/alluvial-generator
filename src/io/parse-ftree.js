@@ -1,31 +1,7 @@
 // @flow
 import id from "../lib/id";
-
-type Row = string[];
-
-export type Node = {
-  +path: string,
-  +flow: number,
-  +name: string,
-  +node: number,
-  +stateNode?: number
-};
-
-export type Link = {
-  +source: number,
-  +target: number,
-  +flow: number
-};
-
-export type Module = {
-  +path: string,
-  +exitFlow: number,
-  +numEdges: number,
-  +numChildren: number,
-  +flow: number,
-  +name: string,
-  +links: Link[]
-};
+import type { Module, Node, Row } from "./network-types";
+import { expanded, parseNode } from "./parse-tree";
 
 export type FTree = {
   +data: {
@@ -39,23 +15,6 @@ export type FTree = {
   },
   +errors: string[]
 };
-
-const expanded = row => row.length === 5;
-
-const parse = (row: Row): Node => ({
-  path: row[0].toString(),
-  flow: +row[1],
-  name: row[2].toString(),
-  node: +row[row.length - 1]
-});
-
-const parseExpanded = (row: Row): Node => ({
-  ...parse(row),
-  stateNode: +row[3]
-});
-
-const parseNode = (row: Row): Node =>
-  expanded(row) ? parseExpanded(row) : parse(row);
 
 const toStringOrDefault = (value, defaultValue = "") =>
   value ? value.toString() : defaultValue.toString();
