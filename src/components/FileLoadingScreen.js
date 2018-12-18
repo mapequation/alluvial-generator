@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, Divider, Icon, Segment, Table } from "semantic-ui-react";
+import { Button, Icon, Segment, Table } from "semantic-ui-react";
 
 import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
@@ -39,7 +39,7 @@ const parsePromises = files => {
 const fileExtension = filename => {
   const index = filename.lastIndexOf(".");
   if (index === -1 || index + 1 === filename.length) return "";
-  return filename.substring(index + 1);
+  return filename.substring(index + 1).toLowerCase();
 };
 
 export default class FileLoadingScreen extends React.Component {
@@ -48,13 +48,13 @@ export default class FileLoadingScreen extends React.Component {
     loading: false
   };
 
-  validExtensions = ["map", "tree", "ftree"];
-
   networkParsers = {
     map: parseMap,
     tree: parseTree,
     ftree: parseFTree
   };
+
+  validExtensions = Object.keys(this.networkParsers);
 
   exampleNetworks = [
     "science1998_2y.ftree",
@@ -121,15 +121,16 @@ export default class FileLoadingScreen extends React.Component {
     const networks = files.map(file => {
       try {
         const parser = this.networkParsers[file.format];
+        const parsed = parser(file.parsed.data);
 
         return {
           name: file.name,
           size: file.size,
           format: file.format,
-          ...parser(file.parsed.data)
+          ...parsed
         };
       } catch (e) {
-        throw `No parser found for format ${file.format}`;
+        throw new Error(`No parser found for format ${file.format}`);
       }
     });
 
