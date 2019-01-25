@@ -6,6 +6,7 @@ import papaParsePromise from "../io/papa-parse-promise";
 import parseFTree from "../io/parse-ftree";
 import parseTree from "../io/parse-tree";
 import parseMap from "../io/parse-map";
+import parseClu from "../io/parse-clu";
 
 function humanFileSize(bytes, si) {
   const thresh = si ? 1000 : 1024;
@@ -49,6 +50,7 @@ export default class FileLoadingScreen extends React.Component {
   };
 
   networkParsers = {
+    clu: parseClu,
     map: parseMap,
     tree: parseTree,
     ftree: parseFTree
