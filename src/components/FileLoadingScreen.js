@@ -139,7 +139,7 @@ export default class FileLoadingScreen extends React.Component {
     this.props.onSubmit(networks);
   };
 
-  whileLoading = callback => () =>
+  withLoadingState = callback => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
 
   loadExample = async () => {
@@ -247,8 +247,8 @@ export default class FileLoadingScreen extends React.Component {
                   floated="right"
                   positive={this.state.files.length > 0}
                   disabled={this.state.files.length < 1}
-                  onClick={this.whileLoading(this.parseNetworks)}
                   size="small"
+                  onClick={this.withLoadingState(this.loadExample)}
                 >
                   Create diagram
                 </Button>
@@ -260,9 +260,9 @@ export default class FileLoadingScreen extends React.Component {
                   Add network
                 </label>
                 <Button
+                  onClick={this.withLoadingState(this.parseNetworks)}
                   size="small"
                   floated="left"
-                  onClick={this.whileLoading(this.loadExample)}
                 >
                   Load example
                 </Button>
@@ -276,7 +276,7 @@ export default class FileLoadingScreen extends React.Component {
           type="file"
           multiple
           id="upload"
-          onChange={this.whileLoading(this.loadSelectedFiles)}
+          onChange={this.withLoadingState(this.loadSelectedFiles)}
           accept={this.validExtensions.map(ext => `.${ext}`).join(",")}
           ref={input => (this.input = input)}
         />
