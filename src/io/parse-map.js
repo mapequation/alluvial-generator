@@ -64,9 +64,9 @@ export default function parseMap(rows: Row[]): Map {
   for (; i < rows.length && numNodes-- > 0; i++) {
     const row = rows[i];
 
-    if (row.length !== 3) {
+    if (row.length !== 3 && row.length !== 4) {
       result.errors.push(
-        `Malformed map data: expected 3 fields, found ${row.length}.`
+        `Malformed map data: expected 3 or 4 fields, found ${row.length}.`
       );
       continue;
     }
