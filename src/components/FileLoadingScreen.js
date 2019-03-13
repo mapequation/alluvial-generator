@@ -3,10 +3,7 @@ import PropTypes from "prop-types";
 import { Button, Icon, Segment, Table } from "semantic-ui-react";
 
 import papaParsePromise from "../io/papa-parse-promise";
-import parseFTree from "../io/parse-ftree";
-import parseTree from "../io/parse-tree";
-import parseMap from "../io/parse-map";
-import parseClu from "../io/parse-clu";
+import { isValidExtension, getParser, acceptedFormats } from "../io/parsers";
 
 function humanFileSize(bytes, si) {
   const thresh = si ? 1000 : 1024;
@@ -49,15 +46,6 @@ export default class FileLoadingScreen extends React.Component {
     loading: false
   };
 
-  networkParsers = {
-    clu: parseClu,
-    map: parseMap,
-    tree: parseTree,
-    ftree: parseFTree
-  };
-
-  validExtensions = Object.keys(this.networkParsers);
-
   exampleNetworks = [
     "science1998_2y.ftree",
     "science2001_2y.ftree",
@@ -77,8 +65,7 @@ export default class FileLoadingScreen extends React.Component {
 
     for (let file of this.input.files) {
       const extension = fileExtension(file.name);
-      const valid = this.validExtensions.includes(extension);
-      if (valid) {
+      if (isValidExtension(extension)) {
         file.format = extension;
         validFiles.push(file);
       } else {
@@ -122,7 +109,7 @@ export default class FileLoadingScreen extends React.Component {
 
     const networks = files.map(file => {
       try {
-        const parser = this.networkParsers[file.format];
+        const parser = getParser(file.format);
         const parsed = parser(file.parsed.data);
 
         return {
@@ -277,7 +264,7 @@ export default class FileLoadingScreen extends React.Component {
           multiple
           id="upload"
           onChange={this.withLoadingState(this.loadSelectedFiles)}
-          accept={this.validExtensions.map(ext => `.${ext}`).join(",")}
+          accept={acceptedFormats}
           ref={input => (this.input = input)}
         />
       </Segment>
