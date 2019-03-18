@@ -167,9 +167,9 @@ export default class FileLoadingScreen extends React.Component {
         loading={loading}
         basic
         textAlign="center"
-        style={{ marginLeft: "20vw", marginTop: "20vh", width: "60vw" }}
+        style={{ marginTop: "20vh", overflow: "auto", padding: 100 }}
       >
-        <Table celled definition singleLine>
+        <Table celled definition>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell />
@@ -191,7 +191,7 @@ export default class FileLoadingScreen extends React.Component {
             <Table.Row>
               <Table.Cell collapsing>Name</Table.Cell>
               {files.map((file, i) => (
-                <Table.Cell collapsing key={i}>
+                <Table.Cell key={i}>
                   {file.name}
                 </Table.Cell>
               ))}
@@ -200,7 +200,7 @@ export default class FileLoadingScreen extends React.Component {
             <Table.Row>
               <Table.Cell collapsing>Size</Table.Cell>
               {files.map((file, i) => (
-                <Table.Cell collapsing key={i}>
+                <Table.Cell key={i}>
                   {humanFileSize(file.size, true)}
                 </Table.Cell>
               ))}
@@ -209,7 +209,7 @@ export default class FileLoadingScreen extends React.Component {
             <Table.Row>
               <Table.Cell collapsing>Format</Table.Cell>
               {files.map((file, i) => (
-                <Table.Cell collapsing key={i}>
+                <Table.Cell key={i}>
                   {file.format}
                 </Table.Cell>
               ))}
@@ -218,7 +218,7 @@ export default class FileLoadingScreen extends React.Component {
             <Table.Row>
               <Table.Cell collapsing>Remove</Table.Cell>
               {files.map((file, i) => (
-                <Table.Cell collapsing key={i} selectable negative>
+                <Table.Cell key={i} selectable negative>
                   <a onClick={() => this.removeFile(i)}>Remove</a>
                 </Table.Cell>
               ))}
@@ -231,27 +231,25 @@ export default class FileLoadingScreen extends React.Component {
               <Table.HeaderCell />
               <Table.HeaderCell colSpan={files.length + 1}>
                 <Button
-                  floated="right"
-                  positive={this.state.files.length > 0}
-                  disabled={this.state.files.length < 1}
                   size="small"
                   onClick={this.withLoadingState(this.loadExample)}
                 >
-                  Create diagram
+                  Load example
                 </Button>
                 <label
-                  className="ui small primary button icon right floated left labeled"
+                  className="ui small primary button icon left labeled"
                   htmlFor="upload"
                 >
                   <Icon name="plus" />
                   Add network
                 </label>
                 <Button
+                  positive={this.state.files.length > 0}
+                  disabled={this.state.files.length < 1}
                   onClick={this.withLoadingState(this.parseNetworks)}
                   size="small"
-                  floated="left"
                 >
-                  Load example
+                  Create diagram
                 </Button>
               </Table.HeaderCell>
             </Table.Row>
