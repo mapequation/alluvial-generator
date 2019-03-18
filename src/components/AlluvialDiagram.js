@@ -609,6 +609,7 @@ export default class AlluvialDiagram extends React.Component {
       <svg
         width="100vw"
         height="100vh"
+        style={{width: "100vw", height: "100vh"}} // For Firefox
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
       >
