@@ -87,7 +87,8 @@ export default class Diagram {
     totalWidth: number,
     height: number,
     streamlineFraction: number,
-    maxModuleWidth: number
+    maxModuleWidth: number,
+    flowThreshold: number
   ) {
     this.dirty = true;
 
@@ -104,8 +105,6 @@ export default class Diagram {
 
     let x = 0;
     let y = height;
-
-    let currentFlowThreshold = 0.0;
 
     const networkTotalMargins = [];
 
@@ -125,11 +124,11 @@ export default class Diagram {
     this.alluvialRoot.forEachDepthFirstPreOrderWhile(
       node =>
         node.depth < Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold),
+        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
       (node, i, nodes) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
-            currentFlowThreshold = node.flowThreshold;
+            node.flowThreshold = flowThreshold;
             networkTotalMargins.push(0);
             node.sortChildren();
             if (i > 0) x += networkWidth;
@@ -182,11 +181,8 @@ export default class Diagram {
       node => node.depth <= Depth.BRANCH
     )) {
       switch (node.depth) {
-        case Depth.NETWORK_ROOT:
-          currentFlowThreshold = node.flowThreshold;
-          break;
         case Depth.BRANCH:
-          node.sortChildren(currentFlowThreshold);
+          node.sortChildren(flowThreshold);
           break;
         default:
           break;
@@ -196,18 +192,10 @@ export default class Diagram {
     x = 0;
     y = height;
 
-    // We can't set this in the loop any more because of post order traversal
-    const networkRoot = this.alluvialRoot.getNetworkRoot(
-      this.networkIndices[0]
-    );
-    currentFlowThreshold = networkRoot
-      ? networkRoot.flowThreshold
-      : currentFlowThreshold;
-
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= currentFlowThreshold)
+        (node.depth === Depth.MODULE && node.flow >= flowThreshold)
     )) {
       switch (node.depth) {
         case Depth.ALLUVIAL_ROOT:

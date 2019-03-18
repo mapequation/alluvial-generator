@@ -9,7 +9,7 @@ import TreePath from "../lib/treepath";
 
 export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
-  flowThreshold: number = 8e-3;
+  flowThreshold: number = 0;
   name: string;
 
   constructor(networkId: string, parent: AlluvialRoot, name: string) {

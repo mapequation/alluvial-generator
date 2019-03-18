@@ -90,7 +90,8 @@ export default class AlluvialDiagram extends React.Component {
       height,
       streamlineFraction,
       networks,
-      maxModuleWidth
+      maxModuleWidth,
+      flowThreshold
     } = this.props;
     const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
@@ -123,11 +124,15 @@ export default class AlluvialDiagram extends React.Component {
       }
     }
 
+    const moduleNameMargin = 150;
+    const networkNameMargin = 60;
+
     this.diagram.calcLayout(
-      width - 300,
-      height - 60,
+      width - 2 * moduleNameMargin,
+      height - networkNameMargin,
       streamlineFraction,
-      maxModuleWidth
+      maxModuleWidth,
+      flowThreshold
     );
 
     console.log(this.diagram);

@@ -47,7 +47,7 @@ export default class Branch extends AlluvialNodeBase {
     return BRANCH;
   }
 
-  sortChildren(moduleFlowThreshold: number = 1e-2) {
+  sortChildren(moduleFlowThreshold: number = 0) {
     this.children = sortBy(this.children, [
       child => child.byOppositeStreamlinePosition(moduleFlowThreshold)
     ]);

@@ -84,6 +84,24 @@ export default function Sidebar(props) {
             }}
           />
         </Menu.Item>
+        <Menu.Item>
+          <Input
+            type="text"
+            label="Flow threshold"
+            labelPosition="left"
+            value={props.flowThreshold}
+          />
+          <Slider
+            discrete
+            settings={{
+              start: props.flowThreshold,
+              min: 0,
+              max: 0.1,
+              step: 0.001,
+              onChange: props.onFlowThresholdChange
+            }}
+          />
+        </Menu.Item>
       </SemanticSidebar>
       <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
         {props.children}
@@ -102,5 +120,7 @@ Sidebar.propTypes = {
   streamlineOpacity: PropTypes.number,
   onStreamlineOpacityChange: PropTypes.func,
   duration: PropTypes.number,
-  onDurationChange: PropTypes.func
+  onDurationChange: PropTypes.func,
+  flowThreshold: PropTypes.number,
+  onFlowThresholdChange: PropTypes.func
 };

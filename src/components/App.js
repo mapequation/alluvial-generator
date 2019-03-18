@@ -11,6 +11,7 @@ export default class App extends React.Component {
     duration: 400,
     streamlineFraction: 2,
     streamlineOpacity: 0.5,
+    flowThreshold: 8e-3,
     networks: []
   };
 
@@ -23,7 +24,8 @@ export default class App extends React.Component {
       height,
       streamlineFraction,
       streamlineOpacity,
-      duration
+      duration,
+      flowThreshold
     } = this.state;
 
     const loadingComplete = networks.length > 0;
@@ -50,6 +52,8 @@ export default class App extends React.Component {
         }
         duration={duration}
         onDurationChange={duration => this.setState({ duration })}
+        flowThreshold={flowThreshold}
+        onFlowThresholdChange={flowThreshold => this.setState({ flowThreshold })}
       >
         <React.StrictMode>
           <AlluvialDiagram
@@ -59,6 +63,7 @@ export default class App extends React.Component {
             streamlineFraction={+streamlineFraction}
             streamlineOpacity={+streamlineOpacity}
             duration={+duration}
+            flowThreshold={+flowThreshold}
           />
         </React.StrictMode>
       </Sidebar>
