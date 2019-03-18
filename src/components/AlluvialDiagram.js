@@ -134,7 +134,7 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   draw(prevProps = this.props) {
-    const { width, height, duration } = this.props;
+    const { width, height, duration, streamlineOpacity } = this.props;
     const {
       networkAdded,
       networkRemoved,
@@ -332,7 +332,7 @@ export default class AlluvialDiagram extends React.Component {
     streamlines
       .transition(t)
       .delay(streamlineUpdateDelay)
-      .call(setOpacity, 0.5)
+      .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
     streamlines
@@ -349,7 +349,7 @@ export default class AlluvialDiagram extends React.Component {
       .call(setStreamlineTransitionPath)
       .transition(t)
       .delay(streamlineDelay(1.5 * delay))
-      .call(setOpacity, 0.5)
+      .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
     /**

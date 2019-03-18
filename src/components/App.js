@@ -10,6 +10,7 @@ export default class App extends React.Component {
     height: 600,
     duration: 400,
     streamlineFraction: 2,
+    streamlineOpacity: 0.5,
     networks: []
   };
 
@@ -21,6 +22,7 @@ export default class App extends React.Component {
       width,
       height,
       streamlineFraction,
+      streamlineOpacity,
       duration
     } = this.state;
 
@@ -42,6 +44,10 @@ export default class App extends React.Component {
         onStreamlineFractionChange={streamlineFraction =>
           this.setState({ streamlineFraction })
         }
+        streamlineOpacity={streamlineOpacity}
+        onStreamlineOpacityChange={streamlineOpacity =>
+          this.setState({ streamlineOpacity })
+        }
         duration={duration}
         onDurationChange={duration => this.setState({ duration })}
       >
@@ -51,6 +57,7 @@ export default class App extends React.Component {
             width={width}
             height={height}
             streamlineFraction={+streamlineFraction}
+            streamlineOpacity={+streamlineOpacity}
             duration={+duration}
           />
         </React.StrictMode>

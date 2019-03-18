@@ -52,6 +52,23 @@ export default function Sidebar(props) {
         <Menu.Item>
           <Input
             type="text"
+            label="Streamline opacity"
+            labelPosition="left"
+            value={props.streamlineOpacity}
+          />
+          <Slider
+            settings={{
+              start: props.streamlineOpacity,
+              min: 0,
+              max: 1,
+              step: 0.05,
+              onChange: props.onStreamlineOpacityChange
+            }}
+          />
+        </Menu.Item>
+        <Menu.Item>
+          <Input
+            type="text"
             label="Animation duration"
             labelPosition="left"
             value={props.duration}
@@ -82,6 +99,8 @@ Sidebar.propTypes = {
   onHeightChange: PropTypes.func,
   streamlineFraction: PropTypes.number,
   onStreamlineFractionChange: PropTypes.func,
+  streamlineOpacity: PropTypes.number,
+  onStreamlineOpacityChange: PropTypes.func,
   duration: PropTypes.number,
   onDurationChange: PropTypes.func
 };
