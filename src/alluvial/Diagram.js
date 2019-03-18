@@ -479,7 +479,7 @@ export default class Diagram {
 
     const newModuleLevel = module.moduleLevel + 1;
 
-    const alreadyExpanded = leafNodes.some(node => node.level < newModuleLevel);
+    const alreadyExpanded = leafNodes.some(node => node.level <= newModuleLevel);
     if (alreadyExpanded) {
       console.warn(
         `Module can't be expanded to level ${newModuleLevel} ` +
