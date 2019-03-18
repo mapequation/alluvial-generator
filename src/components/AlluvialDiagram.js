@@ -3,14 +3,11 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
-import {
-  bracketHorizontal,
-  bracketVerticalLeft,
-  bracketVerticalRight
-} from "../lib/bracket";
+import { bracketHorizontal, bracketVerticalLeft, bracketVerticalRight } from "../lib/bracket";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
+
 
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
@@ -258,6 +255,7 @@ export default class AlluvialDiagram extends React.Component {
       .attr("class", "bracket")
       .attr("fill", "transparent")
       .attr("stroke", "#999")
+      .attr("stroke", "#fff")
       .attr("stroke-linecap", "round")
       .attr("d", this.bracketHorizontal);
 
@@ -454,6 +452,7 @@ export default class AlluvialDiagram extends React.Component {
         .attr("class", "bracket")
         .attr("fill", "transparent")
         .attr("stroke", "#999")
+        .attr("stroke", "#fff")
         .attr("stroke-linecap", "round")
         .attr("stroke-dasharray", bracketDasharray(index))
         .attr("d", bracketVertical(index));
@@ -567,6 +566,41 @@ export default class AlluvialDiagram extends React.Component {
       .transition(t)
       .delay(delay)
       .call(setHeightY)
+      .call(makeOpaque);
+
+    /**
+     * Partition names
+     */
+    const partitions = networkRoots.selectAll(".partition").data(d => d.children, key);
+
+    partitions
+      .exit()
+      .remove();
+
+    partitions
+      .transition(t)
+      .delay(moduleNameUpdateDelay)
+      .attr("y", d => d.moduleName.textY)
+      .attr("x", d => d.x + d.width / 2);
+
+    partitions
+      .enter()
+      .append("text")
+      .attr("class", "partition")
+      .text(d => d.moduleId)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#000")
+      .attr("font-size", 12)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 2)
+      .attr("paint-order", "stroke")
+      .attr("stroke-linecap", "round")
+      .attr("dy", 3)
+      .attr("y", d => d.moduleName.textY)
+      .attr("x", d => d.x + d.width / 2)
+      .call(makeTransparent)
+      .transition(t)
+      .delay(moduleNameUpdateDelay)
       .call(makeOpaque);
   }
 
