@@ -17,6 +17,11 @@ type Event = {
   shiftKey: boolean
 };
 
+const noKeyModifiers: Event = {
+  altKey: false,
+  shiftKey: false
+};
+
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
@@ -70,7 +75,7 @@ export default class Diagram {
     return this.networksById.has(networkId);
   }
 
-  doubleClick(alluvialNode: Object, event: Event) {
+  doubleClick(alluvialNode: Object, event: Event = noKeyModifiers) {
     const { shiftKey, altKey } = event;
     if (alluvialNode.depth === Depth.MODULE) {
       const regroupOrExpand = (shiftKey
