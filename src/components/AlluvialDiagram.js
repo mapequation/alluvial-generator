@@ -18,7 +18,6 @@ export default class AlluvialDiagram extends React.Component {
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
   maxModuleLevel = 3;
-  scale = 1;
 
   static defaultProps = {
     width: 1200,
@@ -26,7 +25,8 @@ export default class AlluvialDiagram extends React.Component {
     streamlineFraction: 2,
     maxModuleWidth: 300,
     duration: 200,
-    moduleFlowThreshold: 0.01
+    moduleFlowThreshold: 0.01,
+    streamlineThreshold: 1
   };
 
   static propTypes = {
@@ -36,7 +36,8 @@ export default class AlluvialDiagram extends React.Component {
     networks: PropTypes.arrayOf(PropTypes.object),
     maxModuleWidth: PropTypes.number,
     duration: PropTypes.number,
-    moduleFlowThreshold: PropTypes.number
+    moduleFlowThreshold: PropTypes.number,
+    streamlineThreshold: PropTypes.number
   };
 
   componentDidMount() {
@@ -54,17 +55,9 @@ export default class AlluvialDiagram extends React.Component {
       .select("#zoomable")
       .attr("transform", initialTransform);
 
-    let zoomTimeout = null;
-
     zoom.on("zoom", () => {
       const { transform } = d3.event;
       zoomable.attr("transform", transform);
-      const scaleChanged = this.scale !== transform.k;
-      this.scale = transform.k;
-      if (scaleChanged) {
-        clearTimeout(zoomTimeout);
-        zoomTimeout = setTimeout(() => this.draw(), 50);
-      }
     });
 
     this.update();
@@ -141,7 +134,7 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   draw(prevProps = this.props) {
-    const { width, height, duration, streamlineOpacity } = this.props;
+    const { width, height, duration, streamlineOpacity, streamlineThreshold } = this.props;
     const {
       networkAdded,
       networkRemoved,
@@ -300,19 +293,11 @@ export default class AlluvialDiagram extends React.Component {
     /**
      * Streamlines
      */
-    const visibleStreamlineHeight = d3
-      .scaleSqrt()
-      .domain([1, 1.4])
-      .range([1, 0.2])
-      .clamp(true);
-
     const streamlines = networkRoots
       .selectAll(".streamline")
       .data(
         d =>
-          d.links.filter(
-            link => link.avgHeight > visibleStreamlineHeight(this.scale)
-          ),
+          d.links.filter(link => link.avgHeight > streamlineThreshold),
         key
       );
 
