@@ -87,18 +87,18 @@ export default function Sidebar(props) {
         <Menu.Item>
           <Input
             type="text"
-            label="Flow threshold"
+            label="Module flow threshold"
             labelPosition="left"
-            value={props.flowThreshold}
+            value={props.moduleFlowThreshold}
           />
           <Slider
             discrete
             settings={{
-              start: props.flowThreshold,
+              start: props.moduleFlowThreshold,
               min: 0,
-              max: 0.1,
+              max: 0.05,
               step: 0.001,
-              onChange: props.onFlowThresholdChange
+              onChange: props.onModuleFlowThresholdChange
             }}
           />
         </Menu.Item>
@@ -121,6 +121,6 @@ Sidebar.propTypes = {
   onStreamlineOpacityChange: PropTypes.func,
   duration: PropTypes.number,
   onDurationChange: PropTypes.func,
-  flowThreshold: PropTypes.number,
-  onFlowThresholdChange: PropTypes.func
+  moduleFlowThreshold: PropTypes.number,
+  onModuleFlowThresholdChange: PropTypes.func
 };
