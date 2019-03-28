@@ -88,6 +88,38 @@ export default class NetworkRoot extends AlluvialNodeBase {
     }
   }
 
+  sortByFewestStreamlineCrossings() {
+    const oppositePositions: Map<string, number> = new Map();
+
+    for (let module of this) {
+      let oppositeModulePosition = 0;
+      // Skip if module if below threshold
+      if (module.flow < this.flowThreshold) continue;
+      for (let group of module) {
+        for (let streamlineNode of group.left) {
+          // Skip if opposite module is below threshold
+          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
+          if (!oppositeStreamlineNode) continue;
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(
+            MODULE
+          );
+          if (oppositeModule && oppositeModule.flow < this.flowThreshold)
+            continue;
+          if (!oppositeModule)
+            continue;
+          const weight = 0.5 * (streamlineNode.flow + oppositeStreamlineNode.flow) / module.flow;
+          oppositeModulePosition += oppositeModule.y * weight;
+        }
+      }
+      oppositePositions.set(module.moduleId, oppositeModulePosition)
+    }
+    this.children.sort((a, b) => {
+      const bOppositePosition = oppositePositions.get(b.moduleId) || 0;
+      const aOppositePosition = oppositePositions.get(a.moduleId) || 0;
+      return bOppositePosition - aOppositePosition;
+    });
+  }
+
   sortChildren() {
     type TreeNode = {
       path: number,
