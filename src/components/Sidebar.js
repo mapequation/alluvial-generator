@@ -35,6 +35,23 @@ export default function Sidebar(props) {
         <Menu.Item>
           <Input
             type="text"
+            label="Max module width"
+            labelPosition="left"
+            value={props.maxModuleWidth}
+          />
+          <Slider
+            settings={{
+              start: props.maxModuleWidth,
+              min: 10,
+              max: props.width,
+              step: 10,
+              onChange: props.onMaxModuleWidthChange
+            }}
+          />
+        </Menu.Item>
+        <Menu.Item>
+          <Input
+            type="text"
             label="Streamline fraction"
             labelPosition="left"
             value={props.streamlineFraction}
@@ -133,6 +150,8 @@ Sidebar.propTypes = {
   onWidthChange: PropTypes.func,
   height: PropTypes.number,
   onHeightChange: PropTypes.func,
+  maxModuleWidth: PropTypes.number,
+  onMaxModuleWidthChange: PropTypes.func,
   streamlineFraction: PropTypes.number,
   onStreamlineFractionChange: PropTypes.func,
   streamlineOpacity: PropTypes.number,

@@ -9,6 +9,7 @@ export default class App extends React.Component {
     width: 1200,
     height: 600,
     duration: 400,
+    maxModuleWidth: 300,
     streamlineFraction: 2,
     streamlineOpacity: 0.5,
     moduleFlowThreshold: 8e-3,
@@ -23,6 +24,7 @@ export default class App extends React.Component {
       networks,
       width,
       height,
+      maxModuleWidth,
       streamlineFraction,
       streamlineOpacity,
       duration,
@@ -58,12 +60,15 @@ export default class App extends React.Component {
         onModuleFlowThresholdChange={moduleFlowThreshold => this.setState({ moduleFlowThreshold })}
         streamlineThreshold={streamlineThreshold}
         onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
+        maxModuleWidth={maxModuleWidth}
+        onMaxModuleWidthChange={maxModuleWidth => this.setState({ maxModuleWidth })}
       >
         <React.StrictMode>
           <AlluvialDiagram
             networks={networks}
             width={width}
             height={height}
+            maxModuleWidth={+maxModuleWidth}
             streamlineFraction={+streamlineFraction}
             streamlineOpacity={+streamlineOpacity}
             duration={+duration}
