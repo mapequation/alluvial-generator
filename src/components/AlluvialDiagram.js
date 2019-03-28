@@ -65,8 +65,20 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.update(prevProps);
+    if (this.shouldUpdateLayout(prevProps))
+      this.update(prevProps);
     this.draw(prevProps);
+  }
+
+  shouldUpdateLayout(prevProps) {
+    const { width, height, networks, streamlineFraction, maxModuleWidth, moduleFlowThreshold } = this.props;
+    const widthChanged = width !== prevProps.width;
+    const heightChanged = height !== prevProps.height;
+    const networksChanged = networks.length !== prevProps.networks.length;
+    const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
+    const maxModuleWidthChanged = maxModuleWidth !== prevProps.maxModuleWidth;
+    const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
+    return widthChanged || heightChanged || networksChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged;
   }
 
   propsChanged(prevProps) {
