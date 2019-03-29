@@ -122,7 +122,7 @@ export default function Sidebar(props) {
         <Menu.Item>
           <Input
             type="text"
-            label="Streamline threshold"
+            label="Streamline height threshold"
             labelPosition="left"
             value={props.streamlineThreshold}
           />
@@ -131,8 +131,8 @@ export default function Sidebar(props) {
             settings={{
               start: props.streamlineThreshold,
               min: 0,
-              max: 3,
-              step: 0.2,
+              max: 2,
+              step: 0.01,
               onChange: props.onStreamlineThresholdChange
             }}
           />
