@@ -10,6 +10,7 @@ import NetworkRoot from "./NetworkRoot";
 import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
 
+
 type NodesByName = Map<string, LeafNode>;
 
 type Event = {
@@ -19,7 +20,18 @@ type Event = {
 
 const noKeyModifiers: Event = {
   altKey: false,
-  shiftKey: false
+  shiftKey: false,
+};
+
+const differenceIndex = (array1, array2) => {
+  let differenceIndex = 0;
+  const minLength = Math.min(array1.length, array2.length);
+  for (let i = 0; i < minLength; i++) {
+    if (array1[i] === array2[i]) continue;
+    differenceIndex = i;
+    break;
+  }
+  return differenceIndex;
 };
 
 export default class Diagram {
@@ -42,7 +54,7 @@ export default class Diagram {
     }
 
     const nodesByName = new Map(
-      nodes.map(node => [node.name, new LeafNode(node, id)])
+      nodes.map(node => [node.name, new LeafNode(node, id)]),
     );
 
     this.networkIndices.push(id);
@@ -79,8 +91,8 @@ export default class Diagram {
     const { shiftKey, altKey } = event;
     if (alluvialNode.depth === Depth.MODULE) {
       const regroupOrExpand = (shiftKey
-        ? this.regroupModule
-        : this.expandModule
+          ? this.regroupModule
+          : this.expandModule
       ).bind(this);
 
       const ids = altKey ? this.networkIndices : [alluvialNode.networkId];
@@ -103,7 +115,7 @@ export default class Diagram {
 
     const width = Math.min(
       totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
-      maxModuleWidth
+      maxModuleWidth,
     );
     const streamlineWidth = streamlineFraction * width;
     const networkWidth = width + streamlineWidth;
@@ -112,17 +124,6 @@ export default class Diagram {
     let y = height;
 
     const networkTotalMargins = [];
-
-    const differenceIndex = (array1, array2) => {
-      let differenceIndex = 0;
-      const minLength = Math.min(array1.length, array2.length);
-      for (let i = 0; i < minLength; i++) {
-        if (array1[i] === array2[i]) continue;
-        differenceIndex = i;
-        break;
-      }
-      return differenceIndex;
-    };
 
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
@@ -154,7 +155,7 @@ export default class Diagram {
           default:
             break;
         }
-      }
+      },
     );
 
     const maxTotalMargin = Math.max(...networkTotalMargins);
@@ -175,7 +176,7 @@ export default class Diagram {
           if (node.depth === Depth.MODULE) {
             node.margin *= moduleMarginScale;
           }
-        }
+        },
       );
 
       const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
@@ -183,7 +184,7 @@ export default class Diagram {
     }
 
     for (let node of this.alluvialRoot.traverseDepthFirstWhile(
-      node => node.depth <= Depth.BRANCH
+      node => node.depth <= Depth.BRANCH,
     )) {
       switch (node.depth) {
         case Depth.BRANCH:
@@ -200,7 +201,7 @@ export default class Diagram {
     for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold)
+        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
     )) {
       switch (node.depth) {
         case Depth.ALLUVIAL_ROOT:
@@ -246,7 +247,7 @@ export default class Diagram {
     node.moduleLevel = moduleLevel;
 
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId
+      networkId,
     );
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
@@ -271,7 +272,7 @@ export default class Diagram {
       const streamlineId = StreamlineId.create(
         node,
         branch.side,
-        oppositeNode
+        oppositeNode,
       ).toString();
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
@@ -283,7 +284,7 @@ export default class Diagram {
 
       if (streamlineNode.hasTarget()) {
         const oppositeStreamlineIsDangling = this.streamlineNodesById.has(
-          streamlineNode.targetId
+          streamlineNode.targetId,
         );
         if (oppositeStreamlineIsDangling && oppositeNode) {
           const oppositeSide = opposite(branch.side);
@@ -292,7 +293,7 @@ export default class Diagram {
         } else {
           throw new Error(
             "Streamline node for the opposite node must be dangling " +
-              "before it has has this node to connect to."
+            "before it has has this node to connect to.",
           );
         }
       }
@@ -311,10 +312,10 @@ export default class Diagram {
     const streamlineId = StreamlineId.create(
       node,
       side,
-      oppositeNode
+      oppositeNode,
     ).toString();
     let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(
-      streamlineId
+      streamlineId,
     );
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
@@ -327,7 +328,7 @@ export default class Diagram {
     if (!streamlineNode) {
       if (!branch) {
         console.warn(
-          `Streamline node with id ${oldStreamlineNode.id} has no parent`
+          `Streamline node with id ${oldStreamlineNode.id} has no parent`,
         );
         return;
       }
@@ -367,7 +368,7 @@ export default class Diagram {
     const module: ?Module = group.parent;
     if (!module) {
       console.warn(
-        `Node ${node.id} was removed without belonging to a module.`
+        `Node ${node.id} was removed without belonging to a module.`,
       );
       return;
     }
@@ -380,7 +381,7 @@ export default class Diagram {
     const networkRoot: ?NetworkRoot = module.parent;
     if (!networkRoot) {
       console.warn(
-        `Node ${node.id} was removed without belonging to a network root.`
+        `Node ${node.id} was removed without belonging to a network root.`,
       );
       return;
     }
@@ -409,7 +410,7 @@ export default class Diagram {
     const branch: ?Branch = streamlineNode.parent;
     if (!branch) {
       console.warn(
-        `Streamline node with id ${streamlineNode.id} has no parent`
+        `Streamline node with id ${streamlineNode.id} has no parent`,
       );
       return;
     }
@@ -422,7 +423,7 @@ export default class Diagram {
         oppositeStreamlineNode.makeDangling();
 
         const duplicate = this.streamlineNodesById.get(
-          oppositeStreamlineNode.id
+          oppositeStreamlineNode.id,
         );
 
         // Does the (new) dangling id already exist? Move nodes from it.
@@ -443,7 +444,7 @@ export default class Diagram {
 
         this.streamlineNodesById.set(
           oppositeStreamlineNode.id,
-          oppositeStreamlineNode
+          oppositeStreamlineNode,
         );
       }
 
@@ -461,7 +462,7 @@ export default class Diagram {
 
   expandModule(moduleId: string, networkId: string) {
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId
+      networkId,
     );
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
@@ -471,7 +472,7 @@ export default class Diagram {
     const module: ?Module = networkRoot.getModule(moduleId);
     if (!module) {
       console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`
+        `No module found with id ${moduleId} in network ${networkId}`,
       );
       return;
     }
@@ -488,7 +489,7 @@ export default class Diagram {
     if (alreadyExpanded) {
       console.warn(
         `Module can't be expanded to level ${newModuleLevel} ` +
-          `because some nodes are at level ${newModuleLevel - 1}`
+        `because some nodes are at level ${newModuleLevel - 1}`,
       );
       return;
     }
@@ -499,7 +500,7 @@ export default class Diagram {
 
   regroupModule(moduleId: string, networkId: string) {
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId
+      networkId,
     );
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
@@ -509,7 +510,7 @@ export default class Diagram {
     const module: ?Module = networkRoot.getModule(moduleId);
     if (!module) {
       console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`
+        `No module found with id ${moduleId} in network ${networkId}`,
       );
       return;
     }
@@ -518,7 +519,7 @@ export default class Diagram {
       console.warn(
         `Module with id ${moduleId} is already at module level ${
           module.moduleLevel
-        }`
+          }`,
       );
       return;
     }
@@ -527,7 +528,7 @@ export default class Diagram {
 
     const leafNodes = [].concat.apply(
       [],
-      modules.map(module => [...module.leafNodes()])
+      modules.map(module => [...module.leafNodes()]),
     );
 
     if (!leafNodes.length) {
