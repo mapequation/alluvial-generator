@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Slider } from "react-semantic-ui-range";
-import { Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Button, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 
 export default function Sidebar(props) {
   return (
@@ -137,6 +137,16 @@ export default function Sidebar(props) {
             }}
           />
         </Menu.Item>
+        <Menu.Item>
+          <Button.Group>
+            <Button icon active={props.verticalAlign === "bottom"} onClick={() => props.onVerticalAlignButtonClick("bottom")}>
+              <Icon name='align left' />
+            </Button>
+            <Button icon active={props.verticalAlign === "justify"} onClick={() => props.onVerticalAlignButtonClick("justify")}>
+              <Icon name='align justify' />
+            </Button>
+          </Button.Group>
+        </Menu.Item>
       </SemanticSidebar>
       <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
         {props.children}
@@ -162,4 +172,6 @@ Sidebar.propTypes = {
   onModuleFlowThresholdChange: PropTypes.func,
   streamlineThreshold: PropTypes.number,
   onStreamlineThresholdChange: PropTypes.func,
+  verticalAlign: PropTypes.string,
+  onVerticalAlignButtonClick: PropTypes.func,
 };

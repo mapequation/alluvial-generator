@@ -26,7 +26,8 @@ export default class AlluvialDiagram extends React.Component {
     maxModuleWidth: 300,
     duration: 200,
     moduleFlowThreshold: 0.01,
-    streamlineThreshold: 1
+    streamlineThreshold: 1,
+    verticalAlign: "bottom"
   };
 
   static propTypes = {
@@ -37,7 +38,8 @@ export default class AlluvialDiagram extends React.Component {
     maxModuleWidth: PropTypes.number,
     duration: PropTypes.number,
     moduleFlowThreshold: PropTypes.number,
-    streamlineThreshold: PropTypes.number
+    streamlineThreshold: PropTypes.number,
+    verticalAlign: PropTypes.string
   };
 
   componentDidMount() {
@@ -71,14 +73,15 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   shouldUpdateLayout(prevProps) {
-    const { width, height, networks, streamlineFraction, maxModuleWidth, moduleFlowThreshold } = this.props;
+    const { width, height, networks, streamlineFraction, maxModuleWidth, moduleFlowThreshold, verticalAlign } = this.props;
     const widthChanged = width !== prevProps.width;
     const heightChanged = height !== prevProps.height;
     const networksChanged = networks.length !== prevProps.networks.length;
     const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
     const maxModuleWidthChanged = maxModuleWidth !== prevProps.maxModuleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
-    return widthChanged || heightChanged || networksChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged;
+    const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
+    return widthChanged || heightChanged || networksChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
   }
 
   propsChanged(prevProps) {
@@ -98,7 +101,8 @@ export default class AlluvialDiagram extends React.Component {
       streamlineFraction,
       networks,
       maxModuleWidth,
-      moduleFlowThreshold
+      moduleFlowThreshold,
+      verticalAlign
     } = this.props;
     const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
@@ -139,7 +143,8 @@ export default class AlluvialDiagram extends React.Component {
       height - networkNameMargin,
       streamlineFraction,
       maxModuleWidth,
-      moduleFlowThreshold
+      moduleFlowThreshold,
+      verticalAlign
     );
 
     console.log(this.diagram);

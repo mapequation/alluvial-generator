@@ -14,6 +14,7 @@ export default class App extends React.Component {
     streamlineOpacity: 0.5,
     moduleFlowThreshold: 8e-3,
     streamlineThreshold: 1,
+    verticalAlign: "bottom",
     networks: []
   };
 
@@ -29,7 +30,8 @@ export default class App extends React.Component {
       streamlineOpacity,
       duration,
       moduleFlowThreshold,
-      streamlineThreshold
+      streamlineThreshold,
+      verticalAlign
     } = this.state;
 
     const loadingComplete = networks.length > 0;
@@ -62,6 +64,8 @@ export default class App extends React.Component {
         onStreamlineThresholdChange={streamlineThreshold => this.setState({ streamlineThreshold })}
         maxModuleWidth={maxModuleWidth}
         onMaxModuleWidthChange={maxModuleWidth => this.setState({ maxModuleWidth })}
+        verticalAlign={verticalAlign}
+        onVerticalAlignButtonClick={verticalAlign => this.setState({ verticalAlign })}
       >
         <React.StrictMode>
           <AlluvialDiagram
@@ -74,6 +78,7 @@ export default class App extends React.Component {
             duration={+duration}
             moduleFlowThreshold={+moduleFlowThreshold}
             streamlineThreshold={+streamlineThreshold}
+            verticalAlign={verticalAlign}
           />
         </React.StrictMode>
       </Sidebar>

@@ -23,6 +23,8 @@ const noKeyModifiers: Event = {
   shiftKey: false,
 };
 
+type VerticalAlign = "bottom" | "justify" | "top";
+
 const differenceIndex = (array1, array2) => {
   let differenceIndex = 0;
   const minLength = Math.min(array1.length, array2.length);
@@ -105,7 +107,8 @@ export default class Diagram {
     height: number,
     streamlineFraction: number,
     maxModuleWidth: number,
-    flowThreshold: number
+    flowThreshold: number,
+    verticalAlign: VerticalAlign = "bottom",
   ) {
     this.dirty = true;
 
@@ -123,7 +126,10 @@ export default class Diagram {
     let x = 0;
     let y = height;
 
-    const networkTotalMargins = [];
+    const networkTotalMargins = new Array(numNetworks).fill(0);
+    const networkTotalFlow = new Array(numNetworks).fill(0);
+    const visibleModules = new Array(numNetworks).fill(0);
+    let networkIndex = 0;
 
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
@@ -135,7 +141,7 @@ export default class Diagram {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
             node.flowThreshold = flowThreshold;
-            networkTotalMargins.push(0);
+            networkIndex = i;
             node.sortChildren();
             if (i > 0) x += networkWidth;
             y = height;
@@ -150,7 +156,9 @@ export default class Diagram {
             node.margin = margin;
             node.layout = { x, y, width, height: node.flow * height };
             y -= margin;
-            networkTotalMargins[networkTotalMargins.length - 1] += margin;
+            networkTotalMargins[networkIndex] += margin;
+            networkTotalFlow[networkIndex] += node.flow;
+            visibleModules[networkIndex]++;
             break;
           default:
             break;
@@ -160,6 +168,31 @@ export default class Diagram {
 
     const maxTotalMargin = Math.max(...networkTotalMargins);
     let usableHeight = height - maxTotalMargin;
+
+    if (verticalAlign === "justify") {
+      let currentTotalMargin = maxTotalMargin;
+      let currentTotalFlow = Math.max(...networkTotalFlow);
+      let currentVisibleModules = 2;
+
+      this.alluvialRoot.forEachDepthFirstWhile(
+        node =>
+          node.depth < Depth.MODULE ||
+          (node.depth === Depth.MODULE && node.flow >= flowThreshold),
+        (node, i) => {
+          if (node.depth === Depth.NETWORK_ROOT) {
+            currentTotalMargin = networkTotalMargins[i];
+            currentTotalFlow = networkTotalFlow[i];
+            currentVisibleModules = visibleModules[i];
+          } else if (node.depth === Depth.MODULE) {
+            node.margin *= (maxTotalMargin / currentTotalMargin);
+            if (currentVisibleModules > 1) {
+              node.margin += (1 - currentTotalFlow) * usableHeight / (currentVisibleModules - 1);
+            }
+          }
+        },
+      );
+    }
+
     const maxMarginFractionOfHeight = 0.5;
     const marginFractionOfHeight = maxTotalMargin / height;
 
