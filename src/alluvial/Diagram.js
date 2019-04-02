@@ -126,8 +126,8 @@ export default class Diagram {
     let x = 0;
     let y = height;
 
-    const networkTotalMargins = new Array(numNetworks).fill(0);
-    const networkTotalFlow = new Array(numNetworks).fill(0);
+    const totalMargins = new Array(numNetworks).fill(0);
+    const visibleFlows = new Array(numNetworks).fill(0);
     const visibleModules = new Array(numNetworks).fill(0);
     let networkIndex = 0;
 
@@ -156,8 +156,8 @@ export default class Diagram {
             node.margin = margin;
             node.layout = { x, y, width, height: node.flow * height };
             y -= margin;
-            networkTotalMargins[networkIndex] += margin;
-            networkTotalFlow[networkIndex] += node.flow;
+            totalMargins[networkIndex] += margin;
+            visibleFlows[networkIndex] += node.flow;
             visibleModules[networkIndex]++;
             break;
           default:
@@ -166,35 +166,8 @@ export default class Diagram {
       },
     );
 
-    const maxTotalMargin = Math.max(...networkTotalMargins);
+    const maxTotalMargin = Math.max(...totalMargins);
     let usableHeight = height - maxTotalMargin;
-
-    if (verticalAlign === "justify") {
-      let currentTotalMargin = maxTotalMargin;
-      let visibleFlow = Math.max(...networkTotalFlow);
-      let currentVisibleModules = 2;
-
-      this.alluvialRoot.forEachDepthFirstWhile(
-        node =>
-          node.depth < Depth.MODULE ||
-          (node.depth === Depth.MODULE && node.flow >= flowThreshold),
-        (node, i) => {
-          if (node.depth === Depth.NETWORK_ROOT) {
-            currentTotalMargin = networkTotalMargins[i];
-            visibleFlow = networkTotalFlow[i];
-            currentVisibleModules = visibleModules[i];
-          } else if (node.depth === Depth.MODULE) {
-            node.margin *= maxTotalMargin / currentTotalMargin;
-            if (currentVisibleModules > 1) {
-              const missingFlow = 1 - visibleFlow;
-              const missingMargin = missingFlow * height;
-              const numMargins = currentVisibleModules - 1;
-              node.margin += missingMargin / numMargins;
-            }
-          }
-        },
-      );
-    }
 
     const maxMarginFractionOfHeight = 0.5;
     const marginFractionOfHeight = maxTotalMargin / height;
@@ -217,6 +190,34 @@ export default class Diagram {
 
       const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
       usableHeight = height - scaledTotalMargin;
+    }
+
+    if (verticalAlign === "justify") {
+      let totalMargin = maxTotalMargin;
+      let visibleFlow = Math.max(...visibleFlows);
+      let missingFlow = 0;
+      let missingMargin = 0;
+      let numMargins = 0;
+
+      this.alluvialRoot.forEachDepthFirstWhile(
+        node =>
+          node.depth < Depth.MODULE ||
+          (node.depth === Depth.MODULE && node.flow >= flowThreshold),
+        (node, i) => {
+          if (node.depth === Depth.NETWORK_ROOT) {
+            totalMargin = totalMargins[i];
+            numMargins = visibleModules[i] - 1;
+            visibleFlow = visibleFlows[i];
+            missingFlow = 1 - visibleFlow;
+            missingMargin = missingFlow * usableHeight;
+          } else if (node.depth === Depth.MODULE && node.margin > 0) {
+            node.margin *= maxTotalMargin / totalMargin;
+            if (numMargins > 0) {
+              node.margin += missingMargin / numMargins;
+            }
+          }
+        },
+      );
     }
 
     for (let node of this.alluvialRoot.traverseDepthFirstWhile(
