@@ -171,7 +171,7 @@ export default class Diagram {
 
     if (verticalAlign === "justify") {
       let currentTotalMargin = maxTotalMargin;
-      let currentTotalFlow = Math.max(...networkTotalFlow);
+      let visibleFlow = Math.max(...networkTotalFlow);
       let currentVisibleModules = 2;
 
       this.alluvialRoot.forEachDepthFirstWhile(
@@ -181,12 +181,15 @@ export default class Diagram {
         (node, i) => {
           if (node.depth === Depth.NETWORK_ROOT) {
             currentTotalMargin = networkTotalMargins[i];
-            currentTotalFlow = networkTotalFlow[i];
+            visibleFlow = networkTotalFlow[i];
             currentVisibleModules = visibleModules[i];
           } else if (node.depth === Depth.MODULE) {
-            node.margin *= (maxTotalMargin / currentTotalMargin);
+            node.margin *= maxTotalMargin / currentTotalMargin;
             if (currentVisibleModules > 1) {
-              node.margin += (1 - currentTotalFlow) * usableHeight / (currentVisibleModules - 1);
+              const missingFlow = 1 - visibleFlow;
+              const missingMargin = missingFlow * height;
+              const numMargins = currentVisibleModules - 1;
+              node.margin += missingMargin / numMargins;
             }
           }
         },
