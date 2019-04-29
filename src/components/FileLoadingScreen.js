@@ -40,6 +40,8 @@ const fileExtension = filename => {
   return filename.substring(index + 1).toLowerCase();
 };
 
+const fileSize = file => new Blob([file]).size;
+
 export default class FileLoadingScreen extends React.Component {
   state = {
     files: [],
@@ -148,7 +150,7 @@ export default class FileLoadingScreen extends React.Component {
       const newFiles = parsed.map((parsed, i) => ({
         parsed,
         name: networks[i],
-        size: new Blob([validFiles[i]]).size,
+        size: fileSize(validFiles[i]),
         format: fileExtension(networks[i])
       }));
 
