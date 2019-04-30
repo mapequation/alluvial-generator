@@ -75,7 +75,8 @@ export default class AlluvialNodeBase {
     const index = this.children.indexOf(node);
     const found = index > -1;
     if (found) {
-      this.children.splice(index, 1);
+      this.children[index] = this.children[this.children.length - 1];
+      this.children.pop();
     }
     if (!this.children.length) {
       this.flow = 0;
