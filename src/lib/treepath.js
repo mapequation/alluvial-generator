@@ -7,6 +7,8 @@ type Path = TreePath | string; // eslint-disable-line no-use-before-define
 export default class TreePath {
   path: string;
   pathArr: string[];
+  ancestorPaths: Map<number, string> = new Map();
+
 
   /**
    * Construct a new TreePath
@@ -14,6 +16,10 @@ export default class TreePath {
   constructor(path: Path) {
     this.path = path.toString();
     this.pathArr = this.path.split(":");
+    this.ancestorPaths.set(0, "root");
+    for (let level = 1; level < this.pathArr.length; level++) {
+      this.ancestorPaths.set(level, this.pathArr.slice(0, level).join(":"));
+    }
   }
 
   /**
@@ -103,8 +109,7 @@ export default class TreePath {
   }
 
   ancestorAtLevelAsString(level: number): string {
-    if (level === 0) return "root";
-    return this.pathArr.slice(0, level).join(":");
+    return this.ancestorPaths.get(level) || this.path;
   }
 
   static ancestorAtLevel(treePath: Path, level: number): TreePath {
