@@ -304,11 +304,7 @@ export default class Diagram {
 
       const oppositeNode = this.getOppositeNode(node, branch.side);
 
-      const streamlineId = StreamlineId.create(
-        node,
-        branch.side,
-        oppositeNode,
-      ).toString();
+      const streamlineId = StreamlineId.create(node, branch.side, oppositeNode);
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
@@ -344,11 +340,7 @@ export default class Diagram {
 
     const oppositeNode: ?LeafNode = this.getOppositeNode(node, side);
 
-    const streamlineId = StreamlineId.create(
-      node,
-      side,
-      oppositeNode,
-    ).toString();
+    const streamlineId = StreamlineId.create(node, side, oppositeNode);
     let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(
       streamlineId,
     );
