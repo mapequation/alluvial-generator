@@ -15,12 +15,6 @@ type Layout = Position & Size;
 
 export type AlluvialNode = $Subtype<AlluvialNodeBase>; // eslint-disable-line no-use-before-define
 
-export type AlluvialNodeIterator = {
-  child: AlluvialNode,
-  childIndex: number,
-  children: AlluvialNode[]
-};
-
 export type IteratorCallback = (
   child: AlluvialNode,
   childIndex: number,
@@ -119,95 +113,8 @@ export default class AlluvialNodeBase {
     };
   }
 
-  *traverseDepthFirst(preOrder: boolean = true): Iterable<AlluvialNode> {
-    if (preOrder) {
-      yield* this.traverseDepthFirstPreOrder();
-    } else {
-      yield* this.traverseDepthFirstPostOrder();
-    }
-  }
-
-  *traverseDepthFirstPreOrder(): Iterable<AlluvialNode> {
-    yield this;
-    for (let child of this) {
-      yield* child.traverseDepthFirstPreOrder();
-    }
-  }
-
-  *traverseDepthFirstPostOrder(): Iterable<AlluvialNode> {
-    for (let child of this) {
-      yield* child.traverseDepthFirstPostOrder();
-    }
-    yield this;
-  }
-
-  *traverseDepthFirstWhile(
-    predicate: Predicate<AlluvialNode>,
-    preOrder: boolean = true
-  ): Iterable<AlluvialNode> {
-    if (preOrder) {
-      yield* this.traverseDepthFirstPreOrderWhile(predicate);
-    } else {
-      yield* this.traverseDepthFirstPostOrderWhile(predicate);
-    }
-  }
-
-  *traverseDepthFirstPreOrderWhile(
-    predicate: Predicate<AlluvialNode>
-  ): Iterable<AlluvialNode> {
-    if (!predicate(this)) return;
-    yield this;
-    for (let child of this) {
-      yield* child.traverseDepthFirstPreOrderWhile(predicate);
-    }
-  }
-
-  *traverseDepthFirstPostOrderWhile(
-    predicate: Predicate<AlluvialNode>
-  ): Iterable<AlluvialNode> {
-    if (!predicate(this)) return;
-    for (let child of this) {
-      yield* child.traverseDepthFirstPostOrderWhile(predicate);
-    }
-    yield this;
-  }
-
-  *childrenDepthFirstPreOrder(): Iterable<AlluvialNodeIterator> {
-    const { children } = this;
-    for (let childIndex = 0; childIndex < children.length; ++childIndex) {
-      const child = children[childIndex];
-      yield { child, childIndex, children };
-      yield* child.childrenDepthFirstPreOrder();
-    }
-  }
-
-  *childrenDepthFirstPostOrder(): Iterable<AlluvialNodeIterator> {
-    const { children } = this;
-    for (let childIndex = 0; childIndex < children.length; ++childIndex) {
-      const child = children[childIndex];
-      yield* child.childrenDepthFirstPostOrder();
-      yield { child, childIndex, children };
-    }
-  }
-
   forEachDepthFirst(callback: IteratorCallback, preOrder: boolean = true) {
-    if (preOrder) {
-      this.forEachDepthFirstPreOrder(callback);
-    } else {
-      this.forEachDepthFirstPostOrder(callback);
-    }
-  }
-
-  forEachDepthFirstWhile(
-    predicate: Predicate<AlluvialNode>,
-    callback: IteratorCallback,
-    preOrder: boolean = true
-  ) {
-    if (preOrder) {
-      this.forEachDepthFirstPreOrderWhile(predicate, callback);
-    } else {
-      this.forEachDepthFirstPostOrderWhile(predicate, callback);
-    }
+    return preOrder ? this.forEachDepthFirstPreOrder(callback) : this.forEachDepthFirstPostOrder(callback);
   }
 
   forEachDepthFirstPreOrder(callback: IteratorCallback) {
@@ -226,9 +133,19 @@ export default class AlluvialNodeBase {
     });
   }
 
+  forEachDepthFirstWhile(
+    predicate: Predicate<AlluvialNode>,
+    callback: IteratorCallback,
+    preOrder: boolean = true,
+  ) {
+    return preOrder
+      ? this.forEachDepthFirstPreOrderWhile(predicate, callback)
+      : this.forEachDepthFirstPostOrderWhile(predicate, callback);
+  }
+
   forEachDepthFirstPreOrderWhile(
     predicate: Predicate<AlluvialNode>,
-    callback: IteratorCallback
+    callback: IteratorCallback,
   ) {
     const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {
@@ -239,7 +156,7 @@ export default class AlluvialNodeBase {
 
   forEachDepthFirstPostOrderWhile(
     predicate: Predicate<AlluvialNode>,
-    callback: IteratorCallback
+    callback: IteratorCallback,
   ) {
     const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {
@@ -248,32 +165,7 @@ export default class AlluvialNodeBase {
     });
   }
 
-  createForEachDepthFirstWhileIterator(
-    predicate: Predicate<AlluvialNode>,
-    preOrder: boolean = true
-  ): IteratorCallback => void {
-    if (preOrder) {
-      return this.createForEachDepthFirstPreOrderWhileIterator(predicate);
-    } else {
-      return this.createForEachDepthFirstPostOrderWhileIterator(predicate);
-    }
-  }
-
-  createForEachDepthFirstPreOrderWhileIterator(
-    predicate: Predicate<AlluvialNode>
-  ): IteratorCallback => void {
-    return (callback: IteratorCallback) =>
-      this.forEachDepthFirstPreOrderWhile(predicate, callback);
-  }
-
-  createForEachDepthFirstPostOrderWhileIterator(
-    predicate: Predicate<AlluvialNode>
-  ): IteratorCallback => void {
-    return (callback: IteratorCallback) =>
-      this.forEachDepthFirstPostOrderWhile(predicate, callback);
-  }
-
-  *leafNodes(): Iterable<AlluvialNode> {
+  * leafNodes(): Iterable<AlluvialNode> {
     for (let child of this) {
       yield* child.leafNodes();
     }

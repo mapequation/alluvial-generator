@@ -220,56 +220,54 @@ export default class Diagram {
       );
     }
 
-    for (let node of this.alluvialRoot.traverseDepthFirstWhile(
+    this.alluvialRoot.forEachDepthFirstWhile(
       node => node.depth <= Depth.BRANCH,
-    )) {
-      switch (node.depth) {
-        case Depth.BRANCH:
+      node => {
+        if (node.depth === Depth.BRANCH) {
           node.sortChildren(flowThreshold);
-          break;
-        default:
-          break;
-      }
-    }
+        }
+      },
+    );
 
     x = 0;
     y = height;
 
-    for (let node of this.alluvialRoot.traverseDepthFirstPostOrderWhile(
+    this.alluvialRoot.forEachDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
         (node.depth === Depth.MODULE && node.flow >= flowThreshold),
-    )) {
-      switch (node.depth) {
-        case Depth.ALLUVIAL_ROOT:
-          node.layout = { x: 0, y: 0, width: totalWidth, height };
-          break;
-        case Depth.NETWORK_ROOT:
-          node.layout = { x, y: 0, width, height };
-          x += networkWidth;
-          y = height;
-          break;
-        case Depth.MODULE:
-          node.layout = { x, y, width, height: node.flow * usableHeight };
-          y -= node.margin;
-          break;
-        case Depth.HIGHLIGHT_GROUP:
-          node.layout = { x, y, width, height: node.flow * usableHeight };
-          break;
-        case Depth.BRANCH:
-          node.layout = { x, y, width, height: node.flow * usableHeight };
-          if (node.isLeft) {
-            y += node.flow * usableHeight;
-          }
-          break;
-        case Depth.STREAMLINE_NODE:
-          y -= node.flow * usableHeight;
-          node.layout = { x, y, width, height: node.flow * usableHeight };
-          break;
-        default:
-          break;
-      }
-    }
+      node => {
+        switch (node.depth) {
+          case Depth.ALLUVIAL_ROOT:
+            node.layout = { x: 0, y: 0, width: totalWidth, height };
+            break;
+          case Depth.NETWORK_ROOT:
+            node.layout = { x, y: 0, width, height };
+            x += networkWidth;
+            y = height;
+            break;
+          case Depth.MODULE:
+            node.layout = { x, y, width, height: node.flow * usableHeight };
+            y -= node.margin;
+            break;
+          case Depth.HIGHLIGHT_GROUP:
+            node.layout = { x, y, width, height: node.flow * usableHeight };
+            break;
+          case Depth.BRANCH:
+            node.layout = { x, y, width, height: node.flow * usableHeight };
+            if (node.isLeft) {
+              y += node.flow * usableHeight;
+            }
+            break;
+          case Depth.STREAMLINE_NODE:
+            y -= node.flow * usableHeight;
+            node.layout = { x, y, width, height: node.flow * usableHeight };
+            break;
+          default:
+            break;
+        }
+      },
+    );
   }
 
   asObject(): Object {
