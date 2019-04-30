@@ -6,12 +6,14 @@ type Path = TreePath | string; // eslint-disable-line no-use-before-define
  */
 export default class TreePath {
   path: string;
+  pathArr: string[];
 
   /**
    * Construct a new TreePath
    */
   constructor(path: Path) {
     this.path = path.toString();
+    this.pathArr = this.path.split(":");
   }
 
   /**
@@ -51,6 +53,10 @@ export default class TreePath {
     return new TreePath("root");
   }
 
+  isRoot() {
+    return this.path === "root";
+  }
+
   static isRoot(treePath: Path) {
     return treePath.toString() === "root";
   }
@@ -79,7 +85,7 @@ export default class TreePath {
   }
 
   get level(): number {
-    return TreePath.level(this);
+    return this.isRoot() ? 0 : this.pathArr.length;
   }
 
   static level(treePath: Path): number {
@@ -94,6 +100,11 @@ export default class TreePath {
 
   ancestorAtLevel(level: number): TreePath {
     return TreePath.ancestorAtLevel(this, level);
+  }
+
+  ancestorAtLevelAsString(level: number): string {
+    if (level === 0) return "root";
+    return this.pathArr.slice(0, level).join(":");
   }
 
   static ancestorAtLevel(treePath: Path, level: number): TreePath {

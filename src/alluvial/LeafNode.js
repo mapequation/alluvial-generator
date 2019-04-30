@@ -7,11 +7,13 @@ import { LEFT } from "./Branch";
 import { LEAF_NODE } from "./Depth";
 import StreamlineNode from "./StreamlineNode";
 
+
 export default class LeafNode extends AlluvialNodeBase {
   node: Node;
   name: string;
   insignificant: boolean;
   highlightIndex: number;
+  treePath: TreePath;
 
   moduleLevel: number = 1;
 
@@ -23,6 +25,7 @@ export default class LeafNode extends AlluvialNodeBase {
     this.node = node;
     this.name = node.name;
     this.flow = node.flow;
+    this.treePath = new TreePath(node.path);
     this.insignificant = node.insignificant || false;
     this.highlightIndex =
       node.highlightIndex != null && Number.isInteger(node.highlightIndex)
@@ -31,15 +34,15 @@ export default class LeafNode extends AlluvialNodeBase {
   }
 
   get level(): number {
-    return TreePath.level(this.node.path);
+    return this.treePath.level;
   }
 
   ancestorAtLevel(moduleLevel: number): string {
-    return TreePath.ancestorAtLevel(this.node.path, moduleLevel).toString();
+    return this.treePath.ancestorAtLevelAsString(moduleLevel);
   }
 
   getAncestorAtCurrentLevel(): string {
-    return this.ancestorAtLevel(this.moduleLevel);
+    return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
   set parent(parent: ?StreamlineNode) {
