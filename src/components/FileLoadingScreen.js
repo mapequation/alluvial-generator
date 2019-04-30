@@ -130,9 +130,8 @@ export default class FileLoadingScreen extends React.Component {
         name: networks[i],
         size: fileSize(file),
         format: fileExtension(networks[i]),
-      })),
-      loading: false,
-    });
+      }))
+    }, this.withLoadingState(this.parseNetworks));
   };
 
   render() {
@@ -208,7 +207,7 @@ export default class FileLoadingScreen extends React.Component {
               <Table.HeaderCell colSpan={files.length + 1}>
                 <Button
                   size="small"
-                  onClick={this.withLoadingState(this.loadExample)}
+                  onClick={this.loadExample}
                 >
                   Load example
                 </Button>
