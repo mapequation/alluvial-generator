@@ -1,11 +1,13 @@
 // @flow
 import sortBy from "lodash/sortBy";
+import PriorityQueue from "../lib/priority-queue";
+import TreePath from "../lib/treepath";
 
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { MODULE } from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import NetworkRoot from "./NetworkRoot";
-import TreePath from "../lib/treepath";
+
 
 export default class Module extends AlluvialNodeBase {
   children: HighlightGroup[] = [];
@@ -46,10 +48,11 @@ export default class Module extends AlluvialNodeBase {
   }
 
   getLargestLeafNodeNames() {
-    return [...this.leafNodes()]
-      .sort((a, b) => b.flow - a.flow)
-      .map(node => node.name)
-      .slice(0, 10);
+    const queue = new PriorityQueue(6);
+    for (let node of this.leafNodes()) {
+      queue.push(node);
+    }
+    return queue.map(node => node.name);
   }
 
   asObject(): Object {
