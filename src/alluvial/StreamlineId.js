@@ -4,7 +4,6 @@ import { opposite, sideToString } from "./Branch";
 import LeafNode from "./LeafNode";
 
 
-
 export default class StreamlineId {
   source: string;
   target: ?string = null;

@@ -21,6 +21,7 @@ export const opposite = (side: Side): Side => (side === LEFT ? RIGHT : LEFT);
 export default class Branch extends AlluvialNodeBase {
   children: StreamlineNode[] = [];
   side: Side;
+  depth = BRANCH;
 
   constructor(side: Side, networkId: string, parent: AlluvialNode) {
     super(networkId, parent, sideToString[side]);
@@ -41,10 +42,6 @@ export default class Branch extends AlluvialNodeBase {
 
   get isRight(): boolean {
     return this.side === RIGHT;
-  }
-
-  get depth(): number {
-    return BRANCH;
   }
 
   sortChildren(moduleFlowThreshold: number = 0) {

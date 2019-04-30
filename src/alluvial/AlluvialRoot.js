@@ -5,6 +5,7 @@ import NetworkRoot from "./NetworkRoot";
 
 export default class AlluvialRoot extends AlluvialNodeBase {
   children: NetworkRoot[] = [];
+  depth = ALLUVIAL_ROOT;
 
   constructor() {
     super("", null, "root");
@@ -18,9 +19,5 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     let root = new NetworkRoot(networkId, this, name);
     this.children.push(root);
     return root;
-  }
-
-  get depth(): number {
-    return ALLUVIAL_ROOT;
   }
 }

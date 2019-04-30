@@ -25,6 +25,7 @@ export default class AlluvialNodeBase {
   flow: number = 0;
   networkId: string;
   id: string;
+  depth: Depth = 0;
 
   x: number = 0;
   y: number = 0;
@@ -48,10 +49,6 @@ export default class AlluvialNodeBase {
     if (this.depth === depth) return this;
     if (!this.parent || this.depth < depth) return null;
     return this.parent.getAncestor(depth);
-  }
-
-  get depth(): number {
-    return 0;
   }
 
   get isEmpty(): boolean {

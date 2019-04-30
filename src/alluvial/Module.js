@@ -14,6 +14,7 @@ export default class Module extends AlluvialNodeBase {
   moduleId: string;
   margin: number = 0;
   name: ?string = null;
+  depth = MODULE;
 
   constructor(
     networkId: string,
@@ -72,9 +73,5 @@ export default class Module extends AlluvialNodeBase {
         textY: y + height / 2
       }
     };
-  }
-
-  get depth(): number {
-    return MODULE;
   }
 }

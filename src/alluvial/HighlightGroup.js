@@ -14,7 +14,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     Branch.createLeft(this.networkId, this),
     Branch.createRight(this.networkId, this)
   ];
-
+  depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
 
   constructor(
@@ -35,10 +35,6 @@ export default class HighlightGroup extends AlluvialNodeBase {
       ...this.layout,
       highlightIndex: this.highlightIndex
     };
-  }
-
-  get depth(): number {
-    return HIGHLIGHT_GROUP;
   }
 
   get left() {

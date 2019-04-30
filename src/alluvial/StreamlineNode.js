@@ -2,15 +2,17 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import Branch from "./Branch";
-import { STREAMLINE_NODE, MODULE } from "./Depth";
-import StreamlineLink from "./StreamlineLink";
+import { MODULE, STREAMLINE_NODE } from "./Depth";
 import StreamlineId from "./StreamlineId";
+import StreamlineLink from "./StreamlineLink";
+
 
 export default class StreamlineNode extends AlluvialNodeBase {
   parent: ?Branch;
   link: ?StreamlineLink = null;
   side: Side;
   streamlineId: StreamlineId;
+  depth = STREAMLINE_NODE;
 
   constructor(networkId: string, parent: Branch, id: string) {
     super(networkId, parent, id);
@@ -36,10 +38,6 @@ export default class StreamlineNode extends AlluvialNodeBase {
       return this.link.left === this ? this.link.right : this.link.left;
     }
     return null;
-  }
-
-  get depth(): number {
-    return STREAMLINE_NODE;
   }
 
   byOppositeStreamlinePosition(moduleFlowThreshold: number) {

@@ -11,6 +11,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
   flowThreshold: number = 0;
   name: string;
+  depth = NETWORK_ROOT;
 
   constructor(networkId: string, parent: AlluvialRoot, name: string) {
     super(networkId, parent, networkId);
@@ -37,10 +38,6 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.children.filter(module =>
       parentPath.isAncestor(module.moduleId)
     );
-  }
-
-  get depth(): number {
-    return NETWORK_ROOT;
   }
 
   asObject(): Object {

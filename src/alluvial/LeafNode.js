@@ -14,7 +14,7 @@ export default class LeafNode extends AlluvialNodeBase {
   insignificant: boolean;
   highlightIndex: number;
   treePath: TreePath;
-
+  depth = LEAF_NODE;
   moduleLevel: number = 1;
 
   leftParent: ?StreamlineNode;
@@ -70,10 +70,6 @@ export default class LeafNode extends AlluvialNodeBase {
       ...super.asObject(),
       name: this.name
     };
-  }
-
-  get depth(): number {
-    return LEAF_NODE;
   }
 
   *leafNodes(): Iterable<AlluvialNode> {
