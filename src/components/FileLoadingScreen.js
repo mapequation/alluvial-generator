@@ -1,9 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Button, Icon, Segment, Table } from "semantic-ui-react";
+import { getParserForExtension } from "@mapequation/infoparse";
 
-import papaParsePromise from "../io/papa-parse-promise";
-import { isValidExtension, getParser, acceptedFormats } from "../io/parsers";
+import { acceptedFormats, getParser, isValidExtension } from "../io/parsers";
+import readAsText from "../io/read-as-text";
+
 
 function humanFileSize(bytes, si) {
   const thresh = si ? 1000 : 1024;
@@ -20,19 +22,6 @@ function humanFileSize(bytes, si) {
   } while (Math.abs(bytes) >= thresh && u < units.length - 1);
   return bytes.toFixed(1) + " " + units[u];
 }
-
-const parsePromises = files => {
-  const parseOpts = {
-    comments: "#",
-    delimiter: " ",
-    quoteChar: '"',
-    dynamicTyping: false,
-    skipEmptyLines: true,
-    worker: true
-  };
-
-  return files.map(file => papaParsePromise(file, parseOpts));
-};
 
 const fileExtension = filename => {
   const index = filename.lastIndexOf(".");
@@ -77,27 +66,22 @@ export default class FileLoadingScreen extends React.Component {
 
     this.input.value = "";
 
-    Promise.all(parsePromises(validFiles)).then(parsed => {
-      parsed
-        .map(_ => _.errors)
-        .forEach(_ =>
-          _.forEach(err => {
-            throw err;
-          })
-        );
+    Promise.all(validFiles.map(readAsText))
+      .then(files => {
+        const newFiles = files.map((file, i) => {
+          return {
+            contents: file,
+            name: validFiles[i].name,
+            size: validFiles[i].size,
+            format: validFiles[i].format,
+          };
+        });
 
-      const newFiles = parsed.map((parsed, i) => ({
-        parsed,
-        name: validFiles[i].name,
-        size: validFiles[i].size,
-        format: validFiles[i].format
-      }));
-
-      this.setState(({ files }) => ({
-        files: [...files, ...newFiles],
-        loading: false
-      }));
-    });
+        this.setState(({ files }) => ({
+          files: [...files, ...newFiles],
+          loading: false,
+        }));
+      });
   };
 
   removeFile = index =>
@@ -111,8 +95,10 @@ export default class FileLoadingScreen extends React.Component {
 
     const networks = files.map(file => {
       try {
-        const parser = getParser(file.format);
-        const parsed = parser(file.parsed.data);
+        const parseLinks = false;
+        const lines = file.contents.split("\n").filter(Boolean);
+        const object = getParserForExtension(file.format)(lines, parseLinks);
+        const parsed = getParser(file.format)(object);
 
         return {
           name: file.name,
@@ -134,30 +120,18 @@ export default class FileLoadingScreen extends React.Component {
   loadExample = async () => {
     const networks = this.exampleNetworks;
 
-    const validFiles = await Promise.all(
-      networks.map(network => fetch(`/data/${network}`))
+    const files = await Promise.all(
+      networks.map(network => fetch(`/data/${network}`)),
     ).then(responses => Promise.all(responses.map(res => res.text())));
 
-    Promise.all(parsePromises(validFiles)).then(parsed => {
-      parsed
-        .map(_ => _.errors)
-        .forEach(_ =>
-          _.forEach(err => {
-            throw err;
-          })
-        );
-
-      const newFiles = parsed.map((parsed, i) => ({
-        parsed,
+    this.setState({
+      files: files.map((file, i) => ({
+        contents: file,
         name: networks[i],
-        size: fileSize(validFiles[i]),
-        format: fileExtension(networks[i])
-      }));
-
-      this.setState({
-        files: newFiles,
-        loading: false
-      });
+        size: fileSize(file),
+        format: fileExtension(networks[i]),
+      })),
+      loading: false,
     });
   };
 

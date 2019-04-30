@@ -5,8 +5,8 @@ declare interface Node {
   +path: string;
   +flow: number;
   +name: string;
-  +node: number;
-  +stateNode?: number;
+  +id?: number;
+  +stateId?: number;
   +insignificant?: boolean;
   +highlightIndex?: number;
 }
