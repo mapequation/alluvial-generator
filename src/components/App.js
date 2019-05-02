@@ -2,6 +2,7 @@ import React from "react";
 
 import AlluvialDiagram from "./AlluvialDiagram";
 import FileLoadingScreen from "./FileLoadingScreen";
+import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 export default class App extends React.Component {
@@ -37,7 +38,10 @@ export default class App extends React.Component {
     const loadingComplete = networks.length > 0;
 
     return !loadingComplete ? (
-      <FileLoadingScreen onSubmit={networks => this.setState({ networks })} />
+      <React.Fragment>
+        <Header />
+        <FileLoadingScreen onSubmit={networks => this.setState({ networks })} />
+      </React.Fragment>
     ) : (
       <Sidebar
         width={width}
