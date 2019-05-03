@@ -16,7 +16,7 @@ const Header = () => (
               <span className="brand">
                   <span className="brand-infomap">Alluvial</span> <span className="brand-nn">Generator</span>
               </span>
-              <div className="sub header">Interactive mapping of change in hierarchical partitions</div>
+              <div className="sub header">Interactive mapping of change in hierarchical networks</div>
             </div>
           </h1>
         </div>
