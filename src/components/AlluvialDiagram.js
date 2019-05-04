@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Diagram from "../alluvial/Diagram";
-import { bracketHorizontal, bracketVerticalLeft, bracketVerticalRight } from "../lib/bracket";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -12,8 +11,6 @@ import LinearGradients from "./LinearGradients";
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
-  bracketHorizontal = bracketHorizontal();
-  bracketVertical = [bracketVerticalLeft(), bracketVerticalRight()];
   diagram = null;
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
@@ -270,15 +267,6 @@ export default class AlluvialDiagram extends React.Component {
       .call(makeOpaque);
 
     networkNamesEnter
-      .append("path")
-      .attr("class", "bracket")
-      .attr("fill", "transparent")
-      .attr("stroke", "#999")
-      .attr("stroke", "#fff")
-      .attr("stroke-linecap", "round")
-      .attr("d", this.bracketHorizontal);
-
-    networkNamesEnter
       .append("text")
       .attr("class", "name")
       .text(d => d.name)
@@ -286,21 +274,11 @@ export default class AlluvialDiagram extends React.Component {
       .attr("y", d => d.textY)
       .attr("text-anchor", "middle")
       .attr("fill", "#999")
-      .attr("stroke", "white")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-width", 5)
-      .attr("paint-order", "stroke")
       .attr("font-size", 12)
       .attr("dy", 3);
 
     const networkNameUpdateDelay =
       networkAdded || !networkRemoved ? 0.5 * delay : delay;
-
-    networkNames
-      .select(".bracket")
-      .transition(t)
-      .delay(networkNameUpdateDelay)
-      .attr("d", this.bracketHorizontal);
 
     networkNames
       .select(".name")
@@ -416,18 +394,6 @@ export default class AlluvialDiagram extends React.Component {
       .domain([0, 100])
       .range([1, 2, 3, 4]);
 
-    const bracketVertical = index => d =>
-      this.bracketVertical[index](d.moduleName.bracket[index]);
-
-    const bracketDasharray = index => d => {
-      const { width, height } = d.moduleName.bracket[index];
-      const array =
-        height < width + 3
-          ? [width - 5, height + 10, width - 5, 0, height]
-          : [width + height / 2, 0, width + height / 2, 0, width];
-      return array.join(" ");
-    };
-
     const tspanDy = (d, i, nodes) =>
       nodes.length === 1
         ? "0.35em"
@@ -459,29 +425,12 @@ export default class AlluvialDiagram extends React.Component {
         .call(makeOpaque);
 
       moduleNamesEnter
-        .append("path")
-        .attr("class", "bracket")
-        .attr("fill", "transparent")
-        .attr("stroke", "#999")
-        .attr("stroke", "#fff")
-        .attr("stroke-linecap", "round")
-        .attr("stroke-dasharray", bracketDasharray(index))
-        .attr("d", bracketVertical(index));
-
-      moduleNamesEnter
         .append("text")
         .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
         .attr("y", d => d.moduleName.textY)
         .attr("fill", "#999")
         .attr("font-size", 9);
-
-      moduleNames
-        .select(".bracket")
-        .transition(t)
-        .delay(moduleNameUpdateDelay)
-        .attr("stroke-dasharray", bracketDasharray(index))
-        .attr("d", bracketVertical(index));
 
       moduleNames
         .select(".name")
