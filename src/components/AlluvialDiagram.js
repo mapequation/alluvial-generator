@@ -428,22 +428,22 @@ export default class AlluvialDiagram extends React.Component {
         .append("text")
         .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
-        .attr("y", d => d.moduleName.y)
+        .attr("y", d => d.moduleNamePosition.y)
         .attr("fill", "#999")
         .attr("font-size", 9);
 
       moduleNames
         .select(".name")
-        .each(function(d) {
+        .each(function (d) {
           d3.select(this)
             .selectAll("tspan")
             .transition(t)
             .delay(moduleNameUpdateDelay)
-            .attr("x", d.moduleName.x[index]);
+            .attr("x", d.moduleNamePosition.x[index]);
         })
         .transition(t)
         .delay(moduleNameUpdateDelay)
-        .attr("y", d => d.moduleName.y);
+        .attr("y", d => d.moduleNamePosition.y);
 
       moduleNames = moduleNamesEnter.merge(moduleNames);
 
@@ -451,14 +451,12 @@ export default class AlluvialDiagram extends React.Component {
         .selectAll(".name")
         .selectAll("tspan")
         .data(
-          d =>
-            d.moduleName.largestLeafNodes
+          d => d.name
+            ? [{ name: d.name, x: d.moduleNamePosition.x[index] }]
+            : d.largestLeafNodes
               .slice(0, numVisibleModuleNames(d.height))
-              .map(name => ({
-                name,
-                x: d.moduleName.x[index]
-              })),
-          function(d) {
+              .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
+          function (d) {
             return d ? d.name : this.id;
           }
         );
@@ -541,8 +539,8 @@ export default class AlluvialDiagram extends React.Component {
       moduleId
         .transition(t)
         .delay(moduleNameUpdateDelay)
-        .attr("y", d => d.moduleIdText.y)
-        .attr("x", d => d.moduleIdText.x);
+        .attr("y", d => d.moduleIdPosition.y)
+        .attr("x", d => d.moduleIdPosition.x);
 
       moduleId
         .enter()
@@ -557,8 +555,8 @@ export default class AlluvialDiagram extends React.Component {
         .attr("paint-order", "stroke")
         .attr("stroke-linecap", "round")
         .attr("dy", 3)
-        .attr("y", d => d.moduleIdText.y)
-        .attr("x", d => d.moduleIdText.x)
+        .attr("y", d => d.moduleIdPosition.y)
+        .attr("x", d => d.moduleIdPosition.x)
         .call(makeTransparent)
         .transition(t)
         .delay(moduleNameUpdateDelay)
@@ -578,19 +576,19 @@ export default class AlluvialDiagram extends React.Component {
       <svg
         width="100vw"
         height="100vh"
-        style={{width: "100vw", height: "100vh"}} // For Firefox
+        style={{ width: "100vw", height: "100vh" }} // For Firefox
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
       >
         <defs>
-          <DropShadows maxLevel={this.maxModuleLevel} />
+          <DropShadows maxLevel={this.maxModuleLevel}/>
           <LinearGradients
             defaultColor={this.defaultColor}
             highlightColors={this.highlightColors}
           />
         </defs>
         <g id="zoomable">
-          <g className="alluvialDiagram" />
+          <g className="alluvialDiagram"/>
         </g>
       </svg>
     );

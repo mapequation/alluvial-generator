@@ -56,7 +56,7 @@ export default class Module extends AlluvialNodeBase {
   }
 
   asObject(): Object {
-    const { name, x: x1, y, height } = this;
+    const { name, x: x1, y, height, parent } = this;
 
     const x2 = x1 + this.width;
     const padding = 5;
@@ -67,16 +67,17 @@ export default class Module extends AlluvialNodeBase {
       ...super.asObject(),
       moduleLevel: this.moduleLevel,
       moduleId: this.moduleId,
-      moduleName: {
-        name: name,
-        largestLeafNodes: this.getLargestLeafNodeNames(),
+      name,
+      largestLeafNodes: this.getLargestLeafNodeNames(),
+      moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
         y: y + height / 2
       },
-      moduleIdText: {
+      moduleIdPosition: {
         x: (x1 + x2) / 2,
         y: y + height / 2
-      }
+      },
+      networkName: parent.name,
     };
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar, Table } from "semantic-ui-react";
 import FileSaver from "file-saver";
 
 import AlluvialDiagram from "./AlluvialDiagram";
@@ -201,6 +201,7 @@ export default class Sidebar extends React.Component {
             </Button.Group>
           </Menu.Item>
           <Menu.Item>
+            <Header as="h4">Settings</Header>
             <Button icon size="small" labelPosition="left" onClick={this.saveSettings}>
               <Icon name="download"/>Save
             </Button>
