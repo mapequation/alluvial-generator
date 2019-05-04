@@ -47,21 +47,13 @@ export default class App extends React.Component {
     ) : (
       <Sidebar
         width={width}
-        onWidthChange={(e, { value }) =>
-          this.setState({ width: this.validNumber(value) })
-        }
+        onWidthChange={width => this.setState({ width: this.validNumber(width) })}
         height={height}
-        onHeightChange={(e, { value }) =>
-          this.setState({ height: this.validNumber(value) })
-        }
+        onHeightChange={height => this.setState({ height: this.validNumber(height) })}
         streamlineFraction={streamlineFraction}
-        onStreamlineFractionChange={streamlineFraction =>
-          this.setState({ streamlineFraction })
-        }
+        onStreamlineFractionChange={streamlineFraction => this.setState({ streamlineFraction })}
         streamlineOpacity={streamlineOpacity}
-        onStreamlineOpacityChange={streamlineOpacity =>
-          this.setState({ streamlineOpacity })
-        }
+        onStreamlineOpacityChange={streamlineOpacity => this.setState({ streamlineOpacity })}
         duration={duration}
         onDurationChange={duration => this.setState({ duration })}
         moduleFlowThreshold={moduleFlowThreshold}

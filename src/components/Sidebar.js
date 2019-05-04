@@ -20,7 +20,7 @@ export default function Sidebar(props) {
             label="Width"
             labelPosition="left"
             value={props.width}
-            onChange={props.onWidthChange}
+            onChange={(e, { value }) => props.onWidthChange(value)}
           />
         </Menu.Item>
         <Menu.Item>
@@ -29,7 +29,7 @@ export default function Sidebar(props) {
             label="Height"
             labelPosition="left"
             value={props.height}
-            onChange={props.onHeightChange}
+            onChange={(e, { value }) => props.onHeightChange(value)}
           />
         </Menu.Item>
         <Menu.Item>
