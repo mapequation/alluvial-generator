@@ -19,6 +19,7 @@ export default class Sidebar extends React.Component {
     streamlineThreshold: 1,
     verticalAlign: "bottom",
     showModuleId: false,
+    dropShadow: false,
   };
 
   input = null;
@@ -64,6 +65,7 @@ export default class Sidebar extends React.Component {
       streamlineThreshold,
       verticalAlign,
       showModuleId,
+      dropShadow,
     } = this.state;
 
     return (
@@ -216,6 +218,10 @@ export default class Sidebar extends React.Component {
                       checked={showModuleId} label="Show module id"/>
           </Menu.Item>
           <Menu.Item>
+            <Checkbox toggle onChange={(e, { checked }) => this.setState({ dropShadow: checked })}
+                      checked={dropShadow} label="Use drop shadow"/>
+          </Menu.Item>
+          <Menu.Item>
             <Button icon labelPosition="left" onClick={this.saveSettings}>
               <Icon name="download"/>Save
             </Button>
@@ -246,6 +252,7 @@ export default class Sidebar extends React.Component {
               streamlineThreshold={+streamlineThreshold}
               verticalAlign={verticalAlign}
               showModuleId={showModuleId}
+              dropShadow={dropShadow}
             />
           </React.StrictMode>
         </SemanticSidebar.Pusher>

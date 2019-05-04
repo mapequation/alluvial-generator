@@ -26,6 +26,7 @@ export default class AlluvialDiagram extends React.Component {
     streamlineThreshold: 1,
     verticalAlign: "bottom",
     showModuleId: false,
+    dropShadow: false,
   };
 
   static propTypes = {
@@ -39,6 +40,7 @@ export default class AlluvialDiagram extends React.Component {
     streamlineThreshold: PropTypes.number,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
+    dropShadow: PropTypes.bool,
   };
 
   componentDidMount() {
@@ -150,7 +152,7 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   draw(prevProps = this.props) {
-    const { width, height, duration, streamlineOpacity, streamlineThreshold, showModuleId } = this.props;
+    const { width, height, duration, streamlineOpacity, streamlineThreshold, showModuleId, dropShadow } = this.props;
     const {
       networkAdded,
       networkRemoved,
@@ -364,10 +366,11 @@ export default class AlluvialDiagram extends React.Component {
       .enter()
       .append("g")
       .attr("class", "module")
-      //.call(DropShadows.filter)
       .on("dblclick", onDoubleClick)
       .on("click", onClick)
       .merge(modules);
+
+    modules.call(DropShadows.filter(dropShadow));
 
     /**
      * Module names

@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import React from "react";
 
+
 export default class DropShadows extends React.PureComponent {
   static defaultProps = {
     maxLevel: 1
@@ -13,8 +14,8 @@ export default class DropShadows extends React.PureComponent {
 
   static getUrl = level => `url(#shadow${level})`;
 
-  static filter = d =>
-    d.style("filter", d => DropShadows.getUrl(d.moduleLevel));
+  static filter = (enabled = true) => d =>
+    d.style("filter", enabled ? d => DropShadows.getUrl(d.moduleLevel) : null);
 
   render() {
     const { maxLevel } = this.props;
