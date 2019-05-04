@@ -25,7 +25,7 @@ export default class AlluvialDiagram extends React.Component {
     moduleFlowThreshold: 0.01,
     streamlineThreshold: 1,
     verticalAlign: "bottom",
-    showModuleId: true
+    showModuleId: false,
   };
 
   static propTypes = {
@@ -38,7 +38,7 @@ export default class AlluvialDiagram extends React.Component {
     moduleFlowThreshold: PropTypes.number,
     streamlineThreshold: PropTypes.number,
     verticalAlign: PropTypes.string,
-    showModuleId: PropTypes.bool
+    showModuleId: PropTypes.bool,
   };
 
   componentDidMount() {
