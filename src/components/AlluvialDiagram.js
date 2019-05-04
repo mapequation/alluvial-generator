@@ -403,10 +403,7 @@ export default class AlluvialDiagram extends React.Component {
 
     const moduleNameUpdateDelay = networkNameUpdateDelay;
 
-    for (let [index, moduleNames] of [
-      leftModuleNames,
-      rightModuleNames
-    ].entries()) {
+    for (let [index, moduleNames] of [leftModuleNames, rightModuleNames].entries()) {
       moduleNames
         .exit()
         .transition(t)
@@ -428,7 +425,7 @@ export default class AlluvialDiagram extends React.Component {
         .append("text")
         .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
-        .attr("y", d => d.moduleName.textY)
+        .attr("y", d => d.moduleName.y)
         .attr("fill", "#999")
         .attr("font-size", 9);
 
@@ -439,11 +436,11 @@ export default class AlluvialDiagram extends React.Component {
             .selectAll("tspan")
             .transition(t)
             .delay(moduleNameUpdateDelay)
-            .attr("x", d.moduleName.textX[index]);
+            .attr("x", d.moduleName.x[index]);
         })
         .transition(t)
         .delay(moduleNameUpdateDelay)
-        .attr("y", d => d.moduleName.textY);
+        .attr("y", d => d.moduleName.y);
 
       moduleNames = moduleNamesEnter.merge(moduleNames);
 
@@ -456,7 +453,7 @@ export default class AlluvialDiagram extends React.Component {
               .slice(0, numVisibleModuleNames(d.height))
               .map(name => ({
                 name,
-                x: d.moduleName.textX[index]
+                x: d.moduleName.x[index]
               })),
           function(d) {
             return d ? d.name : this.id;
@@ -529,43 +526,43 @@ export default class AlluvialDiagram extends React.Component {
       .call(makeOpaque);
 
     /**
-     * Partition names
+     * Module IDs
      */
     if (showModuleId) {
-      const partitions = networkRoots.selectAll(".partition").data(d => d.children, key);
+      const moduleId = networkRoots.selectAll(".moduleId").data(d => d.children, key);
 
-      partitions
+      moduleId
         .exit()
         .remove();
 
-      partitions
+      moduleId
         .transition(t)
         .delay(moduleNameUpdateDelay)
-        .attr("y", d => d.moduleName.textY)
-        .attr("x", d => d.x + d.width / 2);
+        .attr("y", d => d.moduleIdText.y)
+        .attr("x", d => d.moduleIdText.x);
 
-      partitions
+      moduleId
         .enter()
         .append("text")
-        .attr("class", "partition")
+        .attr("class", "moduleId")
         .text(d => d.moduleId)
         .attr("text-anchor", "middle")
-        .attr("fill", "#000")
+        .attr("fill", "#333")
         .attr("font-size", 12)
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
         .attr("paint-order", "stroke")
         .attr("stroke-linecap", "round")
         .attr("dy", 3)
-        .attr("y", d => d.moduleName.textY)
-        .attr("x", d => d.x + d.width / 2)
+        .attr("y", d => d.moduleIdText.y)
+        .attr("x", d => d.moduleIdText.x)
         .call(makeTransparent)
         .transition(t)
         .delay(moduleNameUpdateDelay)
         .call(makeOpaque);
     } else {
       networkRoots
-        .selectAll(".partition")
+        .selectAll(".moduleId")
         .transition(t)
         .call(makeTransparent)
         .delay(moduleNameUpdateDelay)

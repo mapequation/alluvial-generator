@@ -70,8 +70,12 @@ export default class Module extends AlluvialNodeBase {
       moduleName: {
         name: name,
         largestLeafNodes: this.getLargestLeafNodeNames(),
-        textX: [x1 - textOffset, x2 + textOffset],
-        textY: y + height / 2
+        x: [x1 - textOffset, x2 + textOffset],
+        y: y + height / 2
+      },
+      moduleIdText: {
+        x: (x1 + x2) / 2,
+        y: y + height / 2
       }
     };
   }
