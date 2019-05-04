@@ -7,6 +7,8 @@ import AlluvialDiagram from "./AlluvialDiagram";
 import readAsText from "../io/read-as-text";
 
 
+const TextInput = props => <Input size="small" type="text" labelPosition="left" {...props} />;
+
 export default class Sidebar extends React.Component {
   state = {
     width: 1200,
@@ -79,28 +81,22 @@ export default class Sidebar extends React.Component {
           vertical
         >
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Width"
-              labelPosition="left"
               value={width}
               onChange={(e, { value }) => this.setState({ width: this.validNumber(value) })}
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Height"
-              labelPosition="left"
               value={height}
               onChange={(e, { value }) => this.setState({ height: this.validNumber(value) })}
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Max module width"
-              labelPosition="left"
               value={maxModuleWidth}
             />
             <Slider
@@ -114,10 +110,8 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Streamline fraction"
-              labelPosition="left"
               value={streamlineFraction}
             />
             <Slider
@@ -131,10 +125,8 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Streamline opacity"
-              labelPosition="left"
               value={streamlineOpacity}
             />
             <Slider
@@ -148,10 +140,8 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Animation duration"
-              labelPosition="left"
               value={duration}
             />
             <Slider
@@ -166,10 +156,8 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Module flow threshold"
-              labelPosition="left"
               value={moduleFlowThreshold}
             />
             <Slider
@@ -184,10 +172,8 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <Input
-              type="text"
+            <TextInput
               label="Streamline height threshold"
-              labelPosition="left"
               value={streamlineThreshold}
             />
             <Slider
@@ -222,10 +208,10 @@ export default class Sidebar extends React.Component {
                       checked={dropShadow} label="Use drop shadow"/>
           </Menu.Item>
           <Menu.Item>
-            <Button icon labelPosition="left" onClick={this.saveSettings}>
+            <Button icon size="small" labelPosition="left" onClick={this.saveSettings}>
               <Icon name="download"/>Save
             </Button>
-            <label className="ui icon left labeled button" htmlFor="upload">
+            <label className="ui small icon left labeled button" htmlFor="upload">
               <Icon name="upload"/>Load
             </label>
             <input
