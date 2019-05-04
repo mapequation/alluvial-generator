@@ -15,8 +15,10 @@ export default class Module extends AlluvialNodeBase {
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
-  name: ?string = null;
+  _name: ?string = null;
   depth = MODULE;
+
+  static customNames: Map<string, string> = new Map();
 
   constructor(
     networkId: string,
@@ -28,6 +30,21 @@ export default class Module extends AlluvialNodeBase {
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
+    this._name = Module.customNames.get(this.id) || null;
+  }
+
+  set name(name: string) {
+    if (name === "") {
+      Module.customNames.delete(this.id);
+      this._name = null;
+    } else {
+      Module.customNames.set(this.id, name);
+      this._name = name;
+    }
+  }
+
+  get name(): ?string {
+    return this._name;
   }
 
   getGroup(highlightIndex: number): ?HighlightGroup {

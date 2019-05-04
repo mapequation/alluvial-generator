@@ -102,6 +102,13 @@ export default class Diagram {
     }
   }
 
+  setModuleName(id: string, name: ?string) {
+    const module = this.getModuleById(id);
+    if (!module) return;
+    module.name = name;
+    this.dirty = true;
+  }
+
   calcLayout(
     totalWidth: number,
     height: number,
@@ -572,6 +579,13 @@ export default class Diagram {
     const nodesByName = this.networksById.get(networkId);
     if (!nodesByName) return;
     return nodesByName.get(name);
+  }
+
+  getModuleById(id: string): ?Module {
+    const [networkId, moduleId] = id.split("_module");
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!networkRoot) return;
+    return networkRoot.getModule(moduleId);
   }
 
   getNeighborNetworkId(networkId: string, side: Side): ?string {

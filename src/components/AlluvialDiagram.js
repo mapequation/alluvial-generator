@@ -27,6 +27,8 @@ export default class AlluvialDiagram extends React.Component {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
+    onModuleClick: () => null,
+    onModuleNameChange: () => null,
   };
 
   static propTypes = {
@@ -41,6 +43,8 @@ export default class AlluvialDiagram extends React.Component {
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
+    onModuleClick: PropTypes.func,
+    onModuleNameChange: PropTypes.func,
   };
 
   componentDidMount() {
@@ -61,6 +65,11 @@ export default class AlluvialDiagram extends React.Component {
     zoom.on("zoom", () => {
       const { transform } = d3.event;
       zoomable.attr("transform", transform);
+    });
+
+    this.props.onModuleNameChange((id, name) => {
+      if (!this.diagram) return;
+      this.diagram.setModuleName(id, name);
     });
 
     this.update();
@@ -152,7 +161,16 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   draw(prevProps = this.props) {
-    const { width, height, duration, streamlineOpacity, streamlineThreshold, showModuleId, dropShadow } = this.props;
+    const {
+      width,
+      height,
+      duration,
+      streamlineOpacity,
+      streamlineThreshold,
+      showModuleId,
+      dropShadow,
+      onModuleClick,
+    } = this.props;
     const {
       networkAdded,
       networkRemoved,
@@ -367,7 +385,10 @@ export default class AlluvialDiagram extends React.Component {
       .append("g")
       .attr("class", "module")
       .on("dblclick", onDoubleClick)
-      .on("click", onClick)
+      .on("click", (d) => {
+        console.log(d);
+        onModuleClick(d);
+      })
       .merge(modules);
 
     modules.call(DropShadows.filter(dropShadow));

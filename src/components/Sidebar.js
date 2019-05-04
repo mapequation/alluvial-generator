@@ -23,6 +23,9 @@ export default class Sidebar extends React.Component {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
+    selectedModule: null,
+    selectedModuleName: "",
+    updateSelectedModuleName: () => null,
   };
 
   input = null;
@@ -55,6 +58,19 @@ export default class Sidebar extends React.Component {
     }));
   };
 
+  onModuleClick = selectedModule => this.setState({
+    selectedModule,
+    selectedModuleName: selectedModule ? selectedModule.name || "" : "",
+  });
+
+  assignUpdateModuleNameFunction = updateSelectedModuleName => this.setState({ updateSelectedModuleName });
+
+  handleSelectedModuleNameChange = (e, { value }) => {
+    const { updateSelectedModuleName, selectedModule } = this.state;
+    updateSelectedModuleName(selectedModule.id, value);
+    this.setState({ selectedModuleName: value });
+  };
+
   render() {
     const { networks } = this.props;
     const {
@@ -69,6 +85,8 @@ export default class Sidebar extends React.Component {
       verticalAlign,
       showModuleId,
       dropShadow,
+      selectedModule,
+      selectedModuleName,
     } = this.state;
 
     return (
@@ -81,6 +99,43 @@ export default class Sidebar extends React.Component {
           visible={true}
           vertical
         >
+          <Menu.Item>
+            <Header as="h4">Selected module</Header>
+            {selectedModule === null && "No module selected"}
+            {selectedModule !== null &&
+            <Table celled singleLine striped compact>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell>Network</Table.Cell>
+                  <Table.Cell>{selectedModule.networkName}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Flow</Table.Cell>
+                  <Table.Cell>{Number.parseFloat(selectedModule.flow).toPrecision(3)}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Module id</Table.Cell>
+                  <Table.Cell>{selectedModule.moduleId}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Level</Table.Cell>
+                  <Table.Cell>{selectedModule.moduleLevel}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Module name</Table.Cell>
+                  <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
+                    <Input transparent fluid value={selectedModuleName}
+                           onChange={this.handleSelectedModuleNameChange}/>
+                  </Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Largest leaf nodes</Table.Cell>
+                  <Table.Cell>{selectedModule.largestLeafNodes.join(", ")}</Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table>
+            }
+          </Menu.Item>
           <Menu.Item>
             <TextInput
               label="Width"
@@ -233,6 +288,8 @@ export default class Sidebar extends React.Component {
               verticalAlign={verticalAlign}
               showModuleId={showModuleId}
               dropShadow={dropShadow}
+              onModuleClick={this.onModuleClick}
+              onModuleNameChange={this.assignUpdateModuleNameFunction}
             />
           </React.StrictMode>
         </SemanticSidebar.Pusher>
