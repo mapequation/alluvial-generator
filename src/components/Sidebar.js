@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Button, Checkbox, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 
 export default function Sidebar(props) {
   return (
@@ -147,6 +147,9 @@ export default function Sidebar(props) {
             </Button>
           </Button.Group>
         </Menu.Item>
+        <Menu.Item>
+          <Checkbox toggle onChange={(e, { checked }) => props.onShowModuleIdChange(checked)} checked={props.showModuleId} label="Show module id"/>
+        </Menu.Item>
       </SemanticSidebar>
       <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
         {props.children}
@@ -174,4 +177,6 @@ Sidebar.propTypes = {
   onStreamlineThresholdChange: PropTypes.func,
   verticalAlign: PropTypes.string,
   onVerticalAlignButtonClick: PropTypes.func,
+  showModuleId: PropTypes.bool,
+  onShowModuleIdChange: PropTypes.func
 };

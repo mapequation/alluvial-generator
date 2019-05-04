@@ -27,7 +27,8 @@ export default class AlluvialDiagram extends React.Component {
     duration: 200,
     moduleFlowThreshold: 0.01,
     streamlineThreshold: 1,
-    verticalAlign: "bottom"
+    verticalAlign: "bottom",
+    showModuleId: true
   };
 
   static propTypes = {
@@ -39,7 +40,8 @@ export default class AlluvialDiagram extends React.Component {
     duration: PropTypes.number,
     moduleFlowThreshold: PropTypes.number,
     streamlineThreshold: PropTypes.number,
-    verticalAlign: PropTypes.string
+    verticalAlign: PropTypes.string,
+    showModuleId: PropTypes.bool
   };
 
   componentDidMount() {
@@ -151,7 +153,7 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   draw(prevProps = this.props) {
-    const { width, height, duration, streamlineOpacity, streamlineThreshold } = this.props;
+    const { width, height, duration, streamlineOpacity, streamlineThreshold, showModuleId } = this.props;
     const {
       networkAdded,
       networkRemoved,
@@ -580,37 +582,46 @@ export default class AlluvialDiagram extends React.Component {
     /**
      * Partition names
      */
-    const partitions = networkRoots.selectAll(".partition").data(d => d.children, key);
+    if (showModuleId) {
+      const partitions = networkRoots.selectAll(".partition").data(d => d.children, key);
 
-    partitions
-      .exit()
-      .remove();
+      partitions
+        .exit()
+        .remove();
 
-    partitions
-      .transition(t)
-      .delay(moduleNameUpdateDelay)
-      .attr("y", d => d.moduleName.textY)
-      .attr("x", d => d.x + d.width / 2);
+      partitions
+        .transition(t)
+        .delay(moduleNameUpdateDelay)
+        .attr("y", d => d.moduleName.textY)
+        .attr("x", d => d.x + d.width / 2);
 
-    partitions
-      .enter()
-      .append("text")
-      .attr("class", "partition")
-      .text(d => d.moduleId)
-      .attr("text-anchor", "middle")
-      .attr("fill", "#000")
-      .attr("font-size", 12)
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 2)
-      .attr("paint-order", "stroke")
-      .attr("stroke-linecap", "round")
-      .attr("dy", 3)
-      .attr("y", d => d.moduleName.textY)
-      .attr("x", d => d.x + d.width / 2)
-      .call(makeTransparent)
-      .transition(t)
-      .delay(moduleNameUpdateDelay)
-      .call(makeOpaque);
+      partitions
+        .enter()
+        .append("text")
+        .attr("class", "partition")
+        .text(d => d.moduleId)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#000")
+        .attr("font-size", 12)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .attr("paint-order", "stroke")
+        .attr("stroke-linecap", "round")
+        .attr("dy", 3)
+        .attr("y", d => d.moduleName.textY)
+        .attr("x", d => d.x + d.width / 2)
+        .call(makeTransparent)
+        .transition(t)
+        .delay(moduleNameUpdateDelay)
+        .call(makeOpaque);
+    } else {
+      networkRoots
+        .selectAll(".partition")
+        .transition(t)
+        .call(makeTransparent)
+        .delay(moduleNameUpdateDelay)
+        .remove();
+    }
   }
 
   render() {
