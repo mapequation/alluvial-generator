@@ -1,13 +1,14 @@
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Checkbox, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import FileSaver from "file-saver";
 
 import AlluvialDiagram from "./AlluvialDiagram";
 import readAsText from "../io/read-as-text";
 
 
-const TextInput = props => <Input size="small" type="text" labelPosition="left" {...props} />;
+const TextInput = props =>
+  <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} type="text" labelPosition="left" {...props} />;
 
 export default class Sidebar extends React.Component {
   state = {
@@ -86,8 +87,6 @@ export default class Sidebar extends React.Component {
               value={width}
               onChange={(e, { value }) => this.setState({ width: this.validNumber(value) })}
             />
-          </Menu.Item>
-          <Menu.Item>
             <TextInput
               label="Height"
               value={height}
@@ -95,8 +94,9 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
+            <Header as="h4">Module settings</Header>
             <TextInput
-              label="Max module width"
+              label="Max width"
               value={maxModuleWidth}
             />
             <Slider
@@ -108,10 +108,31 @@ export default class Sidebar extends React.Component {
                 onChange: maxModuleWidth => this.setState({ maxModuleWidth })
               }}
             />
+            <TextInput
+              label="Flow threshold"
+              value={moduleFlowThreshold}
+            />
+            <Slider
+              discrete
+              settings={{
+                start: moduleFlowThreshold,
+                min: 0,
+                max: 0.05,
+                step: 0.001,
+                onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold })
+              }}
+            />
+            <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
+                      onChange={(e, { checked }) => this.setState({ showModuleId: checked })}
+                      checked={showModuleId} label="Show module id"/>
+            <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
+                      onChange={(e, { checked }) => this.setState({ dropShadow: checked })}
+                      checked={dropShadow} label="Use drop shadow"/>
           </Menu.Item>
           <Menu.Item>
+            <Header as="h4">Streamline settings</Header>
             <TextInput
-              label="Streamline fraction"
+              label="Fraction of width"
               value={streamlineFraction}
             />
             <Slider
@@ -123,10 +144,8 @@ export default class Sidebar extends React.Component {
                 onChange: streamlineFraction => this.setState({ streamlineFraction })
               }}
             />
-          </Menu.Item>
-          <Menu.Item>
             <TextInput
-              label="Streamline opacity"
+              label="Opacity"
               value={streamlineOpacity}
             />
             <Slider
@@ -136,6 +155,20 @@ export default class Sidebar extends React.Component {
                 max: 1,
                 step: 0.05,
                 onChange: streamlineOpacity => this.setState({ streamlineOpacity })
+              }}
+            />
+            <TextInput
+              label="Height threshold"
+              value={streamlineThreshold}
+            />
+            <Slider
+              discrete
+              settings={{
+                start: streamlineThreshold,
+                min: 0,
+                max: 2,
+                step: 0.01,
+                onChange: streamlineThreshold => this.setState({ streamlineThreshold })
               }}
             />
           </Menu.Item>
@@ -156,39 +189,7 @@ export default class Sidebar extends React.Component {
             />
           </Menu.Item>
           <Menu.Item>
-            <TextInput
-              label="Module flow threshold"
-              value={moduleFlowThreshold}
-            />
-            <Slider
-              discrete
-              settings={{
-                start: moduleFlowThreshold,
-                min: 0,
-                max: 0.05,
-                step: 0.001,
-                onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold })
-              }}
-            />
-          </Menu.Item>
-          <Menu.Item>
-            <TextInput
-              label="Streamline height threshold"
-              value={streamlineThreshold}
-            />
-            <Slider
-              discrete
-              settings={{
-                start: streamlineThreshold,
-                min: 0,
-                max: 2,
-                step: 0.01,
-                onChange: streamlineThreshold => this.setState({ streamlineThreshold })
-              }}
-            />
-          </Menu.Item>
-          <Menu.Item>
-            <Button.Group>
+            <Button.Group style={{ margin: "0.3em" }}>
               <Button icon active={verticalAlign === "bottom"}
                       onClick={() => this.setState({ verticalAlign: "bottom" })}>
                 <Icon name='align left' rotated="clockwise"/>
@@ -198,14 +199,6 @@ export default class Sidebar extends React.Component {
                 <Icon name='align justify' rotated="clockwise"/>
               </Button>
             </Button.Group>
-          </Menu.Item>
-          <Menu.Item>
-            <Checkbox toggle onChange={(e, { checked }) => this.setState({ showModuleId: checked })}
-                      checked={showModuleId} label="Show module id"/>
-          </Menu.Item>
-          <Menu.Item>
-            <Checkbox toggle onChange={(e, { checked }) => this.setState({ dropShadow: checked })}
-                      checked={dropShadow} label="Use drop shadow"/>
           </Menu.Item>
           <Menu.Item>
             <Button icon size="small" labelPosition="left" onClick={this.saveSettings}>
