@@ -140,10 +140,10 @@ export default function Sidebar(props) {
         <Menu.Item>
           <Button.Group>
             <Button icon active={props.verticalAlign === "bottom"} onClick={() => props.onVerticalAlignButtonClick("bottom")}>
-              <Icon name='align left' />
+              <Icon name='align left' rotated="clockwise" />
             </Button>
             <Button icon active={props.verticalAlign === "justify"} onClick={() => props.onVerticalAlignButtonClick("justify")}>
-              <Icon name='align justify' />
+              <Icon name='align justify' rotated="clockwise" />
             </Button>
           </Button.Group>
         </Menu.Item>
