@@ -1,8 +1,10 @@
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
 import { Button, Checkbox, Icon, Input, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import FileSaver from "file-saver";
 
 import AlluvialDiagram from "./AlluvialDiagram";
+import readAsText from "../io/read-as-text";
 
 
 export default class Sidebar extends React.Component {
@@ -19,7 +21,35 @@ export default class Sidebar extends React.Component {
     showModuleId: false,
   };
 
+  input = null;
+
   validNumber = value => (Number.isNaN(+value) ? 0 : +value);
+
+  saveSettings = () => {
+    const settings = {
+      networks: this.props.networks.map(network => network.name),
+      ...this.state,
+    };
+    const json = JSON.stringify(settings, null, 2);
+    const blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, "alluvial-settings.json");
+  };
+
+  parseSettings = async () => {
+    if (!this.input) {
+      throw new Error("Tried to parse settings but input was null");
+    }
+
+    const settings = await readAsText(this.input.files[0]);
+    this.input.value = "";
+
+    const state = JSON.parse(settings);
+
+    this.setState(prevState => ({
+      ...prevState,
+      ...state,
+    }));
+  };
 
   render() {
     const { networks } = this.props;
@@ -184,6 +214,22 @@ export default class Sidebar extends React.Component {
           <Menu.Item>
             <Checkbox toggle onChange={(e, { checked }) => this.setState({ showModuleId: checked })}
                       checked={showModuleId} label="Show module id"/>
+          </Menu.Item>
+          <Menu.Item>
+            <Button icon labelPosition="left" onClick={this.saveSettings}>
+              <Icon name="download"/>Save
+            </Button>
+            <label className="ui icon left labeled button" htmlFor="upload">
+              <Icon name="upload"/>Load
+            </label>
+            <input
+              style={{ display: "none" }}
+              type="file"
+              id="upload"
+              onChange={this.parseSettings}
+              accept={".json"}
+              ref={input => (this.input = input)}
+            />
           </Menu.Item>
         </SemanticSidebar>
         <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
