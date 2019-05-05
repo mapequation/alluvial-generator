@@ -143,7 +143,7 @@ export default class FileLoadingScreen extends React.Component {
         loading={loading}
         basic
         textAlign="center"
-        style={{ overflow: "auto", padding: 100 }}
+        style={{ overflow: "auto", padding: 100, background: "#fff" }}
       >
         <Table celled definition>
           <Table.Header>

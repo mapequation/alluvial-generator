@@ -293,7 +293,6 @@ export default class AlluvialDiagram extends React.Component {
       .attr("x", d => d.textX)
       .attr("y", d => d.textY)
       .attr("text-anchor", "middle")
-      .attr("fill", "#999")
       .attr("font-size", 12)
       .attr("dy", 3);
 
@@ -450,7 +449,6 @@ export default class AlluvialDiagram extends React.Component {
         .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
         .attr("y", d => d.moduleNamePosition.y)
-        .attr("fill", "#999")
         .attr("font-size", 9);
 
       moduleNames
@@ -569,7 +567,6 @@ export default class AlluvialDiagram extends React.Component {
         .attr("class", "moduleId")
         .text(d => d.moduleId)
         .attr("text-anchor", "middle")
-        .attr("fill", "#333")
         .attr("font-size", 12)
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
@@ -597,7 +594,7 @@ export default class AlluvialDiagram extends React.Component {
       <svg
         width="100vw"
         height="100vh"
-        style={{ width: "100vw", height: "100vh" }} // For Firefox
+        style={{ width: "100vw", height: "100vh", background: "#fff" }}
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
       >

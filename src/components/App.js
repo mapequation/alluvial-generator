@@ -3,6 +3,7 @@ import React from "react";
 import FileLoadingScreen from "./FileLoadingScreen";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import Documentation from "./Documentation";
 
 
 export default class App extends React.Component {
@@ -16,11 +17,12 @@ export default class App extends React.Component {
     const loadingComplete = networks.length > 0;
 
     return loadingComplete ? (
-      <Sidebar networks={networks} />
+      <Sidebar networks={networks}/>
     ) : (
       <React.Fragment>
-        <Header />
-        <FileLoadingScreen onSubmit={networks => this.setState({ networks })} />
+        <Header/>
+        <FileLoadingScreen onSubmit={networks => this.setState({ networks })}/>
+        <Documentation/>
       </React.Fragment>
     );
   }
