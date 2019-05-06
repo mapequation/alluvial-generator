@@ -1,16 +1,11 @@
 // @flow
 import id from "../lib/id";
-import type { NetworkData } from "./network-types";
 
 
-export default function parseTree(object: Object): NetworkData {
+export default function parseTree(object: Object, name: string): Network {
   return {
-    data: {
-      nodes: object.nodes,
-      meta: {
-        id: id(),
-        codelength: object.codelength,
-      },
-    },
+    ...object,
+    id: id(),
+    name,
   };
 }

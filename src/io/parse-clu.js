@@ -1,16 +1,12 @@
 // @flow
 import id from "../lib/id";
-import type { NetworkData } from "./network-types";
 
 
-export default function parseClu(object: Object): NetworkData {
+export default function parseClu(object: Object, name: string): Network {
   return {
-    data: {
-      nodes: object.nodes.map(node => ({ path: node.cluster.toString(), ...node })),
-      meta: {
-        id: id(),
-        codelength: object.codelength,
-      },
-    },
+    nodes: object.nodes.map(node => ({ path: node.cluster.toString(), ...node })),
+    id: id(),
+    codelength: object.codelength,
+    name,
   };
 }

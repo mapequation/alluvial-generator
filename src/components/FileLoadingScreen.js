@@ -34,21 +34,21 @@ const fileSize = file => new Blob([file]).size;
 export default class FileLoadingScreen extends React.Component {
   state = {
     files: [],
-    loading: false
+    loading: false,
   };
 
   exampleNetworks = [
     "science1998_2y.ftree",
     "science2001_2y.ftree",
-    "science2007_2y.ftree"
+    "science2007_2y.ftree",
   ];
 
   static propTypes = {
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   };
 
   static defaultProps = {
-    onSubmit: values => console.log(values)
+    onSubmit: values => console.log(values),
   };
 
   loadSelectedFiles = () => {
@@ -98,14 +98,8 @@ export default class FileLoadingScreen extends React.Component {
         const parseLinks = false;
         const lines = file.contents.split("\n").filter(Boolean);
         const object = getParserForExtension(file.format)(lines, parseLinks);
-        const parsed = getParser(file.format)(object);
-
-        return {
-          name: file.name,
-          size: file.size,
-          format: file.format,
-          ...parsed
-        };
+        const objectParser = getParser(file.format);
+        return objectParser(object, file.name);
       } catch (e) {
         throw new Error(`No parser found for format ${file.format}`);
       }
@@ -148,7 +142,7 @@ export default class FileLoadingScreen extends React.Component {
         <Table celled definition>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell />
+              <Table.HeaderCell/>
               {files.map((file, i) => (
                 <Table.HeaderCell
                   collapsing
@@ -159,7 +153,7 @@ export default class FileLoadingScreen extends React.Component {
                   {i + 1}
                 </Table.HeaderCell>
               ))}
-              <Table.HeaderCell />
+              <Table.HeaderCell/>
             </Table.Row>
           </Table.Header>
 
@@ -171,7 +165,7 @@ export default class FileLoadingScreen extends React.Component {
                   {file.name}
                 </Table.Cell>
               ))}
-              <Table.Cell disabled />
+              <Table.Cell disabled/>
             </Table.Row>
             <Table.Row>
               <Table.Cell collapsing>Size</Table.Cell>
@@ -180,7 +174,7 @@ export default class FileLoadingScreen extends React.Component {
                   {humanFileSize(file.size, true)}
                 </Table.Cell>
               ))}
-              <Table.Cell disabled />
+              <Table.Cell disabled/>
             </Table.Row>
             <Table.Row>
               <Table.Cell collapsing>Format</Table.Cell>
@@ -189,7 +183,7 @@ export default class FileLoadingScreen extends React.Component {
                   {file.format}
                 </Table.Cell>
               ))}
-              <Table.Cell disabled />
+              <Table.Cell disabled/>
             </Table.Row>
             <Table.Row>
               <Table.Cell collapsing>Remove</Table.Cell>
@@ -198,13 +192,13 @@ export default class FileLoadingScreen extends React.Component {
                   <a onClick={() => this.removeFile(i)}>Remove</a>
                 </Table.Cell>
               ))}
-              <Table.Cell disabled />
+              <Table.Cell disabled/>
             </Table.Row>
           </Table.Body>
 
           <Table.Footer>
             <Table.Row>
-              <Table.HeaderCell />
+              <Table.HeaderCell/>
               <Table.HeaderCell colSpan={files.length + 1}>
                 <Button
                   size="small"
@@ -216,7 +210,7 @@ export default class FileLoadingScreen extends React.Component {
                   className="ui small primary button icon left labeled"
                   htmlFor="upload"
                 >
-                  <Icon name="plus" />
+                  <Icon name="plus"/>
                   Add network
                 </label>
                 <Button

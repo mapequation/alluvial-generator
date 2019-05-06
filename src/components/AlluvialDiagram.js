@@ -78,7 +78,7 @@ export default class AlluvialDiagram extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.shouldUpdateLayout(prevProps))
-      this.update(prevProps);
+      this.update();
     this.draw(prevProps);
   }
 
@@ -104,7 +104,7 @@ export default class AlluvialDiagram extends React.Component {
     };
   }
 
-  update(prevProps = this.props) {
+  update() {
     const {
       width,
       height,
@@ -114,36 +114,9 @@ export default class AlluvialDiagram extends React.Component {
       moduleFlowThreshold,
       verticalAlign,
     } = this.props;
-    const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
     if (!this.diagram) {
-      this.diagram = new Diagram(
-        networks.map(({ data, name }) => ({
-          nodes: data.nodes,
-          id: data.meta.id,
-          codelength: data.meta.codelength,
-          name,
-        })),
-      );
-    }
-
-    if (networkAdded) {
-      for (let { data, name } of networks) {
-        if (!this.diagram.hasNetwork(data.meta.id)) {
-          this.diagram.addNetwork({
-            nodes: data.nodes,
-            id: data.meta.id,
-            name,
-          });
-        }
-      }
-    } else if (networkRemoved) {
-      const removed = prevProps.networks.filter(n => networks.indexOf(n) < 0);
-      for (let { data } of removed) {
-        if (this.diagram.hasNetwork(data.meta.id)) {
-          this.diagram.removeNetwork(data.meta.id);
-        }
-      }
+      this.diagram = new Diagram(networks);
     }
 
     const moduleNameMargin = 150;
