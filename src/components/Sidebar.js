@@ -1,7 +1,17 @@
 import FileSaver from "file-saver";
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar, Table } from "semantic-ui-react";
+import {
+  Button,
+  Checkbox,
+  Header,
+  Icon,
+  Input,
+  Label,
+  Menu,
+  Sidebar as SemanticSidebar,
+  Table
+} from "semantic-ui-react";
 import Diagram from "../alluvial/Diagram";
 
 import readAsText from "../io/read-as-text";
@@ -9,7 +19,7 @@ import AlluvialDiagram from "./AlluvialDiagram";
 
 
 const TextInput = props =>
-  <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} type="text" labelPosition="left" {...props} />;
+  <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
 
 export default class Sidebar extends React.Component {
   state = {
@@ -156,6 +166,7 @@ export default class Sidebar extends React.Component {
             }
           </Menu.Item>
           <Menu.Item>
+            <Header as="h4">Layout</Header>
             <TextInput
               label="Width"
               value={width}
@@ -174,6 +185,7 @@ export default class Sidebar extends React.Component {
               value={maxModuleWidth}
             />
             <Slider
+              color="blue"
               settings={{
                 start: maxModuleWidth,
                 min: 10,
@@ -187,15 +199,19 @@ export default class Sidebar extends React.Component {
               value={moduleFlowThreshold}
             />
             <Slider
+              color="blue"
               discrete
               settings={{
                 start: moduleFlowThreshold,
                 min: 0,
-                max: 0.05,
+                max: 0.02,
                 step: 0.001,
                 onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold }),
               }}
             />
+            <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
+                      onChange={(e, { checked }) => this.setState({ verticalAlign: checked ? "bottom" : "justify" })}
+                      checked={verticalAlign === "bottom"} label="Vertical align to bottom"/>
             <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
                       onChange={(e, { checked }) => this.setState({ showModuleId: checked })}
                       checked={showModuleId} label="Show module id"/>
@@ -206,10 +222,11 @@ export default class Sidebar extends React.Component {
           <Menu.Item>
             <Header as="h4">Streamline settings</Header>
             <TextInput
-              label="Fraction of width"
+              label="Fraction of module width"
               value={streamlineFraction}
             />
             <Slider
+              color="blue"
               settings={{
                 start: streamlineFraction,
                 min: 0,
@@ -219,23 +236,11 @@ export default class Sidebar extends React.Component {
               }}
             />
             <TextInput
-              label="Opacity"
-              value={streamlineOpacity}
-            />
-            <Slider
-              settings={{
-                start: streamlineOpacity,
-                min: 0,
-                max: 1,
-                step: 0.05,
-                onChange: streamlineOpacity => this.setState({ streamlineOpacity }),
-              }}
-            />
-            <TextInput
-              label="Height threshold"
+              label="Minimum thickness"
               value={streamlineThreshold}
             />
             <Slider
+              color="blue"
               discrete
               settings={{
                 start: streamlineThreshold,
@@ -245,13 +250,30 @@ export default class Sidebar extends React.Component {
                 onChange: streamlineThreshold => this.setState({ streamlineThreshold }),
               }}
             />
+            <TextInput value={Math.round((1 - streamlineOpacity) * 100)} labelPosition="right">
+              <Label>Transparency</Label>
+              <input/>
+              <Label basic>%</Label>
+            </TextInput>
+            <Slider
+              color="blue"
+              settings={{
+                start: 1 - streamlineOpacity,
+                min: 0,
+                max: 1,
+                step: 0.01,
+                onChange: transparency => this.setState({ streamlineOpacity: 1 - transparency }),
+              }}
+            />
           </Menu.Item>
           <Menu.Item>
-            <TextInput
-              label="Animation duration"
-              value={duration}
-            />
+            <TextInput value={duration} labelPosition="right">
+              <Label>Animation duration</Label>
+              <input/>
+              <Label basic>ms</Label>
+            </TextInput>
             <Slider
+              color="blue"
               discrete
               settings={{
                 start: duration,
@@ -261,18 +283,6 @@ export default class Sidebar extends React.Component {
                 onChange: duration => this.setState({ duration }),
               }}
             />
-          </Menu.Item>
-          <Menu.Item>
-            <Button.Group style={{ margin: "0.3em" }}>
-              <Button icon active={verticalAlign === "bottom"}
-                      onClick={() => this.setState({ verticalAlign: "bottom" })}>
-                <Icon name='align left' rotated="clockwise"/>
-              </Button>
-              <Button icon active={verticalAlign === "justify"}
-                      onClick={() => this.setState({ verticalAlign: "justify" })}>
-                <Icon name='align justify' rotated="clockwise"/>
-              </Button>
-            </Button.Group>
           </Menu.Item>
           <Menu.Item>
             <Header as="h4">Settings</Header>
