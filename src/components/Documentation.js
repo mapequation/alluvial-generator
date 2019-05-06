@@ -32,7 +32,7 @@ const Documentation = () =>
       to its deepest level.
     </p>
     <figure>
-      <img src={openModuleGif}/>
+      <img src={openModuleGif} alt="Show sub-modules"/>
       <figcaption>Show sub-modules by double clicking a module.</figcaption>
     </figure>
 
@@ -42,7 +42,7 @@ const Documentation = () =>
       the <kbd>shift</kbd> key.
     </p>
     <figure>
-      <img src={closeModuleGif}/>
+      <img src={closeModuleGif} alt="Regroup sub-modules"/>
       <figcaption>To regroup sub-modules, double click a module while holding the <kbd>shift</kbd> key.</figcaption>
     </figure>
   </Container>;
