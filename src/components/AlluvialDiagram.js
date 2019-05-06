@@ -2,7 +2,6 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import React from "react";
 
-import Diagram from "../alluvial/Diagram";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -11,7 +10,6 @@ import LinearGradients from "./LinearGradients";
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
-  diagram = null;
   highlightColors = d3.schemeSet3;
   defaultColor = "#b6b69f";
   maxModuleLevel = 3;
@@ -35,7 +33,6 @@ export default class AlluvialDiagram extends React.Component {
     width: PropTypes.number,
     height: PropTypes.number,
     streamlineFraction: PropTypes.number,
-    networks: PropTypes.arrayOf(PropTypes.object),
     maxModuleWidth: PropTypes.number,
     duration: PropTypes.number,
     moduleFlowThreshold: PropTypes.number,
@@ -67,11 +64,6 @@ export default class AlluvialDiagram extends React.Component {
       zoomable.attr("transform", transform);
     });
 
-    this.props.onModuleNameChange((id, name) => {
-      if (!this.diagram) return;
-      this.diagram.setModuleName(id, name);
-    });
-
     this.update();
     this.draw();
   }
@@ -83,46 +75,31 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   shouldUpdateLayout(prevProps) {
-    const { width, height, networks, streamlineFraction, maxModuleWidth, moduleFlowThreshold, verticalAlign } = this.props;
+    const { width, height, streamlineFraction, maxModuleWidth, moduleFlowThreshold, verticalAlign } = this.props;
     const widthChanged = width !== prevProps.width;
     const heightChanged = height !== prevProps.height;
-    const networksChanged = networks.length !== prevProps.networks.length;
     const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
     const maxModuleWidthChanged = maxModuleWidth !== prevProps.maxModuleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
-    return widthChanged || heightChanged || networksChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
-  }
-
-  propsChanged(prevProps) {
-    const { width, height, networks } = this.props;
-    return {
-      networkAdded: networks.length > prevProps.networks.length,
-      networkRemoved: networks.length < prevProps.networks.length,
-      widthChanged: width !== prevProps.width,
-      heightChanged: height !== prevProps.height,
-    };
+    return widthChanged || heightChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
   }
 
   update() {
     const {
+      diagram,
       width,
       height,
       streamlineFraction,
-      networks,
       maxModuleWidth,
       moduleFlowThreshold,
       verticalAlign,
     } = this.props;
 
-    if (!this.diagram) {
-      this.diagram = new Diagram(networks);
-    }
-
     const moduleNameMargin = 150;
     const networkNameMargin = 60;
 
-    this.diagram.calcLayout(
+    diagram.calcLayout(
       width - 2 * moduleNameMargin,
       height - networkNameMargin,
       streamlineFraction,
@@ -131,11 +108,12 @@ export default class AlluvialDiagram extends React.Component {
       verticalAlign,
     );
 
-    console.log(this.diagram);
+    console.log(diagram);
   }
 
   draw(prevProps = this.props) {
     const {
+      diagram,
       width,
       height,
       duration,
@@ -145,14 +123,11 @@ export default class AlluvialDiagram extends React.Component {
       dropShadow,
       onModuleClick,
     } = this.props;
-    const {
-      networkAdded,
-      networkRemoved,
-      widthChanged,
-      heightChanged,
-    } = this.propsChanged(prevProps);
 
-    const alluvialRoot = this.diagram.asObject();
+    const widthChanged = width !== prevProps.width;
+    const heightChanged = height !== prevProps.height;
+
+    const alluvialRoot = diagram.asObject();
 
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
@@ -172,7 +147,7 @@ export default class AlluvialDiagram extends React.Component {
     const onClick = d => console.log(d);
 
     const onDoubleClick = d => {
-      this.diagram.doubleClick(d, d3.event);
+      diagram.doubleClick(d, d3.event);
       this.update();
       this.draw();
     };
@@ -190,8 +165,6 @@ export default class AlluvialDiagram extends React.Component {
       d.attr("d", d => this.streamlineGenerator(d[path]));
     const setStreamlineTransitionPath = d =>
       setStreamlinePath(d, "transitionPath");
-    const setStreamlineNetworkTransitionPath = d =>
-      setStreamlinePath(d, "networkTransitionPath");
 
     /**
      * Network roots
@@ -270,8 +243,7 @@ export default class AlluvialDiagram extends React.Component {
       .attr("font-size", 12)
       .attr("dy", 3);
 
-    const networkNameUpdateDelay =
-      networkAdded || !networkRemoved ? 0.5 * delay : delay;
+    const networkNameUpdateDelay = 0.5 * delay;
 
     networkNames
       .select(".name")
@@ -297,18 +269,14 @@ export default class AlluvialDiagram extends React.Component {
       return delay + timePerElement * index;
     };
 
-    const streamlineUpdateDelay = networkRemoved ? delay : 0.5 * delay;
-    const streamlineExitDelay = networkRemoved ? 0 : streamlineDelay(0);
-    const streamlineTransition = networkRemoved
-      ? setStreamlineNetworkTransitionPath
-      : setStreamlineTransitionPath;
+    const streamlineUpdateDelay = 0.5 * delay;
 
     streamlines
       .exit()
       .transition(t)
-      .delay(streamlineExitDelay)
+      .delay(streamlineDelay(0))
       .call(makeTransparent)
-      .call(streamlineTransition)
+      .call(setStreamlineTransitionPath)
       .remove();
 
     streamlines
@@ -481,7 +449,7 @@ export default class AlluvialDiagram extends React.Component {
 
     groups.exit().remove();
 
-    const rectUpdateDelay = networkRemoved ? delay : 0.5 * delay;
+    const rectUpdateDelay = 0.5 * delay;
 
     groups
       .select("rect")
@@ -508,10 +476,6 @@ export default class AlluvialDiagram extends React.Component {
       .call(makeTransparent)
       .on("click", onClick)
       .attr("fill", highlightColor);
-
-    if (networkAdded) {
-      rect.attr("y", 0).attr("height", 0);
-    }
 
     rect
       .transition(t)

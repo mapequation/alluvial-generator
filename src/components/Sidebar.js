@@ -2,6 +2,7 @@ import FileSaver from "file-saver";
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
 import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar, Table } from "semantic-ui-react";
+import Diagram from "../alluvial/Diagram";
 
 import readAsText from "../io/read-as-text";
 import AlluvialDiagram from "./AlluvialDiagram";
@@ -25,10 +26,14 @@ export default class Sidebar extends React.Component {
     dropShadow: false,
     selectedModule: null,
     selectedModuleName: "",
-    updateSelectedModuleName: () => null,
   };
 
   input = null;
+
+  constructor(props) {
+    super(props);
+    this.diagram = new Diagram(this.props.networks);
+  }
 
   validNumber = value => (Number.isNaN(+value) ? 0 : +value);
 
@@ -63,18 +68,15 @@ export default class Sidebar extends React.Component {
     selectedModuleName: selectedModule ? selectedModule.name || "" : "",
   });
 
-  assignUpdateModuleNameFunction = updateSelectedModuleName => this.setState({ updateSelectedModuleName });
-
   handleSelectedModuleNameChange = (e, { value }) => {
-    const { updateSelectedModuleName, selectedModule } = this.state;
-    updateSelectedModuleName(selectedModule.id, value);
+    const { selectedModule } = this.state;
+    this.diagram.setModuleName(selectedModule.id, value);
     this.setState({ selectedModuleName: value });
   };
 
   clearModuleNameInput = () => this.handleSelectedModuleNameChange(null, { value: "" });
 
   render() {
-    const { networks } = this.props;
     const {
       width,
       height,
@@ -293,7 +295,7 @@ export default class Sidebar extends React.Component {
         <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
           <React.StrictMode>
             <AlluvialDiagram
-              networks={networks}
+              diagram={this.diagram}
               width={width}
               height={height}
               maxModuleWidth={+maxModuleWidth}
@@ -306,7 +308,6 @@ export default class Sidebar extends React.Component {
               showModuleId={showModuleId}
               dropShadow={dropShadow}
               onModuleClick={this.onModuleClick}
-              onModuleNameChange={this.assignUpdateModuleNameFunction}
             />
           </React.StrictMode>
         </SemanticSidebar.Pusher>
