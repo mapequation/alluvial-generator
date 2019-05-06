@@ -115,7 +115,9 @@ export default class Sidebar extends React.Component {
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Codelength</Table.Cell>
-                  <Table.Cell>{toPrecision(selectedModule.networkCodelength, selectedModule.networkCodelength > 0 ? 4 : 1)} bits</Table.Cell>
+                  <Table.Cell>
+                    {toPrecision(selectedModule.networkCodelength, selectedModule.networkCodelength > 0 ? 4 : 1)} bits
+                  </Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Flow</Table.Cell>
