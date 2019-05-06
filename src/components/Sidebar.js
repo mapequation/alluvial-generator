@@ -135,6 +135,7 @@ export default class Sidebar extends React.Component {
                   <Table.Cell>Module name</Table.Cell>
                   <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
                     <Input transparent fluid value={selectedModuleName}
+                           placeholder="Set module name..."
                            onChange={this.handleSelectedModuleNameChange}/>
                   </Table.Cell>
                 </Table.Row>
