@@ -1,11 +1,11 @@
 import React from "react";
-import { Container, Header } from "semantic-ui-react";
+import { Container, Header, Image } from "semantic-ui-react";
 import openModuleGif from "./images/open_module.gif";
 import closeModuleGif from "./images/close_module.gif";
 
 
 const Documentation = () =>
-  <Container text style={{ padding: "40px 0 100px 0"}}>
+  <Container text style={{ padding: "40px 0 100px 0" }}>
     <Header as="h1">Feedback</Header>
     <p>
       If you have any questions, feedback, or issues, please add them to the <a
@@ -21,7 +21,7 @@ const Documentation = () =>
       to its deepest level.
     </p>
     <figure>
-      <img src={openModuleGif} alt="Show sub-modules"/>
+      <Image src={openModuleGif} alt="Show sub-modules" centered bordered rounded/>
       <figcaption>Show sub-modules by double clicking a module.</figcaption>
     </figure>
 
@@ -31,7 +31,7 @@ const Documentation = () =>
       the <kbd>shift</kbd> key.
     </p>
     <figure>
-      <img src={closeModuleGif} alt="Regroup sub-modules"/>
+      <Image src={closeModuleGif} alt="Regroup sub-modules" centered bordered rounded/>
       <figcaption>To regroup sub-modules, double click a module while holding the <kbd>shift</kbd> key.</figcaption>
     </figure>
 
