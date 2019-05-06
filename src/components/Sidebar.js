@@ -89,7 +89,7 @@ export default class Sidebar extends React.Component {
       selectedModuleName,
     } = this.state;
 
-    const toPrecision = flow => Number.parseFloat(flow).toPrecision(3);
+    const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
     return (
       <SemanticSidebar.Pushable>
@@ -110,6 +110,10 @@ export default class Sidebar extends React.Component {
                 <Table.Row>
                   <Table.Cell>Network</Table.Cell>
                   <Table.Cell>{selectedModule.networkName}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Codelength</Table.Cell>
+                  <Table.Cell>{toPrecision(selectedModule.networkCodelength, 4)} bits</Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Flow</Table.Cell>

@@ -9,6 +9,7 @@ export default function parseClu(object: Object): NetworkData {
       nodes: object.nodes.map(node => ({ path: node.cluster.toString(), ...node })),
       meta: {
         id: id(),
+        codelength: object.codelength,
       },
     },
   };

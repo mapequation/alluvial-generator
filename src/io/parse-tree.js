@@ -9,6 +9,7 @@ export default function parseTree(object: Object): NetworkData {
       nodes: object.nodes,
       meta: {
         id: id(),
+        codelength: object.codelength,
       },
     },
   };

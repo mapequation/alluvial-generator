@@ -15,8 +15,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     return this.children.find(root => root.networkId === networkId);
   }
 
-  createNetworkRoot(networkId: string, name: string): NetworkRoot {
-    let root = new NetworkRoot(networkId, this, name);
+  createNetworkRoot(networkId: string, name: string, codelength: number): NetworkRoot {
+    let root = new NetworkRoot(networkId, this, name, codelength);
     this.children.push(root);
     return root;
   }

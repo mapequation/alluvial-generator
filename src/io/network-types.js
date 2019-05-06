@@ -11,7 +11,8 @@ export type NetworkData = {
   +data: {
     +nodes: Node[],
     +meta: {
-      id: string
+      id: string,
+      codelength: number
     }
   }
 };

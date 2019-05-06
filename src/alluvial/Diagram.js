@@ -49,7 +49,7 @@ export default class Diagram {
   }
 
   addNetwork(network: Network) {
-    const { nodes, id, name } = network;
+    const { nodes, id, codelength, name } = network;
 
     if (this.networksById.has(id)) {
       throw new Error(`Network with id ${id} already exists`);
@@ -61,7 +61,7 @@ export default class Diagram {
 
     this.networkIndices.push(id);
     this.networksById.set(id, nodesByName);
-    this.alluvialRoot.createNetworkRoot(id, name);
+    this.alluvialRoot.createNetworkRoot(id, name, codelength);
 
     for (let node of nodesByName.values()) {
       this.addNode(node, id);

@@ -1,21 +1,24 @@
 // @flow
+import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
-import TreePath from "../lib/treepath";
+
 
 export default class NetworkRoot extends AlluvialNodeBase {
   children: Module[] = [];
   flowThreshold: number = 0;
   name: string;
   depth = NETWORK_ROOT;
+  codelength: number;
 
-  constructor(networkId: string, parent: AlluvialRoot, name: string) {
+  constructor(networkId: string, parent: AlluvialRoot, name: string, codelength: number) {
     super(networkId, parent, networkId);
     this.name = name;
+    this.codelength = codelength;
   }
 
   getModule(moduleId: string): ?Module {
@@ -36,7 +39,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     if (moduleLevel < 1) return this.children;
     const parentPath = TreePath.ancestorAtLevel(moduleId, moduleLevel);
     return this.children.filter(module =>
-      parentPath.isAncestor(module.moduleId)
+      parentPath.isAncestor(module.moduleId),
     );
   }
 
@@ -44,6 +47,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return {
       id: this.id,
       networkId: this.networkId,
+      codelength: this.codelength,
       flow: this.flow,
       depth: this.depth,
       ...this.layout,
@@ -54,18 +58,18 @@ export default class NetworkRoot extends AlluvialNodeBase {
         width: this.width,
         height: 15,
         textX: this.x + this.width / 2,
-        textY: this.height + 15 + 5
+        textY: this.height + 15 + 5,
       },
       links: Array.from(this.rightStreamlines())
         .map(link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
         .filter(child => child.flow >= this.flowThreshold)
-        .map(child => child.asObject())
+        .map(child => child.asObject()),
     };
   }
 
-  *rightStreamlines(): Iterable<StreamlineLink> {
+  * rightStreamlines(): Iterable<StreamlineLink> {
     for (let module of this) {
       // Skip if left module if below threshold
       if (module.flow < this.flowThreshold) continue;
@@ -74,9 +78,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
           if (!oppositeStreamlineNode) continue;
-          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(
-            MODULE
-          );
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)
             continue;
           if (streamlineNode.link) yield streamlineNode.link;
@@ -97,9 +99,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           // Skip if opposite module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
           if (!oppositeStreamlineNode) continue;
-          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(
-            MODULE
-          );
+          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)
             continue;
           if (!oppositeModule)
@@ -108,7 +108,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           oppositeModulePosition += oppositeModule.y * weight;
         }
       }
-      oppositePositions.set(module.moduleId, oppositeModulePosition)
+      oppositePositions.set(module.moduleId, oppositeModulePosition);
     }
     this.children.sort((a, b) => {
       const bOppositePosition = oppositePositions.get(b.moduleId) || 0;
@@ -125,17 +125,15 @@ export default class NetworkRoot extends AlluvialNodeBase {
     };
 
     function flatten(arr: TreeNode) {
-      return arr.nodes.reduce(function(flat, toFlatten) {
-        return flat.concat(
-          Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten
-        );
+      return arr.nodes.reduce(function (flat, toFlatten) {
+        return flat.concat(Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten);
       }, []);
     }
 
     const tree: TreeNode = {
       path: 0,
       flow: 0,
-      nodes: []
+      nodes: [],
     };
 
     this.children.forEach(module => {
@@ -148,7 +146,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           node = {
             path,
             flow: 0,
-            nodes: []
+            nodes: [],
           };
 
           parent.nodes.push(node);

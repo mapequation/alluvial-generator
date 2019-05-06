@@ -100,7 +100,7 @@ export default class AlluvialDiagram extends React.Component {
       networkAdded: networks.length > prevProps.networks.length,
       networkRemoved: networks.length < prevProps.networks.length,
       widthChanged: width !== prevProps.width,
-      heightChanged: height !== prevProps.height
+      heightChanged: height !== prevProps.height,
     };
   }
 
@@ -112,7 +112,7 @@ export default class AlluvialDiagram extends React.Component {
       networks,
       maxModuleWidth,
       moduleFlowThreshold,
-      verticalAlign
+      verticalAlign,
     } = this.props;
     const { networkAdded, networkRemoved } = this.propsChanged(prevProps);
 
@@ -121,8 +121,9 @@ export default class AlluvialDiagram extends React.Component {
         networks.map(({ data, name }) => ({
           nodes: data.nodes,
           id: data.meta.id,
-          name
-        }))
+          codelength: data.meta.codelength,
+          name,
+        })),
       );
     }
 
@@ -132,7 +133,7 @@ export default class AlluvialDiagram extends React.Component {
           this.diagram.addNetwork({
             nodes: data.nodes,
             id: data.meta.id,
-            name
+            name,
           });
         }
       }
@@ -154,7 +155,7 @@ export default class AlluvialDiagram extends React.Component {
       streamlineFraction,
       maxModuleWidth,
       moduleFlowThreshold,
-      verticalAlign
+      verticalAlign,
     );
 
     console.log(this.diagram);
@@ -175,7 +176,7 @@ export default class AlluvialDiagram extends React.Component {
       networkAdded,
       networkRemoved,
       widthChanged,
-      heightChanged
+      heightChanged,
     } = this.propsChanged(prevProps);
 
     const alluvialRoot = this.diagram.asObject();
@@ -314,7 +315,7 @@ export default class AlluvialDiagram extends React.Component {
       .data(
         d =>
           d.links.filter(link => link.avgHeight > streamlineThreshold),
-        key
+        key,
       );
 
     const streamlineDelay = delay => (d, index, elements) => {
@@ -477,7 +478,7 @@ export default class AlluvialDiagram extends React.Component {
               .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
           function (d) {
             return d ? d.name : this.id;
-          }
+          },
         );
 
       moduleNamesTspan
