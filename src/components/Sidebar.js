@@ -71,6 +71,8 @@ export default class Sidebar extends React.Component {
     this.setState({ selectedModuleName: value });
   };
 
+  clearModuleNameInput = () => this.handleSelectedModuleNameChange(null, { value: "" });
+
   render() {
     const { networks } = this.props;
     const {
@@ -134,7 +136,9 @@ export default class Sidebar extends React.Component {
                 <Table.Row>
                   <Table.Cell>Module name</Table.Cell>
                   <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
-                    <Input transparent fluid value={selectedModuleName}
+                    <Input transparent fluid
+                           value={selectedModuleName}
+                           icon={selectedModuleName && <Icon link name="x" onClick={this.clearModuleNameInput}/>}
                            placeholder="Set module name..."
                            onChange={this.handleSelectedModuleNameChange}/>
                   </Table.Cell>
