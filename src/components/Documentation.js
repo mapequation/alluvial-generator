@@ -5,22 +5,11 @@ import closeModuleGif from "./images/close_module.gif";
 
 
 const Documentation = () =>
-  <Container text>
+  <Container text style={{ padding: "40px 0 100px 0"}}>
     <Header as="h1">Feedback</Header>
     <p>
       If you have any questions, feedback, or issues, please add them to the <a
       href="https://github.com/mapequation/alluvial-generator/issues">GitHub issues page</a>.
-    </p>
-
-    <Header as="h1">Supported formats</Header>
-    <p>
-      Currently, we support networks clustered by <a href="https://www.mapequation.org/code.html">Infomap</a> into
-      the <code>clu</code>, <code>map</code>, <code>tree</code> and <code>ftree</code> formats.
-      To get hierarchical modules, you need to use the formats <code>tree</code> or <code>ftree</code>.
-    </p>
-    <p>
-      Read more about Infomap output formats on the <a href="https://www.mapequation.org/code.html#Output">Infomap
-      documentation page</a>.
     </p>
 
     <Header as="h1">Instructions</Header>
@@ -45,6 +34,17 @@ const Documentation = () =>
       <img src={closeModuleGif} alt="Regroup sub-modules"/>
       <figcaption>To regroup sub-modules, double click a module while holding the <kbd>shift</kbd> key.</figcaption>
     </figure>
+
+    <Header as="h1">Supported formats</Header>
+    <p>
+      Currently, we support networks clustered by <a href="https://www.mapequation.org/code.html">Infomap</a> into
+      the <code>clu</code>, <code>map</code>, <code>tree</code> and <code>ftree</code> formats.
+      To get hierarchical modules, you need to use the formats <code>tree</code> or <code>ftree</code>.
+    </p>
+    <p>
+      Read more about Infomap output formats on the <a href="https://www.mapequation.org/code.html#Output">Infomap
+      documentation page</a>.
+    </p>
   </Container>;
 
 export default Documentation;
