@@ -23,7 +23,7 @@ const Documentation = () =>
       documentation page</a>.
     </p>
 
-    <Header as="h1">Usage instructions</Header>
+    <Header as="h1">Instructions</Header>
 
     <Header>Show sub-modules</Header>
     <p>
