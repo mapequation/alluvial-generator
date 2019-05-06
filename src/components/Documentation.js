@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Header, Image } from "semantic-ui-react";
+import { Container, Divider, Header, Image } from "semantic-ui-react";
 import openModuleGif from "./images/open_module.gif";
 import closeModuleGif from "./images/close_module.gif";
 
@@ -14,26 +14,42 @@ const Documentation = () =>
 
     <Header as="h1">Instructions</Header>
 
+    <p>
+      Networks are shown as vertical stacks of modules. To highlight change between networks, we draw
+      streamines between the networks. To tell which sub-modules that have the same parent module, we draw
+      them closer together than other modules in the same network.
+    </p>
+
+    <Header>Navigation</Header>
+    <p>
+      Zoom in and out by scrolling. Pan the diagram by clicking and dragging.
+      To show module information, click on any module.
+    </p>
+
     <Header>Show sub-modules</Header>
+    <Image src={openModuleGif} alt="Show sub-modules" centered bordered rounded size="medium" floated="right"/>
     <p>
       By default, we show the top level modules for each network. To show the sub-modules
       within any module, double click on it. If nothing happens, the module is already expanded
       to its deepest level.
     </p>
-    <figure>
-      <Image src={openModuleGif} alt="Show sub-modules" centered bordered rounded/>
-      <figcaption>Show sub-modules by double clicking a module.</figcaption>
-    </figure>
-
-    <Header>Regroup sub-modules</Header>
     <p>
-      To regroup sub-modules into top level modules, double click on any sub-module while holding
+      To keep the heights proportional to the contained flow, we re-scale the heights of all other modules.
+    </p>
+
+    <Divider hidden clearing/>
+
+    <Header clear="both">Regroup sub-modules</Header>
+    <Image src={closeModuleGif} alt="Regroup sub-modules" centered bordered rounded size="medium" floated="right"/>
+    <p>
+      To regroup sub-modules into their parent module, double click on any sub-module while holding
       the <kbd>shift</kbd> key.
     </p>
-    <figure>
-      <Image src={closeModuleGif} alt="Regroup sub-modules" centered bordered rounded/>
-      <figcaption>To regroup sub-modules, double click a module while holding the <kbd>shift</kbd> key.</figcaption>
-    </figure>
+    <p>
+      All modules with the same parent will be re-grouped into the parent module.
+    </p>
+
+    <Divider hidden clearing/>
 
     <Header as="h1">Supported formats</Header>
     <p>
