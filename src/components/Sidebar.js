@@ -166,7 +166,7 @@ export default class Sidebar extends React.Component {
             }
           </Menu.Item>
           <Menu.Item>
-            <Header as="h4">Layout</Header>
+            <Header as="h4">Diagram size</Header>
             <TextInput
               label="Width"
               value={width}
