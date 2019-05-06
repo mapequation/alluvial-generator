@@ -86,6 +86,7 @@ export default class Module extends AlluvialNodeBase {
       moduleId: this.moduleId,
       name,
       largestLeafNodes: this.getLargestLeafNodeNames(),
+      numLeafNodes: this.numLeafNodes,
       moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
         y: y + height / 2
@@ -94,7 +95,7 @@ export default class Module extends AlluvialNodeBase {
         x: (x1 + x2) / 2,
         y: y + height / 2
       },
-      networkName: parent.name,
+      networkName: parent ? parent.name : "",
     };
   }
 }

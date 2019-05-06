@@ -68,7 +68,8 @@ export default class LeafNode extends AlluvialNodeBase {
   asObject(): Object {
     return {
       ...super.asObject(),
-      name: this.name
+      name: this.name,
+      highlightIndex: this.highlightIndex,
     };
   }
 

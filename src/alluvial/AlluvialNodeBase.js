@@ -55,6 +55,10 @@ export default class AlluvialNodeBase {
     return this.children.length === 0;
   }
 
+  get numLeafNodes(): number {
+    return Array.from(this.leafNodes()).length;
+  }
+
   set layout({ x, y, width, height }: Layout) {
     this.x = x;
     this.y = y;

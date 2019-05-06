@@ -1,10 +1,10 @@
+import FileSaver from "file-saver";
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
 import { Button, Checkbox, Header, Icon, Input, Menu, Sidebar as SemanticSidebar, Table } from "semantic-ui-react";
-import FileSaver from "file-saver";
 
-import AlluvialDiagram from "./AlluvialDiagram";
 import readAsText from "../io/read-as-text";
+import AlluvialDiagram from "./AlluvialDiagram";
 
 
 const TextInput = props =>
@@ -38,7 +38,7 @@ export default class Sidebar extends React.Component {
       ...this.state,
     };
     const json = JSON.stringify(settings, null, 2);
-    const blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([json], { type: "text/plain;charset=utf-8" });
     FileSaver.saveAs(blob, "alluvial-settings.json");
   };
 
@@ -89,6 +89,8 @@ export default class Sidebar extends React.Component {
       selectedModuleName,
     } = this.state;
 
+    const toPrecision = flow => Number.parseFloat(flow).toPrecision(3);
+
     return (
       <SemanticSidebar.Pushable>
         <SemanticSidebar
@@ -103,7 +105,7 @@ export default class Sidebar extends React.Component {
             <Header as="h4">Selected module</Header>
             {selectedModule === null && "No module selected"}
             {selectedModule !== null &&
-            <Table celled singleLine striped compact>
+            <Table celled singleLine striped compact fixed>
               <Table.Body>
                 <Table.Row>
                   <Table.Cell>Network</Table.Cell>
@@ -111,7 +113,11 @@ export default class Sidebar extends React.Component {
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Flow</Table.Cell>
-                  <Table.Cell>{Number.parseFloat(selectedModule.flow).toPrecision(3)}</Table.Cell>
+                  <Table.Cell>{toPrecision(selectedModule.flow)}</Table.Cell>
+                </Table.Row>
+                <Table.Row>
+                  <Table.Cell>Number of nodes</Table.Cell>
+                  <Table.Cell>{selectedModule.numLeafNodes}</Table.Cell>
                 </Table.Row>
                 <Table.Row>
                   <Table.Cell>Module id</Table.Cell>
@@ -129,7 +135,7 @@ export default class Sidebar extends React.Component {
                   </Table.Cell>
                 </Table.Row>
                 <Table.Row>
-                  <Table.Cell>Largest leaf nodes</Table.Cell>
+                  <Table.Cell>Largest nodes</Table.Cell>
                   <Table.Cell>{selectedModule.largestLeafNodes.join(", ")}</Table.Cell>
                 </Table.Row>
               </Table.Body>
@@ -160,7 +166,7 @@ export default class Sidebar extends React.Component {
                 min: 10,
                 max: width,
                 step: 10,
-                onChange: maxModuleWidth => this.setState({ maxModuleWidth })
+                onChange: maxModuleWidth => this.setState({ maxModuleWidth }),
               }}
             />
             <TextInput
@@ -174,7 +180,7 @@ export default class Sidebar extends React.Component {
                 min: 0,
                 max: 0.05,
                 step: 0.001,
-                onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold })
+                onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold }),
               }}
             />
             <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
@@ -196,7 +202,7 @@ export default class Sidebar extends React.Component {
                 min: 0,
                 max: 3,
                 step: 0.1,
-                onChange: streamlineFraction => this.setState({ streamlineFraction })
+                onChange: streamlineFraction => this.setState({ streamlineFraction }),
               }}
             />
             <TextInput
@@ -209,7 +215,7 @@ export default class Sidebar extends React.Component {
                 min: 0,
                 max: 1,
                 step: 0.05,
-                onChange: streamlineOpacity => this.setState({ streamlineOpacity })
+                onChange: streamlineOpacity => this.setState({ streamlineOpacity }),
               }}
             />
             <TextInput
@@ -223,7 +229,7 @@ export default class Sidebar extends React.Component {
                 min: 0,
                 max: 2,
                 step: 0.01,
-                onChange: streamlineThreshold => this.setState({ streamlineThreshold })
+                onChange: streamlineThreshold => this.setState({ streamlineThreshold }),
               }}
             />
           </Menu.Item>
@@ -239,7 +245,7 @@ export default class Sidebar extends React.Component {
                 min: 100,
                 max: 2000,
                 step: 100,
-                onChange: duration => this.setState({ duration })
+                onChange: duration => this.setState({ duration }),
               }}
             />
           </Menu.Item>
