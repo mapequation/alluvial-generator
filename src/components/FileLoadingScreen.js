@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Button, Icon, Segment, Table } from "semantic-ui-react";
+import { Container, Divider, Step, Icon, Segment, Table } from "semantic-ui-react";
 import { getParserForExtension } from "@mapequation/infoparse";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/parsers";
 import readAsText from "../io/read-as-text";
 
 
-function humanFileSize(bytes, si) {
+function humanFileSize(bytes, si = true) {
   const thresh = si ? 1000 : 1024;
   if (Math.abs(bytes) < thresh) {
     return bytes + " B";
@@ -126,7 +126,7 @@ export default class FileLoadingScreen extends React.Component {
         format: fileExtension(networks[i]),
       })),
       loading: false,
-    });
+    }, this.parseNetworks);
   };
 
   render() {
@@ -134,97 +134,81 @@ export default class FileLoadingScreen extends React.Component {
 
     return (
       <Segment
+        as={Container}
         loading={loading}
-        basic
+        text
         textAlign="center"
-        style={{ overflow: "auto", padding: 100, background: "#fff" }}
+        style={{ padding: "50px 100px" }}
       >
-        <Table celled definition>
+        <Step.Group>
+          <Step link onClick={this.withLoadingState(this.loadExample)}>
+            <Icon name="book"/>
+            <Step.Content>
+              <Step.Title>Load example</Step.Title>
+              <Step.Description>Citation networks</Step.Description>
+            </Step.Content>
+          </Step>
+        </Step.Group>
+
+        <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
+
+        <Table celled singleLine striped size="small">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell/>
-              {files.map((file, i) => (
-                <Table.HeaderCell
-                  collapsing
-                  key={i}
-                  textAlign="center"
-                  selectable
-                >
-                  {i + 1}
-                </Table.HeaderCell>
-              ))}
-              <Table.HeaderCell/>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Size</Table.HeaderCell>
+              <Table.HeaderCell>Format</Table.HeaderCell>
+              <Table.HeaderCell collapsing>Remove</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
+            {files.length === 0 &&
             <Table.Row>
-              <Table.Cell collapsing>Name</Table.Cell>
-              {files.map((file, i) => (
-                <Table.Cell key={i}>
-                  {file.name}
-                </Table.Cell>
-              ))}
-              <Table.Cell disabled/>
+              <Table.Cell disabled colSpan={4}/>
             </Table.Row>
-            <Table.Row>
-              <Table.Cell collapsing>Size</Table.Cell>
-              {files.map((file, i) => (
-                <Table.Cell key={i}>
-                  {humanFileSize(file.size, true)}
+            }
+            {files.length > 0 && files.map((file, i) =>
+              <Table.Row key={i}>
+                <Table.Cell>{file.name}</Table.Cell>
+                <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                <Table.Cell>{file.format}</Table.Cell>
+                <Table.Cell
+                  selectable
+                  negative
+                  onClick={() => this.removeFile(i)}
+                >
+                  <a>Remove</a>
                 </Table.Cell>
-              ))}
-              <Table.Cell disabled/>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell collapsing>Format</Table.Cell>
-              {files.map((file, i) => (
-                <Table.Cell key={i}>
-                  {file.format}
-                </Table.Cell>
-              ))}
-              <Table.Cell disabled/>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell collapsing>Remove</Table.Cell>
-              {files.map((file, i) => (
-                <Table.Cell key={i} selectable negative>
-                  <a onClick={() => this.removeFile(i)}>Remove</a>
-                </Table.Cell>
-              ))}
-              <Table.Cell disabled/>
-            </Table.Row>
+              </Table.Row>
+            )}
           </Table.Body>
-
-          <Table.Footer>
-            <Table.Row>
-              <Table.HeaderCell/>
-              <Table.HeaderCell colSpan={files.length + 1}>
-                <Button
-                  size="small"
-                  onClick={this.withLoadingState(this.loadExample)}
-                >
-                  Load example
-                </Button>
-                <label
-                  className="ui small primary button icon left labeled"
-                  htmlFor="upload"
-                >
-                  <Icon name="plus"/>
-                  Add network
-                </label>
-                <Button
-                  positive={this.state.files.length > 0}
-                  disabled={this.state.files.length < 1}
-                  onClick={this.withLoadingState(this.parseNetworks)}
-                  size="small"
-                >
-                  Create diagram
-                </Button>
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Footer>
         </Table>
+
+        <Step.Group size="small">
+          <Step
+            as="label"
+            link
+            active={this.state.files.length === 0}
+            htmlFor="upload"
+          >
+            <Icon name="plus"/>
+            <Step.Content>
+              <Step.Title>Add networks</Step.Title>
+            </Step.Content>
+          </Step>
+          <Step
+            link
+            active={this.state.files.length > 0}
+            disabled={this.state.files.length === 0}
+            onClick={this.withLoadingState(this.parseNetworks)}
+          >
+            <Icon name="left align" rotated="clockwise"/>
+            <Step.Content>
+              <Step.Title>Create diagram</Step.Title>
+            </Step.Content>
+          </Step>
+        </Step.Group>
 
         <input
           style={{ display: "none" }}
