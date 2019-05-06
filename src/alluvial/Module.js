@@ -33,8 +33,8 @@ export default class Module extends AlluvialNodeBase {
     this._name = Module.customNames.get(this.id) || null;
   }
 
-  set name(name: string) {
-    if (name === "") {
+  set name(name: ?string) {
+    if (!name || name === "") {
       Module.customNames.delete(this.id);
       this._name = null;
     } else {
