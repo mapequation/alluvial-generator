@@ -111,10 +111,11 @@ export default class Sidebar extends React.Component {
                   <Table.Cell>Network</Table.Cell>
                   <Table.Cell>{selectedModule.networkName}</Table.Cell>
                 </Table.Row>
+                {!Number.isNaN(+selectedModule.networkCodelength) &&
                 <Table.Row>
                   <Table.Cell>Codelength</Table.Cell>
                   <Table.Cell>{toPrecision(selectedModule.networkCodelength, 4)} bits</Table.Cell>
-                </Table.Row>
+                </Table.Row>}
                 <Table.Row>
                   <Table.Cell>Flow</Table.Cell>
                   <Table.Cell>{toPrecision(selectedModule.flow)}</Table.Cell>
