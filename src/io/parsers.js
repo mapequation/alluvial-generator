@@ -1,12 +1,12 @@
 import parseClu from "./parse-clu";
-import parseTree from "./parse-tree";
+import parse from "./parse";
 
 
 export const parsers = {
   clu: parseClu,
-  map: parseTree,
-  tree: parseTree,
-  ftree: parseTree,
+  map: parse,
+  tree: parse,
+  ftree: parse,
 };
 
 export const validExtensions = Object.keys(parsers);
