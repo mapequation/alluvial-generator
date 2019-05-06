@@ -48,7 +48,7 @@ export default class AlluvialDiagram extends React.Component {
     this.svg = d3.select(this.node);
 
     const zoom = d3.zoom().scaleExtent([0.1, 1000]);
-    const initialTransform = d3.zoomIdentity.translate(50, 50);
+    const initialTransform = d3.zoomIdentity.translate(0, 50);
 
     this.svg
       .call(zoom)
