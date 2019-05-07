@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Container, Divider, Step, Icon, Segment, Table } from "semantic-ui-react";
 import { getParserForExtension } from "@mapequation/infoparse";
 
-import { acceptedFormats, getParser, isValidExtension } from "../io/parsers";
+import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
 
 
