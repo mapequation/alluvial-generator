@@ -152,39 +152,6 @@ export default class FileLoadingScreen extends React.Component {
 
         <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
 
-        <Table celled singleLine striped size="small">
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Size</Table.HeaderCell>
-              <Table.HeaderCell>Format</Table.HeaderCell>
-              <Table.HeaderCell collapsing>Remove</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {files.length === 0 &&
-            <Table.Row>
-              <Table.Cell disabled colSpan={4}/>
-            </Table.Row>
-            }
-            {files.length > 0 && files.map((file, i) =>
-              <Table.Row key={i}>
-                <Table.Cell>{file.name}</Table.Cell>
-                <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
-                <Table.Cell>{file.format}</Table.Cell>
-                <Table.Cell
-                  selectable
-                  negative
-                  onClick={() => this.removeFile(i)}
-                >
-                  <a>Remove</a>
-                </Table.Cell>
-              </Table.Row>
-            )}
-          </Table.Body>
-        </Table>
-
         <Step.Group size="small">
           <Step
             as="label"
@@ -196,6 +163,15 @@ export default class FileLoadingScreen extends React.Component {
             <Step.Content>
               <Step.Title>Add networks</Step.Title>
             </Step.Content>
+            <input
+              style={{ display: "none" }}
+              type="file"
+              multiple
+              id="upload"
+              onChange={this.withLoadingState(this.loadSelectedFiles)}
+              accept={acceptedFormats}
+              ref={input => (this.input = input)}
+            />
           </Step>
           <Step
             link
@@ -210,15 +186,31 @@ export default class FileLoadingScreen extends React.Component {
           </Step>
         </Step.Group>
 
-        <input
-          style={{ display: "none" }}
-          type="file"
-          multiple
-          id="upload"
-          onChange={this.withLoadingState(this.loadSelectedFiles)}
-          accept={acceptedFormats}
-          ref={input => (this.input = input)}
-        />
+        {files.length > 0 &&
+        <Table celled singleLine striped size="small">
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Size</Table.HeaderCell>
+              <Table.HeaderCell>Format</Table.HeaderCell>
+              <Table.HeaderCell collapsing>Remove</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+
+          <Table.Body>
+            {files.map((file, i) =>
+              <Table.Row key={i}>
+                <Table.Cell>{file.name}</Table.Cell>
+                <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                <Table.Cell>{file.format}</Table.Cell>
+                <Table.Cell selectable negative onClick={() => this.removeFile(i)} >
+                  <a>Remove</a>
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table>
+        }
       </Segment>
     );
   }
