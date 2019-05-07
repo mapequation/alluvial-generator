@@ -18,9 +18,6 @@ import readAsText from "../io/read-as-text";
 import AlluvialDiagram from "./AlluvialDiagram";
 
 
-const TextInput = props =>
-  <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
-
 export default class Sidebar extends React.Component {
   state = {
     width: 1200,
@@ -104,6 +101,9 @@ export default class Sidebar extends React.Component {
     } = this.state;
 
     const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
+
+    const TextInput = props =>
+      <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
 
     return (
       <SemanticSidebar.Pushable>
