@@ -203,7 +203,12 @@ export default class FileLoadingScreen extends React.Component {
                 <Table.Cell>{file.name}</Table.Cell>
                 <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                 <Table.Cell>{file.format}</Table.Cell>
-                <Table.Cell selectable negative onClick={() => this.removeFile(i)} >
+                <Table.Cell
+                  selectable
+                  negative
+                  style={{ cursor: "pointer" }}
+                  onClick={() => this.removeFile(i)}
+                >
                   <a>Remove</a>
                 </Table.Cell>
               </Table.Row>
