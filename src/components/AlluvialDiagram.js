@@ -10,13 +10,13 @@ import LinearGradients from "./LinearGradients";
 export default class AlluvialDiagram extends React.Component {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
-  highlightColors = d3.schemeSet3;
-  defaultColor = "#b6b69f";
   maxModuleLevel = 3;
 
   static defaultProps = {
     width: 1200,
     height: 600,
+    defaultHighlightColor: "#b6b69f",
+    highlightColors: d3.schemeSet3,
     streamlineFraction: 2,
     maxModuleWidth: 300,
     duration: 200,
@@ -32,6 +32,8 @@ export default class AlluvialDiagram extends React.Component {
   static propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
+    defaultHighlightColor: PropTypes.number,
+    highlightColors: PropTypes.array,
     streamlineFraction: PropTypes.number,
     maxModuleWidth: PropTypes.number,
     duration: PropTypes.number,
@@ -116,6 +118,8 @@ export default class AlluvialDiagram extends React.Component {
       diagram,
       width,
       height,
+      defaultHighlightColor,
+      highlightColors,
       duration,
       streamlineOpacity,
       streamlineThreshold,
@@ -466,8 +470,8 @@ export default class AlluvialDiagram extends React.Component {
 
     const highlightColor = d =>
       d.highlightIndex === -1
-        ? this.defaultColor
-        : this.highlightColors[d.highlightIndex];
+        ? defaultHighlightColor
+        : highlightColors[d.highlightIndex];
 
     const rect = groupsEnter
       .append("rect")
@@ -528,6 +532,11 @@ export default class AlluvialDiagram extends React.Component {
   }
 
   render() {
+    const {
+      defaultHighlightColor,
+      highlightColors,
+    } = this.props;
+
     return (
       <svg
         width="100vw"
@@ -539,8 +548,8 @@ export default class AlluvialDiagram extends React.Component {
         <defs>
           <DropShadows maxLevel={this.maxModuleLevel}/>
           <LinearGradients
-            defaultColor={this.defaultColor}
-            highlightColors={this.highlightColors}
+            defaultColor={defaultHighlightColor}
+            highlightColors={highlightColors}
           />
         </defs>
         <g id="zoomable">
