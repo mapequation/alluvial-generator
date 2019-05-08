@@ -187,13 +187,13 @@ export default class FileLoadingScreen extends React.Component {
         </Step.Group>
 
         {files.length > 0 &&
-        <Table celled singleLine striped size="small">
+        <Table celled singleLine fixed unstackable striped size="small">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Size</Table.HeaderCell>
-              <Table.HeaderCell>Format</Table.HeaderCell>
-              <Table.HeaderCell collapsing>Remove</Table.HeaderCell>
+              <Table.HeaderCell width={3}>Size</Table.HeaderCell>
+              <Table.HeaderCell width={3}>Format</Table.HeaderCell>
+              <Table.HeaderCell width={3}>Remove</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
