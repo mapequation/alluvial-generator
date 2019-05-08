@@ -13,15 +13,9 @@ export default class AlluvialDiagram extends React.Component {
   maxModuleLevel = 3;
 
   static defaultProps = {
-    width: 1200,
-    height: 600,
     defaultHighlightColor: "#b6b69f",
     highlightColors: d3.schemeSet3,
-    streamlineFraction: 2,
-    maxModuleWidth: 300,
     duration: 200,
-    moduleFlowThreshold: 0.01,
-    streamlineThreshold: 1,
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
@@ -30,15 +24,15 @@ export default class AlluvialDiagram extends React.Component {
   };
 
   static propTypes = {
-    width: PropTypes.number,
-    height: PropTypes.number,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
     defaultHighlightColor: PropTypes.number,
     highlightColors: PropTypes.array,
-    streamlineFraction: PropTypes.number,
-    maxModuleWidth: PropTypes.number,
+    streamlineFraction: PropTypes.number.isRequired,
+    maxModuleWidth: PropTypes.number.isRequired,
     duration: PropTypes.number,
-    moduleFlowThreshold: PropTypes.number,
-    streamlineThreshold: PropTypes.number,
+    moduleFlowThreshold: PropTypes.number.isRequired,
+    streamlineThreshold: PropTypes.number.isRequired,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
