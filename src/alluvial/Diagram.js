@@ -84,7 +84,7 @@ export default class Diagram {
   }
 
   setModuleName(id: string, name: ?string) {
-    const module = this.getModuleById(id);
+    const module = this.alluvialRoot.getModuleById(id);
     if (!module) return;
     module.name = name;
     this.dirty = true;
@@ -539,12 +539,5 @@ export default class Diagram {
     const newModuleLevel = module.moduleLevel - 1;
     this.removeNodes(leafNodes);
     this.addNodes(leafNodes, networkId, newModuleLevel);
-  }
-
-  getModuleById(id: string): ?Module {
-    const [networkId, moduleId] = id.split("_module");
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!networkRoot) return;
-    return networkRoot.getModule(moduleId);
   }
 }

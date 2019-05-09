@@ -24,13 +24,22 @@ export default class Module extends AlluvialNodeBase {
     networkId: string,
     parent: NetworkRoot,
     moduleId: string,
-    moduleLevel: number = 1
+    moduleLevel: number = 1,
   ) {
-    super(networkId, parent, `${parent.networkId}_module${moduleId}`);
+    super(networkId, parent, Module.createId(parent.networkId, moduleId));
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
     this._name = Module.customNames.get(this.id) || null;
+  }
+
+  static createId(networkId: string, moduleId: string): string {
+    return `${networkId}_module${moduleId}`;
+  }
+
+  static splitId(id: string): [string, string] {
+    const [networkId, moduleId] = id.split("_module");
+    return [networkId, moduleId];
   }
 
   set name(name: ?string) {
@@ -89,11 +98,11 @@ export default class Module extends AlluvialNodeBase {
       numLeafNodes: this.numLeafNodes,
       moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
-        y: y + height / 2
+        y: y + height / 2,
       },
       moduleIdPosition: {
         x: (x1 + x2) / 2,
-        y: y + height / 2
+        y: y + height / 2,
       },
       networkName: parent ? parent.name : "",
       networkCodelength: parent && parent.codelength ? parent.codelength : 0,

@@ -3,6 +3,7 @@ import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { ALLUVIAL_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
+import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 
 
@@ -49,5 +50,12 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     if (!networkRoot) return;
 
     return networkRoot.getLeafNodeByName(node.name);
+  }
+
+  getModuleById(id: string): ?Module {
+    const [networkId, moduleId] = Module.splitId(id);
+    const networkRoot = this.getNetworkRoot(networkId);
+    if (!networkRoot) return;
+    return networkRoot.getModule(moduleId);
   }
 }
