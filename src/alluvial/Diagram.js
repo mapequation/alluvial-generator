@@ -11,8 +11,6 @@ import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
 
 
-type NodesByName = Map<string, LeafNode>;
-
 type Event = {
   altKey: boolean,
   shiftKey: boolean
@@ -39,8 +37,6 @@ const differenceIndex = (array1, array2) => {
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  leafNodesByNetworkId: Map<string, NodesByName> = new Map();
-  networkIndices: string[] = [];
   dirty: boolean = true;
   _asObject: Object = {};
 
@@ -51,36 +47,26 @@ export default class Diagram {
   addNetwork(network: Network) {
     const { nodes, id, codelength, name } = network;
 
-    if (this.leafNodesByNetworkId.has(id)) {
+    if (this.alluvialRoot.hasNetwork(id)) {
       throw new Error(`Network with id ${id} already exists`);
     }
 
-    const nodesByName = new Map(nodes.map(node => [node.name, new LeafNode(node, id)]));
+    const networkRoot = this.alluvialRoot.createNetworkRoot(id, name, codelength);
 
-    this.networkIndices.push(id);
-    this.leafNodesByNetworkId.set(id, nodesByName);
-    this.alluvialRoot.createNetworkRoot(id, name, codelength);
+    const leafNodes = nodes.map(node => new LeafNode(node, id));
+    networkRoot.createLeafNodeToNameMap(leafNodes);
 
-    this.addNodes(nodesByName.values(), id);
+    this.addNodes(leafNodes, id);
   }
 
   removeNetwork(networkId: string) {
-    const networkIndex = this.networkIndices.indexOf(networkId);
-    const nodesByName = this.leafNodesByNetworkId.get(networkId);
-
-    if (networkIndex === -1 || nodesByName == null) {
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!networkRoot) {
       console.warn(`No network exists with id ${networkId}`);
       return;
     }
 
-    this.removeNodes(nodesByName.values());
-
-    this.networkIndices.splice(networkIndex, 1);
-    this.leafNodesByNetworkId.delete(networkId);
-  }
-
-  hasNetwork(networkId: string): boolean {
-    return this.leafNodesByNetworkId.has(networkId);
+    this.removeNodes(networkRoot.leafNodes());
   }
 
   doubleClick(alluvialNode: Object, event: Event = noKeyModifiers) {
@@ -91,8 +77,8 @@ export default class Diagram {
           : this.expandModule
       ).bind(this);
 
-      const ids = altKey ? this.networkIndices : [alluvialNode.networkId];
-      ids.forEach(id => regroupOrExpand(alluvialNode.moduleId, id));
+      const networkIds = altKey ? this.alluvialRoot.networkIds : [alluvialNode.networkId];
+      networkIds.forEach(networkId => regroupOrExpand(alluvialNode.moduleId, networkId));
     }
   }
 
@@ -113,7 +99,7 @@ export default class Diagram {
   ) {
     this.dirty = true;
 
-    const numNetworks = this.networkIndices.length;
+    const numNetworks = this.alluvialRoot.numChildren;
 
     if (!numNetworks) return;
 
@@ -555,9 +541,13 @@ export default class Diagram {
   }
 
   getNodeByName(networkId: string, name: string): ?LeafNode {
-    const nodesByName = this.leafNodesByNetworkId.get(networkId);
-    if (!nodesByName) return;
-    return nodesByName.get(name);
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!networkRoot) {
+      console.warn(`Cannot get node because no network exists with id ${networkId}`);
+      return;
+    }
+
+    return networkRoot.getLeafNodeByName(name);
   }
 
   getModuleById(id: string): ?Module {
@@ -567,20 +557,8 @@ export default class Diagram {
     return networkRoot.getModule(moduleId);
   }
 
-  getNeighborNetworkId(networkId: string, side: Side): ?string {
-    const networkIndex = this.networkIndices.indexOf(networkId);
-    if (networkIndex === -1) return;
-    const neighborNetworkIndex = networkIndex + side;
-    if (
-      neighborNetworkIndex < 0 ||
-      neighborNetworkIndex === this.networkIndices.length
-    )
-      return;
-    return this.networkIndices[neighborNetworkIndex];
-  }
-
   getOppositeNode(node: LeafNode, side: Side): ?LeafNode {
-    const neighborNetworkId = this.getNeighborNetworkId(node.networkId, side);
+    const neighborNetworkId = this.alluvialRoot.getNeighborNetworkId(node.networkId, side);
 
     return neighborNetworkId
       ? this.getNodeByName(neighborNetworkId, node.name)

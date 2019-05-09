@@ -51,10 +51,6 @@ export default class AlluvialNodeBase {
     return this.parent.getAncestor(depth);
   }
 
-  get isEmpty(): boolean {
-    return this.children.length === 0;
-  }
-
   get numLeafNodes(): number {
     return Array.from(this.leafNodes()).length;
   }
@@ -88,14 +84,22 @@ export default class AlluvialNodeBase {
     return found;
   }
 
-  removeFromParent() {
-    if (!this.parent) return;
-    this.parent.removeChild(this);
-  }
-
   getChild(index: number): ?AlluvialNode {
     if (index < 0 || index > this.children.length - 1) return null;
     return this.children[index];
+  }
+
+  get numChildren(): number {
+    return this.children.length;
+  }
+
+  get isEmpty(): boolean {
+    return this.numChildren === 0;
+  }
+
+  removeFromParent() {
+    if (!this.parent) return;
+    this.parent.removeChild(this);
   }
 
   sortChildren() {

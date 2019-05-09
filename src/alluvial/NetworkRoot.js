@@ -3,6 +3,7 @@ import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
+import LeafNode from "./LeafNode";
 import Module from "./Module";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
@@ -14,6 +15,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
   name: string;
   depth = NETWORK_ROOT;
   codelength: number;
+  nodesByName: Map<string, LeafNode> = new Map();
 
   constructor(networkId: string, parent: AlluvialRoot, name: string, codelength: number) {
     super(networkId, parent, networkId);
@@ -41,6 +43,16 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.children.filter(module =>
       parentPath.isAncestor(module.moduleId),
     );
+  }
+
+  createLeafNodeToNameMap(nodes: Iterable<LeafNode>) {
+    this.nodesByName = new Map(
+      Array.from(nodes).map(node => [node.name, node])
+    );
+  }
+
+  getLeafNodeByName(name: string): ?LeafNode {
+    return this.nodesByName.get(name);
   }
 
   asObject(): Object {
