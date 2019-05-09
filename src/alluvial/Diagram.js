@@ -129,8 +129,8 @@ export default class Diagram {
 
       if (!streamlineNode) {
         streamlineNode = new StreamlineNode(networkId, branch, streamlineId);
-        this.streamlineNodesById.set(streamlineId, streamlineNode);
         branch.addChild(streamlineNode);
+        this.streamlineNodesById.set(streamlineId, streamlineNode);
       }
 
       if (streamlineNode.hasTarget) {
@@ -154,8 +154,6 @@ export default class Diagram {
   }
 
   addNodeToSide(node: LeafNode, side: Side) {
-    const { networkId } = node;
-
     const oppositeNode: ?LeafNode = this.alluvialRoot.getOppositeNode(node, side);
 
     const streamlineId = StreamlineId.create(node, side, oppositeNode);
@@ -174,7 +172,7 @@ export default class Diagram {
         return;
       }
 
-      streamlineNode = new StreamlineNode(networkId, branch, streamlineId);
+      streamlineNode = new StreamlineNode(node.networkId, branch, streamlineId);
       this.streamlineNodesById.set(streamlineId, streamlineNode);
       branch.addChild(streamlineNode);
 
@@ -281,18 +279,12 @@ export default class Diagram {
           duplicate.removeFromParent();
         }
 
-        this.streamlineNodesById.set(
-          oppositeStreamlineNode.id,
-          oppositeStreamlineNode,
-        );
+        this.streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
       }
 
       this.streamlineNodesById.delete(streamlineNode.id);
 
-      if (streamlineNode.link) {
-        streamlineNode.link.remove();
-      }
-
+      streamlineNode.removeLink();
       streamlineNode.removeFromParent();
     }
 
@@ -300,9 +292,7 @@ export default class Diagram {
   }
 
   expandModule(moduleId: string, networkId: string) {
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId,
-    );
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId );
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;

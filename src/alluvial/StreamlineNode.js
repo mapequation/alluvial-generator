@@ -53,4 +53,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
     let reverse = this.parent ? this.parent.isLeft : false;
     StreamlineLink.linkNodes(this, opposite, reverse);
   }
+
+  removeLink() {
+    if (this.link) {
+      this.link.remove();
+    }
+  }
 }
