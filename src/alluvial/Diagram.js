@@ -94,14 +94,16 @@ export default class Diagram {
     return this._asObject;
   }
 
-  addNodes(nodes: Iterable<LeafNode>, moduleLevel: number = 1) {
+  addNodes(nodes: Iterable<LeafNode>, moduleLevel: ?number) {
     for (let node of nodes) {
-      this.addNode(node, moduleLevel);
+      this.addNode(node, moduleLevel || node.moduleLevel);
     }
   }
 
-  addNode(node: LeafNode, moduleLevel: number = 1) {
-    node.moduleLevel = moduleLevel;
+  addNode(node: LeafNode, moduleLevel: ?number) {
+    if (moduleLevel) {
+      node.moduleLevel = moduleLevel;
+    }
 
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(node.networkId);
     if (!networkRoot) {
