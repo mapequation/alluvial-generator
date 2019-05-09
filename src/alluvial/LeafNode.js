@@ -77,7 +77,7 @@ export default class LeafNode extends AlluvialNodeBase {
     };
   }
 
-  *leafNodes(): Iterable<AlluvialNode> {
+  * leafNodes(): Iterable<AlluvialNode> {
     yield this;
   }
 }

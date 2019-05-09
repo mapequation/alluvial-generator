@@ -29,7 +29,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return this.streamlineId.target;
   }
 
-  hasTarget(): boolean {
+  get hasTarget(): boolean {
     return !!this.targetId;
   }
 

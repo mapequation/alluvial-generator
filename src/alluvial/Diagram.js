@@ -55,9 +55,7 @@ export default class Diagram {
       throw new Error(`Network with id ${id} already exists`);
     }
 
-    const nodesByName = new Map(
-      nodes.map(node => [node.name, new LeafNode(node, id)]),
-    );
+    const nodesByName = new Map(nodes.map(node => [node.name, new LeafNode(node, id)]));
 
     this.networkIndices.push(id);
     this.leafNodesByNetworkId.set(id, nodesByName);
@@ -179,8 +177,7 @@ export default class Diagram {
       // Reduce margins to below 50% of vertical space
       // Use moduleMarginScale such that
       //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfHeight
-      const moduleMarginScale =
-        (maxMarginFractionOfHeight * height) / maxTotalMargin;
+      const moduleMarginScale = (maxMarginFractionOfHeight * height) / maxTotalMargin;
 
       this.alluvialRoot.forEachDepthFirstWhile(
         node => node.depth <= Depth.MODULE,
@@ -290,9 +287,7 @@ export default class Diagram {
   addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId,
-    );
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;
@@ -322,10 +317,8 @@ export default class Diagram {
         branch.addChild(streamlineNode);
       }
 
-      if (streamlineNode.hasTarget()) {
-        const oppositeStreamlineIsDangling = this.streamlineNodesById.has(
-          streamlineNode.targetId,
-        );
+      if (streamlineNode.hasTarget) {
+        const oppositeStreamlineIsDangling = this.streamlineNodesById.has(streamlineNode.targetId);
         if (oppositeStreamlineIsDangling && oppositeNode) {
           const oppositeSide = opposite(branch.side);
           this.removeNodeFromSide(oppositeNode, oppositeSide);
@@ -350,9 +343,7 @@ export default class Diagram {
     const oppositeNode: ?LeafNode = this.getOppositeNode(node, side);
 
     const streamlineId = StreamlineId.create(node, side, oppositeNode);
-    let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(
-      streamlineId,
-    );
+    let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
     if (!oldStreamlineNode) {
@@ -363,9 +354,7 @@ export default class Diagram {
 
     if (!streamlineNode) {
       if (!branch) {
-        console.warn(
-          `Streamline node with id ${oldStreamlineNode.id} has no parent`,
-        );
+        console.warn(`Streamline node with id ${oldStreamlineNode.id} has no parent`);
         return;
       }
 
@@ -409,9 +398,7 @@ export default class Diagram {
 
     const module: ?Module = group.parent;
     if (!module) {
-      console.warn(
-        `Node ${node.id} was removed without belonging to a module.`,
-      );
+      console.warn(`Node ${node.id} was removed without belonging to a module.`);
       return;
     }
     module.flow -= node.flow;
@@ -422,9 +409,7 @@ export default class Diagram {
 
     const networkRoot: ?NetworkRoot = module.parent;
     if (!networkRoot) {
-      console.warn(
-        `Node ${node.id} was removed without belonging to a network root.`,
-      );
+      console.warn(`Node ${node.id} was removed without belonging to a network root.`);
       return;
     }
     networkRoot.flow -= node.flow;
@@ -451,9 +436,7 @@ export default class Diagram {
 
     const branch: ?Branch = streamlineNode.parent;
     if (!branch) {
-      console.warn(
-        `Streamline node with id ${streamlineNode.id} has no parent`,
-      );
+      console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
       return;
     }
     branch.flow -= node.flow;
@@ -464,9 +447,7 @@ export default class Diagram {
         this.streamlineNodesById.delete(oppositeStreamlineNode.id);
         oppositeStreamlineNode.makeDangling();
 
-        const duplicate = this.streamlineNodesById.get(
-          oppositeStreamlineNode.id,
-        );
+        const duplicate = this.streamlineNodesById.get(oppositeStreamlineNode.id);
 
         // Does the (new) dangling id already exist? Move nodes from it.
         // Note: as we move nodes around we don't need to propagate flow.
@@ -513,9 +494,7 @@ export default class Diagram {
 
     const module: ?Module = networkRoot.getModule(moduleId);
     if (!module) {
-      console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`,
-      );
+      console.warn(`No module found with id ${moduleId} in network ${networkId}`);
       return;
     }
 
@@ -541,9 +520,7 @@ export default class Diagram {
   }
 
   regroupModule(moduleId: string, networkId: string) {
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(
-      networkId,
-    );
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;
@@ -551,18 +528,12 @@ export default class Diagram {
 
     const module: ?Module = networkRoot.getModule(moduleId);
     if (!module) {
-      console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`,
-      );
+      console.warn(`No module found with id ${moduleId} in network ${networkId}`);
       return;
     }
 
     if (module.moduleLevel <= 1) {
-      console.warn(
-        `Module with id ${moduleId} is already at module level ${
-          module.moduleLevel
-          }`,
-      );
+      console.warn(`Module with id ${moduleId} is already at module level ${module.moduleLevel}`);
       return;
     }
 
