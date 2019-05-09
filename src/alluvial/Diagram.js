@@ -292,7 +292,7 @@ export default class Diagram {
     for (let branch of group) {
       branch.flow += node.flow;
 
-      const oppositeNode = this.getOppositeNode(node, branch.side);
+      const oppositeNode = this.alluvialRoot.getOppositeNode(node, branch.side);
 
       const streamlineId = StreamlineId.create(node, branch.side, oppositeNode);
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
@@ -326,7 +326,7 @@ export default class Diagram {
   addNodeToSide(node: LeafNode, side: Side) {
     const { networkId } = node;
 
-    const oppositeNode: ?LeafNode = this.getOppositeNode(node, side);
+    const oppositeNode: ?LeafNode = this.alluvialRoot.getOppositeNode(node, side);
 
     const streamlineId = StreamlineId.create(node, side, oppositeNode);
     let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
@@ -540,28 +540,10 @@ export default class Diagram {
     this.addNodes(leafNodes, networkId, newModuleLevel);
   }
 
-  getNodeByName(networkId: string, name: string): ?LeafNode {
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!networkRoot) {
-      console.warn(`Cannot get node because no network exists with id ${networkId}`);
-      return;
-    }
-
-    return networkRoot.getLeafNodeByName(name);
-  }
-
   getModuleById(id: string): ?Module {
     const [networkId, moduleId] = id.split("_module");
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     return networkRoot.getModule(moduleId);
-  }
-
-  getOppositeNode(node: LeafNode, side: Side): ?LeafNode {
-    const neighborNetworkId = this.alluvialRoot.getNeighborNetworkId(node.networkId, side);
-
-    return neighborNetworkId
-      ? this.getNodeByName(neighborNetworkId, node.name)
-      : null;
   }
 }

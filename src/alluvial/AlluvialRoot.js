@@ -2,6 +2,7 @@
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Branch";
 import { ALLUVIAL_ROOT } from "./Depth";
+import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
 
 
@@ -27,7 +28,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     return this.children.some(network => network.networkId === networkId);
   }
 
-  getNeighborNetworkId(networkId: string, side: Side): ?string {
+  getNeighborNetwork(networkId: string, side: Side): ?NetworkRoot {
     const networkIndex = this.children.findIndex(networkRoot => networkRoot.networkId === networkId);
     if (networkIndex === -1) return;
     const neighborNetworkIndex = networkIndex + side;
@@ -36,10 +37,17 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       neighborNetworkIndex === this.children.length
     )
       return;
-    return this.children[neighborNetworkIndex].networkId;
+    return this.children[neighborNetworkIndex];
   }
 
   get networkIds(): string[] {
     return this.children.map(networkRoot => networkRoot.networkId);
+  }
+
+  getOppositeNode(node: LeafNode, side: Side): ?LeafNode {
+    const networkRoot = this.getNeighborNetwork(node.networkId, side);
+    if (!networkRoot) return;
+
+    return networkRoot.getLeafNodeByName(node.name);
   }
 }
