@@ -26,8 +26,8 @@ export default class AlluvialDiagram extends React.Component {
   static propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    defaultHighlightColor: PropTypes.number,
-    highlightColors: PropTypes.array,
+    defaultHighlightColor: PropTypes.string,
+    highlightColors: PropTypes.arrayOf(PropTypes.string),
     streamlineFraction: PropTypes.number.isRequired,
     maxModuleWidth: PropTypes.number.isRequired,
     duration: PropTypes.number,
