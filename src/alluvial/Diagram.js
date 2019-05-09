@@ -16,11 +16,6 @@ type Event = {
   shiftKey: boolean
 };
 
-const noKeyModifiers: Event = {
-  altKey: false,
-  shiftKey: false,
-};
-
 type VerticalAlign = "bottom" | "justify" | "top";
 
 const differenceIndex = (array1, array2) => {
@@ -69,8 +64,14 @@ export default class Diagram {
     this.removeNodes(networkRoot.leafNodes());
   }
 
-  doubleClick(alluvialNode: Object, event: Event = noKeyModifiers) {
-    const { shiftKey, altKey } = event;
+  doubleClick(alluvialNode: Object, event: ?Event) {
+    const noKeyModifiers: Event = {
+      altKey: false,
+      shiftKey: false,
+    };
+
+    const { shiftKey, altKey } = event || noKeyModifiers;
+
     if (alluvialNode.depth === Depth.MODULE) {
       const regroupOrExpand = (shiftKey
           ? this.regroupModule
