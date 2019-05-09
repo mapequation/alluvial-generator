@@ -1,5 +1,4 @@
 // @flow
-import TreePath from "../lib/treepath";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
@@ -34,15 +33,6 @@ export default class NetworkRoot extends AlluvialNodeBase {
       this.children.push(module);
     }
     return module;
-  }
-
-  getSiblings(moduleId: string): Module[] {
-    const moduleLevel = TreePath.level(moduleId) - 1;
-    if (moduleLevel < 1) return this.children;
-    const parentPath = TreePath.ancestorAtLevel(moduleId, moduleLevel);
-    return this.children.filter(module =>
-      parentPath.isAncestor(module.moduleId),
-    );
   }
 
   createLeafNodeToNameMap(nodes: Iterable<LeafNode>) {

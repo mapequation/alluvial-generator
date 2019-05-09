@@ -10,6 +10,7 @@ import NetworkRoot from "./NetworkRoot";
 
 
 export default class Module extends AlluvialNodeBase {
+  parent: NetworkRoot;
   children: HighlightGroup[] = [];
   moduleLevel: number = 1;
   path: number[] = [];
@@ -54,6 +55,17 @@ export default class Module extends AlluvialNodeBase {
 
   get name(): ?string {
     return this._name;
+  }
+
+  getSiblings(): Module[] {
+    if (!this.parent) return [];
+    const modules = this.parent.children;
+
+    const moduleLevel = this.moduleLevel - 1;
+    if (moduleLevel < 1) return modules;
+
+    const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
+    return modules.filter(module => parentPath.isAncestor(module.moduleId));
   }
 
   getGroup(highlightIndex: number): ?HighlightGroup {

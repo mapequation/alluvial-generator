@@ -343,7 +343,7 @@ export default class Diagram {
       return;
     }
 
-    const modules = networkRoot.getSiblings(moduleId);
+    const modules = module.getSiblings();
 
     const leafNodes = [].concat.apply(
       [],
