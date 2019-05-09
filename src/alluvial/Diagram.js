@@ -39,7 +39,7 @@ const differenceIndex = (array1, array2) => {
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  networksById: Map<string, NodesByName> = new Map();
+  leafNodesByNetworkId: Map<string, NodesByName> = new Map();
   networkIndices: string[] = [];
   dirty: boolean = true;
   _asObject: Object = {};
@@ -51,7 +51,7 @@ export default class Diagram {
   addNetwork(network: Network) {
     const { nodes, id, codelength, name } = network;
 
-    if (this.networksById.has(id)) {
+    if (this.leafNodesByNetworkId.has(id)) {
       throw new Error(`Network with id ${id} already exists`);
     }
 
@@ -60,7 +60,7 @@ export default class Diagram {
     );
 
     this.networkIndices.push(id);
-    this.networksById.set(id, nodesByName);
+    this.leafNodesByNetworkId.set(id, nodesByName);
     this.alluvialRoot.createNetworkRoot(id, name, codelength);
 
     for (let node of nodesByName.values()) {
@@ -70,7 +70,7 @@ export default class Diagram {
 
   removeNetwork(networkId: string) {
     const networkIndex = this.networkIndices.indexOf(networkId);
-    const nodesByName = this.networksById.get(networkId);
+    const nodesByName = this.leafNodesByNetworkId.get(networkId);
 
     if (networkIndex === -1 || nodesByName == null) {
       console.warn(`No network exists with id ${networkId}`);
@@ -82,11 +82,11 @@ export default class Diagram {
     }
 
     this.networkIndices.splice(networkIndex, 1);
-    this.networksById.delete(networkId);
+    this.leafNodesByNetworkId.delete(networkId);
   }
 
   hasNetwork(networkId: string): boolean {
-    return this.networksById.has(networkId);
+    return this.leafNodesByNetworkId.has(networkId);
   }
 
   doubleClick(alluvialNode: Object, event: Event = noKeyModifiers) {
@@ -576,7 +576,7 @@ export default class Diagram {
   }
 
   getNodeByName(networkId: string, name: string): ?LeafNode {
-    const nodesByName = this.networksById.get(networkId);
+    const nodesByName = this.leafNodesByNetworkId.get(networkId);
     if (!nodesByName) return;
     return nodesByName.get(name);
   }
