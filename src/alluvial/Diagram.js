@@ -41,7 +41,7 @@ export default class Diagram {
     const leafNodes = nodes.map(node => new LeafNode(node, id));
     networkRoot.createLeafNodeToNameMap(leafNodes);
 
-    this.addNodes(leafNodes, id);
+    this.addNodes(leafNodes);
   }
 
   removeNetwork(networkId: string) {
@@ -94,18 +94,18 @@ export default class Diagram {
     return this._asObject;
   }
 
-  addNodes(nodes: Iterable<LeafNode>, networkId: string, moduleLevel: number = 1) {
+  addNodes(nodes: Iterable<LeafNode>, moduleLevel: number = 1) {
     for (let node of nodes) {
-      this.addNode(node, networkId, moduleLevel);
+      this.addNode(node, moduleLevel);
     }
   }
 
-  addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
+  addNode(node: LeafNode, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(node.networkId);
     if (!networkRoot) {
-      console.warn(`No network id ${networkId}`);
+      console.warn(`No network id ${node.networkId}`);
       return;
     }
 
@@ -128,7 +128,7 @@ export default class Diagram {
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
-        streamlineNode = new StreamlineNode(networkId, branch, streamlineId);
+        streamlineNode = new StreamlineNode(node.networkId, branch, streamlineId);
         branch.addChild(streamlineNode);
         this.streamlineNodesById.set(streamlineId, streamlineNode);
       }
@@ -322,7 +322,7 @@ export default class Diagram {
     }
 
     this.removeNodes(leafNodes);
-    this.addNodes(leafNodes, networkId, newModuleLevel);
+    this.addNodes(leafNodes, newModuleLevel);
   }
 
   regroupModule(moduleId: string, networkId: string) {
@@ -357,6 +357,6 @@ export default class Diagram {
 
     const newModuleLevel = module.moduleLevel - 1;
     this.removeNodes(leafNodes);
-    this.addNodes(leafNodes, networkId, newModuleLevel);
+    this.addNodes(leafNodes, newModuleLevel);
   }
 }
