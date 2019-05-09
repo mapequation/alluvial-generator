@@ -1,6 +1,7 @@
 // @flow
 import type { Depth } from "./Depth";
 
+
 type Position = {
   x: number,
   y: number
@@ -35,11 +36,7 @@ export default class AlluvialNodeBase {
   +children: AlluvialNode[] = [];
   parent: ?AlluvialNode = null;
 
-  constructor(
-    networkId: string,
-    parent: ?AlluvialNode = null,
-    id: string = ""
-  ) {
+  constructor(networkId: string, parent: ?AlluvialNode = null, id: string = "") {
     this.networkId = networkId;
     this.parent = parent;
     this.id = id;

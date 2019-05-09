@@ -54,7 +54,7 @@ export default class Diagram {
     this.removeNodes(networkRoot.leafNodes());
   }
 
-  doubleClick(alluvialNode: Object, event: ?Event) {
+  doubleClick(alluvialObject: Object, event: ?Event) {
     const noKeyModifiers: Event = {
       altKey: false,
       shiftKey: false,
@@ -62,14 +62,14 @@ export default class Diagram {
 
     const { shiftKey, altKey } = event || noKeyModifiers;
 
-    if (alluvialNode.depth === Depth.MODULE) {
+    if (alluvialObject.depth === Depth.MODULE) {
       const regroupOrExpand = (shiftKey
           ? this.regroupModule
           : this.expandModule
       ).bind(this);
 
-      const networkIds = altKey ? this.alluvialRoot.networkIds : [alluvialNode.networkId];
-      networkIds.forEach(networkId => regroupOrExpand(alluvialNode.moduleId, networkId));
+      const networkIds = altKey ? this.alluvialRoot.networkIds : [alluvialObject.networkId];
+      networkIds.forEach(networkId => regroupOrExpand(alluvialObject.moduleId, networkId));
     }
   }
 
@@ -292,7 +292,7 @@ export default class Diagram {
   }
 
   expandModule(moduleId: string, networkId: string) {
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId );
+    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;

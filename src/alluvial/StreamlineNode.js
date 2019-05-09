@@ -1,14 +1,17 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import type { Side } from "./Side";
+import { LEFT } from "./Side";
 import Branch from "./Branch";
 import { MODULE, STREAMLINE_NODE } from "./Depth";
 import StreamlineId from "./StreamlineId";
 import StreamlineLink from "./StreamlineLink";
+import LeafNode from "./LeafNode";
 
 
 export default class StreamlineNode extends AlluvialNodeBase {
-  parent: ?Branch;
+  parent: Branch;
+  children: LeafNode[] = [];
   link: ?StreamlineLink = null;
   side: Side;
   streamlineId: StreamlineId;
@@ -41,16 +44,16 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   byOppositeStreamlinePosition(moduleFlowThreshold: number) {
-    const at_bottom = -Infinity;
+    const atBottom = -Infinity;
     const opposite = this.getOppositeStreamlineNode();
-    if (!opposite) return at_bottom;
+    if (!opposite) return atBottom;
     const module = opposite.getAncestor(MODULE);
-    if (!module || module.flow < moduleFlowThreshold) return at_bottom;
+    if (!module || module.flow < moduleFlowThreshold) return atBottom;
     return -module.y;
   }
 
   linkTo(opposite: StreamlineNode) {
-    let reverse = this.parent ? this.parent.isLeft : false;
+    let reverse = this.side === LEFT;
     StreamlineLink.linkNodes(this, opposite, reverse);
   }
 
