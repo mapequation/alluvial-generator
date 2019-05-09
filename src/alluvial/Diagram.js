@@ -63,9 +63,7 @@ export default class Diagram {
     this.leafNodesByNetworkId.set(id, nodesByName);
     this.alluvialRoot.createNetworkRoot(id, name, codelength);
 
-    for (let node of nodesByName.values()) {
-      this.addNode(node, id);
-    }
+    this.addNodes(nodesByName.values(), id);
   }
 
   removeNetwork(networkId: string) {
@@ -77,9 +75,7 @@ export default class Diagram {
       return;
     }
 
-    for (let node of nodesByName.values()) {
-      this.removeNode(node);
-    }
+    this.removeNodes(nodesByName.values());
 
     this.networkIndices.splice(networkIndex, 1);
     this.leafNodesByNetworkId.delete(networkId);
@@ -285,6 +281,12 @@ export default class Diagram {
     return this._asObject;
   }
 
+  addNodes(nodes: Iterable<LeafNode>, networkId: string, moduleLevel: number = 1) {
+    for (let node of nodes) {
+      this.addNode(node, networkId, moduleLevel);
+    }
+  }
+
   addNode(node: LeafNode, networkId: string, moduleLevel: number = 1) {
     node.moduleLevel = moduleLevel;
 
@@ -386,6 +388,12 @@ export default class Diagram {
     streamlineNode.addChild(node);
     streamlineNode.flow += node.flow;
     node.setParent(streamlineNode, side);
+  }
+
+  removeNodes(nodes: Iterable<LeafNode>) {
+    for (let node of nodes) {
+      this.removeNode(node);
+    }
   }
 
   removeNode(node: LeafNode) {
@@ -528,8 +536,8 @@ export default class Diagram {
       return;
     }
 
-    leafNodes.forEach(node => this.removeNode(node));
-    leafNodes.forEach(node => this.addNode(node, networkId, newModuleLevel));
+    this.removeNodes(leafNodes);
+    this.addNodes(leafNodes, networkId, newModuleLevel);
   }
 
   regroupModule(moduleId: string, networkId: string) {
@@ -571,8 +579,8 @@ export default class Diagram {
     }
 
     const newModuleLevel = module.moduleLevel - 1;
-    leafNodes.forEach(node => this.removeNode(node));
-    leafNodes.forEach(node => this.addNode(node, networkId, newModuleLevel));
+    this.removeNodes(leafNodes);
+    this.addNodes(leafNodes, networkId, newModuleLevel);
   }
 
   getNodeByName(networkId: string, name: string): ?LeafNode {
