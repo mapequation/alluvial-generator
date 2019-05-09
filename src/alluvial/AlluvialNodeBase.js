@@ -88,6 +88,11 @@ export default class AlluvialNodeBase {
     return found;
   }
 
+  removeFromParent() {
+    if (!this.parent) return;
+    this.parent.removeChild(this);
+  }
+
   getChild(index: number): ?AlluvialNode {
     if (index < 0 || index > this.children.length - 1) return null;
     return this.children[index];

@@ -417,7 +417,7 @@ export default class Diagram {
     module.flow -= node.flow;
 
     if (group.isEmpty) {
-      module.removeChild(group);
+      group.removeFromParent();
     }
 
     const networkRoot: ?NetworkRoot = module.parent;
@@ -430,13 +430,13 @@ export default class Diagram {
     networkRoot.flow -= node.flow;
 
     if (module.isEmpty) {
-      networkRoot.removeChild(module);
+      module.removeFromParent();
     }
 
     this.alluvialRoot.flow -= node.flow;
 
     if (networkRoot.isEmpty) {
-      this.alluvialRoot.removeChild(networkRoot);
+      networkRoot.removeFromParent();
     }
   }
 
@@ -481,7 +481,7 @@ export default class Diagram {
           if (!oppositeBranch) {
             throw new Error("No parent found for opposite streamline node");
           }
-          oppositeBranch.removeChild(duplicate);
+          duplicate.removeFromParent();
         }
 
         this.streamlineNodesById.set(
@@ -496,7 +496,7 @@ export default class Diagram {
         streamlineNode.link.remove();
       }
 
-      branch.removeChild(streamlineNode);
+      streamlineNode.removeFromParent();
     }
 
     return branch.parent;

@@ -65,6 +65,10 @@ export default class LeafNode extends AlluvialNodeBase {
     }
   }
 
+  removeFromParent() {
+    console.warn("LeafNode.removeFromParent() is a no-op");
+  }
+
   asObject(): Object {
     return {
       ...super.asObject(),
