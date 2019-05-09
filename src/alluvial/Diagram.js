@@ -16,22 +16,11 @@ type Event = {
   shiftKey: boolean
 };
 
-type VerticalAlign = "bottom" | "justify" | "top";
-
-const differenceIndex = (array1, array2) => {
-  let differenceIndex = 0;
-  const minLength = Math.min(array1.length, array2.length);
-  for (let i = 0; i < minLength; i++) {
-    if (array1[i] === array2[i]) continue;
-    differenceIndex = i;
-    break;
-  }
-  return differenceIndex;
-};
 
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
   streamlineNodesById: Map<string, StreamlineNode> = new Map();
+
   dirty: boolean = true;
   _asObject: Object = {};
 
@@ -90,171 +79,10 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  calcLayout(
-    totalWidth: number,
-    height: number,
-    streamlineFraction: number,
-    maxModuleWidth: number,
-    flowThreshold: number,
-    verticalAlign: VerticalAlign = "bottom",
-  ) {
+  updateLayout(...args) {
     this.dirty = true;
 
-    const numNetworks = this.alluvialRoot.numChildren;
-
-    if (!numNetworks) return;
-
-    const width = Math.min(
-      totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
-      maxModuleWidth,
-    );
-    const streamlineWidth = streamlineFraction * width;
-    const networkWidth = width + streamlineWidth;
-
-    let x = 0;
-    let y = height;
-
-    const totalMargins = new Array(numNetworks).fill(0);
-    const visibleFlows = new Array(numNetworks).fill(0);
-    const visibleModules = new Array(numNetworks).fill(0);
-    let networkIndex = 0;
-
-    // Use first pass to get order of modules to sort streamlines in second pass
-    // Y position of modules will be tuned in second pass depending on max margins
-    this.alluvialRoot.forEachDepthFirstPreOrderWhile(
-      node =>
-        node.depth < Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
-      (node, i, nodes) => {
-        switch (node.depth) {
-          case Depth.NETWORK_ROOT:
-            node.flowThreshold = flowThreshold;
-            networkIndex = i;
-            node.sortChildren();
-            if (i > 0) x += networkWidth;
-            y = height;
-            break;
-          case Depth.MODULE:
-            node.sortChildren();
-            const margin =
-              i + 1 < nodes.length
-                ? 2 ** (5 - differenceIndex(node.path, nodes[i + 1].path))
-                : 0;
-            y -= node.flow * height;
-            node.margin = margin;
-            node.layout = { x, y, width, height: node.flow * height };
-            y -= margin;
-            totalMargins[networkIndex] += margin;
-            visibleFlows[networkIndex] += node.flow;
-            visibleModules[networkIndex]++;
-            break;
-          default:
-            break;
-        }
-      },
-    );
-
-    const maxTotalMargin = Math.max(...totalMargins);
-    let usableHeight = height - maxTotalMargin;
-
-    const maxMarginFractionOfHeight = 0.5;
-    const marginFractionOfHeight = maxTotalMargin / height;
-
-    if (marginFractionOfHeight > maxMarginFractionOfHeight) {
-      // Reduce margins to below 50% of vertical space
-      // Use moduleMarginScale such that
-      //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfHeight
-      const moduleMarginScale = (maxMarginFractionOfHeight * height) / maxTotalMargin;
-
-      this.alluvialRoot.forEachDepthFirstWhile(
-        node => node.depth <= Depth.MODULE,
-        node => {
-          if (node.depth === Depth.MODULE) {
-            node.margin *= moduleMarginScale;
-          }
-        },
-      );
-
-      const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
-      usableHeight = height - scaledTotalMargin;
-    }
-
-    if (verticalAlign === "justify") {
-      let totalMargin = maxTotalMargin;
-      let visibleFlow = Math.max(...visibleFlows);
-      let missingFlow = 0;
-      let missingMargin = 0;
-      let numMargins = 0;
-
-      this.alluvialRoot.forEachDepthFirstWhile(
-        node =>
-          node.depth < Depth.MODULE ||
-          (node.depth === Depth.MODULE && node.flow >= flowThreshold),
-        (node, i) => {
-          if (node.depth === Depth.NETWORK_ROOT) {
-            totalMargin = totalMargins[i];
-            numMargins = visibleModules[i] - 1;
-            visibleFlow = visibleFlows[i];
-            missingFlow = 1 - visibleFlow;
-            missingMargin = missingFlow * usableHeight;
-          } else if (node.depth === Depth.MODULE && node.margin > 0) {
-            node.margin *= maxTotalMargin / totalMargin;
-            if (numMargins > 0) {
-              node.margin += missingMargin / numMargins;
-            }
-          }
-        },
-      );
-    }
-
-    this.alluvialRoot.forEachDepthFirstWhile(
-      node => node.depth <= Depth.BRANCH,
-      node => {
-        if (node.depth === Depth.BRANCH) {
-          node.sortChildren(flowThreshold);
-        }
-      },
-    );
-
-    x = 0;
-    y = height;
-
-    this.alluvialRoot.forEachDepthFirstPostOrderWhile(
-      node =>
-        node.depth !== Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
-      node => {
-        switch (node.depth) {
-          case Depth.ALLUVIAL_ROOT:
-            node.layout = { x: 0, y: 0, width: totalWidth, height };
-            break;
-          case Depth.NETWORK_ROOT:
-            node.layout = { x, y: 0, width, height };
-            x += networkWidth;
-            y = height;
-            break;
-          case Depth.MODULE:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
-            y -= node.margin;
-            break;
-          case Depth.HIGHLIGHT_GROUP:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
-            break;
-          case Depth.BRANCH:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
-            if (node.isLeft) {
-              y += node.flow * usableHeight;
-            }
-            break;
-          case Depth.STREAMLINE_NODE:
-            y -= node.flow * usableHeight;
-            node.layout = { x, y, width, height: node.flow * usableHeight };
-            break;
-          default:
-            break;
-        }
-      },
-    );
+    this.alluvialRoot.updateLayout(...args);
   }
 
   asObject(): Object {

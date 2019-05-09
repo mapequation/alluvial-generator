@@ -95,7 +95,7 @@ export default class AlluvialDiagram extends React.Component {
     const moduleNameMargin = 150;
     const networkNameMargin = 60;
 
-    diagram.calcLayout(
+    diagram.updateLayout(
       width - 2 * moduleNameMargin,
       height - networkNameMargin,
       streamlineFraction,
