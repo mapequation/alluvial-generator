@@ -2,8 +2,8 @@
 import TreePath from "../lib/treepath";
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import type { Side } from "./Branch";
-import { LEFT } from "./Branch";
+import type { Side } from "./Side";
+import { LEFT } from "./Side";
 import { LEAF_NODE } from "./Depth";
 import StreamlineNode from "./StreamlineNode";
 

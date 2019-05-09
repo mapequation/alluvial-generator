@@ -1,6 +1,6 @@
 // @flow
-import type { Side } from "./Branch";
-import { opposite, sideToString } from "./Branch";
+import type { Side } from "./Side";
+import { opposite, sideToString } from "./Side";
 import LeafNode from "./LeafNode";
 
 
@@ -41,7 +41,7 @@ export default class StreamlineId {
     const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
 
     const createId = (node, side) =>
-      `${node.networkId}_module${node.getAncestorAtCurrentLevel()}_group${typeSuffix(node)}_${sideToString[side]}`;
+      `${node.networkId}_module${node.getAncestorAtCurrentLevel()}_group${typeSuffix(node)}_${sideToString(side)}`;
 
     const source = createId(node, side);
 

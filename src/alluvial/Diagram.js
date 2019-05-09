@@ -1,7 +1,8 @@
 // @flow
 import AlluvialRoot from "./AlluvialRoot";
-import type { Side } from "./Branch";
-import Branch, { LEFT, opposite, RIGHT, sideToString } from "./Branch";
+import type { Side } from "./Side";
+import { LEFT, opposite, RIGHT, sideToString } from "./Side";
+import Branch from "./Branch";
 import Depth from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
@@ -162,7 +163,7 @@ export default class Diagram {
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
     if (!oldStreamlineNode) {
-      console.warn(`Node ${node.id} has no ${sideToString[side]} parent`);
+      console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
       return;
     }
     const branch: ?Branch = oldStreamlineNode.parent;
@@ -243,7 +244,7 @@ export default class Diagram {
   removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
     const streamlineNode = node.getParent(side);
     if (!streamlineNode) {
-      console.warn(`Node ${node.id} has no ${sideToString[side]} parent`);
+      console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
       return;
     }
     streamlineNode.removeChild(node);

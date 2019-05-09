@@ -1,6 +1,6 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import type { Side } from "./Branch";
+import type { Side } from "./Side";
 import Branch from "./Branch";
 import { MODULE, STREAMLINE_NODE } from "./Depth";
 import StreamlineId from "./StreamlineId";

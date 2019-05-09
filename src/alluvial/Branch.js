@@ -5,18 +5,9 @@ import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { BRANCH } from "./Depth";
 import StreamlineNode from "./StreamlineNode";
+import type { Side } from "./Side";
+import { LEFT, RIGHT, sideToString } from "./Side";
 
-export type Side = -1 | 1;
-
-export const LEFT: Side = -1;
-export const RIGHT: Side = 1;
-
-export const sideToString = {
-  [LEFT]: "left",
-  [RIGHT]: "right"
-};
-
-export const opposite = (side: Side): Side => (side === LEFT ? RIGHT : LEFT);
 
 export default class Branch extends AlluvialNodeBase {
   children: StreamlineNode[] = [];
@@ -24,7 +15,7 @@ export default class Branch extends AlluvialNodeBase {
   depth = BRANCH;
 
   constructor(side: Side, networkId: string, parent: AlluvialNode) {
-    super(networkId, parent, sideToString[side]);
+    super(networkId, parent, sideToString(side));
     this.side = side;
   }
 

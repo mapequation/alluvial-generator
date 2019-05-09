@@ -2,6 +2,7 @@
 import StreamlineNode from "./StreamlineNode";
 import HighlightGroup from "./HighlightGroup";
 
+
 export default class StreamlineLink {
   left: StreamlineNode;
   right: StreamlineNode;

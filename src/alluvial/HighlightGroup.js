@@ -5,6 +5,7 @@ import Branch from "./Branch";
 import { HIGHLIGHT_GROUP } from "./Depth";
 import Module from "./Module";
 
+
 export const NOT_HIGHLIGHTED = -1;
 export const INSIGNIFICANT = -2;
 
@@ -49,7 +50,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     return this.left.isEmpty && this.right.isEmpty;
   }
 
-  *leafNodes(): Iterable<AlluvialNode> {
+  * leafNodes(): Iterable<AlluvialNode> {
     yield* this.left.leafNodes();
   }
 }
