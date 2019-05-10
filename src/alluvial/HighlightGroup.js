@@ -17,14 +17,17 @@ export default class HighlightGroup extends AlluvialNodeBase {
   ];
   depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
+  insignificant: boolean;
 
   constructor(
     parent: Module,
-    highlightIndex: number = NOT_HIGHLIGHTED
+    highlightIndex: number = NOT_HIGHLIGHTED,
+    insignificant: boolean = false,
   ) {
-    super(parent, parent.networkId, `${parent.id}_group${highlightIndex}`);
+    super(parent, parent.networkId, `${parent.id}_group${insignificant ? "i" : ""}${highlightIndex}`);
     parent.addChild(this);
     this.highlightIndex = highlightIndex;
+    this.insignificant = insignificant;
   }
 
   asObject() {
