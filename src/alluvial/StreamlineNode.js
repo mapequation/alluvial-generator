@@ -1,12 +1,12 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import type { Side } from "./Side";
-import { LEFT } from "./Side";
 import Branch from "./Branch";
 import { MODULE, STREAMLINE_NODE } from "./Depth";
+import LeafNode from "./LeafNode";
+import type { Side } from "./Side";
+import { LEFT } from "./Side";
 import StreamlineId from "./StreamlineId";
 import StreamlineLink from "./StreamlineLink";
-import LeafNode from "./LeafNode";
 
 
 export default class StreamlineNode extends AlluvialNodeBase {
@@ -16,12 +16,35 @@ export default class StreamlineNode extends AlluvialNodeBase {
   side: Side;
   streamlineId: StreamlineId;
   depth = STREAMLINE_NODE;
+  nodeIndexById: Map<string, number> = new Map();
 
   constructor(parent: Branch, id: string) {
     super(parent, parent.networkId, id);
     parent.addChild(this);
     this.side = parent.side;
     this.streamlineId = StreamlineId.fromString(id);
+  }
+
+  addChild(node: LeafNode) {
+    const index = super.addChild(node) - 1;
+    this.nodeIndexById.set(node.id, index);
+  }
+
+  removeChild(node: LeafNode) {
+    const index = this.nodeIndexById.get(node.id);
+    if (index == null) {
+      return false;
+    }
+    const moved = this.children[index] = this.children[this.children.length - 1];
+    this.children.pop();
+
+    this.nodeIndexById.set(moved.id, index);
+    this.nodeIndexById.delete(node.id);
+
+    if (!this.children.length) {
+      this.flow = 0;
+    }
+    return true;
   }
 
   makeDangling() {

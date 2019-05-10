@@ -65,7 +65,7 @@ export default class AlluvialNodeBase {
   }
 
   addChild(node: AlluvialNode) {
-    this.children.push(node);
+    return this.children.push(node);
   }
 
   removeChild(node: AlluvialNode) {
