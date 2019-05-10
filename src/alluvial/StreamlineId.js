@@ -15,15 +15,15 @@ export default class StreamlineId {
     return StreamlineId.streamlineNodesById.get(id);
   }
 
-  static set(id: string, streamlineNode: StreamlineNode) {
+  static set(id: string, streamlineNode: StreamlineNode): Map<string, StreamlineNode> {
     return StreamlineId.streamlineNodesById.set(id, streamlineNode);
   }
 
-  static has(id: string) {
+  static has(id: string): boolean {
     return StreamlineId.streamlineNodesById.has(id);
   }
 
-  static delete(id: string) {
+  static delete(id: string): boolean {
     return StreamlineId.streamlineNodesById.delete(id);
   }
 
