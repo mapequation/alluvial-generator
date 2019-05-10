@@ -1,16 +1,16 @@
 // @flow
+import type { VerticalAlign } from "./AlluvialRoot";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import Branch from "./Branch";
-import Depth from "./Depth";
-import HighlightGroup from "./HighlightGroup";
+import Depth, { HIGHLIGHT_GROUP } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
-import type { VerticalAlign } from "./AlluvialRoot";
+import HighlightGroup from "./HighlightGroup";
 
 
 type Event = {
@@ -37,7 +37,7 @@ export default class Diagram {
       throw new Error(`Network with id ${id} already exists`);
     }
 
-    const networkRoot = this.alluvialRoot.createNetworkRoot(id, name, codelength);
+    const networkRoot = new NetworkRoot(this.alluvialRoot, id, name, codelength);
 
     const leafNodes = nodes.map(node => new LeafNode(node, id));
     networkRoot.createLeafNodeToNameMap(leafNodes);
@@ -121,8 +121,8 @@ export default class Diagram {
     networkRoot.flow += node.flow;
 
     const moduleId = node.ancestorAtLevel(moduleLevel);
-    const module = networkRoot.getOrCreateModule(moduleId, moduleLevel);
-    const group = module.getOrCreateGroup(node.highlightIndex);
+    const module = networkRoot.getModule(moduleId) || new Module(networkRoot, moduleId, moduleLevel);
+    const group = module.getGroup(node.highlightIndex) || new HighlightGroup(module, node.highlightIndex);
 
     module.flow += node.flow;
     group.flow += node.flow;
@@ -136,8 +136,7 @@ export default class Diagram {
       let streamlineNode = this.streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
-        streamlineNode = new StreamlineNode(node.networkId, branch, streamlineId);
-        branch.addChild(streamlineNode);
+        streamlineNode = new StreamlineNode(branch, streamlineId);
         this.streamlineNodesById.set(streamlineId, streamlineNode);
       }
 
@@ -180,9 +179,8 @@ export default class Diagram {
         return;
       }
 
-      streamlineNode = new StreamlineNode(node.networkId, branch, streamlineId);
+      streamlineNode = new StreamlineNode(branch, streamlineId);
       this.streamlineNodesById.set(streamlineId, streamlineNode);
-      branch.addChild(streamlineNode);
 
       if (oppositeNode) {
         const oppositeId = StreamlineId.oppositeId(streamlineId);
@@ -208,8 +206,10 @@ export default class Diagram {
   }
 
   removeNode(node: LeafNode) {
+    const group = node.getAncestor(HIGHLIGHT_GROUP);
+
     this.removeNodeFromSide(node, LEFT);
-    const group = this.removeNodeFromSide(node, RIGHT);
+    this.removeNodeFromSide(node, RIGHT);
 
     if (!group) {
       console.warn(`Node ${node.id} was removed without belonging to a group.`);
@@ -247,7 +247,7 @@ export default class Diagram {
     }
   }
 
-  removeNodeFromSide(node: LeafNode, side: Side): ?HighlightGroup {
+  removeNodeFromSide(node: LeafNode, side: Side) {
     const streamlineNode = node.getParent(side);
     if (!streamlineNode) {
       console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
@@ -255,13 +255,6 @@ export default class Diagram {
     }
     streamlineNode.removeChild(node);
     streamlineNode.flow -= node.flow;
-
-    const branch: ?Branch = streamlineNode.parent;
-    if (!branch) {
-      console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
-      return;
-    }
-    branch.flow -= node.flow;
 
     if (streamlineNode.isEmpty) {
       const oppositeStreamlineNode = streamlineNode.getOppositeStreamlineNode();
@@ -296,7 +289,12 @@ export default class Diagram {
       streamlineNode.removeFromParent();
     }
 
-    return branch.parent;
+    const branch: ?Branch = streamlineNode.parent;
+    if (!branch) {
+      console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
+      return;
+    }
+    branch.flow -= node.flow;
   }
 
   expandModule(moduleId: string, networkId: string) {

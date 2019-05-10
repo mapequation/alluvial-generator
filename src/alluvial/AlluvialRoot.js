@@ -15,17 +15,11 @@ export default class AlluvialRoot extends AlluvialNodeBase {
   depth = ALLUVIAL_ROOT;
 
   constructor() {
-    super("", null, "root");
+    super(null, "", "root");
   }
 
   getNetworkRoot(networkId: string): ?NetworkRoot {
     return this.children.find(root => root.networkId === networkId);
-  }
-
-  createNetworkRoot(networkId: string, name: string, codelength: number): NetworkRoot {
-    const root = new NetworkRoot(networkId, this, name, codelength);
-    this.children.push(root);
-    return root;
   }
 
   hasNetwork(networkId: string): boolean {

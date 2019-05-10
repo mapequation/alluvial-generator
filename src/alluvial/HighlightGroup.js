@@ -12,18 +12,18 @@ export const INSIGNIFICANT = -2;
 export default class HighlightGroup extends AlluvialNodeBase {
   parent: ?Module;
   children: Branch[] = [
-    Branch.createLeft(this.networkId, this),
-    Branch.createRight(this.networkId, this)
+    Branch.createLeft(this),
+    Branch.createRight(this)
   ];
   depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
 
   constructor(
-    networkId: string,
     parent: Module,
     highlightIndex: number = NOT_HIGHLIGHTED
   ) {
-    super(networkId, parent, `${parent.id}_group${highlightIndex}`);
+    super(parent, parent.networkId, `${parent.id}_group${highlightIndex}`);
+    parent.addChild(this);
     this.highlightIndex = highlightIndex;
   }
 

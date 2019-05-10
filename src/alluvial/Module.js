@@ -22,12 +22,12 @@ export default class Module extends AlluvialNodeBase {
   static customNames: Map<string, string> = new Map();
 
   constructor(
-    networkId: string,
     parent: NetworkRoot,
     moduleId: string,
     moduleLevel: number = 1,
   ) {
-    super(networkId, parent, Module.createId(parent.networkId, moduleId));
+    super(parent, parent.networkId, Module.createId(parent.networkId, moduleId));
+    parent.addChild(this);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
@@ -70,15 +70,6 @@ export default class Module extends AlluvialNodeBase {
 
   getGroup(highlightIndex: number): ?HighlightGroup {
     return this.children.find(group => group.highlightIndex === highlightIndex);
-  }
-
-  getOrCreateGroup(highlightIndex: number): HighlightGroup {
-    let group = this.getGroup(highlightIndex);
-    if (!group) {
-      group = new HighlightGroup(this.networkId, this, highlightIndex);
-      this.children.push(group);
-    }
-    return group;
   }
 
   sortChildren() {

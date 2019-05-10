@@ -17,8 +17,9 @@ export default class StreamlineNode extends AlluvialNodeBase {
   streamlineId: StreamlineId;
   depth = STREAMLINE_NODE;
 
-  constructor(networkId: string, parent: Branch, id: string) {
-    super(networkId, parent, id);
+  constructor(parent: Branch, id: string) {
+    super(parent, parent.networkId, id);
+    parent.addChild(this);
     this.side = parent.side;
     this.streamlineId = StreamlineId.fromString(id);
   }

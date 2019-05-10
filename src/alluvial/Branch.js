@@ -15,17 +15,17 @@ export default class Branch extends AlluvialNodeBase {
   side: Side;
   depth = BRANCH;
 
-  constructor(networkId: string, parent: HighlightGroup, side: Side) {
-    super(networkId, parent, sideToString(side));
+  constructor(parent: HighlightGroup, side: Side) {
+    super(parent, parent.networkId, sideToString(side));
     this.side = side;
   }
 
-  static createLeft(networkId: string, parent: HighlightGroup): Branch {
-    return new Branch(networkId, parent, LEFT);
+  static createLeft(parent: HighlightGroup): Branch {
+    return new Branch(parent, LEFT);
   }
 
-  static createRight(networkId: string, parent: HighlightGroup): Branch {
-    return new Branch(networkId, parent, RIGHT);
+  static createRight(parent: HighlightGroup): Branch {
+    return new Branch(parent, RIGHT);
   }
 
   get isLeft(): boolean {

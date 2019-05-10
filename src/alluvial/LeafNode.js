@@ -9,7 +9,6 @@ import StreamlineNode from "./StreamlineNode";
 
 
 export default class LeafNode extends AlluvialNodeBase {
-  node: Node;
   name: string;
   insignificant: boolean;
   highlightIndex: number;
@@ -21,8 +20,7 @@ export default class LeafNode extends AlluvialNodeBase {
   rightParent: ?StreamlineNode;
 
   constructor(node: Node, networkId: string) {
-    super(networkId, null, node.path);
-    this.node = node;
+    super(null, networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
     this.treePath = new TreePath(node.path);

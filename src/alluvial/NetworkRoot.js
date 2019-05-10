@@ -17,23 +17,20 @@ export default class NetworkRoot extends AlluvialNodeBase {
   codelength: number;
   nodesByName: Map<string, LeafNode> = new Map();
 
-  constructor(networkId: string, parent: AlluvialRoot, name: string, codelength: number) {
-    super(networkId, parent, networkId);
+  constructor(
+    parent: AlluvialRoot,
+    networkId: string,
+    name: string,
+    codelength: number
+  ) {
+    super(parent, networkId, networkId);
+    parent.addChild(this);
     this.name = name;
     this.codelength = codelength;
   }
 
   getModule(moduleId: string): ?Module {
     return this.children.find(module => module.moduleId === moduleId);
-  }
-
-  getOrCreateModule(moduleId: string, moduleLevel: number): Module {
-    let module = this.getModule(moduleId);
-    if (!module) {
-      module = new Module(this.networkId, this, moduleId, moduleLevel);
-      this.children.push(module);
-    }
-    return module;
   }
 
   createLeafNodeToNameMap(nodes: Iterable<LeafNode>) {
