@@ -33,7 +33,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.children.find(module => module.moduleId === moduleId);
   }
 
-  createLeafNodeToNameMap(nodes: Iterable<LeafNode>) {
+  createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
     this.nodesByName = new Map(
       Array.from(nodes).map(node => [node.name, node])
     );

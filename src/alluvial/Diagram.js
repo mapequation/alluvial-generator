@@ -39,7 +39,7 @@ export default class Diagram {
     const networkRoot = new NetworkRoot(this.alluvialRoot, id, name, codelength);
 
     const leafNodes = nodes.map(node => new LeafNode(node, id));
-    networkRoot.createLeafNodeToNameMap(leafNodes);
+    networkRoot.createLeafNodeByNameMap(leafNodes);
 
     this.addNodes(leafNodes);
   }
