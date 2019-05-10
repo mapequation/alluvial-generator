@@ -2,11 +2,30 @@
 import type { Side } from "./Side";
 import { opposite, sideToString } from "./Side";
 import LeafNode from "./LeafNode";
+import StreamlineNode from "./StreamlineNode";
 
 
 export default class StreamlineId {
   source: string;
   target: ?string = null;
+
+  static streamlineNodesById: Map<string, StreamlineNode> = new Map();
+
+  static get(id: string): ?StreamlineNode {
+    return StreamlineId.streamlineNodesById.get(id);
+  }
+
+  static set(id: string, streamlineNode: StreamlineNode) {
+    return StreamlineId.streamlineNodesById.set(id, streamlineNode);
+  }
+
+  static has(id: string) {
+    return StreamlineId.streamlineNodesById.has(id);
+  }
+
+  static delete(id: string) {
+    return StreamlineId.streamlineNodesById.delete(id);
+  }
 
   constructor(source: string, target: ?string = null) {
     this.source = source;

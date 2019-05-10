@@ -21,7 +21,6 @@ type Event = {
 
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
-  streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
   dirty: boolean = true;
   _asObject: Object = {};
@@ -132,15 +131,15 @@ export default class Diagram {
       const oppositeNode = this.alluvialRoot.getOppositeNode(node, branch.side);
 
       const streamlineId = StreamlineId.create(node, branch.side, oppositeNode);
-      let streamlineNode = this.streamlineNodesById.get(streamlineId);
+      let streamlineNode = StreamlineId.get(streamlineId);
 
       if (!streamlineNode) {
         streamlineNode = new StreamlineNode(branch, streamlineId);
-        this.streamlineNodesById.set(streamlineId, streamlineNode);
+        StreamlineId.set(streamlineId, streamlineNode);
       }
 
       if (streamlineNode.hasTarget) {
-        const oppositeStreamlineIsDangling = this.streamlineNodesById.has(streamlineNode.targetId);
+        const oppositeStreamlineIsDangling = StreamlineId.has(streamlineNode.targetId);
         if (oppositeStreamlineIsDangling && oppositeNode) {
           const oppositeSide = opposite(branch.side);
           this.removeNodeFromSide(oppositeNode, oppositeSide);
@@ -163,7 +162,7 @@ export default class Diagram {
     const oppositeNode: ?LeafNode = this.alluvialRoot.getOppositeNode(node, side);
 
     const streamlineId = StreamlineId.create(node, side, oppositeNode);
-    let streamlineNode: ?StreamlineNode = this.streamlineNodesById.get(streamlineId);
+    let streamlineNode: ?StreamlineNode = StreamlineId.get(streamlineId);
 
     const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
     if (!oldStreamlineNode) {
@@ -179,11 +178,11 @@ export default class Diagram {
       }
 
       streamlineNode = new StreamlineNode(branch, streamlineId);
-      this.streamlineNodesById.set(streamlineId, streamlineNode);
+      StreamlineId.set(streamlineId, streamlineNode);
 
       if (oppositeNode) {
         const oppositeId = StreamlineId.oppositeId(streamlineId);
-        const oppositeStreamlineNode = this.streamlineNodesById.get(oppositeId);
+        const oppositeStreamlineNode = StreamlineId.get(oppositeId);
 
         if (oppositeStreamlineNode) {
           streamlineNode.linkTo(oppositeStreamlineNode);
@@ -258,10 +257,10 @@ export default class Diagram {
     if (streamlineNode.isEmpty) {
       const oppositeStreamlineNode = streamlineNode.getOpposite();
       if (oppositeStreamlineNode) {
-        this.streamlineNodesById.delete(oppositeStreamlineNode.id);
+        StreamlineId.delete(oppositeStreamlineNode.id);
         oppositeStreamlineNode.makeDangling();
 
-        const duplicate = this.streamlineNodesById.get(oppositeStreamlineNode.id);
+        const duplicate = StreamlineId.get(oppositeStreamlineNode.id);
 
         // Does the (new) dangling id already exist? Move nodes from it.
         // Note: as we move nodes around we don't need to propagate flow.
@@ -279,10 +278,10 @@ export default class Diagram {
           duplicate.removeFromParent();
         }
 
-        this.streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
+        StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
       }
 
-      this.streamlineNodesById.delete(streamlineNode.id);
+      StreamlineId.delete(streamlineNode.id);
 
       streamlineNode.removeLink();
       streamlineNode.removeFromParent();
