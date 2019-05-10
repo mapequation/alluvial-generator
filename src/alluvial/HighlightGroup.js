@@ -10,7 +10,7 @@ export const NOT_HIGHLIGHTED = -1;
 export const INSIGNIFICANT = -2;
 
 export default class HighlightGroup extends AlluvialNodeBase {
-  parent: Module;
+  parent: ?Module;
   children: Branch[] = [
     Branch.createLeft(this.networkId, this),
     Branch.createRight(this.networkId, this)

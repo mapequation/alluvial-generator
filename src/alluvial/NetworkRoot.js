@@ -9,7 +9,7 @@ import StreamlineNode from "./StreamlineNode";
 
 
 export default class NetworkRoot extends AlluvialNodeBase {
-  parent: AlluvialRoot;
+  parent: ?AlluvialRoot;
   children: Module[] = [];
   flowThreshold: number = 0;
   name: string;

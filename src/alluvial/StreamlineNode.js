@@ -10,7 +10,7 @@ import LeafNode from "./LeafNode";
 
 
 export default class StreamlineNode extends AlluvialNodeBase {
-  parent: Branch;
+  parent: ?Branch;
   children: LeafNode[] = [];
   link: ?StreamlineLink = null;
   side: Side;

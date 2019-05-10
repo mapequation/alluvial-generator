@@ -10,7 +10,7 @@ import NetworkRoot from "./NetworkRoot";
 
 
 export default class Module extends AlluvialNodeBase {
-  parent: NetworkRoot;
+  parent: ?NetworkRoot;
   children: HighlightGroup[] = [];
   moduleLevel: number = 1;
   path: number[] = [];

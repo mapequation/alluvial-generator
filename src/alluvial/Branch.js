@@ -10,7 +10,7 @@ import HighlightGroup from "./HighlightGroup";
 
 
 export default class Branch extends AlluvialNodeBase {
-  parent: HighlightGroup;
+  parent: ?HighlightGroup;
   children: StreamlineNode[] = [];
   side: Side;
   depth = BRANCH;

@@ -10,6 +10,7 @@ import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
+import type { VerticalAlign } from "./AlluvialRoot";
 
 
 type Event = {
@@ -80,10 +81,17 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  updateLayout(...args) {
+  updateLayout(
+    totalWidth: number,
+    height: number,
+    streamlineFraction: number,
+    maxModuleWidth: number,
+    flowThreshold: number,
+    verticalAlign: VerticalAlign = "bottom",
+  ) {
     this.dirty = true;
 
-    this.alluvialRoot.updateLayout(...args);
+    this.alluvialRoot.updateLayout(totalWidth, height, streamlineFraction, maxModuleWidth, flowThreshold, verticalAlign);
   }
 
   asObject(): Object {
@@ -100,10 +108,8 @@ export default class Diagram {
     }
   }
 
-  addNode(node: LeafNode, moduleLevel: ?number) {
-    if (moduleLevel) {
-      node.moduleLevel = moduleLevel;
-    }
+  addNode(node: LeafNode, moduleLevel: number) {
+    node.moduleLevel = moduleLevel;
 
     const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(node.networkId);
     if (!networkRoot) {
