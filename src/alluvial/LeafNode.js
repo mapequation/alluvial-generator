@@ -35,11 +35,7 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.treePath.level;
   }
 
-  ancestorAtLevel(moduleLevel: number): string {
-    return this.treePath.ancestorAtLevelAsString(moduleLevel);
-  }
-
-  getAncestorAtCurrentLevel(): string {
+  get moduleId(): string {
     return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 

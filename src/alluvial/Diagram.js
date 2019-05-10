@@ -120,8 +120,7 @@ export default class Diagram {
     this.alluvialRoot.flow += node.flow;
     networkRoot.flow += node.flow;
 
-    const moduleId = node.ancestorAtLevel(moduleLevel);
-    const module = networkRoot.getModule(moduleId) || new Module(networkRoot, moduleId, moduleLevel);
+    const module = networkRoot.getModule(node.moduleId) || new Module(networkRoot, node.moduleId, node.moduleLevel);
     const group = module.getGroup(node.highlightIndex) || new HighlightGroup(module, node.highlightIndex);
 
     module.flow += node.flow;
