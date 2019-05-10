@@ -2,9 +2,8 @@
 import type { VerticalAlign } from "./AlluvialRoot";
 import AlluvialRoot from "./AlluvialRoot";
 import type { Side } from "./Side";
-import { LEFT, opposite, RIGHT, sideToString } from "./Side";
-import Branch from "./Branch";
-import Depth, { HIGHLIGHT_GROUP } from "./Depth";
+import { opposite, sideToString } from "./Side";
+import Depth from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
@@ -110,7 +109,7 @@ export default class Diagram {
   addNode(node: LeafNode, moduleLevel: number) {
     node.moduleLevel = moduleLevel;
 
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(node.networkId);
+    const networkRoot = this.alluvialRoot.getNetworkRoot(node.networkId);
     if (!networkRoot) {
       console.warn(`No network id ${node.networkId}`);
       return;
@@ -140,9 +139,9 @@ export default class Diagram {
 
       if (streamlineNode.hasTarget) {
         const oppositeStreamlineIsDangling = StreamlineId.has(streamlineNode.targetId);
-        if (oppositeStreamlineIsDangling && oppositeNode) {
+        if (oppositeStreamlineIsDangling && oppositeNode /* oppositeNode always exists if we have a target id */) {
           const oppositeSide = opposite(branch.side);
-          this.removeNodeFromSide(oppositeNode, oppositeSide);
+          oppositeNode.removeFromSide(oppositeSide);
           this.addNodeToSide(oppositeNode, oppositeSide);
         } else {
           throw new Error(
@@ -160,18 +159,16 @@ export default class Diagram {
 
   addNodeToSide(node: LeafNode, side: Side) {
     const oppositeNode: ?LeafNode = this.alluvialRoot.getOppositeNode(node, side);
-
     const streamlineId = StreamlineId.create(node, side, oppositeNode);
-    let streamlineNode: ?StreamlineNode = StreamlineId.get(streamlineId);
-
-    const oldStreamlineNode: ?StreamlineNode = node.getParent(side);
-    if (!oldStreamlineNode) {
-      console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
-      return;
-    }
-    const branch: ?Branch = oldStreamlineNode.parent;
+    let streamlineNode = StreamlineId.get(streamlineId);
 
     if (!streamlineNode) {
+      const oldStreamlineNode = node.getParent(side);
+      if (!oldStreamlineNode) {
+        console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
+        return;
+      }
+      const branch = oldStreamlineNode.parent;
       if (!branch) {
         console.warn(`Streamline node with id ${oldStreamlineNode.id} has no parent`);
         return;
@@ -190,6 +187,7 @@ export default class Diagram {
       }
     }
 
+    const branch = streamlineNode.parent;
     if (branch) branch.flow += node.flow;
 
     streamlineNode.addChild(node);
@@ -199,110 +197,18 @@ export default class Diagram {
 
   removeNodes(nodes: Iterable<LeafNode>) {
     for (let node of nodes) {
-      this.removeNode(node);
+      node.remove();
     }
-  }
-
-  removeNode(node: LeafNode) {
-    const group = node.getAncestor(HIGHLIGHT_GROUP);
-
-    this.removeNodeFromSide(node, LEFT);
-    this.removeNodeFromSide(node, RIGHT);
-
-    if (!group) {
-      console.warn(`Node ${node.id} was removed without belonging to a group.`);
-      return;
-    }
-    group.flow -= node.flow;
-    // No need to remove branches here
-
-    const module: ?Module = group.parent;
-    if (!module) {
-      console.warn(`Node ${node.id} was removed without belonging to a module.`);
-      return;
-    }
-    module.flow -= node.flow;
-
-    if (group.isEmpty) {
-      group.removeFromParent();
-    }
-
-    const networkRoot: ?NetworkRoot = module.parent;
-    if (!networkRoot) {
-      console.warn(`Node ${node.id} was removed without belonging to a network root.`);
-      return;
-    }
-    networkRoot.flow -= node.flow;
-
-    if (module.isEmpty) {
-      module.removeFromParent();
-    }
-
-    this.alluvialRoot.flow -= node.flow;
-
-    if (networkRoot.isEmpty) {
-      networkRoot.removeFromParent();
-    }
-  }
-
-  removeNodeFromSide(node: LeafNode, side: Side) {
-    const streamlineNode = node.getParent(side);
-    if (!streamlineNode) {
-      console.warn(`Node ${node.id} has no ${sideToString(side)} parent`);
-      return;
-    }
-    streamlineNode.removeChild(node);
-    streamlineNode.flow -= node.flow;
-
-    if (streamlineNode.isEmpty) {
-      const oppositeStreamlineNode = streamlineNode.getOpposite();
-      if (oppositeStreamlineNode) {
-        StreamlineId.delete(oppositeStreamlineNode.id);
-        oppositeStreamlineNode.makeDangling();
-
-        const duplicate = StreamlineId.get(oppositeStreamlineNode.id);
-
-        // Does the (new) dangling id already exist? Move nodes from it.
-        // Note: as we move nodes around we don't need to propagate flow.
-        if (duplicate) {
-          duplicate.children.forEach((node: LeafNode) => {
-            oppositeStreamlineNode.addChild(node);
-            oppositeStreamlineNode.flow += node.flow;
-            node.setParent(oppositeStreamlineNode, opposite(side));
-          });
-
-          const oppositeBranch: ?Branch = oppositeStreamlineNode.parent;
-          if (!oppositeBranch) {
-            throw new Error("No parent found for opposite streamline node");
-          }
-          duplicate.removeFromParent();
-        }
-
-        StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
-      }
-
-      StreamlineId.delete(streamlineNode.id);
-
-      streamlineNode.removeLink();
-      streamlineNode.removeFromParent();
-    }
-
-    const branch: ?Branch = streamlineNode.parent;
-    if (!branch) {
-      console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
-      return;
-    }
-    branch.flow -= node.flow;
   }
 
   expandModule(moduleId: string, networkId: string) {
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;
     }
 
-    const module: ?Module = networkRoot.getModule(moduleId);
+    const module = networkRoot.getModule(moduleId);
     if (!module) {
       console.warn(`No module found with id ${moduleId} in network ${networkId}`);
       return;
@@ -330,13 +236,13 @@ export default class Diagram {
   }
 
   regroupModule(moduleId: string, networkId: string) {
-    const networkRoot: ?NetworkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) {
       console.warn(`No network id ${networkId}`);
       return;
     }
 
-    const module: ?Module = networkRoot.getModule(moduleId);
+    const module = networkRoot.getModule(moduleId);
     if (!module) {
       console.warn(`No module found with id ${moduleId} in network ${networkId}`);
       return;
