@@ -76,7 +76,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
       for (let group of module) {
         for (let streamlineNode of group.right) {
           // Skip if right module is below threshold
-          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
+          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOpposite();
           if (!oppositeStreamlineNode) continue;
           const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)
@@ -97,7 +97,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
       for (let group of module) {
         for (let streamlineNode of group.left) {
           // Skip if opposite module is below threshold
-          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOppositeStreamlineNode();
+          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOpposite();
           if (!oppositeStreamlineNode) continue;
           const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
           if (oppositeModule && oppositeModule.flow < this.flowThreshold)

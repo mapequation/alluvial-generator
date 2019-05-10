@@ -256,7 +256,7 @@ export default class Diagram {
     streamlineNode.flow -= node.flow;
 
     if (streamlineNode.isEmpty) {
-      const oppositeStreamlineNode = streamlineNode.getOppositeStreamlineNode();
+      const oppositeStreamlineNode = streamlineNode.getOpposite();
       if (oppositeStreamlineNode) {
         this.streamlineNodesById.delete(oppositeStreamlineNode.id);
         oppositeStreamlineNode.makeDangling();
