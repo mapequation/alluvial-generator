@@ -16,12 +16,13 @@ export default class NetworkRoot extends AlluvialNodeBase {
   depth = NETWORK_ROOT;
   codelength: number;
   nodesByName: Map<string, LeafNode> = new Map();
+  modulesById: Map<string, Module> = new Map();
 
   constructor(
     parent: AlluvialRoot,
     networkId: string,
     name: string,
-    codelength: number
+    codelength: number,
   ) {
     super(parent, networkId, networkId);
     parent.addChild(this);
@@ -29,13 +30,23 @@ export default class NetworkRoot extends AlluvialNodeBase {
     this.codelength = codelength;
   }
 
+  addChild(module: Module) {
+    super.addChild(module);
+    this.modulesById.set(module.moduleId, module);
+  }
+
+  removeChild(module: Module) {
+    super.removeChild(module);
+    this.modulesById.delete(module.moduleId);
+  }
+
   getModule(moduleId: string): ?Module {
-    return this.children.find(module => module.moduleId === moduleId);
+    return this.modulesById.get(moduleId);
   }
 
   createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
     this.nodesByName = new Map(
-      Array.from(nodes).map(node => [node.name, node])
+      Array.from(nodes).map(node => [node.name, node]),
     );
   }
 
