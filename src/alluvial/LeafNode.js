@@ -126,26 +126,26 @@ export default class LeafNode extends AlluvialNodeBase {
         // Delete the old id
         StreamlineId.delete(oppositeStreamlineNode.id);
         oppositeStreamlineNode.makeDangling();
+        oppositeStreamlineNode.removeLink();
 
         const alreadyDanglingStreamlineNode = StreamlineId.get(oppositeStreamlineNode.id);
         // Does the (new) dangling id already exist? Move nodes from it.
         // Note: as we move nodes around we don't need to propagate flow.
         if (alreadyDanglingStreamlineNode) {
-          for (let node of alreadyDanglingStreamlineNode) {
-            oppositeStreamlineNode.addChild(node);
-            oppositeStreamlineNode.flow += node.flow;
-            node.setParent(oppositeStreamlineNode, opposite(side));
+          for (let node of oppositeStreamlineNode) {
+            alreadyDanglingStreamlineNode.addChild(node);
+            alreadyDanglingStreamlineNode.flow += node.flow;
+            node.setParent(alreadyDanglingStreamlineNode, opposite(side));
           }
 
-          alreadyDanglingStreamlineNode.removeFromParent();
+          oppositeStreamlineNode.removeFromParent();
+        } else {
+          // Update with the new dangling id
+          StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
         }
-
-        // Update with the new dangling id
-        StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
       }
 
       StreamlineId.delete(streamlineNode.id);
-      streamlineNode.removeLink();
       streamlineNode.removeFromParent();
     }
 
