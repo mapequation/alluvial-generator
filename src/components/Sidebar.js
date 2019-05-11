@@ -83,6 +83,34 @@ export default class Sidebar extends React.Component {
 
   clearModuleNameInput = () => this.handleSelectedModuleNameChange(null, { value: "" });
 
+  serializeElement = (elementId) => {
+    const svgEl = document.getElementById(elementId);
+    return new XMLSerializer().serializeToString(svgEl);
+  };
+
+  saveSvg = () => {
+    const svg = this.serializeElement("alluvialSvg");
+    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    const svgBlob = new Blob([preface, svg], { type: "image/svg+xml;charset=utf-8" });
+    FileSaver.saveAs(svgBlob, "alluvial.svg");
+  };
+
+  savePng = () => {
+    const svg = this.serializeElement("alluvialSvg");
+    const canvas = document.createElement("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const context = canvas.getContext("2d");
+
+    const image = new Image();
+    image.onload = function () {
+      context.drawImage(this, 0, 0);
+      canvas.toBlob(blob => FileSaver.saveAs(blob, "alluvial.png"));
+    };
+
+    image.src = `data:image/svg+xml; charset=utf8, ${encodeURIComponent(svg)}`;
+  };
+
   render() {
     const {
       width,
@@ -283,6 +311,15 @@ export default class Sidebar extends React.Component {
                 onChange: duration => this.setState({ duration }),
               }}
             />
+          </Menu.Item>
+          <Menu.Item>
+            <Header as="h4">Export</Header>
+            <Button icon size="small" labelPosition="left" onClick={this.saveSvg}>
+              <Icon name="download"/>SVG
+            </Button>
+            <Button icon size="small" labelPosition="left" onClick={this.savePng}>
+              <Icon name="image"/>PNG
+            </Button>
           </Menu.Item>
           <Menu.Item>
             <Header as="h4">Settings</Header>

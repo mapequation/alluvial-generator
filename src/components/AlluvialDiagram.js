@@ -533,11 +533,10 @@ export default class AlluvialDiagram extends React.Component {
 
     return (
       <svg
-        width="100vw"
-        height="100vh"
         style={{ width: "100vw", height: "100vh", background: "#fff" }}
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
+        id="alluvialSvg"
       >
         <defs>
           <DropShadows maxLevel={this.maxModuleLevel}/>
