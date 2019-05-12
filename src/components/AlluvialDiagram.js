@@ -588,7 +588,7 @@ export default class AlluvialDiagram extends React.Component {
             highlightColors={highlightColors}
           />
         </defs>
-        <rect className="background" width="100vw" height="100vh" fill="#fff"/>
+        <rect className="background" width="100%" height="100%" fill="#fff"/>
         <g id="zoomable">
           <g className="alluvialDiagram"/>
         </g>
