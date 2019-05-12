@@ -348,10 +348,13 @@ export default class AlluvialDiagram extends React.Component {
     }
 
     this.svg.select(".background")
-      .on("click", () =>
+      .on("click", () => {
         d3.selectAll(".module")
           .transition()
-          .attr("stroke-opacity", 0));
+          .attr("stroke-opacity", 0);
+
+        onModuleClick(null);
+      });
 
     modules = modules
       .enter()
