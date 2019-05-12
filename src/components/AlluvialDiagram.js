@@ -347,13 +347,28 @@ export default class AlluvialDiagram extends React.Component {
         .attr("transform", "translate(0 0)");
     }
 
+    this.svg.select(".background")
+      .on("click", () =>
+        d3.selectAll(".module")
+          .transition()
+          .attr("stroke-opacity", 0));
+
     modules = modules
       .enter()
       .append("g")
       .attr("class", "module")
+      .attr("stroke", "red")
+      .attr("stroke-opacity", 0)
       .on("dblclick", onDoubleClick(this))
       .on("click", function (d) {
         console.log(d);
+
+        d3.selectAll(".module")
+          .transition()
+          .attr("stroke-opacity", (context => function () {
+            return context === this ? 1 : 0;
+          })(this));
+
         onModuleClick.call(this, d);
       })
       .merge(modules);
@@ -555,13 +570,15 @@ export default class AlluvialDiagram extends React.Component {
 
   render() {
     const {
+      width,
+      height,
       defaultHighlightColor,
       highlightColors,
     } = this.props;
 
     return (
       <svg
-        style={{ width: "100vw", height: "100vh", background: "#fff" }}
+        style={{ width: "100vw", height: "100vh" }}
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
         id="alluvialSvg"
@@ -573,6 +590,7 @@ export default class AlluvialDiagram extends React.Component {
             highlightColors={highlightColors}
           />
         </defs>
+        <rect className="background" width={width} height={height} fill="#fff"/>
         <g id="zoomable">
           <g className="alluvialDiagram"/>
         </g>
