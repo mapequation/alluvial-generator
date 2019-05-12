@@ -144,12 +144,6 @@ export default class AlluvialDiagram extends React.Component {
 
     const onClick = d => console.log(d);
 
-    const onDoubleClick = d => {
-      diagram.doubleClick(d, d3.event);
-      this.update();
-      this.draw();
-    };
-
     function key(d) {
       return d ? d.id : this.id;
     }
@@ -319,14 +313,48 @@ export default class AlluvialDiagram extends React.Component {
       .delay(delay)
       .remove();
 
+    const onDoubleClick = context => function (d) {
+      const success = diagram.doubleClick(d, d3.event);
+      if (success) {
+        context.update();
+        context.draw();
+      } else {
+        wiggle.call(this, d);
+      }
+    };
+
+    function wiggle() {
+      const duration = 80;
+      const dx = 8;
+
+      d3.select(this)
+        .attr("transform", null)
+        .transition()
+        .ease(d3.easeSin)
+        .duration(duration)
+        .attr("transform", `translate(${1.5 * dx} 0)`)
+        .transition()
+        .ease(d3.easeSin)
+        .duration(2 * duration)
+        .attr("transform", `translate(-${dx} 0)`)
+        .transition()
+        .ease(d3.easeSin)
+        .duration(2 * duration)
+        .attr("transform", `translate(${dx / 2} 0)`)
+        .transition()
+        .ease(d3.easeSin)
+        .duration(duration)
+        .attr("transform", "translate(0 0)");
+    }
+
     modules = modules
       .enter()
       .append("g")
       .attr("class", "module")
-      .on("dblclick", onDoubleClick)
-      .on("click", (d) => {
+      .on("dblclick", onDoubleClick(this))
+      .on("click", function (d) {
         console.log(d);
-        onModuleClick(d);
+        onModuleClick.call(this, d);
       })
       .merge(modules);
 
