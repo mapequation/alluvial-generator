@@ -70,14 +70,6 @@ export default class StreamlineLink {
         h0: h0 / 2,
         h1: h1 / 2
       },
-      networkTransitionPath: {
-        x0,
-        x1,
-        y0: 0,
-        y1: 0,
-        h0: 0,
-        h1: 0
-      },
       leftHighlightIndex,
       rightHighlightIndex
     };
