@@ -582,6 +582,7 @@ export default class AlluvialDiagram extends React.Component {
         style={{ width: "100vw", height: "100vh" }}
         ref={node => (this.node = node)}
         xmlns={d3.namespaces.svg}
+        xmlnsXlink={d3.namespaces.xlink}
         id="alluvialSvg"
       >
         <defs>
