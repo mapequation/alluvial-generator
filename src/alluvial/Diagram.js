@@ -67,6 +67,16 @@ export default class Diagram {
       } else {
         return this.expandModule(alluvialObject.moduleId, alluvialObject.networkId);
       }
+    } else if (alluvialObject.depth === Depth.STREAMLINE_NODE) {
+      let leftSuccess, rightSuccess;
+      if (shiftKey) {
+        leftSuccess = this.regroupModule(alluvialObject.leftModuleId, alluvialObject.leftNetworkId);
+        rightSuccess = this.regroupModule(alluvialObject.rightModuleId, alluvialObject.rightNetworkId);
+      } else {
+        leftSuccess = this.expandModule(alluvialObject.leftModuleId, alluvialObject.leftNetworkId);
+        rightSuccess = this.expandModule(alluvialObject.rightModuleId, alluvialObject.rightNetworkId);
+      }
+      return leftSuccess || rightSuccess;
     }
 
     return false;

@@ -301,11 +301,22 @@ export default class AlluvialDiagram extends React.Component {
         .call(highlightConnectedModules, d);
     }
 
+    const onDoubleClick = context => function (d) {
+      const success = diagram.doubleClick(d, d3.event);
+      if (success) {
+        context.update();
+        context.draw();
+      } else {
+        wiggle.call(this, d);
+      }
+    };
+
     streamlines
       .enter()
       .append("path")
       .attr("class", "streamline")
       .on("click", onClick)
+      .on("dblclick", onDoubleClick(this))
       .on("mouseover", highlightStreamline)
       .on("mouseout", dehighlightStreamline)
       .call(LinearGradients.fill)
@@ -338,16 +349,6 @@ export default class AlluvialDiagram extends React.Component {
       .transition(t)
       .delay(delay)
       .remove();
-
-    const onDoubleClick = context => function (d) {
-      const success = diagram.doubleClick(d, d3.event);
-      if (success) {
-        context.update();
-        context.draw();
-      } else {
-        wiggle.call(this, d);
-      }
-    };
 
     function wiggle() {
       const duration = 80;

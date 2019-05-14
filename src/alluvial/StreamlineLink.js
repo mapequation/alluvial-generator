@@ -33,8 +33,8 @@ export default class StreamlineLink {
 
   asObject() {
     const {
-      left: { id, sourceId, targetId, layout: leftLayout, parent: leftBranch },
-      right: { layout: rightLayout, parent: rightBranch },
+      left: { layout: leftLayout, parent: leftBranch, networkId: leftNetworkId, id, sourceId, targetId, depth },
+      right: { layout: rightLayout, parent: rightBranch, networkId: rightNetworkId },
     } = this;
 
     const x0 = leftLayout.x + leftLayout.width;
@@ -50,11 +50,18 @@ export default class StreamlineLink {
     const rightGroup: ?HighlightGroup = rightBranch ? rightBranch.parent : null;
     const leftHighlightIndex = leftGroup ? leftGroup.highlightIndex : -1;
     const rightHighlightIndex = rightGroup ? rightGroup.highlightIndex : -1;
+    const leftModuleId = leftGroup && leftGroup.parent ? leftGroup.parent.moduleId : 0;
+    const rightModuleId = rightGroup && rightGroup.parent ? rightGroup.parent.moduleId : 0;
 
     return {
       id,
       sourceId: sourceId.replace("_right", ""),
       targetId: targetId.replace("_left", ""),
+      leftNetworkId,
+      rightNetworkId,
+      leftModuleId,
+      rightModuleId,
+      depth,
       avgHeight: (h0 + h1) / 2,
       path: {
         x0,
