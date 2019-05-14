@@ -1,5 +1,4 @@
 # [Alluvial Diagram Generator](https://alluvial.mapequation.org)
-##### Interactive mapping of change in hierarchical networks
 
 ## Feedback
 If you have any questions, feedback, or issues, please add them to the [issues page](https://github.com/mapequation/alluvial-generator/issues).
