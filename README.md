@@ -15,7 +15,7 @@ Zoom in and out by scrolling. Pan the diagram by clicking and dragging.
 To show module information, click on any module.
 
 ### Show sub-modules
-![Expand modules by clicking](./src/components/images/open_module.gif)
+![Expand modules by clicking](src/images/expand.gif)
 
 By default, we show the top level modules for each network. To show the sub-modules
 within any module, double click on it. If nothing happens, the module is already expanded
@@ -24,7 +24,7 @@ to its deepest level.
 To keep the heights proportional to the contained flow, we re-scale the heights of all other modules.
 
 ### Regroup sub-modules
-![Expand modules by clicking](./src/components/images/close_module.gif)
+![Expand modules by clicking](src/images/regroup.gif)
 
 To regroup sub-modules into their parent module, double click on any sub-module while holding
 the shift key.

@@ -1,8 +1,13 @@
 import React from "react";
-import { Container, Divider, Header, Image } from "semantic-ui-react";
-import openModuleGif from "./images/open_module.gif";
-import closeModuleGif from "./images/close_module.gif";
+import { Container, Divider, Header } from "semantic-ui-react";
+import expandModuleMov from "../videos/expand.mov";
+import regroupModuleMov from "../videos/regroup.mov";
 
+
+const Video = (props) =>
+  <video autoPlay loop className="ui video right floated image" width={300} height={200}>
+    <source src={props.src} type="video/mp4"/>
+  </video>;
 
 const Documentation = () =>
   <Container text style={{ padding: "40px 0 100px 0" }}>
@@ -27,7 +32,7 @@ const Documentation = () =>
     </p>
 
     <Header>Show sub-modules</Header>
-    <Image src={openModuleGif} alt="Show sub-modules" centered bordered rounded size="medium" floated="right"/>
+    <Video src={expandModuleMov}/>
     <p>
       By default, we show the top level modules for each network. To show the sub-modules
       within any module, double click on it. If nothing happens, the module is already expanded
@@ -40,7 +45,7 @@ const Documentation = () =>
     <Divider hidden clearing/>
 
     <Header clear="both">Regroup sub-modules</Header>
-    <Image src={closeModuleGif} alt="Regroup sub-modules" centered bordered rounded size="medium" floated="right"/>
+    <Video src={regroupModuleMov}/>
     <p>
       To regroup sub-modules into their parent module, double click on any sub-module while holding
       the <kbd>shift</kbd> key.
