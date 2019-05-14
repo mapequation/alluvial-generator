@@ -1,6 +1,6 @@
 // @flow
-import StreamlineNode from "./StreamlineNode";
 import HighlightGroup from "./HighlightGroup";
+import StreamlineNode from "./StreamlineNode";
 
 
 export default class StreamlineLink {
@@ -10,7 +10,7 @@ export default class StreamlineLink {
   constructor(
     left: StreamlineNode,
     right: StreamlineNode,
-    reverse: boolean = false
+    reverse: boolean = false,
   ) {
     this.left = reverse ? right : left;
     this.right = reverse ? left : right;
@@ -21,7 +21,7 @@ export default class StreamlineLink {
   static linkNodes(
     left: StreamlineNode,
     right: StreamlineNode,
-    reverse: boolean = false
+    reverse: boolean = false,
   ) {
     return new StreamlineLink(left, right, reverse);
   }
@@ -33,8 +33,8 @@ export default class StreamlineLink {
 
   asObject() {
     const {
-      left: { id, layout: leftLayout, parent: leftBranch },
-      right: { layout: rightLayout, parent: rightBranch }
+      left: { id, sourceId, targetId, layout: leftLayout, parent: leftBranch },
+      right: { layout: rightLayout, parent: rightBranch },
     } = this;
 
     const x0 = leftLayout.x + leftLayout.width;
@@ -53,6 +53,8 @@ export default class StreamlineLink {
 
     return {
       id,
+      sourceId: sourceId.replace("_right", ""),
+      targetId: targetId.replace("_left", ""),
       avgHeight: (h0 + h1) / 2,
       path: {
         x0,
@@ -60,7 +62,7 @@ export default class StreamlineLink {
         y0,
         y1,
         h0,
-        h1
+        h1,
       },
       transitionPath: {
         x0: xAvg,
@@ -68,10 +70,10 @@ export default class StreamlineLink {
         y0: yAvg + h0 / 4,
         y1: yAvg + h1 / 4,
         h0: h0 / 2,
-        h1: h1 / 2
+        h1: h1 / 2,
       },
       leftHighlightIndex,
-      rightHighlightIndex
+      rightHighlightIndex,
     };
   }
 }

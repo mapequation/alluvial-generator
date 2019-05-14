@@ -277,11 +277,37 @@ export default class AlluvialDiagram extends React.Component {
       .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
+    function highlightConnectedModules(modules, streamline, strokeOpacity = null, stroke = null) {
+      modules
+        .filter(group => group.id === streamline.sourceId || group.id === streamline.targetId)
+        .select("rect")
+        .attr("stroke-opacity", strokeOpacity)
+        .attr("stroke", stroke);
+    }
+
+    function highlightStreamline(d) {
+      d3.select(this)
+        .attr("stroke", "#f00");
+
+      d3.selectAll(".group")
+        .call(highlightConnectedModules, d, 0.5, "#f00");
+    }
+
+    function dehighlightStreamline(d) {
+      d3.select(this)
+        .call(LinearGradients.stroke);
+
+      d3.selectAll(".group")
+        .call(highlightConnectedModules, d);
+    }
+
     streamlines
       .enter()
       .append("path")
       .attr("class", "streamline")
       .on("click", onClick)
+      .on("mouseover", highlightStreamline)
+      .on("mouseout", dehighlightStreamline)
       .call(LinearGradients.fill)
       .call(LinearGradients.stroke)
       .attr("stroke-width", 1)
@@ -347,9 +373,22 @@ export default class AlluvialDiagram extends React.Component {
         .attr("transform", "translate(0 0)");
     }
 
+    function restoreMouseOver(selection) {
+      selection
+        .on("mouseover", function () {
+          d3.select(this)
+            .attr("stroke-opacity", 0.5);
+        })
+        .on("mouseout", function () {
+          d3.select(this)
+            .attr("stroke-opacity", 0);
+        });
+    }
+
     this.svg.select(".background")
       .on("click", () => {
         d3.selectAll(".module")
+          .call(restoreMouseOver)
           .transition()
           .attr("stroke-opacity", 0);
 
@@ -360,13 +399,23 @@ export default class AlluvialDiagram extends React.Component {
       .enter()
       .append("g")
       .attr("class", "module")
-      .attr("stroke", "red")
+      .attr("stroke", "#f00")
       .attr("stroke-opacity", 0)
+      .call(restoreMouseOver)
       .on("dblclick", onDoubleClick(this))
       .on("click", function (d) {
         console.log(d);
 
+        const removeEventHandler = context => function (selection, event) {
+          const handler = selection.on(event);
+          selection.on(event, function () {
+            return context === this ? null : handler.call(this);
+          });
+        };
+
         d3.selectAll(".module")
+          .call(removeEventHandler(this), "mouseover")
+          .call(removeEventHandler(this), "mouseout")
           .transition()
           .attr("stroke-opacity", (context => function () {
             return context === this ? 1 : 0;

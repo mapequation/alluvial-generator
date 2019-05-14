@@ -52,6 +52,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
     this.id = this.streamlineId.toString();
   }
 
+  get sourceId() {
+    return this.streamlineId.source;
+  }
+
   get targetId() {
     return this.streamlineId.target;
   }
