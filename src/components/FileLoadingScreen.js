@@ -1,10 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Container, Divider, Step, Icon, Segment, Table } from "semantic-ui-react";
 import { getParserForExtension } from "@mapequation/infoparse";
+import PropTypes from "prop-types";
+import React from "react";
+import { Container, Divider, Icon, Segment, Step, Table } from "semantic-ui-react";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
+import DraggableTableRow from "./DraggableTableRow";
 
 
 function humanFileSize(bytes, si = true) {
@@ -129,6 +130,17 @@ export default class FileLoadingScreen extends React.Component {
     }, this.parseNetworks);
   };
 
+  moveRow = (toIndex, fromIndex) =>
+    this.setState(prevState => {
+      const { files } = prevState;
+      const file = files[fromIndex];
+      files.splice(fromIndex, 1);
+      files.splice(toIndex, 0, file);
+      return {
+        files,
+      };
+    });
+
   render() {
     const { files, loading } = this.state;
 
@@ -199,8 +211,8 @@ export default class FileLoadingScreen extends React.Component {
 
           <Table.Body>
             {files.map((file, i) =>
-              <Table.Row key={i}>
-                <Table.Cell>{file.name}</Table.Cell>
+              <DraggableTableRow key={i} index={i} action={this.moveRow}>
+                <Table.Cell style={{ cursor: "grab" }}>{file.name}</Table.Cell>
                 <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                 <Table.Cell>{file.format}</Table.Cell>
                 <Table.Cell
@@ -211,7 +223,7 @@ export default class FileLoadingScreen extends React.Component {
                 >
                   <a>Remove</a>
                 </Table.Cell>
-              </Table.Row>
+              </DraggableTableRow>,
             )}
           </Table.Body>
         </Table>
