@@ -78,32 +78,8 @@ export default class LeafNode extends AlluvialNodeBase {
     }
     group.flow -= this.flow;
     if (group.isEmpty) {
-      group.removeFromParent();
+      group.removeFromTree();
     }
-
-    const module = group.parent;
-    if (!module) {
-      console.warn(`Node ${this.id} was removed without belonging to a module.`);
-      return;
-    }
-    module.flow -= this.flow;
-    if (module.isEmpty) {
-      module.removeFromParent();
-    }
-
-    const networkRoot = module.parent;
-    if (!networkRoot) {
-      console.warn(`Node ${this.id} was removed without belonging to a network root.`);
-      return;
-    }
-    networkRoot.flow -= this.flow;
-    if (networkRoot.isEmpty) {
-      networkRoot.removeFromParent();
-    }
-
-    const alluvialRoot = networkRoot.parent;
-    if (!alluvialRoot) return;
-    alluvialRoot.flow -= this.flow;
   }
 
   removeFromSide(side: Side) {
