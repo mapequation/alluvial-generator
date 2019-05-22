@@ -5,7 +5,68 @@ import React from "react";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
+import ZoomableSvg from "./ZoomableSvg";
 
+
+function highlightConnectedModules(modules, streamline, strokeOpacity = null, stroke = null) {
+  modules
+    .filter(group => group.id === streamline.sourceId || group.id === streamline.targetId)
+    .select("rect")
+    .attr("stroke-opacity", strokeOpacity)
+    .attr("stroke", stroke);
+}
+
+function highlightStreamline(d) {
+  d3.select(this)
+    .attr("stroke", "#f00");
+
+  d3.selectAll(".group")
+    .call(highlightConnectedModules, d, 0.5, "#f00");
+}
+
+function dehighlightStreamline(d) {
+  d3.select(this)
+    .call(LinearGradients.stroke);
+
+  d3.selectAll(".group")
+    .call(highlightConnectedModules, d);
+}
+
+function restoreMouseOver(selection) {
+  selection
+    .on("mouseover", function () {
+      d3.select(this)
+        .attr("stroke-opacity", 0.5);
+    })
+    .on("mouseout", function () {
+      d3.select(this)
+        .attr("stroke-opacity", 0);
+    });
+}
+
+function wiggle() {
+  const duration = 80;
+  const dx = 8;
+
+  d3.select(this)
+    .attr("transform", null)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(duration)
+    .attr("transform", `translate(${1.5 * dx} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2 * duration)
+    .attr("transform", `translate(-${dx} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2 * duration)
+    .attr("transform", `translate(${dx / 2} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(duration)
+    .attr("transform", "translate(0 0)");
+}
 
 export default class AlluvialDiagram extends React.PureComponent {
   svg = d3.select(null);
@@ -42,24 +103,6 @@ export default class AlluvialDiagram extends React.PureComponent {
 
   componentDidMount() {
     this.svg = d3.select(this.node);
-
-    const zoom = d3.zoom().scaleExtent([0.1, 1000]);
-    const initialTransform = d3.zoomIdentity.translate(0, 50);
-
-    this.svg
-      .call(zoom)
-      .on("dblclick.zoom", null)
-      .call(zoom.transform, initialTransform);
-
-    const zoomable = this.svg
-      .select("#zoomable")
-      .attr("transform", initialTransform);
-
-    zoom.on("zoom", () => {
-      const { transform } = d3.event;
-      zoomable.attr("transform", transform);
-    });
-
     this.props.onUpdateLayout();
     this.draw();
   }
@@ -238,34 +281,10 @@ export default class AlluvialDiagram extends React.PureComponent {
       .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
-    function highlightConnectedModules(modules, streamline, strokeOpacity = null, stroke = null) {
-      modules
-        .filter(group => group.id === streamline.sourceId || group.id === streamline.targetId)
-        .select("rect")
-        .attr("stroke-opacity", strokeOpacity)
-        .attr("stroke", stroke);
-    }
-
-    function highlightStreamline(d) {
-      d3.select(this)
-        .attr("stroke", "#f00");
-
-      d3.selectAll(".group")
-        .call(highlightConnectedModules, d, 0.5, "#f00");
-    }
-
-    function dehighlightStreamline(d) {
-      d3.select(this)
-        .call(LinearGradients.stroke);
-
-      d3.selectAll(".group")
-        .call(highlightConnectedModules, d);
-    }
-
     const onDoubleClick = context => function (d) {
       const success = diagram.doubleClick(d, d3.event);
       if (success) {
-        context.update();
+        onUpdateLayout();
         context.draw();
       } else {
         wiggle.call(this, d);
@@ -310,52 +329,6 @@ export default class AlluvialDiagram extends React.PureComponent {
       .transition(t)
       .delay(delay)
       .remove();
-
-    function wiggle() {
-      const duration = 80;
-      const dx = 8;
-
-      d3.select(this)
-        .attr("transform", null)
-        .transition()
-        .ease(d3.easeSin)
-        .duration(duration)
-        .attr("transform", `translate(${1.5 * dx} 0)`)
-        .transition()
-        .ease(d3.easeSin)
-        .duration(2 * duration)
-        .attr("transform", `translate(-${dx} 0)`)
-        .transition()
-        .ease(d3.easeSin)
-        .duration(2 * duration)
-        .attr("transform", `translate(${dx / 2} 0)`)
-        .transition()
-        .ease(d3.easeSin)
-        .duration(duration)
-        .attr("transform", "translate(0 0)");
-    }
-
-    function restoreMouseOver(selection) {
-      selection
-        .on("mouseover", function () {
-          d3.select(this)
-            .attr("stroke-opacity", 0.5);
-        })
-        .on("mouseout", function () {
-          d3.select(this)
-            .attr("stroke-opacity", 0);
-        });
-    }
-
-    this.svg.select(".background")
-      .on("click", () => {
-        d3.selectAll(".module")
-          .call(restoreMouseOver)
-          .transition()
-          .attr("stroke-opacity", 0);
-
-        onModuleClick(null);
-      });
 
     modules = modules
       .enter()
@@ -586,6 +559,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const {
       defaultHighlightColor,
       highlightColors,
+      onModuleClick,
     } = this.props;
 
     return (
@@ -603,10 +577,16 @@ export default class AlluvialDiagram extends React.PureComponent {
             highlightColors={highlightColors}
           />
         </defs>
-        <rect className="background" width="100%" height="100%" fill="#fff"/>
-        <g id="zoomable">
+        <ZoomableSvg onClick={() => {
+          d3.selectAll(".module")
+            .call(restoreMouseOver)
+            .transition()
+            .attr("stroke-opacity", 0);
+
+          onModuleClick(null);
+        }}>
           <g className="alluvialDiagram"/>
-        </g>
+        </ZoomableSvg>
       </svg>
     );
   }
