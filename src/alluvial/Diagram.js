@@ -58,21 +58,24 @@ export default class Diagram {
     };
 
     const { shiftKey } = event || noKeyModifiers;
+    const { depth } = alluvialObject;
 
-    if (alluvialObject.depth === Depth.MODULE) {
+    if (depth === Depth.MODULE) {
+      const { moduleId, networkId } = alluvialObject;
       if (shiftKey) {
-        return this.regroupModule(alluvialObject.moduleId, alluvialObject.networkId);
+        return this.regroupModule(moduleId, networkId);
       } else {
-        return this.expandModule(alluvialObject.moduleId, alluvialObject.networkId);
+        return this.expandModule(moduleId, networkId);
       }
-    } else if (alluvialObject.depth === Depth.STREAMLINE_NODE) {
+    } else if (depth === Depth.STREAMLINE_NODE) {
+      const { rightNetworkId, leftNetworkId, rightModuleId, leftModuleId } = alluvialObject;
       let leftSuccess, rightSuccess;
       if (shiftKey) {
-        leftSuccess = this.regroupModule(alluvialObject.leftModuleId, alluvialObject.leftNetworkId);
-        rightSuccess = this.regroupModule(alluvialObject.rightModuleId, alluvialObject.rightNetworkId);
+        leftSuccess = this.regroupModule(leftModuleId, leftNetworkId);
+        rightSuccess = this.regroupModule(rightModuleId, rightNetworkId);
       } else {
-        leftSuccess = this.expandModule(alluvialObject.leftModuleId, alluvialObject.leftNetworkId);
-        rightSuccess = this.expandModule(alluvialObject.rightModuleId, alluvialObject.rightNetworkId);
+        leftSuccess = this.expandModule(leftModuleId, leftNetworkId);
+        rightSuccess = this.expandModule(rightModuleId, rightNetworkId);
       }
       return leftSuccess || rightSuccess;
     }
