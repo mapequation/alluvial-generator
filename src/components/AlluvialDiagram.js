@@ -7,7 +7,7 @@ import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 
 
-export default class AlluvialDiagram extends React.Component {
+export default class AlluvialDiagram extends React.PureComponent {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
   maxModuleLevel = 3;
