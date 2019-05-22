@@ -26,21 +26,12 @@ export default class Module extends AlluvialNodeBase {
     moduleId: string,
     moduleLevel: number = 1,
   ) {
-    super(parent, parent.networkId, Module.createId(parent.networkId, moduleId));
+    super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
     this._name = Module.customNames.get(this.id) || null;
     parent.addChild(this);
-  }
-
-  static createId(networkId: string, moduleId: string): string {
-    return `${networkId}_module${moduleId}`;
-  }
-
-  static splitId(id: string): [string, string] {
-    const [networkId, moduleId] = id.split("_module");
-    return [networkId, moduleId];
   }
 
   set name(name: ?string) {
