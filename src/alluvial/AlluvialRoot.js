@@ -1,14 +1,13 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import type { Side } from "./Side";
 import Depth, { ALLUVIAL_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
+import type { Side } from "./Side";
 
 
 export type VerticalAlign = "bottom" | "justify" | "top";
-
 
 export default class AlluvialRoot extends AlluvialNodeBase {
   children: NetworkRoot[] = [];
@@ -57,10 +56,9 @@ export default class AlluvialRoot extends AlluvialNodeBase {
   }
 
   updateLayout(
-    totalWidth: number,
     height: number,
     streamlineFraction: number,
-    maxModuleWidth: number,
+    moduleWidth: number,
     flowThreshold: number,
     verticalAlign: VerticalAlign = "bottom",
   ) {
@@ -68,12 +66,9 @@ export default class AlluvialRoot extends AlluvialNodeBase {
 
     if (!numNetworks) return;
 
-    const width = Math.min(
-      totalWidth / (numNetworks + (numNetworks - 1) * streamlineFraction),
-      maxModuleWidth,
-    );
-    const streamlineWidth = streamlineFraction * width;
-    const networkWidth = width + streamlineWidth;
+    const streamlineWidth = streamlineFraction * moduleWidth;
+    const networkWidth = moduleWidth + streamlineWidth;
+    const totalWidth = networkWidth * numNetworks - streamlineWidth;
 
     let x = 0;
     let y = height;
@@ -117,7 +112,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
                 : 0;
             y -= node.flow * height;
             node.margin = margin;
-            node.layout = { x, y, width, height: node.flow * height };
+            node.layout = { x, y, width: moduleWidth, height: node.flow * height };
             y -= margin;
             totalMargins[networkIndex] += margin;
             visibleFlows[networkIndex] += node.flow;
@@ -204,26 +199,26 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             node.layout = { x: 0, y: 0, width: totalWidth, height };
             break;
           case Depth.NETWORK_ROOT:
-            node.layout = { x, y: 0, width, height };
+            node.layout = { x, y: 0, width: moduleWidth, height };
             x += networkWidth;
             y = height;
             break;
           case Depth.MODULE:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
             y -= node.margin;
             break;
           case Depth.HIGHLIGHT_GROUP:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
             break;
           case Depth.BRANCH:
-            node.layout = { x, y, width, height: node.flow * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
             if (node.isLeft) {
               y += node.flow * usableHeight;
             }
             break;
           case Depth.STREAMLINE_NODE:
             y -= node.flow * usableHeight;
-            node.layout = { x, y, width, height: node.flow * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
             break;
           default:
             break;

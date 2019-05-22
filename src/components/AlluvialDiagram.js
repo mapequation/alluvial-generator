@@ -24,12 +24,11 @@ export default class AlluvialDiagram extends React.Component {
   };
 
   static propTypes = {
-    width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     defaultHighlightColor: PropTypes.string,
     highlightColors: PropTypes.arrayOf(PropTypes.string),
     streamlineFraction: PropTypes.number.isRequired,
-    maxModuleWidth: PropTypes.number.isRequired,
+    moduleWidth: PropTypes.number.isRequired,
     duration: PropTypes.number,
     moduleFlowThreshold: PropTypes.number.isRequired,
     streamlineThreshold: PropTypes.number.isRequired,
@@ -38,6 +37,7 @@ export default class AlluvialDiagram extends React.Component {
     dropShadow: PropTypes.bool,
     onModuleClick: PropTypes.func,
     onModuleNameChange: PropTypes.func,
+    onUpdateLayout: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -60,58 +60,29 @@ export default class AlluvialDiagram extends React.Component {
       zoomable.attr("transform", transform);
     });
 
-    this.update();
+    this.props.onUpdateLayout();
     this.draw();
   }
 
   componentDidUpdate(prevProps) {
     if (this.shouldUpdateLayout(prevProps))
-      this.update();
-    this.draw(prevProps);
+      this.props.onUpdateLayout();
+    this.draw();
   }
 
   shouldUpdateLayout(prevProps) {
-    const { width, height, streamlineFraction, maxModuleWidth, moduleFlowThreshold, verticalAlign } = this.props;
-    const widthChanged = width !== prevProps.width;
+    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
     const heightChanged = height !== prevProps.height;
     const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
-    const maxModuleWidthChanged = maxModuleWidth !== prevProps.maxModuleWidth;
+    const moduleWidthChanged = moduleWidth !== prevProps.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
-    return widthChanged || heightChanged || streamlineFractionChanged || maxModuleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
+    return heightChanged || streamlineFractionChanged || moduleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
   }
 
-  update() {
+  draw() {
     const {
       diagram,
-      width,
-      height,
-      streamlineFraction,
-      maxModuleWidth,
-      moduleFlowThreshold,
-      verticalAlign,
-    } = this.props;
-
-    const moduleNameMargin = 150;
-    const networkNameMargin = 60;
-
-    diagram.updateLayout(
-      width - 2 * moduleNameMargin,
-      height - networkNameMargin,
-      streamlineFraction,
-      maxModuleWidth,
-      moduleFlowThreshold,
-      verticalAlign,
-    );
-
-    console.log(diagram);
-  }
-
-  draw(prevProps = this.props) {
-    const {
-      diagram,
-      width,
-      height,
       defaultHighlightColor,
       highlightColors,
       duration,
@@ -120,27 +91,17 @@ export default class AlluvialDiagram extends React.Component {
       showModuleId,
       dropShadow,
       onModuleClick,
+      onUpdateLayout,
     } = this.props;
-
-    const widthChanged = width !== prevProps.width;
-    const heightChanged = height !== prevProps.height;
 
     const alluvialRoot = diagram.asObject();
 
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
 
-    const sizeTransitionDelay = widthChanged || heightChanged ? 0.5 * delay : 0;
-
     const alluvialDiagram = this.svg
       .select(".alluvialDiagram")
       .attr("transform", "translate(200 10)");
-
-    alluvialDiagram
-      .transition(t)
-      .delay(sizeTransitionDelay)
-      .attr("width", width)
-      .attr("height", height);
 
     const onClick = d => console.log(d);
 

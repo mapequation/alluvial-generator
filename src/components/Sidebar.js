@@ -10,7 +10,7 @@ import {
   Label,
   Menu,
   Sidebar as SemanticSidebar,
-  Table
+  Table,
 } from "semantic-ui-react";
 import Diagram from "../alluvial/Diagram";
 
@@ -20,10 +20,9 @@ import AlluvialDiagram from "./AlluvialDiagram";
 
 export default class Sidebar extends React.Component {
   state = {
-    width: 1200,
     height: 600,
     duration: 400,
-    maxModuleWidth: 300,
+    moduleWidth: 100,
     streamlineFraction: 2,
     streamlineOpacity: 0.5,
     moduleFlowThreshold: 8e-3,
@@ -39,7 +38,7 @@ export default class Sidebar extends React.Component {
 
   constructor(props) {
     super(props);
-    this.diagram = new Diagram(this.props.networks);
+    this.diagram = new Diagram(props.networks);
   }
 
   validNumber = value => (Number.isNaN(+value) ? 0 : +value);
@@ -70,6 +69,15 @@ export default class Sidebar extends React.Component {
     }));
   };
 
+  updateLayout = () =>
+    this.diagram.updateLayout(
+      this.state.height,
+      this.state.streamlineFraction,
+      this.state.moduleWidth,
+      this.state.moduleFlowThreshold,
+      this.state.verticalAlign,
+    );
+
   onModuleClick = selectedModule => this.setState({
     selectedModule,
     selectedModuleName: selectedModule ? selectedModule.name || "" : "",
@@ -90,7 +98,7 @@ export default class Sidebar extends React.Component {
   saveSvg = () => {
     const svgEl = document.getElementById("alluvialSvg");
     const svg = new XMLSerializer().serializeToString(svgEl);
-    const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    const preface = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n";
     const svgBlob = new Blob([preface, svg], { type: "image/svg+xml;charset=utf-8" });
     FileSaver.saveAs(svgBlob, this.basename() + ".svg");
   };
@@ -112,7 +120,7 @@ export default class Sidebar extends React.Component {
 
     const image = new Image(width, height);
     image.onload = () => {
-      context.drawImage(image, 0, 0,);
+      context.drawImage(image, 0, 0);
       canvas.toBlob(blob => FileSaver.saveAs(blob, this.basename() + ".png"));
     };
 
@@ -125,10 +133,9 @@ export default class Sidebar extends React.Component {
 
   render() {
     const {
-      width,
       height,
       duration,
-      maxModuleWidth,
+      moduleWidth,
       streamlineFraction,
       streamlineOpacity,
       moduleFlowThreshold,
@@ -206,32 +213,34 @@ export default class Sidebar extends React.Component {
             }
           </Menu.Item>
           <Menu.Item>
-            <Header as="h4">Diagram size</Header>
-            <TextInput
-              label="Width"
-              value={width}
-              onChange={(e, { value }) => this.setState({ width: this.validNumber(value) })}
-            />
+            <Header as="h4">Module settings</Header>
             <TextInput
               label="Height"
               value={height}
               onChange={(e, { value }) => this.setState({ height: this.validNumber(value) })}
             />
-          </Menu.Item>
-          <Menu.Item>
-            <Header as="h4">Module settings</Header>
+            <Slider
+              color="blue"
+              settings={{
+                start: height,
+                min: 400,
+                max: 2000,
+                step: 10,
+                onChange: height => this.setState({ height }),
+              }}
+            />
             <TextInput
-              label="Max width"
-              value={maxModuleWidth}
+              label="Width"
+              value={moduleWidth}
             />
             <Slider
               color="blue"
               settings={{
-                start: maxModuleWidth,
+                start: moduleWidth,
                 min: 10,
-                max: width,
+                max: 200,
                 step: 10,
-                onChange: maxModuleWidth => this.setState({ maxModuleWidth }),
+                onChange: moduleWidth => this.setState({ moduleWidth }),
               }}
             />
             <TextInput
@@ -355,9 +364,8 @@ export default class Sidebar extends React.Component {
           <React.StrictMode>
             <AlluvialDiagram
               diagram={this.diagram}
-              width={width}
               height={height}
-              maxModuleWidth={+maxModuleWidth}
+              moduleWidth={+moduleWidth}
               streamlineFraction={+streamlineFraction}
               streamlineOpacity={+streamlineOpacity}
               duration={+duration}
@@ -367,6 +375,7 @@ export default class Sidebar extends React.Component {
               showModuleId={showModuleId}
               dropShadow={dropShadow}
               onModuleClick={this.onModuleClick}
+              onUpdateLayout={this.updateLayout}
             />
           </React.StrictMode>
         </SemanticSidebar.Pusher>

@@ -1,22 +1,20 @@
 // @flow
-import type { VerticalAlign } from "./AlluvialRoot";
 import AlluvialRoot from "./AlluvialRoot";
-import type { Side } from "./Side";
-import { opposite, sideToString } from "./Side";
 import Depth from "./Depth";
+import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
+import type { Side } from "./Side";
+import { opposite, sideToString } from "./Side";
 import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
-import HighlightGroup from "./HighlightGroup";
 
 
 type Event = {
   altKey: boolean,
   shiftKey: boolean
 };
-
 
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
@@ -89,17 +87,9 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  updateLayout(
-    totalWidth: number,
-    height: number,
-    streamlineFraction: number,
-    maxModuleWidth: number,
-    flowThreshold: number,
-    verticalAlign: VerticalAlign = "bottom",
-  ) {
+  updateLayout() {
     this.dirty = true;
-
-    this.alluvialRoot.updateLayout(totalWidth, height, streamlineFraction, maxModuleWidth, flowThreshold, verticalAlign);
+    this.alluvialRoot.updateLayout(...arguments);
   }
 
   asObject(): Object {
