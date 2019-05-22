@@ -85,7 +85,8 @@ export default class Sidebar extends React.Component {
 
   handleSelectedModuleNameChange = (e, { value }) => {
     const { selectedModule } = this.state;
-    this.diagram.setModuleName(selectedModule.id, value);
+    selectedModule.name = value;
+    this.diagram.setModuleName(selectedModule);
     this.setState({ selectedModuleName: value });
   };
 

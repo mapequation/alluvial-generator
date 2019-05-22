@@ -80,8 +80,11 @@ export default class Diagram {
     return false;
   }
 
-  setModuleName(id: string, name: ?string) {
-    const module = this.alluvialRoot.getModuleById(id);
+  setModuleName(alluvialObject: Object) {
+    const { networkId, moduleId, name } = alluvialObject;
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!networkRoot) return;
+    const module = networkRoot.getModule(moduleId);
     if (!module) return;
     module.name = name;
     this.dirty = true;

@@ -48,13 +48,6 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     return networkRoot.getLeafNodeByName(node.name);
   }
 
-  getModuleById(id: string): ?Module {
-    const [networkId, moduleId] = Module.splitId(id);
-    const networkRoot = this.getNetworkRoot(networkId);
-    if (!networkRoot) return;
-    return networkRoot.getModule(moduleId);
-  }
-
   updateLayout(
     height: number,
     streamlineFraction: number,
