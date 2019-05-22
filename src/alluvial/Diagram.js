@@ -58,25 +58,19 @@ export default class Diagram {
     };
 
     const { shiftKey } = event || noKeyModifiers;
+    const action = shiftKey ? this.regroupModule : this.expandModule;
+
     const { depth } = alluvialObject;
 
     if (depth === Depth.MODULE) {
       const { moduleId, networkId } = alluvialObject;
-      if (shiftKey) {
-        return this.regroupModule(moduleId, networkId);
-      } else {
-        return this.expandModule(moduleId, networkId);
-      }
-    } else if (depth === Depth.STREAMLINE_NODE) {
+      return action.call(this, moduleId, networkId);
+    }
+
+    if (depth === Depth.STREAMLINE_NODE) {
       const { rightNetworkId, leftNetworkId, rightModuleId, leftModuleId } = alluvialObject;
-      let leftSuccess, rightSuccess;
-      if (shiftKey) {
-        leftSuccess = this.regroupModule(leftModuleId, leftNetworkId);
-        rightSuccess = this.regroupModule(rightModuleId, rightNetworkId);
-      } else {
-        leftSuccess = this.expandModule(leftModuleId, leftNetworkId);
-        rightSuccess = this.expandModule(rightModuleId, rightNetworkId);
-      }
+      const leftSuccess = action.call(this, leftModuleId, leftNetworkId);
+      const rightSuccess = action.call(this, rightModuleId, rightNetworkId);
       return leftSuccess || rightSuccess;
     }
 
