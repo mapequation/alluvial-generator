@@ -232,6 +232,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     networkNamesEnter
       .append("text")
       .attr("class", "name")
+      .style("cursor", "default")
       .text(d => d.name)
       .attr("x", d => d.textX)
       .attr("y", d => d.textY)
@@ -295,6 +296,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .enter()
       .append("path")
       .attr("class", "streamline")
+      .style("cursor", "pointer")
       .on("click", onClick)
       .on("dblclick", onDoubleClick(this))
       .on("mouseover", highlightStreamline)
@@ -334,6 +336,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .enter()
       .append("g")
       .attr("class", "module")
+      .style("cursor", "pointer")
       .attr("stroke", "#f00")
       .attr("stroke-opacity", 0)
       .call(restoreMouseOver)
@@ -407,6 +410,7 @@ export default class AlluvialDiagram extends React.PureComponent {
         .enter()
         .append("g")
         .attr("class", "moduleName")
+        .style("cursor", "default")
         .call(makeTransparent);
 
       moduleNamesEnter
@@ -531,6 +535,7 @@ export default class AlluvialDiagram extends React.PureComponent {
         .enter()
         .append("text")
         .attr("class", "moduleId")
+        .attr("pointer-events", "none")
         .text(d => d.moduleId)
         .attr("text-anchor", "middle")
         .attr("font-size", 12)
