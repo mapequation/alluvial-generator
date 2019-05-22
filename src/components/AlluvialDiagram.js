@@ -81,7 +81,6 @@ export default class AlluvialDiagram extends React.PureComponent {
     showModuleId: false,
     dropShadow: false,
     onModuleClick: () => null,
-    onModuleNameChange: () => null,
   };
 
   static propTypes = {
@@ -97,7 +96,6 @@ export default class AlluvialDiagram extends React.PureComponent {
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
     onModuleClick: PropTypes.func,
-    onModuleNameChange: PropTypes.func,
     onUpdateLayout: PropTypes.func.isRequired,
   };
 
