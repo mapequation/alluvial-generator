@@ -69,14 +69,12 @@ export default class FileLoadingScreen extends React.Component {
 
     Promise.all(validFiles.map(readAsText))
       .then(files => {
-        const newFiles = files.map((file, i) => {
-          return {
-            contents: file,
-            name: validFiles[i].name,
-            size: validFiles[i].size,
-            format: validFiles[i].format,
-          };
-        });
+        const newFiles = files.map((file, i) => ({
+          contents: file,
+          name: validFiles[i].name,
+          size: validFiles[i].size,
+          format: validFiles[i].format,
+        }));
 
         this.setState(({ files }) => ({
           files: [...files, ...newFiles],
