@@ -46,7 +46,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
 
   createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
     this.nodesByName = new Map(
-      Array.from(nodes).map(node => [node.name, node]),
+      Array.from(nodes, node => [node.name, node]),
     );
   }
 
@@ -71,8 +71,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
         textX: this.x + this.width / 2,
         textY: this.height + 15 + 5,
       },
-      links: Array.from(this.rightStreamlines())
-        .map(link => link.asObject())
+      links: Array.from(this.rightStreamlines(), link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
         .filter(child => child.flow >= this.flowThreshold)
