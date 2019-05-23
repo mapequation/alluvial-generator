@@ -1,12 +1,10 @@
 // @flow
-import sortBy from "lodash/sortBy";
-
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { BRANCH } from "./Depth";
-import StreamlineNode from "./StreamlineNode";
+import HighlightGroup from "./HighlightGroup";
 import type { Side } from "./Side";
 import { LEFT, RIGHT, sideToString } from "./Side";
-import HighlightGroup from "./HighlightGroup";
+import StreamlineNode from "./StreamlineNode";
 
 
 export default class Branch extends AlluvialNodeBase {
@@ -37,8 +35,7 @@ export default class Branch extends AlluvialNodeBase {
   }
 
   sortChildren(moduleFlowThreshold: number = 0) {
-    this.children = sortBy(this.children, [
-      child => child.byOppositeStreamlinePosition(moduleFlowThreshold)
-    ]);
+    this.sortBy((a: StreamlineNode, b: StreamlineNode) =>
+      a.oppositeStreamlinePosition(moduleFlowThreshold) - b.oppositeStreamlinePosition(moduleFlowThreshold));
   }
 }

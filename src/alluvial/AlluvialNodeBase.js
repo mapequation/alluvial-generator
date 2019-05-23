@@ -100,8 +100,8 @@ export default class AlluvialNodeBase {
   }
 
   removeFromTree() {
-    if (!this.parent) return;
     this.removeFromParent();
+    if (!this.parent) return;
     this.parent.flow -= this.flow;
     if (this.parent.isEmpty) {
       this.parent.removeFromTree();
@@ -110,6 +110,10 @@ export default class AlluvialNodeBase {
 
   sortChildren() {
     // no-op
+  }
+
+  sortBy(compareFn: (a: AlluvialNode, b: AlluvialNode) => number) {
+    this.children.sort(compareFn);
   }
 
   /*:: @@iterator(): Iterator<AlluvialNode> { return this.children.values() } */

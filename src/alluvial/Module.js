@@ -1,5 +1,4 @@
 // @flow
-import sortBy from "lodash/sortBy";
 import PriorityQueue from "../lib/priority-queue";
 import TreePath from "../lib/treepath";
 
@@ -64,7 +63,7 @@ export default class Module extends AlluvialNodeBase {
   }
 
   sortChildren() {
-    this.children = sortBy(this.children, [child => child.highlightIndex]);
+    this.sortBy((a: HighlightGroup, b: HighlightGroup) => b.highlightIndex - a.highlightIndex);
   }
 
   getLargestLeafNodeNames() {

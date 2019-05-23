@@ -71,7 +71,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return null;
   }
 
-  byOppositeStreamlinePosition(moduleFlowThreshold: number) {
+  oppositeStreamlinePosition(moduleFlowThreshold: number) {
     const atBottom = -Infinity;
     const opposite = this.getOpposite();
     if (!opposite) return atBottom;
