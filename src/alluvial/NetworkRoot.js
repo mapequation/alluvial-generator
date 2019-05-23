@@ -74,8 +74,11 @@ export default class NetworkRoot extends AlluvialNodeBase {
       links: Array.from(this.rightStreamlines(), link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
-        .filter(child => child.flow >= this.flowThreshold)
-        .map(child => child.asObject()),
+        .reduce((filtered, child) => {
+          if (child.flow >= this.flowThreshold)
+            filtered.push(child.asObject());
+          return filtered;
+        }, []),
     };
   }
 
