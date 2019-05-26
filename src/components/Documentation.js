@@ -17,8 +17,17 @@ const Documentation = () =>
       href="https://github.com/mapequation/alluvial-generator/issues">GitHub issues page</a>.
     </p>
 
-    <Header as="h1">Instructions</Header>
+    <Header as="h1">References</Header>
+    <p>
+      If you are using the software at mapequation.org in one of your research articles or otherwise want to refer to it,
+      please cite <a href="https://www.mapequation.org/publications.html">relevant publication</a> or use the following format:
+    </p>
+    <p>
+      D. Edler, A. Eriksson and M. Rosvall, The MapEquation software package,
+      available online at <a href="https://www.mapequation.org">mapequation.org</a>.
+    </p>
 
+    <Header as="h1">Instructions</Header>
     <p>
       Networks are shown as vertical stacks of modules. To highlight change between networks, we draw
       streamines between the networks. To tell which sub-modules that have the same parent module, we draw
