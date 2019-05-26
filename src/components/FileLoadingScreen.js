@@ -162,16 +162,17 @@ export default class FileLoadingScreen extends React.Component {
 
         <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
 
-        <Step.Group size="small">
+        <Step.Group ordered>
           <Step
             as="label"
             link
-            active={this.state.files.length === 0}
+            completed={files.length > 0}
+            active={files.length === 0}
             htmlFor="upload"
           >
-            <Icon name="plus"/>
             <Step.Content>
               <Step.Title>Add networks</Step.Title>
+              <Step.Description><code>clu</code>, <code>map</code>, <code>tree</code>, <code>ftree</code></Step.Description>
             </Step.Content>
             <input
               style={{ display: "none" }}
@@ -185,11 +186,10 @@ export default class FileLoadingScreen extends React.Component {
           </Step>
           <Step
             link
-            active={this.state.files.length > 0}
-            disabled={this.state.files.length === 0}
+            active={files.length > 0}
+            disabled={files.length === 0}
             onClick={this.withLoadingState(this.parseNetworks)}
           >
-            <Icon name="left align" rotated="clockwise"/>
             <Step.Content>
               <Step.Title>Create diagram</Step.Title>
             </Step.Content>
