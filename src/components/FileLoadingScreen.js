@@ -74,6 +74,7 @@ export default class FileLoadingScreen extends React.Component {
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
+          error: false,
         }));
 
         this.setState(({ files }) => ({
@@ -92,17 +93,35 @@ export default class FileLoadingScreen extends React.Component {
   parseNetworks = () => {
     const { files } = this.state;
 
-    const networks = files.map(file => {
+    const networks = files.map((file, i) => {
       try {
         const parseLinks = false;
         const lines = file.contents.split("\n").filter(Boolean);
         const object = getParserForExtension(file.format)(lines, parseLinks);
         const objectParser = getParser(file.format);
-        return objectParser(object, file.name);
+        const parsed = objectParser(object, file.name);
+
+        // names must be unique
+        const uniqueNames = new Set();
+        parsed.nodes.forEach(node => {
+          if (uniqueNames.has(node.name)) {
+            throw new Error(`Network contains nodes with duplicate names: "${node.name}"`);
+          }
+          uniqueNames.add(node.name);
+        });
+
+        return parsed;
       } catch (e) {
-        throw new Error(`No parser found for format ${file.format}`);
+        files[i].error = true;
+        console.warn(e);
+        return null;
       }
     });
+
+    if (files.some(file => file.error)) {
+      this.setState({ loading: false });
+      return;
+    }
 
     this.props.onSubmit(networks);
   };
@@ -123,6 +142,7 @@ export default class FileLoadingScreen extends React.Component {
         name: networks[i],
         size: fileSize(file),
         format: fileExtension(networks[i]),
+        error: false,
       })),
       loading: false,
     }, this.parseNetworks);
@@ -210,7 +230,7 @@ export default class FileLoadingScreen extends React.Component {
           <Table.Body>
             {files.map((file, i) =>
               <DraggableTableRow key={i} index={i} action={this.moveRow}>
-                <Table.Cell style={{ cursor: "grab" }}>{file.name}</Table.Cell>
+                <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
                 <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                 <Table.Cell>{file.format}</Table.Cell>
                 <Table.Cell

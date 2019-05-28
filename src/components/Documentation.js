@@ -20,6 +20,12 @@ const Documentation = () =>
           closer together than other modules in the same network.
         </p>
 
+        <Header>Requirements</Header>
+        <p>
+          Two nodes in different networks are considered equal if their names are the same. For this to work, all nodes
+          in a network must have unique names.
+        </p>
+
         <Header>Navigation</Header>
         <p>
           Zoom in and out by scrolling. Pan the diagram by clicking and dragging.
