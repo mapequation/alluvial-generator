@@ -10,12 +10,23 @@ const parse: ObjectParser = (object, name) => ({
   ...object,
 });
 
-const parseClu: ObjectParser = (object, name) => ({
-  id: id(),
-  name,
-  nodes: object.nodes.map(node => ({ path: node.cluster.toString(), ...node })),
-  codelength: object.codelength,
-});
+const parseClu: ObjectParser = (object, name) => {
+  const numNodes = object.nodes.length;
+  const normalizedWeight = 1 / (numNodes || 1);
+
+  return {
+    id: id(),
+    name,
+    nodes: object.nodes.map(node => ({
+      path: node.module.toString(),
+      id: node.id,
+      name: node.stateId ? node.stateId.toString() : node.id.toString(),
+      ...node,
+      flow: node.flow || normalizedWeight,
+    })),
+    codelength: object.codelength,
+  };
+};
 
 const objectParsers = {
   clu: parseClu,
