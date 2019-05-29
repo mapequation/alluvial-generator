@@ -133,7 +133,7 @@ export default class FileLoadingScreen extends React.Component {
     const networks = this.exampleNetworks;
 
     const files = await Promise.all(
-      networks.map(network => fetch(`/data/${network}`)),
+      networks.map(network => fetch(`data/${network}`)),
     ).then(responses => Promise.all(responses.map(res => res.text())));
 
     this.setState({
