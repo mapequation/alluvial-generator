@@ -13,6 +13,7 @@ import {
   Label,
   Menu,
   Portal,
+  Rail,
   Segment,
   Sidebar as SemanticSidebar,
   Table
@@ -37,6 +38,7 @@ export default class Sidebar extends React.Component {
     dropShadow: false,
     selectedModule: null,
     selectedModuleName: "",
+    sidebarVisible: true
   };
 
   input = null;
@@ -48,10 +50,12 @@ export default class Sidebar extends React.Component {
 
   validNumber = value => (Number.isNaN(+value) ? 0 : +value);
 
+  toggleSidebar = () => this.setState(prevState => ({ sidebarVisible: !prevState.sidebarVisible }));
+
   saveSettings = () => {
     const settings = {
       networks: this.props.networks.map(network => network.name),
-      ...this.state,
+      ...this.state
     };
     const json = JSON.stringify(settings, null, 2);
     const blob = new Blob([json], { type: "text/plain;charset=utf-8" });
@@ -70,7 +74,7 @@ export default class Sidebar extends React.Component {
 
     this.setState(prevState => ({
       ...prevState,
-      ...state,
+      ...state
     }));
   };
 
@@ -80,7 +84,7 @@ export default class Sidebar extends React.Component {
       this.state.streamlineFraction,
       this.state.moduleWidth,
       this.state.moduleFlowThreshold,
-      this.state.verticalAlign,
+      this.state.verticalAlign
     );
 
   onModuleClick = selectedModule => {
@@ -149,6 +153,7 @@ export default class Sidebar extends React.Component {
       dropShadow,
       selectedModule,
       selectedModuleName,
+      sidebarVisible
     } = this.state;
 
     const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
@@ -229,7 +234,7 @@ export default class Sidebar extends React.Component {
       animation="overlay"
       width="wide"
       direction="right"
-      visible={true}
+      visible={sidebarVisible}
       vertical
     >
       <Menu.Item header href="//www.mapequation.org/alluvial">
@@ -247,6 +252,7 @@ export default class Sidebar extends React.Component {
           </div>
         </Header>
       </Menu.Item>
+      <Menu.Item onClick={this.toggleSidebar} icon='close' content='Hide sidebar'/>
       <Menu.Item>
         <Header as="h4">Module settings</Header>
         <TextInput
@@ -261,7 +267,7 @@ export default class Sidebar extends React.Component {
             min: 400,
             max: 2000,
             step: 10,
-            onChange: height => this.setState({ height }),
+            onChange: height => this.setState({ height })
           }}
         />
         <TextInput
@@ -275,7 +281,7 @@ export default class Sidebar extends React.Component {
             min: 10,
             max: 200,
             step: 10,
-            onChange: moduleWidth => this.setState({ moduleWidth }),
+            onChange: moduleWidth => this.setState({ moduleWidth })
           }}
         />
         <TextInput
@@ -290,7 +296,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 0.02,
             step: 0.001,
-            onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold }),
+            onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold })
           }}
         />
         <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
@@ -316,7 +322,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 3,
             step: 0.1,
-            onChange: streamlineFraction => this.setState({ streamlineFraction }),
+            onChange: streamlineFraction => this.setState({ streamlineFraction })
           }}
         />
         <TextInput
@@ -331,7 +337,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 2,
             step: 0.01,
-            onChange: streamlineThreshold => this.setState({ streamlineThreshold }),
+            onChange: streamlineThreshold => this.setState({ streamlineThreshold })
           }}
         />
         <TextInput value={Math.round((1 - streamlineOpacity) * 100)} labelPosition="right">
@@ -346,7 +352,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 1,
             step: 0.01,
-            onChange: transparency => this.setState({ streamlineOpacity: 1 - transparency }),
+            onChange: transparency => this.setState({ streamlineOpacity: 1 - transparency })
           }}
         />
       </Menu.Item>
@@ -364,7 +370,7 @@ export default class Sidebar extends React.Component {
             min: 100,
             max: 2000,
             step: 100,
-            onChange: duration => this.setState({ duration }),
+            onChange: duration => this.setState({ duration })
           }}
         />
       </Menu.Item>
@@ -418,6 +424,19 @@ export default class Sidebar extends React.Component {
         <SemanticSidebar.Pushable>
           {sidebar}
           <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
+            <Rail
+              internal
+              position="right"
+              style={{ paddingRight: 0, marginRight: 0, height: 0 }}
+            >
+              <Menu vertical>
+                <Menu.Item
+                  icon="sidebar"
+                  content="Show sidebar"
+                  onClick={this.toggleSidebar}
+                />
+              </Menu>
+            </Rail>
             <React.StrictMode>
               {alluvialDiagram}
             </React.StrictMode>
