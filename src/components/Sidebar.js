@@ -8,13 +8,14 @@ import {
   Container,
   Header,
   Icon,
+  Image,
   Input,
   Label,
   Menu,
   Portal,
   Segment,
   Sidebar as SemanticSidebar,
-  Table,
+  Table
 } from "semantic-ui-react";
 
 import Diagram from "../alluvial/Diagram";
@@ -231,6 +232,21 @@ export default class Sidebar extends React.Component {
       visible={true}
       vertical
     >
+      <Menu.Item header href="//www.mapequation.org/alluvial">
+        <Header>
+          <Image
+            size="mini"
+            verticalAlign="middle"
+            src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
+            alt="mapequation-icon"
+          />
+          <div className="content">
+            <span className="brand">
+              <span className="brand-infomap">Alluvial Diagram</span> <span className="brand-nn">Generator</span>
+            </span>
+          </div>
+        </Header>
+      </Menu.Item>
       <Menu.Item>
         <Header as="h4">Module settings</Header>
         <TextInput
