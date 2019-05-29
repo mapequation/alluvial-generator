@@ -81,7 +81,7 @@ const Documentation = () =>
         </p>
         <p>
           Infomap is available as a <a href="https://www.mapequation.org/code.html">stand-alone</a> C++ application
-          and on the web as <a href="https://infomap.mapequation.org">Infomap Online</a>.
+          and on the web as <a href="https://www.mapequation.org/infomap">Infomap Online</a>.
         </p>
         <p>
           Read more about Infomap output formats on the <a href="https://www.mapequation.org/code.html#Output">Infomap
