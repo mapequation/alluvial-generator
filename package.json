@@ -2,6 +2,7 @@
   "name": "alluvial-generator",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/alluvial",
   "dependencies": {
     "@mapequation/infoparse": "^0.0.14",
     "autoprefixer": "7.1.6",
