@@ -1,16 +1,6 @@
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
-import {
-  Button,
-  Checkbox,
-  Header,
-  Icon,
-  Image,
-  Input,
-  Label,
-  Menu,
-  Sidebar as SemanticSidebar
-} from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Input, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 
 import Diagram from "../alluvial/Diagram";
 import { savePng, saveSvg } from "../io/export";
@@ -18,6 +8,7 @@ import { parseState, serializeState } from "../io/serialize-state";
 import AlluvialDiagram from "./AlluvialDiagram";
 import SelectedModule from "./SelectedModule";
 import ShowSidebarButton from "./ShowSidebarButton";
+import MenuHeader from "./MenuHeader";
 
 
 export default class Sidebar extends React.Component {
@@ -108,19 +99,7 @@ export default class Sidebar extends React.Component {
       vertical
     >
       <Menu.Item header href="//www.mapequation.org/alluvial">
-        <Header>
-          <Image
-            size="mini"
-            verticalAlign="middle"
-            src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
-            alt="mapequation-icon"
-          />
-          <div className="content">
-            <span className="brand">
-              <span className="brand-infomap">Alluvial Diagram</span> <span className="brand-nn">Generator</span>
-            </span>
-          </div>
-        </Header>
+        <MenuHeader/>
       </Menu.Item>
       <Menu.Item onClick={this.toggleSidebar} icon='close' content='Hide sidebar'/>
       <Menu.Item>
