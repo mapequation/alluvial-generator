@@ -1,4 +1,3 @@
-import FileSaver from "file-saver";
 import React from "react";
 import { Slider } from "react-semantic-ui-range";
 import {
@@ -14,8 +13,8 @@ import {
 } from "semantic-ui-react";
 
 import Diagram from "../alluvial/Diagram";
-import readAsText from "../io/read-as-text";
 import { savePng, saveSvg } from "../io/export";
+import { parseState, serializeState } from "../io/serialize-state";
 import AlluvialDiagram from "./AlluvialDiagram";
 import SelectedModule from "./SelectedModule";
 import ShowSidebarButton from "./ShowSidebarButton";
@@ -47,31 +46,16 @@ export default class Sidebar extends React.Component {
 
   toggleSidebar = () => this.setState(prevState => ({ sidebarVisible: !prevState.sidebarVisible }));
 
-  saveSettings = () => {
-    const settings = {
-      networks: this.props.networks.map(network => network.name),
-      ...this.state
-    };
-    const json = JSON.stringify(settings, null, 2);
-    const blob = new Blob([json], { type: "text/plain;charset=utf-8" });
-    FileSaver.saveAs(blob, "alluvial-settings.json");
-  };
+  saveSettings = () => serializeState(this.state, "alluvial-settings.json");
 
-  parseSettings = async () => {
-    if (!this.input) {
-      throw new Error("Tried to parse settings but input was null");
-    }
-
-    const settings = await readAsText(this.input.files[0]);
-    this.input.value = "";
-
-    const state = JSON.parse(settings);
-
-    this.setState(prevState => ({
-      ...prevState,
-      ...state
-    }));
-  };
+  parseSettings = () => parseState(this.input.files[0])
+    .then(state => {
+      this.input.value = "";
+      this.setState(prevState => ({
+        ...prevState,
+        ...state
+      }));
+    });
 
   updateLayout = () =>
     this.diagram.updateLayout(
