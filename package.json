@@ -59,7 +59,8 @@
     "build": "node scripts/build.js",
     "flow": "$(npm bin)/flow",
     "test": "node scripts/test.js --env=jsdom",
-    "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial"
+    "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial",
+    "postbuild": "react-snap"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -106,6 +107,7 @@
   "devDependencies": {
     "flow-bin": "^0.80.0",
     "flow-typed": "^2.5.1",
-    "prettier": "^1.17.0"
+    "prettier": "^1.17.0",
+    "react-snap": "^1.23.0"
   }
 }
