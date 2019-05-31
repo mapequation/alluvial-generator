@@ -11,9 +11,9 @@ export default function MenuHeader() {
       alt="mapequation-icon"
     />
     <div className="content">
-            <span className="brand">
-              <span className="brand-infomap">Alluvial Diagram</span> <span className="brand-nn">Generator</span>
-            </span>
+      <span className="brand">
+        <span className="brand-infomap">Alluvial Diagram</span> <span className="brand-nn">Generator</span>
+      </span>
     </div>
   </Header>;
 }
