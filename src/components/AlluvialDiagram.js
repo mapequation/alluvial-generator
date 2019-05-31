@@ -357,7 +357,7 @@ export default class AlluvialDiagram extends React.PureComponent {
             return context === this ? 1 : 0;
           })(this));
 
-        onModuleClick(d);
+        onModuleClick(d, d.name);
       })
       .merge(modules);
 

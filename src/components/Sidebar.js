@@ -81,11 +81,6 @@ export default class Sidebar extends React.Component {
       this.state.verticalAlign
     );
 
-  onModuleClick = selectedModule => {
-    const selectedModuleName = selectedModule ? selectedModule.name || "" : "";
-    this.setState({ selectedModule, selectedModuleName });
-  };
-
   handleModuleNameChange = selectedModuleName => {
     const { selectedModule } = this.state;
     selectedModule.name = selectedModuleName;
@@ -340,7 +335,8 @@ export default class Sidebar extends React.Component {
       verticalAlign={verticalAlign}
       showModuleId={showModuleId}
       dropShadow={dropShadow}
-      onModuleClick={this.onModuleClick}
+      onModuleClick={(selectedModule, selectedModuleName = "") =>
+        this.setState({ selectedModule, selectedModuleName })}
       onUpdateLayout={this.updateLayout}
     />;
 
