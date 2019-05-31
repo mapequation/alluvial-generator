@@ -15,6 +15,7 @@ import {
 
 import Diagram from "../alluvial/Diagram";
 import readAsText from "../io/read-as-text";
+import { savePng, saveSvg } from "../io/export";
 import AlluvialDiagram from "./AlluvialDiagram";
 import SelectedModule from "./SelectedModule";
 import ShowSidebarButton from "./ShowSidebarButton";
@@ -91,42 +92,6 @@ export default class Sidebar extends React.Component {
   clearModuleName = () => this.handleModuleNameChange("");
 
   basename = () => this.props.networks.map(network => network.name);
-
-  saveSvg = () => {
-    const svgEl = document.getElementById("alluvialSvg");
-    const svg = new XMLSerializer().serializeToString(svgEl);
-    const preface = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n";
-    const svgBlob = new Blob([preface, svg], { type: "image/svg+xml;charset=utf-8" });
-    FileSaver.saveAs(svgBlob, this.basename() + ".svg");
-  };
-
-  savePng = () => {
-    const [width, height] = [window.innerWidth, window.innerHeight];
-
-    const svgEl = document.getElementById("alluvialSvg");
-    svgEl.setAttribute("width", width);
-    svgEl.setAttribute("height", height);
-    const svg = new XMLSerializer().serializeToString(svgEl);
-    svgEl.removeAttribute("width");
-    svgEl.removeAttribute("height");
-
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-
-    const image = new Image(width, height);
-    image.onload = () => {
-      context.drawImage(image, 0, 0);
-      canvas.toBlob(blob => FileSaver.saveAs(blob, this.basename() + ".png"));
-    };
-
-    image.onerror = (err) => {
-      console.error(err.type, err.message);
-    };
-
-    image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(svg);
-  };
 
   render() {
     const {
@@ -297,10 +262,10 @@ export default class Sidebar extends React.Component {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Export</Header>
-        <Button icon size="small" labelPosition="left" onClick={this.saveSvg}>
+        <Button icon size="small" labelPosition="left" onClick={() => saveSvg("alluvialSvg", this.basename() + ".svg")}>
           <Icon name="download"/>SVG
         </Button>
-        <Button icon size="small" labelPosition="left" onClick={this.savePng}>
+        <Button icon size="small" labelPosition="left" onClick={() => savePng("alluvialSvg", this.basename() + ".png")}>
           <Icon name="image"/>PNG
         </Button>
       </Menu.Item>
