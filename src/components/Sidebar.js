@@ -1,27 +1,23 @@
 import FileSaver from "file-saver";
 import React from "react";
-import Draggable from "react-draggable";
 import { Slider } from "react-semantic-ui-range";
 import {
   Button,
   Checkbox,
-  Container,
   Header,
   Icon,
   Image,
   Input,
   Label,
   Menu,
-  Portal,
   Rail,
-  Segment,
-  Sidebar as SemanticSidebar,
-  Table
+  Sidebar as SemanticSidebar
 } from "semantic-ui-react";
 
 import Diagram from "../alluvial/Diagram";
 import readAsText from "../io/read-as-text";
 import AlluvialDiagram from "./AlluvialDiagram";
+import SelectedModule from "./SelectedModule";
 
 
 export default class Sidebar extends React.Component {
@@ -47,8 +43,6 @@ export default class Sidebar extends React.Component {
     super(props);
     this.diagram = new Diagram(props.networks);
   }
-
-  validNumber = value => (Number.isNaN(+value) ? 0 : +value);
 
   toggleSidebar = () => this.setState(prevState => ({ sidebarVisible: !prevState.sidebarVisible }));
 
@@ -156,78 +150,10 @@ export default class Sidebar extends React.Component {
       sidebarVisible
     } = this.state;
 
-    const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
+    const validNumber = value => (Number.isNaN(+value) ? 0 : +value);
 
     const TextInput = props =>
       <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
-
-    const portal = <Portal open={selectedModule !== null}>
-      <Draggable handle=".draggable">
-        <Segment
-          as={Container}
-          raised
-          text
-          style={{ right: "360px", position: "fixed", bottom: "10px" }}
-        >
-          <Header
-            as="h4"
-            className="draggable"
-            style={{ cursor: "pointer" }}
-          >
-            Selected module
-          </Header>
-          <Table celled striped compact fixed singleLine size="small">
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell width={4}>Network</Table.Cell>
-                <Table.Cell>{selectedModule && selectedModule.networkName}</Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Codelength</Table.Cell>
-                <Table.Cell>
-                  {selectedModule && toPrecision(selectedModule.networkCodelength,
-                    selectedModule.networkCodelength > 0 ? 4 : 1)} bits
-                </Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Flow</Table.Cell>
-                <Table.Cell>{selectedModule && toPrecision(selectedModule.flow)}</Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Number of nodes</Table.Cell>
-                <Table.Cell>{selectedModule && selectedModule.numLeafNodes}</Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Module id</Table.Cell>
-                <Table.Cell>{selectedModule && selectedModule.moduleId}</Table.Cell>
-              </Table.Row>
-              <Table.Row>
-                <Table.Cell>Level</Table.Cell>
-                <Table.Cell>{selectedModule && selectedModule.moduleLevel}</Table.Cell>
-              </Table.Row>
-              {/*
-              <Table.Row>
-                <Table.Cell>Module name</Table.Cell>
-                <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
-                  {selectedModule &&
-                  <Input transparent fluid
-                         value={selectedModuleName}
-                         icon={selectedModuleName && <Icon link name="x" onClick={this.clearModuleName}/>}
-                         placeholder="Set module name..."
-                         onChange={(e, { value }) => this.handleModuleNameChange(value)}/>
-                  }
-                </Table.Cell>
-              </Table.Row>
-              */}
-              <Table.Row>
-                <Table.Cell>Largest nodes</Table.Cell>
-                <Table.Cell>{selectedModule && selectedModule.largestLeafNodes.join(", ")}</Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table>
-        </Segment>
-      </Draggable>
-    </Portal>;
 
     const sidebar = <SemanticSidebar
       as={Menu}
@@ -258,7 +184,7 @@ export default class Sidebar extends React.Component {
         <TextInput
           label="Height"
           value={height}
-          onChange={(e, { value }) => this.setState({ height: this.validNumber(value) })}
+          onChange={(e, { value }) => this.setState({ height: validNumber(value) })}
         />
         <Slider
           color="blue"
@@ -420,7 +346,7 @@ export default class Sidebar extends React.Component {
 
     return (
       <React.Fragment>
-        {portal}
+        <SelectedModule module={selectedModule}/>
         <SemanticSidebar.Pushable>
           {sidebar}
           <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
