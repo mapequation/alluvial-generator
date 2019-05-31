@@ -1,34 +1,28 @@
-import PropTypes from "prop-types";
 import React from "react";
 import { Table } from "semantic-ui-react";
 
 
-export default class DraggableTableRow extends React.PureComponent {
-  static propTypes = {
-    action: PropTypes.func.isRequired,
+export default function DraggableTableRow(props) {
+  const { action, index, children } = props;
+
+  const onDragStart = e => e.dataTransfer.setData("index", index);
+
+  const onDragOver = e => e.preventDefault();
+
+  const onDrop = e => {
+    const fromIndex = e.dataTransfer.getData("index");
+    action(parseInt(index, 10), parseInt(fromIndex, 10));
   };
 
-  onDragStart = (ev, i) => ev.dataTransfer.setData("index", i);
-
-  onDragOver = ev => ev.preventDefault();
-
-  onDrop = (ev, a) => {
-    const b = ev.dataTransfer.getData("index");
-    this.props.action(parseInt(a, 10), parseInt(b, 10));
-  };
-
-  render() {
-    const { index, children } = this.props;
-    return (
-      <Table.Row
-        draggable
-        className="draggable"
-        onDragStart={e => this.onDragStart(e, index)}
-        onDragOver={e => this.onDragOver(e)}
-        onDrop={e => this.onDrop(e, index)}
-      >
-        {children}
-      </Table.Row>
-    );
-  }
+  return (
+    <Table.Row
+      draggable
+      className="draggable"
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+      {children}
+    </Table.Row>
+  );
 }

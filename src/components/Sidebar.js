@@ -10,7 +10,6 @@ import {
   Input,
   Label,
   Menu,
-  Rail,
   Sidebar as SemanticSidebar
 } from "semantic-ui-react";
 
@@ -18,6 +17,7 @@ import Diagram from "../alluvial/Diagram";
 import readAsText from "../io/read-as-text";
 import AlluvialDiagram from "./AlluvialDiagram";
 import SelectedModule from "./SelectedModule";
+import ShowSidebarButton from "./ShowSidebarButton";
 
 
 export default class Sidebar extends React.Component {
@@ -323,44 +323,30 @@ export default class Sidebar extends React.Component {
       </Menu.Item>
     </SemanticSidebar>;
 
-    const alluvialDiagram = <AlluvialDiagram
-      diagram={this.diagram}
-      height={height}
-      moduleWidth={+moduleWidth}
-      streamlineFraction={+streamlineFraction}
-      streamlineOpacity={+streamlineOpacity}
-      duration={+duration}
-      moduleFlowThreshold={+moduleFlowThreshold}
-      streamlineThreshold={+streamlineThreshold}
-      verticalAlign={verticalAlign}
-      showModuleId={showModuleId}
-      dropShadow={dropShadow}
-      onModuleClick={(selectedModule, selectedModuleName = "") =>
-        this.setState({ selectedModule, selectedModuleName })}
-      onUpdateLayout={this.updateLayout}
-    />;
-
     return (
       <React.Fragment>
         <SelectedModule module={selectedModule}/>
         <SemanticSidebar.Pushable>
           {sidebar}
           <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
-            <Rail
-              internal
-              position="right"
-              style={{ paddingRight: 0, marginRight: 0, height: 0 }}
-            >
-              <Menu vertical>
-                <Menu.Item
-                  icon="sidebar"
-                  content="Show sidebar"
-                  onClick={this.toggleSidebar}
-                />
-              </Menu>
-            </Rail>
+            <ShowSidebarButton onClick={this.toggleSidebar}/>
             <React.StrictMode>
-              {alluvialDiagram}
+              <AlluvialDiagram
+                diagram={this.diagram}
+                height={height}
+                moduleWidth={+moduleWidth}
+                streamlineFraction={+streamlineFraction}
+                streamlineOpacity={+streamlineOpacity}
+                duration={+duration}
+                moduleFlowThreshold={+moduleFlowThreshold}
+                streamlineThreshold={+streamlineThreshold}
+                verticalAlign={verticalAlign}
+                showModuleId={showModuleId}
+                dropShadow={dropShadow}
+                onModuleClick={(selectedModule, selectedModuleName = "") =>
+                  this.setState({ selectedModule, selectedModuleName })}
+                onUpdateLayout={this.updateLayout}
+              />
             </React.StrictMode>
           </SemanticSidebar.Pusher>
         </SemanticSidebar.Pushable>

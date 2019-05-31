@@ -1,29 +1,14 @@
-import React from "react";
-
-import FileLoadingScreen from "./FileLoadingScreen";
-import Header from "./Header";
+import React, { useState } from "react";
 import Sidebar from "./Sidebar";
-import Documentation from "./Documentation";
+import StartPage from "./StartPage";
 
 
-export default class App extends React.Component {
-  state = {
-    networks: []
-  };
+export default function App() {
+  const [networks, setNetworks] = useState([]);
 
-  render() {
-    const { networks } = this.state;
-
-    const loadingComplete = networks.length > 0;
-
-    return loadingComplete ? (
-      <Sidebar networks={networks}/>
-    ) : (
-      <React.Fragment>
-        <Header/>
-        <FileLoadingScreen onSubmit={networks => this.setState({ networks })}/>
-        <Documentation/>
-      </React.Fragment>
-    );
+  if (networks.length === 0) {
+    return <StartPage onSubmit={setNetworks}/>;
   }
+
+  return <Sidebar networks={networks}/>;
 }

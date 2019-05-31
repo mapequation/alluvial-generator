@@ -15,9 +15,9 @@ const Documentation = () =>
       <Grid.Column>
         <Header as="h1">Instructions</Header>
         <p>
-          Networks are shown as vertical stacks of modules. To highlight change between networks, we draw
-          streamlines between the networks. Sub-modules that have the same parent module are drawn
-          closer together than other modules in the same network.
+          Networks are shown as vertical stacks of modules. To highlight change between networks, we draw streamlines
+          between the networks. Sub-modules that have the same parent module are drawn closer together than other
+          modules in the same network.
         </p>
 
         <Header>Limitations</Header>
@@ -28,16 +28,15 @@ const Documentation = () =>
 
         <Header>Navigation</Header>
         <p>
-          Zoom in and out by scrolling. Pan the diagram by clicking and dragging.
-          To show module information, click on any module.
+          Zoom in and out by scrolling. Pan the diagram by clicking and dragging. To show module information, click on
+          any module.
         </p>
 
         <Header>Show sub-modules</Header>
         <Video src={expandModuleMov}/>
         <p>
-          By default, we show the top level modules for each network. To show the sub-modules
-          within any module, double click on it. If the modules shakes back and forth,
-          the module is already expanded to its deepest level.
+          By default, we show the top level modules for each network. To show the sub-modules within any module, double
+          click on it. If the modules shakes back and forth, the module is already expanded to its deepest level.
         </p>
         <p>
           To keep the heights proportional to the contained flow, we re-scale the heights of all other modules.
@@ -56,16 +55,15 @@ const Documentation = () =>
       <Grid.Column>
         <Header as="h1">Feedback</Header>
         <p>
-          If you have any questions, suggestions or issues regarding the software,
-          please add them to <a href="https://github.com/mapequation/alluvial-generator/issues"><Icon name="github"/>GitHub
+          If you have any questions, suggestions or issues regarding the software, please add them to <a
+          href="https://github.com/mapequation/alluvial-generator/issues"><Icon name="github"/>GitHub
           issues</a>.
         </p>
 
         <Header as="h1">References</Header>
         <p>
           If you are using the software at mapequation.org in one of your research articles or otherwise want to refer
-          to it,
-          please cite <a href="https://www.mapequation.org/publications.html">relevant publication</a> or use the
+          to it, please cite <a href="https://www.mapequation.org/publications.html">relevant publication</a> or use the
           following format:
         </p>
         <p>

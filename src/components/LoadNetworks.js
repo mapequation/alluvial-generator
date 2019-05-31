@@ -8,14 +8,12 @@ import readAsText from "../io/read-as-text";
 import DraggableTableRow from "./DraggableTableRow";
 
 
-function humanFileSize(bytes, si = true) {
-  const thresh = si ? 1000 : 1024;
+function humanFileSize(bytes) {
+  const thresh = 1000;
   if (Math.abs(bytes) < thresh) {
     return bytes + " B";
   }
-  const units = si
-    ? ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-    : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+  const units = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   let u = -1;
   do {
     bytes /= thresh;
@@ -32,24 +30,24 @@ const fileExtension = filename => {
 
 const fileSize = file => new Blob([file]).size;
 
-export default class FileLoadingScreen extends React.Component {
+export default class LoadNetworks extends React.Component {
   state = {
     files: [],
-    loading: false,
+    loading: false
   };
 
   exampleNetworks = [
     "science1998_2y.ftree",
     "science2001_2y.ftree",
-    "science2007_2y.ftree",
+    "science2007_2y.ftree"
   ];
 
   static propTypes = {
-    onSubmit: PropTypes.func,
+    onSubmit: PropTypes.func
   };
 
   static defaultProps = {
-    onSubmit: values => console.log(values),
+    onSubmit: values => console.log(values)
   };
 
   loadSelectedFiles = () => {
@@ -74,12 +72,12 @@ export default class FileLoadingScreen extends React.Component {
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
-          error: false,
+          error: false
         }));
 
         this.setState(({ files }) => ({
           files: [...files, ...newFiles],
-          loading: false,
+          loading: false
         }));
       });
   };
@@ -92,6 +90,7 @@ export default class FileLoadingScreen extends React.Component {
 
   parseNetworks = () => {
     const { files } = this.state;
+    const { onSubmit } = this.props;
 
     const networks = files.map((file, i) => {
       try {
@@ -123,7 +122,7 @@ export default class FileLoadingScreen extends React.Component {
       return;
     }
 
-    this.props.onSubmit(networks);
+    onSubmit(networks);
   };
 
   withLoadingState = callback => () =>
@@ -133,7 +132,7 @@ export default class FileLoadingScreen extends React.Component {
     const networks = this.exampleNetworks;
 
     const files = await Promise.all(
-      networks.map(network => fetch(`data/${network}`)),
+      networks.map(network => fetch(`data/${network}`))
     ).then(responses => Promise.all(responses.map(res => res.text())));
 
     this.setState({
@@ -142,21 +141,19 @@ export default class FileLoadingScreen extends React.Component {
         name: networks[i],
         size: fileSize(file),
         format: fileExtension(networks[i]),
-        error: false,
+        error: false
       })),
-      loading: false,
+      loading: false
     }, this.parseNetworks);
   };
 
   moveRow = (toIndex, fromIndex) =>
-    this.setState(prevState => {
-      const { files } = prevState;
+    this.setState(state => {
+      const { files } = state;
       const file = files[fromIndex];
       files.splice(fromIndex, 1);
       files.splice(toIndex, 0, file);
-      return {
-        files,
-      };
+      return { files };
     });
 
   render() {
@@ -241,7 +238,7 @@ export default class FileLoadingScreen extends React.Component {
                 >
                   <a>Remove</a>
                 </Table.Cell>
-              </DraggableTableRow>,
+              </DraggableTableRow>
             )}
           </Table.Body>
         </Table>
