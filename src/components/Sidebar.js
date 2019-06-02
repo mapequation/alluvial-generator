@@ -57,18 +57,8 @@ export default class Sidebar extends React.Component {
       this.state.verticalAlign
     );
 
-  handleModuleNameChange = selectedModuleName => {
-    const { selectedModule } = this.state;
-    selectedModule.name = selectedModuleName;
-    this.diagram.setModuleName(selectedModule);
-    this.setState({ selectedModuleName });
-  };
-
-  clearModuleName = () => this.handleModuleNameChange("");
-
-  basename = () => this.props.networks.map(network => network.name);
-
   render() {
+    const { networks } = this.props;
     const {
       height,
       duration,
@@ -81,11 +71,12 @@ export default class Sidebar extends React.Component {
       showModuleId,
       dropShadow,
       selectedModule,
-      selectedModuleName,
       sidebarVisible
     } = this.state;
 
     const validNumber = value => (Number.isNaN(+value) ? 0 : +value);
+
+    const basename = networks.map(network => network.name);
 
     const TextInput = props =>
       <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
@@ -225,10 +216,10 @@ export default class Sidebar extends React.Component {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Export</Header>
-        <Button icon size="small" labelPosition="left" onClick={() => saveSvg("alluvialSvg", this.basename() + ".svg")}>
+        <Button icon size="small" labelPosition="left" onClick={() => saveSvg("alluvialSvg", basename + ".svg")}>
           <Icon name="download"/>SVG
         </Button>
-        <Button icon size="small" labelPosition="left" onClick={() => savePng("alluvialSvg", this.basename() + ".png")}>
+        <Button icon size="small" labelPosition="left" onClick={() => savePng("alluvialSvg", basename + ".png")}>
           <Icon name="image"/>PNG
         </Button>
       </Menu.Item>
