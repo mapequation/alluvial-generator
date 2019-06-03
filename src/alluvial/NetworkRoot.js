@@ -22,7 +22,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     parent: AlluvialRoot,
     networkId: string,
     name: string,
-    codelength: number,
+    codelength: number
   ) {
     super(parent, networkId, networkId);
     parent.addChild(this);
@@ -46,7 +46,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
 
   createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
     this.nodesByName = new Map(
-      Array.from(nodes, node => [node.name, node]),
+      Array.from(nodes, node => [node.name, node])
     );
   }
 
@@ -69,7 +69,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
         width: this.width,
         height: 15,
         textX: this.x + this.width / 2,
-        textY: this.height + 15 + 5,
+        textY: this.height + 15 + 5
       },
       links: Array.from(this.rightStreamlines(), link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
@@ -78,7 +78,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           if (child.flow >= this.flowThreshold)
             filtered.push(child.asObject());
           return filtered;
-        }, []),
+        }, [])
     };
   }
 
@@ -108,7 +108,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     };
 
     function flatten(arr: TreeNode) {
-      return arr.nodes.reduce(function (flat, toFlatten) {
+      return arr.nodes.reduce(function(flat, toFlatten) {
         return flat.concat(Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten);
       }, []);
     }
@@ -116,7 +116,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     const tree: TreeNode = {
       path: 0,
       flow: 0,
-      nodes: [],
+      nodes: []
     };
 
     this.children.forEach(module => {
@@ -129,7 +129,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
           node = {
             path,
             flow: 0,
-            nodes: [],
+            nodes: []
           };
 
           parent.nodes.push(node);

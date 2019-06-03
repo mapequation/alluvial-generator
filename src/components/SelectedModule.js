@@ -32,7 +32,9 @@ export default function SelectedModule(props) {
             </Table.Row>
             <Table.Row>
               <Table.Cell>Codelength</Table.Cell>
-              <Table.Cell>{toPrecision(module.networkCodelength, module.networkCodelength > 0 ? 4 : 1)} bits</Table.Cell>
+              <Table.Cell>
+                {toPrecision(module.networkCodelength, module.networkCodelength > 0 ? 4 : 1)} bits
+              </Table.Cell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>Flow</Table.Cell>

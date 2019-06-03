@@ -5,7 +5,7 @@ export const RIGHT: Side = 1;
 
 export default {
   LEFT,
-  RIGHT,
+  RIGHT
 };
 
 export const sideToString = (side: Side): string => side === LEFT ? "left" : "right";

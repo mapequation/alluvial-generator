@@ -157,7 +157,7 @@ export default class AlluvialNodeBase {
   forEachDepthFirstWhile(
     predicate: Predicate<AlluvialNode>,
     callback: IteratorCallback,
-    preOrder: boolean = true,
+    preOrder: boolean = true
   ) {
     return preOrder
       ? this.forEachDepthFirstPreOrderWhile(predicate, callback)
@@ -166,7 +166,7 @@ export default class AlluvialNodeBase {
 
   forEachDepthFirstPreOrderWhile(
     predicate: Predicate<AlluvialNode>,
-    callback: IteratorCallback,
+    callback: IteratorCallback
   ) {
     const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {
@@ -177,7 +177,7 @@ export default class AlluvialNodeBase {
 
   forEachDepthFirstPostOrderWhile(
     predicate: Predicate<AlluvialNode>,
-    callback: IteratorCallback,
+    callback: IteratorCallback
   ) {
     const children = this.children.filter(predicate);
     children.forEach((child, childIndex) => {

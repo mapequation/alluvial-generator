@@ -6,9 +6,9 @@ import Diagram from "../alluvial/Diagram";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
 import AlluvialDiagram from "./AlluvialDiagram";
+import MenuHeader from "./MenuHeader";
 import SelectedModule from "./SelectedModule";
 import ShowSidebarButton from "./ShowSidebarButton";
-import MenuHeader from "./MenuHeader";
 
 
 export default class Sidebar extends React.Component {

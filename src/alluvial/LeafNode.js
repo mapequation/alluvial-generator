@@ -2,11 +2,11 @@
 import TreePath from "../lib/treepath";
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
+import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
-import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
-import StreamlineNode from "./StreamlineNode";
 import StreamlineId from "./StreamlineId";
+import StreamlineNode from "./StreamlineNode";
 
 
 export default class LeafNode extends AlluvialNodeBase {
@@ -137,7 +137,7 @@ export default class LeafNode extends AlluvialNodeBase {
     return {
       ...super.asObject(),
       name: this.name,
-      highlightIndex: this.highlightIndex,
+      highlightIndex: this.highlightIndex
     };
   }
 

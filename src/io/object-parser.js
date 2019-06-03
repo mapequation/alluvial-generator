@@ -7,7 +7,7 @@ type ObjectParser = (object: Object, name: string) => Network;
 const parse: ObjectParser = (object, name) => ({
   id: id(),
   name,
-  ...object,
+  ...object
 });
 
 const parseClu: ObjectParser = (object, name) => {
@@ -22,9 +22,9 @@ const parseClu: ObjectParser = (object, name) => {
       id: node.id,
       name: node.stateId ? node.stateId.toString() : node.id.toString(),
       ...node,
-      flow: node.flow || normalizedWeight,
+      flow: node.flow || normalizedWeight
     })),
-    codelength: object.codelength,
+    codelength: object.codelength
   };
 };
 
@@ -32,7 +32,7 @@ const objectParsers = {
   clu: parseClu,
   map: parse,
   tree: parse,
-  ftree: parse,
+  ftree: parse
 };
 
 export const validExtensions: string[] = Object.keys(objectParsers);

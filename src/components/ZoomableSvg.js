@@ -7,13 +7,13 @@ export default class ZoomableSvg extends React.PureComponent {
   static defaultProps = {
     width: "100vw",
     height: "100vh",
-    onClick: () => null,
+    onClick: () => null
   };
 
   static propTypes = {
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    onClick: PropTypes.func,
+    onClick: PropTypes.func
   };
 
   componentDidMount() {

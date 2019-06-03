@@ -10,7 +10,7 @@ export default class StreamlineLink {
   constructor(
     left: StreamlineNode,
     right: StreamlineNode,
-    reverse: boolean = false,
+    reverse: boolean = false
   ) {
     this.left = reverse ? right : left;
     this.right = reverse ? left : right;
@@ -21,7 +21,7 @@ export default class StreamlineLink {
   static linkNodes(
     left: StreamlineNode,
     right: StreamlineNode,
-    reverse: boolean = false,
+    reverse: boolean = false
   ) {
     return new StreamlineLink(left, right, reverse);
   }
@@ -34,7 +34,7 @@ export default class StreamlineLink {
   asObject() {
     const {
       left: { layout: leftLayout, parent: leftBranch, networkId: leftNetworkId, id, sourceId, targetId, depth },
-      right: { layout: rightLayout, parent: rightBranch, networkId: rightNetworkId },
+      right: { layout: rightLayout, parent: rightBranch, networkId: rightNetworkId }
     } = this;
 
     const x0 = leftLayout.x + leftLayout.width;
@@ -69,7 +69,7 @@ export default class StreamlineLink {
         y0,
         y1,
         h0,
-        h1,
+        h1
       },
       transitionPath: {
         x0: xAvg,
@@ -77,10 +77,10 @@ export default class StreamlineLink {
         y0: yAvg + h0 / 4,
         y1: yAvg + h1 / 4,
         h0: h0 / 2,
-        h1: h1 / 2,
+        h1: h1 / 2
       },
       leftHighlightIndex,
-      rightHighlightIndex,
+      rightHighlightIndex
     };
   }
 }

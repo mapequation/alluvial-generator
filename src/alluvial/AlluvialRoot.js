@@ -52,7 +52,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     streamlineFraction: number,
     moduleWidth: number,
     flowThreshold: number,
-    verticalAlign: VerticalAlign = "bottom",
+    verticalAlign: VerticalAlign = "bottom"
   ) {
     const numNetworks = this.numChildren;
 
@@ -113,7 +113,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
           default:
             break;
         }
-      },
+      }
     );
 
     const maxTotalMargin = Math.max(...totalMargins);
@@ -134,7 +134,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
           if (node.depth === Depth.MODULE) {
             node.margin *= moduleMarginScale;
           }
-        },
+        }
       );
 
       const scaledTotalMargin = maxTotalMargin * moduleMarginScale;
@@ -165,7 +165,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               node.margin += missingMargin / numMargins;
             }
           }
-        },
+        }
       );
     }
 
@@ -175,7 +175,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
         if (node.depth === Depth.BRANCH) {
           node.sortChildren(flowThreshold);
         }
-      },
+      }
     );
 
     x = 0;
@@ -215,7 +215,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
           default:
             break;
         }
-      },
+      }
     );
   }
 }

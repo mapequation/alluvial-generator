@@ -9,7 +9,6 @@ export default class TreePath {
   pathArr: string[];
   ancestorPaths: Map<number, string> = new Map();
 
-
   /**
    * Construct a new TreePath
    */

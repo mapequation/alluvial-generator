@@ -22,7 +22,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
   constructor(
     parent: Module,
     highlightIndex: number = NOT_HIGHLIGHTED,
-    insignificant: boolean = false,
+    insignificant: boolean = false
   ) {
     super(parent, parent.networkId, `${parent.id}_group${insignificant ? "i" : ""}${highlightIndex}`);
     parent.addChild(this);

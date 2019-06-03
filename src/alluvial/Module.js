@@ -23,7 +23,7 @@ export default class Module extends AlluvialNodeBase {
   constructor(
     parent: NetworkRoot,
     moduleId: string,
-    moduleLevel: number = 1,
+    moduleLevel: number = 1
   ) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
@@ -91,14 +91,14 @@ export default class Module extends AlluvialNodeBase {
       numLeafNodes: this.numLeafNodes,
       moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
-        y: y + height / 2,
+        y: y + height / 2
       },
       moduleIdPosition: {
         x: (x1 + x2) / 2,
-        y: y + height / 2,
+        y: y + height / 2
       },
       networkName: parent ? parent.name : "",
-      networkCodelength: parent && parent.codelength ? parent.codelength : 0,
+      networkCodelength: parent && parent.codelength ? parent.codelength : 0
     };
   }
 }

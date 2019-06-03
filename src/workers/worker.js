@@ -1,5 +1,6 @@
 import { ECHO } from "./actions";
 
+
 const log = message => console.log(`[Worker] ${message}`);
 
 onmessage = function onMessage(event) {

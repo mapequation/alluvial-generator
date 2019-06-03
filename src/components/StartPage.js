@@ -1,7 +1,7 @@
 import React from "react";
+import Documentation from "./Documentation";
 import Header from "./Header";
 import LoadNetworks from "./LoadNetworks";
-import Documentation from "./Documentation";
 
 
 export default function StartPage(props) {

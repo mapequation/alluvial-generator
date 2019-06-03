@@ -1,7 +1,7 @@
 // @flow
+import LeafNode from "./LeafNode";
 import type { Side } from "./Side";
 import { opposite, sideToString } from "./Side";
-import LeafNode from "./LeafNode";
 import StreamlineNode from "./StreamlineNode";
 
 
@@ -55,7 +55,7 @@ export default class StreamlineId {
   static createId(
     node: LeafNode,
     side: Side,
-    oppositeNode: ?LeafNode = null,
+    oppositeNode: ?LeafNode = null
   ): [string, ?string] {
     const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
 
@@ -72,7 +72,7 @@ export default class StreamlineId {
   static create(
     node: LeafNode,
     side: Side,
-    oppositeNode: ?LeafNode = null,
+    oppositeNode: ?LeafNode = null
   ): string {
     const [source, target] = StreamlineId.createId(node, side, oppositeNode);
     return target ? `${source}--${target}` : source;

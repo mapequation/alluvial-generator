@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import React from "react";
 
+
 export default class LinearGradients extends React.PureComponent {
   static defaultProps = {
     defaultColor: "white",
@@ -50,12 +51,12 @@ export default class LinearGradients extends React.PureComponent {
         {pairs.map(([left, right], key) => (
           <React.Fragment key={key}>
             <linearGradient id={id(left, right)}>
-              <stop offset={leftOffset} stopColor={color(left)} />
-              <stop offset={rightOffset} stopColor={color(right)} />
+              <stop offset={leftOffset} stopColor={color(left)}/>
+              <stop offset={rightOffset} stopColor={color(right)}/>
             </linearGradient>
             <linearGradient id={strokeId(left, right)}>
-              <stop offset={leftOffset} stopColor={stroke(color(left))} />
-              <stop offset={rightOffset} stopColor={stroke(color(right))} />
+              <stop offset={leftOffset} stopColor={stroke(color(left))}/>
+              <stop offset={rightOffset} stopColor={stroke(color(right))}/>
             </linearGradient>
           </React.Fragment>
         ))}

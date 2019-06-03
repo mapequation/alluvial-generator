@@ -34,11 +34,11 @@ function dehighlightStreamline(d) {
 
 function restoreMouseOver(selection) {
   selection
-    .on("mouseover", function () {
+    .on("mouseover", function() {
       d3.select(this)
         .attr("stroke-opacity", 0.5);
     })
-    .on("mouseout", function () {
+    .on("mouseout", function() {
       d3.select(this)
         .attr("stroke-opacity", 0);
     });
@@ -80,7 +80,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
-    onModuleClick: () => null,
+    onModuleClick: () => null
   };
 
   static propTypes = {
@@ -96,7 +96,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
     onModuleClick: PropTypes.func,
-    onUpdateLayout: PropTypes.func.isRequired,
+    onUpdateLayout: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -132,7 +132,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       showModuleId,
       dropShadow,
       onModuleClick,
-      onUpdateLayout,
+      onUpdateLayout
     } = this.props;
 
     const alluvialRoot = diagram.asObject();
@@ -255,7 +255,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .data(
         d =>
           d.links.filter(link => link.avgHeight > streamlineThreshold),
-        key,
+        key
       );
 
     const streamlineDelay = delay => (d, index, elements) => {
@@ -280,7 +280,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
-    const onDoubleClick = context => function (d) {
+    const onDoubleClick = context => function(d) {
       const success = diagram.doubleClick(d, d3.event);
       if (success) {
         onUpdateLayout();
@@ -339,12 +339,12 @@ export default class AlluvialDiagram extends React.PureComponent {
       .attr("stroke-opacity", 0)
       .call(restoreMouseOver)
       .on("dblclick", onDoubleClick(this))
-      .on("click", function (d) {
+      .on("click", function(d) {
         console.log(d);
 
-        const removeEventHandler = context => function (selection, event) {
+        const removeEventHandler = context => function(selection, event) {
           const handler = selection.on(event);
-          selection.on(event, function () {
+          selection.on(event, function() {
             return context === this ? null : handler.call(this);
           });
         };
@@ -353,7 +353,7 @@ export default class AlluvialDiagram extends React.PureComponent {
           .call(removeEventHandler(this), "mouseover")
           .call(removeEventHandler(this), "mouseout")
           .transition()
-          .attr("stroke-opacity", (context => function () {
+          .attr("stroke-opacity", (context => function() {
             return context === this ? 1 : 0;
           })(this));
 
@@ -425,7 +425,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
       moduleNames
         .select(".name")
-        .each(function (d) {
+        .each(function(d) {
           d3.select(this)
             .selectAll("tspan")
             .transition(t)
@@ -447,9 +447,9 @@ export default class AlluvialDiagram extends React.PureComponent {
             : d.largestLeafNodes
               .slice(0, numVisibleModuleNames(d.height))
               .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
-          function (d) {
+          function(d) {
             return d ? d.name : this.id;
-          },
+          }
         );
 
       moduleNamesTspan
@@ -562,7 +562,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const {
       defaultHighlightColor,
       highlightColors,
-      onModuleClick,
+      onModuleClick
     } = this.props;
 
     return (

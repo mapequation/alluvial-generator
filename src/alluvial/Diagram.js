@@ -54,7 +54,7 @@ export default class Diagram {
   doubleClick(alluvialObject: Object, event: ?Event): boolean {
     const noKeyModifiers: Event = {
       altKey: false,
-      shiftKey: false,
+      shiftKey: false
     };
 
     const { shiftKey } = event || noKeyModifiers;
@@ -146,7 +146,7 @@ export default class Diagram {
         } else {
           throw new Error(
             "Streamline node for the opposite node must be dangling " +
-            "before it has has this node to connect to.",
+            "before it has has this node to connect to."
           );
         }
       }
@@ -226,7 +226,7 @@ export default class Diagram {
     if (alreadyExpanded) {
       console.warn(
         `Module can't be expanded to level ${newModuleLevel} ` +
-        `because some nodes are at level ${newModuleLevel - 1}`,
+        `because some nodes are at level ${newModuleLevel - 1}`
       );
       return false;
     }
@@ -259,7 +259,7 @@ export default class Diagram {
 
     const leafNodes = [].concat.apply(
       [],
-      modules.map(module => [...module.leafNodes()]),
+      modules.map(module => [...module.leafNodes()])
     );
 
     if (!leafNodes.length) {
