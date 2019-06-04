@@ -7,6 +7,20 @@ import MenuHeader from "./MenuHeader";
 import Dispatch from "../context/Dispatch";
 
 
+const validNumber = value => Number.isNaN(+value) ? 0 : +value;
+
+const TextInput = props =>
+  <Input
+    fluid
+    type="text"
+    size="small"
+    labelPosition="left"
+    style={{ margin: "0.3em 0 0.3em 0" }}
+    {...props}
+  />;
+
+const BlueSlider = props => <Slider color="blue" {...props}/>;
+
 export default function Sidebar(props) {
   const {
     networks,
@@ -29,8 +43,6 @@ export default function Sidebar(props) {
 
   let fileInput = null;
 
-  const validNumber = value => (Number.isNaN(+value) ? 0 : +value);
-
   const basename = networks.map(network => network.name);
 
   const saveSettings = () => serializeState({
@@ -45,14 +57,9 @@ export default function Sidebar(props) {
       dispatch({ type: "loadState", value });
     });
 
-  const TextInput = props =>
-    <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
-
-  const BlueSlider = props => <Slider color="blue" {...props}/>
-
   const selectedModuleName = selectedModule
     ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
-    : "No module selected";
+    : <span style={{ color: "#777"}}>No module selected</span>;
 
   return (
     <SemanticSidebar
