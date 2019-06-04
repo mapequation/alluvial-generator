@@ -193,7 +193,7 @@ export default function Sidebar(props) {
         <div style={{ clear: "both" }}/>
       </Menu.Item>
       <Menu.Item>
-        <LabelForSlider content="Anim. speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
+        <LabelForSlider content="Animation speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
           <GreySlider
             settings={{
               start: 1 / duration,
