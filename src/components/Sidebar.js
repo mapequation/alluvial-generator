@@ -48,6 +48,8 @@ export default function Sidebar(props) {
   const TextInput = props =>
     <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
 
+  const BlueSlider = props => <Slider color="blue" {...props}/>
+
   const selectedModuleName = selectedModule
     ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
     : "No module selected";
@@ -89,8 +91,7 @@ export default function Sidebar(props) {
           value={height}
           onChange={(e, { value }) => dispatch({ type: "height", value: validNumber(value) })}
         />
-        <Slider
-          color="blue"
+        <BlueSlider
           settings={{
             start: height,
             min: 400,
@@ -103,8 +104,7 @@ export default function Sidebar(props) {
           label="Width"
           value={moduleWidth}
         />
-        <Slider
-          color="blue"
+        <BlueSlider
           settings={{
             start: moduleWidth,
             min: 10,
@@ -117,8 +117,7 @@ export default function Sidebar(props) {
           label="Flow threshold"
           value={moduleFlowThreshold}
         />
-        <Slider
-          color="blue"
+        <BlueSlider
           discrete
           settings={{
             start: moduleFlowThreshold,
@@ -150,8 +149,7 @@ export default function Sidebar(props) {
           label="Fraction of module width"
           value={streamlineFraction}
         />
-        <Slider
-          color="blue"
+        <BlueSlider
           settings={{
             start: streamlineFraction,
             min: 0,
@@ -164,8 +162,7 @@ export default function Sidebar(props) {
           label="Minimum thickness"
           value={streamlineThreshold}
         />
-        <Slider
-          color="blue"
+        <BlueSlider
           discrete
           settings={{
             start: streamlineThreshold,
@@ -180,8 +177,7 @@ export default function Sidebar(props) {
           <input/>
           <Label basic>%</Label>
         </TextInput>
-        <Slider
-          color="blue"
+        <BlueSlider
           settings={{
             start: 1 - streamlineOpacity,
             min: 0,
@@ -197,8 +193,7 @@ export default function Sidebar(props) {
           <input/>
           <Label basic>ms</Label>
         </TextInput>
-        <Slider
-          color="blue"
+        <BlueSlider
           discrete
           settings={{
             start: duration,
