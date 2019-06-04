@@ -21,6 +21,8 @@ const TextInput = props =>
 
 const BlueSlider = props => <Slider color="blue" {...props}/>;
 
+const ToggleCheckbox = props => <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle {...props}/>;
+
 export default function Sidebar(props) {
   const {
     networks,
@@ -59,7 +61,8 @@ export default function Sidebar(props) {
 
   const selectedModuleName = selectedModule
     ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
-    : <span style={{ color: "#777"}}>No module selected</span>;
+    : <span style={{ color: "#777" }}>No module selected</span>;
+
 
   return (
     <SemanticSidebar
@@ -134,20 +137,20 @@ export default function Sidebar(props) {
             onChange: value => dispatch({ type: "moduleFlowThreshold", value })
           }}
         />
-        <Checkbox
-          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+        <ToggleCheckbox
+          label="Vertical align to bottom"
+          checked={verticalAlign === "bottom"}
           onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
-          checked={verticalAlign === "bottom"} label="Vertical align to bottom"
         />
-        <Checkbox
-          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+        <ToggleCheckbox
+          label="Show module id"
+          checked={showModuleId}
           onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
-          checked={showModuleId} label="Show module id"
         />
-        <Checkbox
-          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+        <ToggleCheckbox
+          label="Use drop shadow"
+          checked={dropShadow}
           onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
-          checked={dropShadow} label="Use drop shadow"
         />
       </Menu.Item>
       <Menu.Item>
