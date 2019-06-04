@@ -195,13 +195,12 @@ export default function Sidebar(props) {
       <Menu.Item>
         <LabelForSlider content="Anim. speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
           <GreySlider
-            discrete
             settings={{
-              start: duration,
-              min: 100,
-              max: 2000,
-              step: 100,
-              onChange: value => dispatch({ type: "duration", value })
+              start: 1 / duration,
+              min: 1 / 2000,
+              max: 1 / 200,
+              step: 1 / 2000,
+              onChange: value => dispatch({ type: "duration", value: 1 / value })
             }}
           />
         </LabelForSlider>
