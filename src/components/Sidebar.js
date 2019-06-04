@@ -27,7 +27,7 @@ function LabelForSlider(props) {
 
 const BlueSlider = props => <Slider color="blue" {...props}/>;
 
-const ToggleCheckbox = props => <Checkbox style={{ margin: "0.3em 0" }} toggle {...props}/>;
+const MyCheckbox = props => <Checkbox style={{ display: "block", margin: "0.3em 0" }} {...props}/>;
 
 export default function Sidebar(props) {
   const {
@@ -136,18 +136,18 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <div style={{ clear: "both" }}>
-          <ToggleCheckbox
+        <div style={{ clear: "both", paddingTop: "0.5em" }}>
+          <MyCheckbox
             label="Vertical align to bottom"
             checked={verticalAlign === "bottom"}
             onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
           />
-          <ToggleCheckbox
+          <MyCheckbox
             label="Show module id"
             checked={showModuleId}
             onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
           />
-          <ToggleCheckbox
+          <MyCheckbox
             label="Use drop shadow"
             checked={dropShadow}
             onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
