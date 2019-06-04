@@ -1,27 +1,33 @@
 import React, { useContext } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Icon, Input, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Checkbox, Header, Icon, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
 import MenuHeader from "./MenuHeader";
 import Dispatch from "../context/Dispatch";
 
 
-const validNumber = value => Number.isNaN(+value) ? 0 : +value;
+function LabelForSlider(props) {
+  const { children, ...rest } = props;
 
-const TextInput = props =>
-  <Input
-    fluid
-    type="text"
-    size="small"
-    labelPosition="left"
-    style={{ margin: "0.3em 0 0.3em 0" }}
-    {...props}
-  />;
+  return (
+    <div style={{ clear: "both" }}>
+      <Label
+        basic
+        horizontal
+        {...rest}
+        style={{ float: "left", margin: "0.08em 0" }}
+      />
+      <div style={{ width: "55%", display: "inline-block", float: "right" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 const BlueSlider = props => <Slider color="blue" {...props}/>;
 
-const ToggleCheckbox = props => <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle {...props}/>;
+const ToggleCheckbox = props => <Checkbox style={{ margin: "0.3em 0" }} toggle {...props}/>;
 
 export default function Sidebar(props) {
   const {
@@ -96,123 +102,110 @@ export default function Sidebar(props) {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Module settings</Header>
-        <TextInput
-          label="Height"
-          value={height}
-          onChange={(e, { value }) => dispatch({ type: "height", value: validNumber(value) })}
-        />
-        <BlueSlider
-          settings={{
-            start: height,
-            min: 400,
-            max: 2000,
-            step: 10,
-            onChange: value => dispatch({ type: "height", value })
-          }}
-        />
-        <TextInput
-          label="Width"
-          value={moduleWidth}
-        />
-        <BlueSlider
-          settings={{
-            start: moduleWidth,
-            min: 10,
-            max: 200,
-            step: 10,
-            onChange: value => dispatch({ type: "moduleWidth", value })
-          }}
-        />
-        <TextInput
-          label="Flow threshold"
-          value={moduleFlowThreshold}
-        />
-        <BlueSlider
-          discrete
-          settings={{
-            start: moduleFlowThreshold,
-            min: 0,
-            max: 0.02,
-            step: 0.001,
-            onChange: value => dispatch({ type: "moduleFlowThreshold", value })
-          }}
-        />
-        <ToggleCheckbox
-          label="Vertical align to bottom"
-          checked={verticalAlign === "bottom"}
-          onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
-        />
-        <ToggleCheckbox
-          label="Show module id"
-          checked={showModuleId}
-          onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
-        />
-        <ToggleCheckbox
-          label="Use drop shadow"
-          checked={dropShadow}
-          onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
-        />
+        <LabelForSlider content="Height" detail={height}>
+          <BlueSlider
+            settings={{
+              start: height,
+              min: 400,
+              max: 2000,
+              step: 10,
+              onChange: value => dispatch({ type: "height", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider content="Width" detail={moduleWidth}>
+          <BlueSlider
+            settings={{
+              start: moduleWidth,
+              min: 10,
+              max: 200,
+              step: 10,
+              onChange: value => dispatch({ type: "moduleWidth", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider content="Min. flow" detail={moduleFlowThreshold}>
+          <BlueSlider
+            discrete
+            settings={{
+              start: moduleFlowThreshold,
+              min: 0,
+              max: 0.02,
+              step: 0.001,
+              onChange: value => dispatch({ type: "moduleFlowThreshold", value })
+            }}
+          />
+        </LabelForSlider>
+        <div style={{ clear: "both" }}>
+          <ToggleCheckbox
+            label="Vertical align to bottom"
+            checked={verticalAlign === "bottom"}
+            onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
+          />
+          <ToggleCheckbox
+            label="Show module id"
+            checked={showModuleId}
+            onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
+          />
+          <ToggleCheckbox
+            label="Use drop shadow"
+            checked={dropShadow}
+            onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
+          />
+        </div>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Streamline settings</Header>
-        <TextInput
-          label="Fraction of module width"
-          value={streamlineFraction}
-        />
-        <BlueSlider
-          settings={{
-            start: streamlineFraction,
-            min: 0,
-            max: 3,
-            step: 0.1,
-            onChange: value => dispatch({ type: "streamlineFraction", value })
-          }}
-        />
-        <TextInput
-          label="Minimum thickness"
-          value={streamlineThreshold}
-        />
-        <BlueSlider
-          discrete
-          settings={{
-            start: streamlineThreshold,
-            min: 0,
-            max: 2,
-            step: 0.01,
-            onChange: value => dispatch({ type: "streamlineThreshold", value })
-          }}
-        />
-        <TextInput value={Math.round((1 - streamlineOpacity) * 100)} labelPosition="right">
-          <Label>Transparency</Label>
-          <input/>
-          <Label basic>%</Label>
-        </TextInput>
-        <BlueSlider
-          settings={{
-            start: 1 - streamlineOpacity,
-            min: 0,
-            max: 1,
-            step: 0.01,
-            onChange: transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })
-          }}
-        />
+        <LabelForSlider content="Relative width" detail={streamlineFraction}>
+          <BlueSlider
+            settings={{
+              start: streamlineFraction,
+              min: 0,
+              max: 3,
+              step: 0.1,
+              onChange: value => dispatch({ type: "streamlineFraction", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider content="Min. thickness" detail={streamlineThreshold}>
+          <BlueSlider
+            discrete
+            settings={{
+              start: streamlineThreshold,
+              min: 0,
+              max: 2,
+              step: 0.01,
+              onChange: value => dispatch({ type: "streamlineThreshold", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider content="Transparency" detail={Math.round((1 - streamlineOpacity) * 100) + "%"}>
+          <BlueSlider
+            settings={{
+              start: 1 - streamlineOpacity,
+              min: 0,
+              max: 1,
+              step: 0.01,
+              onChange: transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })
+            }}
+          />
+        </LabelForSlider>
+        <div style={{ clear: "both" }}/>
       </Menu.Item>
       <Menu.Item>
-        <TextInput value={duration} labelPosition="right">
-          <Label>Animation duration</Label>
-          <input/>
-          <Label basic>ms</Label>
-        </TextInput>
-        <BlueSlider
-          discrete
-          settings={{
-            start: duration,
-            min: 100,
-            max: 2000,
-            step: 100,
-            onChange: value => dispatch({ type: "duration", value })
-          }}
-        />
+        <LabelForSlider content="Anim. speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
+          <BlueSlider
+            discrete
+            settings={{
+              start: duration,
+              min: 100,
+              max: 2000,
+              step: 100,
+              onChange: value => dispatch({ type: "duration", value })
+            }}
+          />
+        </LabelForSlider>
+        <div style={{ clear: "both" }}/>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Export</Header>
