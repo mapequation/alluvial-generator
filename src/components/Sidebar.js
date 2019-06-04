@@ -156,7 +156,7 @@ export default function Sidebar(props) {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Streamline settings</Header>
-        <LabelForSlider content="Relative width" detail={streamlineFraction}>
+        <LabelForSlider content="Relative width" detail={Math.round(streamlineFraction * 100) + "%"}>
           <GreySlider
             settings={{
               start: streamlineFraction,
