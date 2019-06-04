@@ -18,7 +18,7 @@ function LabelForSlider(props) {
         {...rest}
         style={{ float: "left", margin: "0.08em 0" }}
       />
-      <div style={{ width: "55%", display: "inline-block", float: "right" }}>
+      <div style={{ width: "50%", display: "inline-block", float: "right" }}>
         {children}
       </div>
     </div>
