@@ -2,6 +2,8 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import React from "react";
 
+import Diagram from "../alluvial/Diagram";
+import Dispatch from "../context/Dispatch";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -73,41 +75,43 @@ export default class AlluvialDiagram extends React.PureComponent {
   streamlineGenerator = streamlineHorizontal();
   maxModuleLevel = 3;
 
+  static contextType = Dispatch;
+
+  static propTypes = {
+    networks: PropTypes.arrayOf(PropTypes.any).isRequired,
+    height: PropTypes.number.isRequired,
+    moduleWidth: PropTypes.number.isRequired,
+    streamlineFraction: PropTypes.number.isRequired,
+    streamlineThreshold: PropTypes.number.isRequired,
+    streamlineOpacity: PropTypes.number.isRequired,
+    moduleFlowThreshold: PropTypes.number.isRequired,
+    duration: PropTypes.number,
+    verticalAlign: PropTypes.string,
+    showModuleId: PropTypes.bool,
+    dropShadow: PropTypes.bool,
+    defaultHighlightColor: PropTypes.string,
+    highlightColors: PropTypes.arrayOf(PropTypes.string)
+  };
+
   static defaultProps = {
-    defaultHighlightColor: "#b6b69f",
-    highlightColors: d3.schemeSet3,
     duration: 200,
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
-    onModuleClick: () => null
-  };
-
-  static propTypes = {
-    height: PropTypes.number.isRequired,
-    defaultHighlightColor: PropTypes.string,
-    highlightColors: PropTypes.arrayOf(PropTypes.string),
-    streamlineFraction: PropTypes.number.isRequired,
-    moduleWidth: PropTypes.number.isRequired,
-    duration: PropTypes.number,
-    moduleFlowThreshold: PropTypes.number.isRequired,
-    streamlineThreshold: PropTypes.number.isRequired,
-    verticalAlign: PropTypes.string,
-    showModuleId: PropTypes.bool,
-    dropShadow: PropTypes.bool,
-    onModuleClick: PropTypes.func,
-    onUpdateLayout: PropTypes.func.isRequired
+    defaultHighlightColor: "#b6b69f",
+    highlightColors: d3.schemeSet3
   };
 
   componentDidMount() {
     this.svg = d3.select(this.node);
-    this.props.onUpdateLayout();
+    this.diagram = new Diagram(this.props.networks);
+    this.update();
     this.draw();
   }
 
   componentDidUpdate(prevProps) {
     if (this.shouldUpdateLayout(prevProps))
-      this.props.onUpdateLayout();
+      this.update();
     this.draw();
   }
 
@@ -121,21 +125,25 @@ export default class AlluvialDiagram extends React.PureComponent {
     return heightChanged || streamlineFractionChanged || moduleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
   }
 
+  update() {
+    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
+    this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign);
+  }
+
   draw() {
     const {
-      diagram,
       defaultHighlightColor,
       highlightColors,
       duration,
       streamlineOpacity,
       streamlineThreshold,
       showModuleId,
-      dropShadow,
-      onModuleClick,
-      onUpdateLayout
+      dropShadow
     } = this.props;
+    const { dispatch } = this.context;
 
-    const alluvialRoot = diagram.asObject();
+    const alluvialRoot = this.diagram.asObject();
+    console.log(this.diagram);
 
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
@@ -281,9 +289,9 @@ export default class AlluvialDiagram extends React.PureComponent {
       .call(setStreamlinePath);
 
     const onDoubleClick = context => function(d) {
-      const success = diagram.doubleClick(d, d3.event);
+      const success = context.diagram.doubleClick(d, d3.event);
       if (success) {
-        onUpdateLayout();
+        context.update();
         context.draw();
       } else {
         wiggle.call(this, d);
@@ -357,7 +365,7 @@ export default class AlluvialDiagram extends React.PureComponent {
             return context === this ? 1 : 0;
           })(this));
 
-        onModuleClick(d, d.name);
+        dispatch({ type: "selectedModule", value: d });
       })
       .merge(modules);
 
@@ -559,11 +567,8 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   render() {
-    const {
-      defaultHighlightColor,
-      highlightColors,
-      onModuleClick
-    } = this.props;
+    const { defaultHighlightColor, highlightColors } = this.props;
+    const { dispatch } = this.context;
 
     return (
       <svg
@@ -586,7 +591,7 @@ export default class AlluvialDiagram extends React.PureComponent {
             .transition()
             .attr("stroke-opacity", 0);
 
-          onModuleClick(null);
+          dispatch({ type: "selectedModule", value: null });
         }}>
           <g className="alluvialDiagram"/>
         </ZoomableSvg>

@@ -1,14 +1,29 @@
-import React from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import Draggable from "react-draggable";
-import { Container, Header, Portal, Segment, Table } from "semantic-ui-react";
+import { Container, Header, Icon, Input, Portal, Segment, Table } from "semantic-ui-react";
+import Dispatch from "../context/Dispatch";
 
 
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
 export default function SelectedModule(props) {
-  const { module } = props;
+  const { module, open } = props;
+  const { dispatch } = useContext(Dispatch);
+  const [name, setName] = useState("");
 
-  return <Portal open={!!module}>
+  const handleChange = name => {
+    if (!module) return;
+    module.name = name;
+    setName(name);
+    dispatch({ type: "selectedModuleNameChange" });
+  };
+
+  useLayoutEffect(() => {
+    if (!module) return;
+    setName(module.name || "");
+  }, [module]);
+
+  return <Portal open={open && !!module}>
     <Draggable handle=".draggable">
       <Segment
         as={Container}
@@ -52,20 +67,18 @@ export default function SelectedModule(props) {
               <Table.Cell>Level</Table.Cell>
               <Table.Cell>{module.moduleLevel}</Table.Cell>
             </Table.Row>
-            {/*
-              <Table.Row>
-                <Table.Cell>Module name</Table.Cell>
-                <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
-                  {module &&
-                  <Input transparent fluid
-                         value={selectedModuleName}
-                         icon={selectedModuleName && <Icon link name="x" onClick={this.clearModuleName}/>}
-                         placeholder="Set module name..."
-                         onChange={(e, { value }) => this.handleModuleNameChange(value)}/>
-                  }
-                </Table.Cell>
-              </Table.Row>
-              */}
+            <Table.Row>
+              <Table.Cell>Module name</Table.Cell>
+              <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
+                {module &&
+                <Input transparent fluid
+                       value={name}
+                       icon={name && <Icon link name="x" onClick={() => handleChange("")}/>}
+                       placeholder="Set module name..."
+                       onChange={(e, { value }) => handleChange(value)}/>
+                }
+              </Table.Cell>
+            </Table.Row>
             <Table.Row>
               <Table.Cell>Largest nodes</Table.Cell>
               <Table.Cell>{module.largestLeafNodes.join(", ")}</Table.Cell>

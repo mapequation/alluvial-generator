@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Documentation from "./Documentation";
 import Header from "./Header";
 import LoadNetworks from "./LoadNetworks";
-import Sidebar from "./Sidebar";
+import Layout from "./Layout";
 
 
 export default function App() {
@@ -16,5 +16,5 @@ export default function App() {
     </React.Fragment>;
   }
 
-  return <Sidebar networks={networks}/>;
+  return <Layout networks={networks}/>;
 }

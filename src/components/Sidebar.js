@@ -1,87 +1,59 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Checkbox, Header, Icon, Input, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
-
-import Diagram from "../alluvial/Diagram";
+import { Checkbox, Header, Icon, Input, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
-import AlluvialDiagram from "./AlluvialDiagram";
 import MenuHeader from "./MenuHeader";
-import SelectedModule from "./SelectedModule";
-import ShowSidebarButton from "./ShowSidebarButton";
+import Dispatch from "../context/Dispatch";
 
 
-export default class Sidebar extends React.Component {
-  state = {
-    height: 600,
-    duration: 400,
-    moduleWidth: 100,
-    streamlineFraction: 2,
-    streamlineOpacity: 0.5,
-    moduleFlowThreshold: 8e-3,
-    streamlineThreshold: 1,
-    verticalAlign: "bottom",
-    showModuleId: false,
-    dropShadow: false,
-    selectedModule: null,
-    selectedModuleName: "",
-    sidebarVisible: true
-  };
+export default function Sidebar(props) {
+  const {
+    networks,
+    height,
+    duration,
+    moduleWidth,
+    streamlineFraction,
+    streamlineOpacity,
+    moduleFlowThreshold,
+    streamlineThreshold,
+    verticalAlign,
+    showModuleId,
+    dropShadow,
+    sidebarVisible,
+    selectedModule,
+    selectedModuleOpen
+  } = props;
 
-  input = null;
+  const { dispatch } = useContext(Dispatch);
 
-  constructor(props) {
-    super(props);
-    this.diagram = new Diagram(props.networks);
-  }
+  let fileInput = null;
 
-  toggleSidebar = () => this.setState(prevState => ({ sidebarVisible: !prevState.sidebarVisible }));
+  const validNumber = value => (Number.isNaN(+value) ? 0 : +value);
 
-  saveSettings = () => serializeState(this.state, "alluvial-settings.json");
+  const basename = networks.map(network => network.name);
 
-  parseSettings = () => parseState(this.input.files[0])
-    .then(state => {
-      this.input.value = "";
-      this.setState(prevState => ({
-        ...prevState,
-        ...state
-      }));
+  const saveSettings = () => serializeState({
+    height, duration, moduleWidth, streamlineFraction,
+    streamlineOpacity, streamlineThreshold, moduleFlowThreshold,
+    verticalAlign, showModuleId, dropShadow
+  }, "alluvial-settings.json");
+
+  const parseSettings = () => parseState(fileInput.files[0])
+    .then(value => {
+      fileInput.value = "";
+      dispatch({ type: "loadState", value });
     });
 
-  updateLayout = () =>
-    this.diagram.updateLayout(
-      this.state.height,
-      this.state.streamlineFraction,
-      this.state.moduleWidth,
-      this.state.moduleFlowThreshold,
-      this.state.verticalAlign
-    );
+  const TextInput = props =>
+    <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
 
-  render() {
-    const { networks } = this.props;
-    const {
-      height,
-      duration,
-      moduleWidth,
-      streamlineFraction,
-      streamlineOpacity,
-      moduleFlowThreshold,
-      streamlineThreshold,
-      verticalAlign,
-      showModuleId,
-      dropShadow,
-      selectedModule,
-      sidebarVisible
-    } = this.state;
+  const selectedModuleName = selectedModule
+    ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
+    : "No module selected";
 
-    const validNumber = value => (Number.isNaN(+value) ? 0 : +value);
-
-    const basename = networks.map(network => network.name);
-
-    const TextInput = props =>
-      <Input size="small" style={{ margin: "0.3em 0 0.3em 0" }} fluid type="text" labelPosition="left" {...props} />;
-
-    const sidebar = <SemanticSidebar
+  return (
+    <SemanticSidebar
       as={Menu}
       animation="overlay"
       width="wide"
@@ -92,13 +64,30 @@ export default class Sidebar extends React.Component {
       <Menu.Item header href="//www.mapequation.org/alluvial">
         <MenuHeader/>
       </Menu.Item>
-      <Menu.Item onClick={this.toggleSidebar} icon='close' content='Hide sidebar'/>
+      <Menu.Item
+        icon='close'
+        content='Hide sidebar'
+        onClick={() => dispatch({ type: "sidebarVisible", value: false })}
+      />
+      <Menu.Item>
+        <Header as="h4">Selected module</Header>
+        {selectedModuleName}
+        {selectedModule &&
+        <Menu.Menu>
+          <Menu.Item
+            icon={selectedModuleOpen ? "close" : "info circle"}
+            content={selectedModuleOpen ? "Show less" : "Show more"}
+            onClick={() => dispatch({ type: "selectedModuleOpen", value: !selectedModuleOpen })}
+          />
+        </Menu.Menu>
+        }
+      </Menu.Item>
       <Menu.Item>
         <Header as="h4">Module settings</Header>
         <TextInput
           label="Height"
           value={height}
-          onChange={(e, { value }) => this.setState({ height: validNumber(value) })}
+          onChange={(e, { value }) => dispatch({ type: "height", value: validNumber(value) })}
         />
         <Slider
           color="blue"
@@ -107,7 +96,7 @@ export default class Sidebar extends React.Component {
             min: 400,
             max: 2000,
             step: 10,
-            onChange: height => this.setState({ height })
+            onChange: value => dispatch({ type: "height", value })
           }}
         />
         <TextInput
@@ -121,7 +110,7 @@ export default class Sidebar extends React.Component {
             min: 10,
             max: 200,
             step: 10,
-            onChange: moduleWidth => this.setState({ moduleWidth })
+            onChange: value => dispatch({ type: "moduleWidth", value })
           }}
         />
         <TextInput
@@ -136,18 +125,24 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 0.02,
             step: 0.001,
-            onChange: moduleFlowThreshold => this.setState({ moduleFlowThreshold })
+            onChange: value => dispatch({ type: "moduleFlowThreshold", value })
           }}
         />
-        <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
-                  onChange={(e, { checked }) => this.setState({ verticalAlign: checked ? "bottom" : "justify" })}
-                  checked={verticalAlign === "bottom"} label="Vertical align to bottom"/>
-        <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
-                  onChange={(e, { checked }) => this.setState({ showModuleId: checked })}
-                  checked={showModuleId} label="Show module id"/>
-        <Checkbox style={{ margin: "0.3em 0 0.3em 0" }} toggle
-                  onChange={(e, { checked }) => this.setState({ dropShadow: checked })}
-                  checked={dropShadow} label="Use drop shadow"/>
+        <Checkbox
+          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+          onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
+          checked={verticalAlign === "bottom"} label="Vertical align to bottom"
+        />
+        <Checkbox
+          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+          onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
+          checked={showModuleId} label="Show module id"
+        />
+        <Checkbox
+          style={{ margin: "0.3em 0 0.3em 0" }} toggle
+          onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
+          checked={dropShadow} label="Use drop shadow"
+        />
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Streamline settings</Header>
@@ -162,7 +157,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 3,
             step: 0.1,
-            onChange: streamlineFraction => this.setState({ streamlineFraction })
+            onChange: value => dispatch({ type: "streamlineFraction", value })
           }}
         />
         <TextInput
@@ -177,7 +172,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 2,
             step: 0.01,
-            onChange: streamlineThreshold => this.setState({ streamlineThreshold })
+            onChange: value => dispatch({ type: "streamlineThreshold", value })
           }}
         />
         <TextInput value={Math.round((1 - streamlineOpacity) * 100)} labelPosition="right">
@@ -192,7 +187,7 @@ export default class Sidebar extends React.Component {
             min: 0,
             max: 1,
             step: 0.01,
-            onChange: transparency => this.setState({ streamlineOpacity: 1 - transparency })
+            onChange: transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })
           }}
         />
       </Menu.Item>
@@ -210,66 +205,50 @@ export default class Sidebar extends React.Component {
             min: 100,
             max: 2000,
             step: 100,
-            onChange: duration => this.setState({ duration })
+            onChange: value => dispatch({ type: "duration", value })
           }}
         />
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Export</Header>
-        <Button icon size="small" labelPosition="left" onClick={() => saveSvg("alluvialSvg", basename + ".svg")}>
-          <Icon name="download"/>SVG
-        </Button>
-        <Button icon size="small" labelPosition="left" onClick={() => savePng("alluvialSvg", basename + ".png")}>
-          <Icon name="image"/>PNG
-        </Button>
+        <Menu.Menu>
+          <Menu.Item
+            icon="download"
+            onClick={() => saveSvg("alluvialSvg", basename + ".svg")}
+            content="Download SVG"
+          />
+        </Menu.Menu>
+        <Menu.Menu>
+          <Menu.Item
+            icon="image"
+            onClick={() => savePng("alluvialSvg", basename + ".png")}
+            content="Download PNG"
+          />
+        </Menu.Menu>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Settings</Header>
-        <Button icon size="small" labelPosition="left" onClick={this.saveSettings}>
-          <Icon name="download"/>Save
-        </Button>
-        <label className="ui small icon left labeled button" htmlFor="upload">
-          <Icon name="upload"/>Load
-        </label>
-        <input
-          style={{ display: "none" }}
-          type="file"
-          id="upload"
-          onChange={this.parseSettings}
-          accept={".json"}
-          ref={input => (this.input = input)}
-        />
+        <Menu.Menu>
+          <Menu.Item
+            icon="download"
+            onClick={saveSettings}
+            content="Save settings"
+          />
+        </Menu.Menu>
+        <Menu.Menu>
+          <label className="link item" htmlFor="upload">
+            <Icon name="upload"/>Load settings
+          </label>
+          <input
+            style={{ display: "none" }}
+            type="file"
+            id="upload"
+            onChange={parseSettings}
+            accept={".json"}
+            ref={input => fileInput = input}
+          />
+        </Menu.Menu>
       </Menu.Item>
-    </SemanticSidebar>;
-
-    return (
-      <React.Fragment>
-        <SelectedModule module={selectedModule}/>
-        <SemanticSidebar.Pushable>
-          {sidebar}
-          <SemanticSidebar.Pusher style={{ overflow: "hidden", height: "100vh" }}>
-            <ShowSidebarButton onClick={this.toggleSidebar}/>
-            <React.StrictMode>
-              <AlluvialDiagram
-                diagram={this.diagram}
-                height={height}
-                moduleWidth={+moduleWidth}
-                streamlineFraction={+streamlineFraction}
-                streamlineOpacity={+streamlineOpacity}
-                duration={+duration}
-                moduleFlowThreshold={+moduleFlowThreshold}
-                streamlineThreshold={+streamlineThreshold}
-                verticalAlign={verticalAlign}
-                showModuleId={showModuleId}
-                dropShadow={dropShadow}
-                onModuleClick={(selectedModule, selectedModuleName = "") =>
-                  this.setState({ selectedModule, selectedModuleName })}
-                onUpdateLayout={this.updateLayout}
-              />
-            </React.StrictMode>
-          </SemanticSidebar.Pusher>
-        </SemanticSidebar.Pushable>
-      </React.Fragment>
-    );
-  }
+    </SemanticSidebar>
+  );
 }
