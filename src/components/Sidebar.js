@@ -25,7 +25,7 @@ function LabelForSlider(props) {
   );
 }
 
-const BlueSlider = props => <Slider color="blue" {...props}/>;
+const GreySlider = props => <Slider color="grey" {...props}/>;
 
 const MyCheckbox = props => <Checkbox style={{ display: "block", margin: "0.3em 0" }} {...props}/>;
 
@@ -103,7 +103,7 @@ export default function Sidebar(props) {
       <Menu.Item>
         <Header as="h4">Module settings</Header>
         <LabelForSlider content="Height" detail={height}>
-          <BlueSlider
+          <GreySlider
             settings={{
               start: height,
               min: 400,
@@ -114,7 +114,7 @@ export default function Sidebar(props) {
           />
         </LabelForSlider>
         <LabelForSlider content="Width" detail={moduleWidth}>
-          <BlueSlider
+          <GreySlider
             settings={{
               start: moduleWidth,
               min: 10,
@@ -125,7 +125,7 @@ export default function Sidebar(props) {
           />
         </LabelForSlider>
         <LabelForSlider content="Min. flow" detail={moduleFlowThreshold}>
-          <BlueSlider
+          <GreySlider
             discrete
             settings={{
               start: moduleFlowThreshold,
@@ -157,7 +157,7 @@ export default function Sidebar(props) {
       <Menu.Item>
         <Header as="h4">Streamline settings</Header>
         <LabelForSlider content="Relative width" detail={streamlineFraction}>
-          <BlueSlider
+          <GreySlider
             settings={{
               start: streamlineFraction,
               min: 0,
@@ -168,7 +168,7 @@ export default function Sidebar(props) {
           />
         </LabelForSlider>
         <LabelForSlider content="Min. thickness" detail={streamlineThreshold}>
-          <BlueSlider
+          <GreySlider
             discrete
             settings={{
               start: streamlineThreshold,
@@ -180,7 +180,7 @@ export default function Sidebar(props) {
           />
         </LabelForSlider>
         <LabelForSlider content="Transparency" detail={Math.round((1 - streamlineOpacity) * 100) + "%"}>
-          <BlueSlider
+          <GreySlider
             settings={{
               start: 1 - streamlineOpacity,
               min: 0,
@@ -194,7 +194,7 @@ export default function Sidebar(props) {
       </Menu.Item>
       <Menu.Item>
         <LabelForSlider content="Anim. speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
-          <BlueSlider
+          <GreySlider
             discrete
             settings={{
               start: duration,
