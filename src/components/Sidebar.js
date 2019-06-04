@@ -124,15 +124,15 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <LabelForSlider content="Min. flow" detail={moduleFlowThreshold}>
+        <LabelForSlider content="Visible flow" detail={(1 - moduleFlowThreshold) * 100 + "%"}>
           <GreySlider
             discrete
             settings={{
-              start: moduleFlowThreshold,
-              min: 0,
-              max: 0.02,
-              step: 0.001,
-              onChange: value => dispatch({ type: "moduleFlowThreshold", value })
+              start: (1 - moduleFlowThreshold) * 100,
+              min: 97,
+              max: 100,
+              step: 0.1,
+              onChange: value => dispatch({ type: "moduleFlowThreshold", value: 1 - value / 100 })
             }}
           />
         </LabelForSlider>
