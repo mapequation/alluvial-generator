@@ -4,26 +4,33 @@ import { Container, Header, Icon, Input, Portal, Segment, Table } from "semantic
 import Dispatch from "../context/Dispatch";
 
 
+const SelectableTableCell = props => <Table.Cell selectable style={{ padding: "0 8px" }} {...props}/>;
+
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
 export default function SelectedModule(props) {
   const { module, open } = props;
   const { dispatch } = useContext(Dispatch);
   const [name, setName] = useState("");
+  const [networkName, setNetworkName] = useState("");
 
-  const handleChange = name => {
+  const handleChange = (setName, prop) => (e, { value }) => {
     if (!module) return;
-    module.name = name;
-    setName(name);
+    module[prop] = value;
+    setName(value);
     dispatch({ type: "selectedModuleNameChange" });
   };
+
+  const handleNameChange = handleChange(setName, "name");
+  const handleNetworkNameChange = handleChange(setNetworkName, "networkName");
 
   useLayoutEffect(() => {
     if (!module) return;
     setName(module.name || "");
+    setNetworkName(module.networkName);
   }, [module]);
 
-  return <Portal open={open && !!module}>
+  return <Portal open={open && !!module} onClose={() => dispatch({ type: "selectedModuleOpen", value: false })}>
     <Draggable handle=".draggable">
       <Segment
         as={Container}
@@ -43,7 +50,15 @@ export default function SelectedModule(props) {
           <Table.Body>
             <Table.Row>
               <Table.Cell width={4}>Network</Table.Cell>
-              <Table.Cell>{module.networkName}</Table.Cell>
+              <SelectableTableCell>
+                <Input
+                  fluid
+                  transparent
+                  value={networkName}
+                  placeholder="Set network name..."
+                  onChange={handleNetworkNameChange}
+                />
+              </SelectableTableCell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>Codelength</Table.Cell>
@@ -69,15 +84,16 @@ export default function SelectedModule(props) {
             </Table.Row>
             <Table.Row>
               <Table.Cell>Module name</Table.Cell>
-              <Table.Cell selectable style={{ padding: "0 0 0 8px" }}>
-                {module &&
-                <Input transparent fluid
-                       value={name}
-                       icon={name && <Icon link name="x" onClick={() => handleChange("")}/>}
-                       placeholder="Set module name..."
-                       onChange={(e, { value }) => handleChange(value)}/>
-                }
-              </Table.Cell>
+              <SelectableTableCell>
+                <Input
+                  fluid
+                  transparent
+                  value={name}
+                  placeholder="Set module name..."
+                  onChange={handleNameChange}
+                  icon={name && <Icon link name="x" onClick={() => handleNameChange(null, { value: "" })}/>}
+                />
+              </SelectableTableCell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>Largest nodes</Table.Cell>

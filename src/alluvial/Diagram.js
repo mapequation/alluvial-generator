@@ -87,6 +87,14 @@ export default class Diagram {
     this.dirty = true;
   }
 
+  setNetworkName(alluvialObject: Object) {
+    const { networkId, networkName } = alluvialObject;
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    if (!networkRoot) return;
+    networkRoot.name = networkName;
+    this.dirty = true;
+  }
+
   updateLayout() {
     this.dirty = true;
     this.alluvialRoot.updateLayout(...arguments);

@@ -148,6 +148,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     if (selectedModule && selectedModuleNameChange !== prevProps.selectedModuleNameChange) {
       this.diagram.setModuleName(selectedModule);
+      this.diagram.setNetworkName(selectedModule);
     }
 
     const alluvialRoot = this.diagram.asObject();
@@ -257,6 +258,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     networkNames
       .select(".name")
+      .text(d => d.name)
       .transition(t)
       .delay(networkNameUpdateDelay)
       .attr("x", d => d.textX)
