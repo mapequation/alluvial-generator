@@ -27,7 +27,7 @@
     "eslint-plugin-react": "7.4.0",
     "extract-text-webpack-plugin": "3.0.2",
     "file-loader": "1.1.5",
-    "file-saver": "^2.0.1",
+    "file-saver": "^2.0.2",
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
     "jest": "20.0.4",
@@ -107,8 +107,8 @@
   },
   "devDependencies": {
     "flow-bin": "^0.80.0",
-    "flow-typed": "^2.5.1",
-    "prettier": "^1.17.0",
+    "flow-typed": "^2.5.2",
+    "prettier": "^1.17.1",
     "react-snap": "^1.23.0"
   }
 }
