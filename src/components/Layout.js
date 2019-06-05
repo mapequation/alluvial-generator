@@ -31,7 +31,6 @@ function reducer(state, action) {
       return { ...state, dropShadow: action.value };
     case "selectedModule":
       return { ...state, selectedModule: action.value };
-    case "selectedModuleOpen":
     case "selectedModuleNameChange":
       return { ...state, selectedModuleNameChange: !state.selectedModuleNameChange };
     case "sidebarVisible":
