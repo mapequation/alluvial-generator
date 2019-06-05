@@ -2,7 +2,6 @@ import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
-import SelectedModule from "./SelectedModule";
 import Sidebar from "./Sidebar";
 
 
@@ -33,7 +32,6 @@ function reducer(state, action) {
     case "selectedModule":
       return { ...state, selectedModule: action.value };
     case "selectedModuleOpen":
-      return { ...state, selectedModuleOpen: action.value };
     case "selectedModuleNameChange":
       return { ...state, selectedModuleNameChange: !state.selectedModuleNameChange };
     case "sidebarVisible":
@@ -59,7 +57,6 @@ export default function Layout(props) {
     showModuleId: false,
     dropShadow: false,
     selectedModule: null,
-    selectedModuleOpen: false,
     selectedModuleNameChange: true,
     sidebarVisible: true
   };
@@ -68,7 +65,6 @@ export default function Layout(props) {
 
   return (
     <Dispatch.Provider value={{ dispatch }}>
-      <SelectedModule open={state.selectedModuleOpen} module={state.selectedModule}/>
       <SemanticSidebar.Pushable style={{ height: "100vh", overflow: "hidden" }}>
         <Sidebar {...state} {...props}/>
         <SemanticSidebar.Pusher>

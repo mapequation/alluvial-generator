@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { SketchPicker } from "react-color";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Checkbox, Header, Icon, Label, Menu, Popup, Portal, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
 import MenuHeader from "./MenuHeader";
+import SelectedModule from "./SelectedModule";
 
 
 function LabelForSlider(props) {
@@ -45,11 +46,12 @@ export default function Sidebar(props) {
     showModuleId,
     dropShadow,
     sidebarVisible,
-    selectedModule,
-    selectedModuleOpen
+    selectedModule
   } = props;
 
   const { dispatch } = useContext(Dispatch);
+
+  const [selectedModuleOpen, setSelectedModuleOpen] = useState(false);
 
   let fileInput = null;
 
@@ -92,13 +94,19 @@ export default function Sidebar(props) {
         <Header as="h4">Selected module</Header>
         {selectedModuleName}
         {selectedModule &&
-        <Menu.Menu>
-          <Menu.Item
-            icon={selectedModuleOpen ? "close" : "info circle"}
-            content={selectedModuleOpen ? "Show less" : "Show more"}
-            onClick={() => dispatch({ type: "selectedModuleOpen", value: !selectedModuleOpen })}
-          />
-        </Menu.Menu>
+        <Portal
+          open={selectedModuleOpen && !!selectedModule}
+          onClose={() => setSelectedModuleOpen(false)}
+          trigger={<Menu.Menu>
+            <Menu.Item
+              icon={selectedModuleOpen ? "close" : "info circle"}
+              content={selectedModuleOpen ? "Show less" : "Show more"}
+              onClick={() => setSelectedModuleOpen(!selectedModuleOpen)}
+            />
+          </Menu.Menu>}
+        >
+          <SelectedModule module={selectedModule}/>
+        </Portal>
         }
       </Menu.Item>
       <Menu.Item>

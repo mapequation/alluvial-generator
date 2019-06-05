@@ -112,9 +112,17 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
+    const { selectedModule, selectedModuleNameChange } = this.props;
+
+    if (selectedModule && selectedModuleNameChange !== prevProps.selectedModuleNameChange) {
+      this.diagram.setModuleName(selectedModule);
+      this.diagram.setNetworkName(selectedModule);
+    }
+
     if (this.shouldUpdateLayout(prevProps))
       this.update();
-    this.draw(prevProps);
+
+    this.draw();
   }
 
   shouldUpdateLayout(prevProps) {
@@ -132,7 +140,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign);
   }
 
-  draw(prevProps = this.props) {
+  draw() {
     const {
       defaultHighlightColor,
       highlightColors,
@@ -140,16 +148,9 @@ export default class AlluvialDiagram extends React.PureComponent {
       streamlineOpacity,
       streamlineThreshold,
       showModuleId,
-      dropShadow,
-      selectedModule,
-      selectedModuleNameChange
+      dropShadow
     } = this.props;
     const { dispatch } = this.context;
-
-    if (selectedModule && selectedModuleNameChange !== prevProps.selectedModuleNameChange) {
-      this.diagram.setModuleName(selectedModule);
-      this.diagram.setNetworkName(selectedModule);
-    }
 
     const alluvialRoot = this.diagram.asObject();
 
@@ -518,7 +519,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     groups
       .select("rect")
-      .attr("fill", highlightColor)
+      .attr("fill", highlightColor);
 
     const rect = groupsEnter
       .append("rect")

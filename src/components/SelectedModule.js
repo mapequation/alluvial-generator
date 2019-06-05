@@ -1,6 +1,6 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import Draggable from "react-draggable";
-import { Container, Header, Icon, Input, Portal, Segment, Table } from "semantic-ui-react";
+import { Container, Header, Icon, Input, Segment, Table } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 
 
@@ -9,7 +9,7 @@ const SelectableTableCell = props => <Table.Cell selectable style={{ padding: "0
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
 export default function SelectedModule(props) {
-  const { module, open } = props;
+  const { module } = props;
   const { dispatch } = useContext(Dispatch);
   const [name, setName] = useState("");
   const [networkName, setNetworkName] = useState("");
@@ -30,7 +30,7 @@ export default function SelectedModule(props) {
     setNetworkName(module.networkName);
   }, [module]);
 
-  return <Portal open={open && !!module} onClose={() => dispatch({ type: "selectedModuleOpen", value: false })}>
+  return (
     <Draggable handle=".draggable">
       <Segment
         as={Container}
@@ -42,9 +42,8 @@ export default function SelectedModule(props) {
           as="h4"
           className="draggable"
           style={{ cursor: "pointer" }}
-        >
-          Selected module
-        </Header>
+          content="Selected module"
+        />
         <Table celled striped compact fixed singleLine size="small">
           {module &&
           <Table.Body>
@@ -104,5 +103,5 @@ export default function SelectedModule(props) {
         </Table>
       </Segment>
     </Draggable>
-  </Portal>;
+  );
 }
