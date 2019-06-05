@@ -208,23 +208,6 @@ export default function Sidebar(props) {
         <div style={{ clear: "both" }}/>
       </Menu.Item>
       <Menu.Item>
-        <Header as="h4">Export</Header>
-        <Menu.Menu>
-          <Menu.Item
-            icon="download"
-            onClick={() => saveSvg("alluvialSvg", basename + ".svg")}
-            content="Download SVG"
-          />
-        </Menu.Menu>
-        <Menu.Menu>
-          <Menu.Item
-            icon="image"
-            onClick={() => savePng("alluvialSvg", basename + ".png")}
-            content="Download PNG"
-          />
-        </Menu.Menu>
-      </Menu.Item>
-      <Menu.Item>
         <Header as="h4">Settings</Header>
         <Menu.Menu>
           <Popup
@@ -262,6 +245,23 @@ export default function Sidebar(props) {
             onChange={parseSettings}
             accept={".json"}
             ref={input => fileInput = input}
+          />
+        </Menu.Menu>
+      </Menu.Item>
+      <Menu.Item>
+        <Header as="h4">Export</Header>
+        <Menu.Menu>
+          <Menu.Item
+            icon="download"
+            onClick={() => saveSvg("alluvialSvg", basename + ".svg")}
+            content="Download SVG"
+          />
+        </Menu.Menu>
+        <Menu.Menu>
+          <Menu.Item
+            icon="image"
+            onClick={() => savePng("alluvialSvg", basename + ".png")}
+            content="Download PNG"
           />
         </Menu.Menu>
       </Menu.Item>
