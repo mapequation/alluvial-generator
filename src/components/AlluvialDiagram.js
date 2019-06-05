@@ -514,6 +514,10 @@ export default class AlluvialDiagram extends React.PureComponent {
         ? defaultHighlightColor
         : highlightColors[d.highlightIndex];
 
+    groups
+      .select("rect")
+      .attr("fill", highlightColor)
+
     const rect = groupsEnter
       .append("rect")
       .call(setWidthX)

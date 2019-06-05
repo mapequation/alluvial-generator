@@ -1,9 +1,9 @@
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
 import SelectedModule from "./SelectedModule";
 import Sidebar from "./Sidebar";
-import Dispatch from "../context/Dispatch";
 
 
 function reducer(state, action) {
@@ -22,6 +22,8 @@ function reducer(state, action) {
       return { ...state, moduleFlowThreshold: action.value };
     case "streamlineThreshold":
       return { ...state, streamlineThreshold: action.value };
+    case "defaultHighlightColor":
+      return { ...state, defaultHighlightColor: action.value };
     case "verticalAlign":
       return { ...state, verticalAlign: action.value };
     case "showModuleId":
@@ -52,6 +54,7 @@ export default function Layout(props) {
     streamlineThreshold: 1,
     streamlineOpacity: 0.5,
     moduleFlowThreshold: 8e-3,
+    defaultHighlightColor: "#b6b69f",
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,

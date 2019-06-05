@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
+import { SketchPicker } from "react-color";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Icon, Label, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
 import MenuHeader from "./MenuHeader";
-import Dispatch from "../context/Dispatch";
 
 
 function LabelForSlider(props) {
@@ -39,6 +40,7 @@ export default function Sidebar(props) {
     streamlineOpacity,
     moduleFlowThreshold,
     streamlineThreshold,
+    defaultHighlightColor,
     verticalAlign,
     showModuleId,
     dropShadow,
@@ -56,7 +58,7 @@ export default function Sidebar(props) {
   const saveSettings = () => serializeState({
     height, duration, moduleWidth, streamlineFraction,
     streamlineOpacity, streamlineThreshold, moduleFlowThreshold,
-    verticalAlign, showModuleId, dropShadow
+    verticalAlign, showModuleId, dropShadow, defaultHighlightColor
   }, "alluvial-settings.json");
 
   const parseSettings = () => parseState(fileInput.files[0])
@@ -68,7 +70,6 @@ export default function Sidebar(props) {
   const selectedModuleName = selectedModule
     ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
     : <span style={{ color: "#777" }}>No module selected</span>;
-
 
   return (
     <SemanticSidebar
@@ -225,6 +226,24 @@ export default function Sidebar(props) {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Settings</Header>
+        <Menu.Menu>
+          <Popup
+            on="click"
+            basic
+            trigger={<Menu.Item icon="paint brush" content="Choose color"/>}
+            style={{ background: "none", backgroundImage: "none", border: "none", boxShadow: "none" }}
+          >
+            <SketchPicker
+              disableAlpha
+              color={defaultHighlightColor}
+              onChangeComplete={color => dispatch({ type: "defaultHighlightColor", value: color.hex })}
+              presetColors={[
+                "#C27F87", "#DDBF8D", "#D0CA92", "#AE927A", "#A7CB81", "#64764F", "#D599E1", "#D4A2FF",
+                "#A0BFE4", "#A6CBC1", "#BAD0A1", "#b6b69f", "#414141", "#808080", "#BFBFBF"
+              ]}
+            />
+          </Popup>
+        </Menu.Menu>
         <Menu.Menu>
           <Menu.Item
             icon="download"
