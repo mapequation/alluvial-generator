@@ -85,6 +85,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     streamlineThreshold: PropTypes.number.isRequired,
     streamlineOpacity: PropTypes.number.isRequired,
     moduleFlowThreshold: PropTypes.number.isRequired,
+    selectedModuleNameChange: PropTypes.bool.isRequired,
+    selectedModule: PropTypes.object,
     duration: PropTypes.number,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
@@ -112,7 +114,7 @@ export default class AlluvialDiagram extends React.PureComponent {
   componentDidUpdate(prevProps) {
     if (this.shouldUpdateLayout(prevProps))
       this.update();
-    this.draw();
+    this.draw(prevProps);
   }
 
   shouldUpdateLayout(prevProps) {
@@ -130,7 +132,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign);
   }
 
-  draw() {
+  draw(prevProps = this.props) {
     const {
       defaultHighlightColor,
       highlightColors,
@@ -138,12 +140,17 @@ export default class AlluvialDiagram extends React.PureComponent {
       streamlineOpacity,
       streamlineThreshold,
       showModuleId,
-      dropShadow
+      dropShadow,
+      selectedModule,
+      selectedModuleNameChange
     } = this.props;
     const { dispatch } = this.context;
 
+    if (selectedModule && selectedModuleNameChange !== prevProps.selectedModuleNameChange) {
+      this.diagram.setModuleName(selectedModule);
+    }
+
     const alluvialRoot = this.diagram.asObject();
-    console.log(this.diagram);
 
     const t = d3.transition().duration(duration);
     const delay = 0.5 * duration;
