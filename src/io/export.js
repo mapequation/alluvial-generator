@@ -2,22 +2,16 @@ import FileSaver from "file-saver";
 
 
 export const saveSvg = (elementId, filename) => {
-  const svgEl = document.getElementById(elementId);
-  const svg = new XMLSerializer().serializeToString(svgEl);
-  const preface = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n";
-  const svgBlob = new Blob([preface, svg], { type: "image/svg+xml;charset=utf-8" });
-  FileSaver.saveAs(svgBlob, filename);
+  const svg = document.getElementById(elementId);
+  const string = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([string], { type: "image/svg+xml;charset=utf-8" });
+  FileSaver.saveAs(blob, filename);
 };
 
 export const savePng = (elementId, filename) => {
-  const [width, height] = [window.innerWidth, window.innerHeight];
-
-  const svgEl = document.getElementById(elementId);
-  svgEl.setAttribute("width", width);
-  svgEl.setAttribute("height", height);
-  const svg = new XMLSerializer().serializeToString(svgEl);
-  svgEl.removeAttribute("width");
-  svgEl.removeAttribute("height");
+  const svg = document.getElementById(elementId);
+  const { width, height } = svg.getBoundingClientRect();
+  const string = new XMLSerializer().serializeToString(svg);
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -34,5 +28,5 @@ export const savePng = (elementId, filename) => {
     console.error(err.type, err.message);
   };
 
-  image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(svg);
+  image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(string);
 };
