@@ -77,11 +77,16 @@ export default class Diagram {
     return false;
   }
 
-  setModuleName(alluvialObject: Object) {
-    const { networkId, moduleId, name } = alluvialObject;
+  getModule(alluvialObject: Object) {
+    const { networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
-    const module = networkRoot.getModule(moduleId);
+    return networkRoot.getModule(moduleId);
+  }
+
+  setModuleName(alluvialObject: Object) {
+    const { name } = alluvialObject;
+    const module = this.getModule(alluvialObject);
     if (!module) return;
     module.name = name;
     this.dirty = true;
@@ -92,6 +97,17 @@ export default class Diagram {
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     networkRoot.name = networkName;
+    this.dirty = true;
+  }
+
+  setModuleColor(alluvialObject: Object) {
+    const { highlightIndex } = alluvialObject;
+    const module = this.getModule(alluvialObject);
+    if (!module) return;
+    const leafNodes = Array.from(module.leafNodes());
+    leafNodes.forEach(node => node.highlightIndex = highlightIndex);
+    this.removeNodes(leafNodes);
+    this.addNodes(leafNodes);
     this.dirty = true;
   }
 

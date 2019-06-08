@@ -1,5 +1,6 @@
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { schemePaired } from "d3";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
 import Sidebar from "./Sidebar";
@@ -32,7 +33,9 @@ function reducer(state, action) {
     case "selectedModule":
       return { ...state, selectedModule: action.value };
     case "selectedModuleNameChange":
-      return { ...state, selectedModuleNameChange: !state.selectedModuleNameChange };
+      return { ...state, selectedModuleNameChangeBit: state.selectedModuleNameChangeBit ? 0 : 1 };
+    case "selectedModuleColorChange":
+      return { ...state, selectedModuleColorChangeBit: state.selectedModuleColorChangeBit ? 0 : 1 };
     case "sidebarVisible":
       return { ...state, sidebarVisible: action.value };
     case "loadState":
@@ -52,11 +55,13 @@ export default function Layout(props) {
     streamlineOpacity: 0.5,
     moduleFlowThreshold: 8e-3,
     defaultHighlightColor: "#b6b69f",
+    highlightColors: schemePaired,
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
     selectedModule: null,
-    selectedModuleNameChange: true,
+    selectedModuleNameChangeBit: 0,
+    selectedModuleColorChangeBit: 0,
     sidebarVisible: true
   };
 

@@ -42,6 +42,7 @@ export default function Sidebar(props) {
     moduleFlowThreshold,
     streamlineThreshold,
     defaultHighlightColor,
+    highlightColors,
     verticalAlign,
     showModuleId,
     dropShadow,
@@ -58,9 +59,10 @@ export default function Sidebar(props) {
   const basename = networks.map(network => network.name);
 
   const saveSettings = () => serializeState({
-    height, duration, moduleWidth, streamlineFraction,
-    streamlineOpacity, streamlineThreshold, moduleFlowThreshold,
-    verticalAlign, showModuleId, dropShadow, defaultHighlightColor
+    height, duration, moduleWidth, moduleFlowThreshold,
+    streamlineFraction, streamlineOpacity, streamlineThreshold,
+    verticalAlign, showModuleId, dropShadow,
+    defaultHighlightColor, highlightColors
   }, "alluvial-settings.json");
 
   const parseSettings = () => parseState(fileInput.files[0])
@@ -105,7 +107,7 @@ export default function Sidebar(props) {
             />
           </Menu.Menu>}
         >
-          <SelectedModule module={selectedModule}/>
+          <SelectedModule module={selectedModule} highlightColors={highlightColors}/>
         </Portal>
         }
       </Menu.Item>

@@ -85,14 +85,15 @@ export default class AlluvialDiagram extends React.PureComponent {
     streamlineThreshold: PropTypes.number.isRequired,
     streamlineOpacity: PropTypes.number.isRequired,
     moduleFlowThreshold: PropTypes.number.isRequired,
-    selectedModuleNameChange: PropTypes.bool.isRequired,
+    selectedModuleNameChangeBit: PropTypes.number.isRequired,
+    selectedModuleColorChangeBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
     defaultHighlightColor: PropTypes.string,
-    highlightColors: PropTypes.arrayOf(PropTypes.string)
+    highlightColors: PropTypes.arrayOf(PropTypes.string).isRequired
   };
 
   static defaultProps = {
@@ -100,8 +101,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
-    defaultHighlightColor: "#b6b69f",
-    highlightColors: d3.schemeSet3
+    defaultHighlightColor: "#b6b69f"
   };
 
   componentDidMount() {
@@ -112,11 +112,16 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { selectedModule, selectedModuleNameChange } = this.props;
+    const { selectedModule, selectedModuleNameChangeBit, selectedModuleColorChangeBit } = this.props;
 
-    if (selectedModule && selectedModuleNameChange !== prevProps.selectedModuleNameChange) {
-      this.diagram.setModuleName(selectedModule);
-      this.diagram.setNetworkName(selectedModule);
+    if (selectedModule) {
+      if (selectedModuleNameChangeBit !== prevProps.selectedModuleNameChangeBit) {
+        this.diagram.setModuleName(selectedModule);
+        this.diagram.setNetworkName(selectedModule);
+      }
+      if (selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit) {
+        this.diagram.setModuleColor(selectedModule);
+      }
     }
 
     if (this.shouldUpdateLayout(prevProps))
@@ -126,13 +131,14 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   shouldUpdateLayout(prevProps) {
-    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
+    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, selectedModuleColorChangeBit } = this.props;
     const heightChanged = height !== prevProps.height;
     const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
     const moduleWidthChanged = moduleWidth !== prevProps.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
-    return heightChanged || streamlineFractionChanged || moduleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged;
+    const selectedModuleColorChanged = selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit;
+    return heightChanged || streamlineFractionChanged || moduleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged || selectedModuleColorChanged;
   }
 
   update() {
