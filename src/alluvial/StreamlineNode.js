@@ -1,7 +1,7 @@
 // @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
-import { MODULE, STREAMLINE_NODE } from "./Depth";
+import { HIGHLIGHT_GROUP, STREAMLINE_NODE } from "./Depth";
 import LeafNode from "./LeafNode";
 import type { Side } from "./Side";
 import { LEFT } from "./Side";
@@ -71,13 +71,13 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return null;
   }
 
-  oppositeStreamlinePosition(moduleFlowThreshold: number) {
+  oppositeStreamlinePosition(flowThreshold: number) {
     const atBottom = -Infinity;
     const opposite = this.getOpposite();
     if (!opposite) return atBottom;
-    const module = opposite.getAncestor(MODULE);
-    if (!module || module.flow < moduleFlowThreshold) return atBottom;
-    return -module.y;
+    const group = opposite.getAncestor(HIGHLIGHT_GROUP);
+    if (!group || group.flow < flowThreshold) return atBottom;
+    return -group.y;
   }
 
   linkTo(opposite: StreamlineNode) {

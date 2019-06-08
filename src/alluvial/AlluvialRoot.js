@@ -81,12 +81,16 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       return differenceIndex;
     };
 
+    let moduleHeight = 0;
+    let moduleMargin = 0;
+
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
     this.forEachDepthFirstPreOrderWhile(
       node =>
         node.depth < Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
+        (node.depth === Depth.MODULE && node.flow >= flowThreshold) ||
+        node.depth === Depth.HIGHLIGHT_GROUP,
       (node, i, nodes) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
@@ -102,13 +106,25 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               i + 1 < nodes.length
                 ? 2 ** (5 - differenceIndex(node.path, nodes[i + 1].path))
                 : 0;
-            y -= node.flow * height;
+            moduleHeight = node.flow * height;
+            y -= moduleHeight;
             node.margin = margin;
-            node.layout = { x, y, width: moduleWidth, height: node.flow * height };
-            y -= margin;
+            node.layout = { x, y, width: moduleWidth, height: moduleHeight };
+            y -= moduleMargin = margin;
             totalMargins[networkIndex] += margin;
             visibleFlows[networkIndex] += node.flow;
             visibleModules[networkIndex]++;
+            break;
+          case Depth.HIGHLIGHT_GROUP:
+            if (i === 0) {
+              y += moduleHeight + moduleMargin;
+            }
+            const groupHeight = node.flow * height;
+            y -= groupHeight;
+            node.layout = { x, y, width: moduleWidth, height: groupHeight };
+            if (i + 1 === nodes.length) {
+              y -= moduleMargin;
+            }
             break;
           default:
             break;

@@ -63,7 +63,7 @@ export default class Module extends AlluvialNodeBase {
   }
 
   sortChildren() {
-    this.sortBy((a: HighlightGroup, b: HighlightGroup) => b.highlightIndex - a.highlightIndex);
+    this.sortBy((a: HighlightGroup, b: HighlightGroup) => a.highlightIndex - b.highlightIndex);
   }
 
   getLargestLeafNodeNames() {
