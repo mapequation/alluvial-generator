@@ -107,7 +107,11 @@ export default function Sidebar(props) {
             />
           </Menu.Menu>}
         >
-          <SelectedModule module={selectedModule} highlightColors={highlightColors}/>
+          <SelectedModule
+            module={selectedModule}
+            highlightColors={highlightColors}
+            defaultHighlightColor={defaultHighlightColor}
+          />
         </Portal>
         }
       </Menu.Item>

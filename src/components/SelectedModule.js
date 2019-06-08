@@ -10,7 +10,7 @@ const SelectableTableCell = props => <Table.Cell selectable style={{ padding: "0
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
 export default function SelectedModule(props) {
-  const { module, highlightColors } = props;
+  const { module, highlightColors, defaultHighlightColor } = props;
   const { dispatch } = useContext(Dispatch);
   const [name, setName] = useState("");
   const [networkName, setNetworkName] = useState("");
@@ -107,7 +107,11 @@ export default function SelectedModule(props) {
           </Table.Body>
           }
         </Table>
-        <GithubPicker colors={highlightColors} triangle="hide" onChangeComplete={handleColorChange}/>
+        <GithubPicker
+          triangle="hide"
+          colors={[...highlightColors, defaultHighlightColor]}
+          onChangeComplete={handleColorChange}
+        />
       </Segment>
     </Draggable>
   );
