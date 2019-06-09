@@ -75,8 +75,8 @@ export default function Layout(props) {
       <SemanticSidebar.Pushable style={{ height: "100vh", overflow: "hidden" }}>
         <Sidebar {...state} {...props}/>
         <SemanticSidebar.Pusher>
-          <Rail internal position="right" style={{ padding: 0, margin: 0, height: 0 }}>
-            <Menu vertical>
+          <Rail internal position="right" style={{ padding: 0, margin: 0, height: 0, width: "182px" }}>
+            <Menu vertical size="small">
               <Menu.Item
                 icon="sidebar"
                 content="Show sidebar"
