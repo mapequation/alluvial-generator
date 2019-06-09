@@ -10,16 +10,18 @@ import SelectedModule from "./SelectedModule";
 
 
 function LabelForSlider(props) {
-  const { children, ...rest } = props;
+  const { children, popup, ...rest } = props;
+
+  const label = <Label
+    basic
+    horizontal
+    {...rest}
+    style={{ float: "left", margin: "0.08em 0" }}
+  />;
 
   return (
     <div style={{ clear: "both" }}>
-      <Label
-        basic
-        horizontal
-        {...rest}
-        style={{ float: "left", margin: "0.08em 0" }}
-      />
+      {popup ? <Popup content={popup} inverted size="small" trigger={label}/> : label}
       <div style={{ width: "50%", display: "inline-block", float: "right" }}>
         {children}
       </div>
@@ -29,7 +31,11 @@ function LabelForSlider(props) {
 
 const GreySlider = props => <Slider color="grey" {...props}/>;
 
-const MyCheckbox = props => <Checkbox style={{ display: "block", margin: "0.3em 0" }} {...props}/>;
+const MyCheckbox = props => {
+  const { popup, ...rest } = props;
+  const checkbox = <Checkbox style={{ display: "block", margin: "0.3em 0" }} {...rest}/>;
+  return popup ? <Popup content={popup} inverted size="small" trigger={checkbox}/> : checkbox;
+};
 
 export default function Sidebar(props) {
   const {
@@ -117,8 +123,12 @@ export default function Sidebar(props) {
         }
       </Menu.Item>
       <Menu.Item>
-        <Header as="h4">Module settings</Header>
-        <LabelForSlider content="Height" detail={height}>
+        <Header as="h4">Layout</Header>
+        <LabelForSlider
+          content="Height"
+          detail={height}
+          popup="Total height of the diagram (arbitrary units)."
+        >
           <GreySlider
             settings={{
               start: height,
@@ -129,7 +139,11 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <LabelForSlider content="Width" detail={moduleWidth}>
+        <LabelForSlider
+          content="Module width"
+          detail={moduleWidth}
+          popup="Width of each stack of modules (arbitrary units)."
+        >
           <GreySlider
             settings={{
               start: moduleWidth,
@@ -140,7 +154,26 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <LabelForSlider content="Margin" detail={2 ** (marginExponent - 1)}>
+        <LabelForSlider
+          content="Module spacing"
+          detail={Math.round(streamlineFraction * 100) + "%"}
+          popup="Relative streamline width to module width."
+        >
+          <GreySlider
+            settings={{
+              start: streamlineFraction,
+              min: 0,
+              max: 3,
+              step: 0.1,
+              onChange: value => dispatch({ type: "streamlineFraction", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider
+          content="Margin"
+          detail={2 ** (marginExponent - 1)}
+          popup="Margin between top-level modules. Sub-modules are spaced closer together."
+        >
           <GreySlider
             discrete
             settings={{
@@ -152,7 +185,11 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <LabelForSlider content="Visible flow" detail={(1 - moduleFlowThreshold) * 100 + "%"}>
+        <LabelForSlider
+          content="Visible flow"
+          detail={(1 - moduleFlowThreshold) * 100 + "%"}
+          popup="Show modules that together contain this much flow of information."
+        >
           <GreySlider
             discrete
             settings={{
@@ -164,38 +201,11 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <div style={{ clear: "both", paddingTop: "0.5em" }}>
-          <MyCheckbox
-            label="Vertical align to bottom"
-            checked={verticalAlign === "bottom"}
-            onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
-          />
-          <MyCheckbox
-            label="Show module id"
-            checked={showModuleId}
-            onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
-          />
-          <MyCheckbox
-            label="Use drop shadow"
-            checked={dropShadow}
-            onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
-          />
-        </div>
-      </Menu.Item>
-      <Menu.Item>
-        <Header as="h4">Streamline settings</Header>
-        <LabelForSlider content="Relative width" detail={Math.round(streamlineFraction * 100) + "%"}>
-          <GreySlider
-            settings={{
-              start: streamlineFraction,
-              min: 0,
-              max: 3,
-              step: 0.1,
-              onChange: value => dispatch({ type: "streamlineFraction", value })
-            }}
-          />
-        </LabelForSlider>
-        <LabelForSlider content="Min. thickness" detail={streamlineThreshold}>
+        <LabelForSlider
+          content="Streamline filter"
+          detail={streamlineThreshold}
+          popup="Show streamlines that are at least this tall."
+        >
           <GreySlider
             discrete
             settings={{
@@ -207,7 +217,11 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <LabelForSlider content="Transparency" detail={Math.round((1 - streamlineOpacity) * 100) + "%"}>
+        <LabelForSlider
+          content="Transparency"
+          detail={Math.round((1 - streamlineOpacity) * 100) + "%"}
+          popup="Increase transparency to highlight overlapping streamlines."
+        >
           <GreySlider
             settings={{
               start: 1 - streamlineOpacity,
@@ -218,10 +232,11 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <div style={{ clear: "both" }}/>
-      </Menu.Item>
-      <Menu.Item>
-        <LabelForSlider content="Animation speed" detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}>
+        <LabelForSlider
+          content="Animation speed"
+          detail={duration < 300 ? "🐇" : duration < 1000 ? "🐈" : "🐢"}
+          popup="Faster or slower animation speed."
+        >
           <GreySlider
             settings={{
               start: 1 / duration,
@@ -232,7 +247,26 @@ export default function Sidebar(props) {
             }}
           />
         </LabelForSlider>
-        <div style={{ clear: "both" }}/>
+        <div style={{ clear: "both", paddingTop: "0.5em" }}>
+          <MyCheckbox
+            label="Bottom align"
+            checked={verticalAlign === "bottom"}
+            onChange={(e, { checked }) => dispatch({ type: "verticalAlign", value: checked ? "bottom" : "justify" })}
+            popup="Justify vertical module alignment or align modules to bottom."
+          />
+          <MyCheckbox
+            label="Module ids"
+            checked={showModuleId}
+            onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
+            popup="Show or hide module designations."
+          />
+          <MyCheckbox
+            label="Drop shadow"
+            checked={dropShadow}
+            onChange={(e, { checked }) => dispatch({ type: "dropShadow", value: checked })}
+            popup="Use drop shadow on modules. Sub-modules use drop shadow with less radius than top-level modules. (Slow)"
+          />
+        </div>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Settings</Header>
