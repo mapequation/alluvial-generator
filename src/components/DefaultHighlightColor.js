@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SketchPicker } from "react-color";
 import { Popup } from "semantic-ui-react";
 
@@ -13,6 +13,10 @@ export default function DefaultHighlightColor(props) {
     setColor(color.hex);
     onChange(color.hex);
   };
+
+  useEffect(() => {
+    setColor(defaultHighlightColor);
+  }, [defaultHighlightColor]);
 
   const styles = {
     color: {
