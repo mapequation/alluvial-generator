@@ -28,19 +28,11 @@ const fileExtension = filename => {
   return filename.substring(index + 1).toLowerCase();
 };
 
-const fileSize = file => new Blob([file]).size;
-
 export default class LoadNetworks extends React.Component {
   state = {
     files: [],
     loading: false
   };
-
-  exampleNetworks = [
-    "science1998_2y.ftree",
-    "science2001_2y.ftree",
-    "science2007_2y.ftree"
-  ];
 
   static propTypes = {
     onSubmit: PropTypes.func
@@ -128,23 +120,18 @@ export default class LoadNetworks extends React.Component {
   withLoadingState = callback => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
 
-  loadExample = async () => {
-    const networks = this.exampleNetworks;
+  loadExample = () => {
+    const { onSubmit } = this.props;
 
-    const files = await Promise.all(
-      networks.map(network => fetch(`data/${network}`))
-    ).then(responses => Promise.all(responses.map(res => res.text())));
+    const filename = "science-1998-2001-2007.json";
 
-    this.setState({
-      files: files.map((file, i) => ({
-        contents: file,
-        name: networks[i],
-        size: fileSize(file),
-        format: fileExtension(networks[i]),
-        error: false
-      })),
-      loading: false
-    }, this.parseNetworks);
+    fetch(`./data/${filename}`)
+      .then(res => res.json())
+      .then(onSubmit)
+      .catch(err => {
+        console.log(err);
+        this.setState({ loading: false });
+      });
   };
 
   moveRow = (toIndex, fromIndex) =>
