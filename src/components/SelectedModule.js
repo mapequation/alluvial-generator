@@ -65,7 +65,7 @@ export default function SelectedModule(props) {
             <Table.Cell>{toPrecision(module.flow)}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>Num. nodes</Table.Cell>
+            <Table.Cell>Nodes</Table.Cell>
             <Table.Cell>{module.numLeafNodes}</Table.Cell>
           </Table.Row>
           <Table.Row>
