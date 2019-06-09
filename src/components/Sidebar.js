@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { SketchPicker } from "react-color";
 import { Slider } from "react-semantic-ui-range";
 import { Checkbox, Header, Icon, Label, Menu, Popup, Portal, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
@@ -30,7 +29,10 @@ function LabelForSlider(props) {
   );
 }
 
-const GreySlider = props => <Slider color="grey" {...props}/>;
+const GreySlider = props => {
+  const { start, ...settings } = props;
+  return <Slider color="grey" value={start} settings={{ start, ...settings }}/>;
+};
 
 const MyCheckbox = props => {
   const { popup, ...rest } = props;
@@ -131,13 +133,11 @@ export default function Sidebar(props) {
           popup="Total height of the diagram (arbitrary units)."
         >
           <GreySlider
-            settings={{
-              start: height,
-              min: 400,
-              max: 2000,
-              step: 10,
-              onChange: value => dispatch({ type: "height", value })
-            }}
+            start={height}
+            min={400}
+            max={2000}
+            step={10}
+            onChange={value => dispatch({ type: "height", value })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -146,13 +146,11 @@ export default function Sidebar(props) {
           popup="Width of each stack of modules (arbitrary units)."
         >
           <GreySlider
-            settings={{
-              start: moduleWidth,
-              min: 10,
-              max: 200,
-              step: 10,
-              onChange: value => dispatch({ type: "moduleWidth", value })
-            }}
+            start={moduleWidth}
+            min={10}
+            max={200}
+            step={10}
+            onChange={value => dispatch({ type: "moduleWidth", value })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -161,13 +159,11 @@ export default function Sidebar(props) {
           popup="Relative streamline width to module width."
         >
           <GreySlider
-            settings={{
-              start: streamlineFraction,
-              min: 0,
-              max: 3,
-              step: 0.1,
-              onChange: value => dispatch({ type: "streamlineFraction", value })
-            }}
+            start={streamlineFraction}
+            min={0}
+            max={3}
+            step={0.1}
+            onChange={value => dispatch({ type: "streamlineFraction", value })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -176,14 +172,11 @@ export default function Sidebar(props) {
           popup="Margin between top-level modules. Sub-modules are spaced closer together."
         >
           <GreySlider
-            discrete
-            settings={{
-              start: marginExponent,
-              min: 1,
-              max: 10,
-              step: 1,
-              onChange: value => dispatch({ type: "marginExponent", value })
-            }}
+            start={marginExponent}
+            min={1}
+            max={10}
+            step={1}
+            onChange={value => dispatch({ type: "marginExponent", value })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -192,14 +185,11 @@ export default function Sidebar(props) {
           popup="Show modules that together contain this much flow of information."
         >
           <GreySlider
-            discrete
-            settings={{
-              start: (1 - moduleFlowThreshold) * 100,
-              min: 97,
-              max: 100,
-              step: 0.1,
-              onChange: value => dispatch({ type: "moduleFlowThreshold", value: 1 - value / 100 })
-            }}
+            start={(1 - moduleFlowThreshold) * 100}
+            min={97}
+            max={100}
+            step={0.1}
+            onChange={value => dispatch({ type: "moduleFlowThreshold", value: 1 - value / 100 })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -208,14 +198,11 @@ export default function Sidebar(props) {
           popup="Show streamlines that are at least this tall."
         >
           <GreySlider
-            discrete
-            settings={{
-              start: streamlineThreshold,
-              min: 0,
-              max: 2,
-              step: 0.01,
-              onChange: value => dispatch({ type: "streamlineThreshold", value })
-            }}
+            start={streamlineThreshold}
+            min={0}
+            max={2}
+            step={0.01}
+            onChange={value => dispatch({ type: "streamlineThreshold", value })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -224,13 +211,11 @@ export default function Sidebar(props) {
           popup="Increase transparency to highlight overlapping streamlines."
         >
           <GreySlider
-            settings={{
-              start: 1 - streamlineOpacity,
-              min: 0,
-              max: 1,
-              step: 0.01,
-              onChange: transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })
-            }}
+            start={1 - streamlineOpacity}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })}
           />
         </LabelForSlider>
         <LabelForSlider
@@ -239,13 +224,11 @@ export default function Sidebar(props) {
           popup="Faster or slower animation speed."
         >
           <GreySlider
-            settings={{
-              start: 1 / duration,
-              min: 1 / 2000,
-              max: 1 / 200,
-              step: 1 / 2000,
-              onChange: value => dispatch({ type: "duration", value: 1 / value })
-            }}
+            start={1 / duration}
+            min={1 / 2000}
+            max={1 / 200}
+            step={1 / 2000}
+            onChange={value => dispatch({ type: "duration", value: 1 / value })}
           />
         </LabelForSlider>
         <div style={{ clear: "both", paddingTop: "0.5em" }}>
