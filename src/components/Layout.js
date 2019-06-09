@@ -52,7 +52,7 @@ export default function Layout(props) {
     moduleWidth: 100,
     streamlineFraction: 2,
     streamlineThreshold: 1,
-    streamlineOpacity: 0.5,
+    streamlineOpacity: 0.6,
     moduleFlowThreshold: 8e-3,
     defaultHighlightColor: "#b6b69f",
     highlightColors: schemePaired,
