@@ -89,6 +89,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     selectedModuleColorChangeBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
+    marginExponent: PropTypes.number,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
@@ -98,6 +99,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
   static defaultProps = {
     duration: 200,
+    marginExponent: 5,
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
@@ -131,19 +133,38 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   shouldUpdateLayout(prevProps) {
-    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, selectedModuleColorChangeBit } = this.props;
+    const {
+      height,
+      marginExponent,
+      streamlineFraction,
+      moduleWidth,
+      moduleFlowThreshold,
+      verticalAlign,
+      selectedModuleColorChangeBit
+    } = this.props;
+
     const heightChanged = height !== prevProps.height;
+    const marginExponentChanged = marginExponent !== prevProps.marginExponent;
     const streamlineFractionChanged = streamlineFraction !== prevProps.streamlineFraction;
     const moduleWidthChanged = moduleWidth !== prevProps.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
     const selectedModuleColorChanged = selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit;
-    return heightChanged || streamlineFractionChanged || moduleWidthChanged || moduleFlowThresholdChanged || verticalAlignChanged || selectedModuleColorChanged;
+
+    return (
+      heightChanged ||
+      marginExponentChanged ||
+      streamlineFractionChanged ||
+      moduleWidthChanged ||
+      moduleFlowThresholdChanged ||
+      verticalAlignChanged ||
+      selectedModuleColorChanged
+    );
   }
 
   update() {
-    const { height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
-    this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign);
+    const { height, marginExponent, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
+    this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, marginExponent);
   }
 
   draw() {

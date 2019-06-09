@@ -12,6 +12,8 @@ function reducer(state, action) {
       return { ...state, height: action.value };
     case "duration":
       return { ...state, duration: action.value };
+    case "marginExponent":
+      return { ...state, marginExponent: action.value };
     case "moduleWidth":
       return { ...state, moduleWidth: action.value };
     case "streamlineFraction":
@@ -49,6 +51,7 @@ export default function Layout(props) {
   const initialState = {
     height: 600,
     duration: 400,
+    marginExponent: 5,
     moduleWidth: 100,
     streamlineFraction: 2,
     streamlineThreshold: 1,

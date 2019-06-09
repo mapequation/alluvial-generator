@@ -36,6 +36,7 @@ export default function Sidebar(props) {
     networks,
     height,
     duration,
+    marginExponent,
     moduleWidth,
     streamlineFraction,
     streamlineOpacity,
@@ -59,7 +60,7 @@ export default function Sidebar(props) {
   const basename = networks.map(network => network.name);
 
   const saveSettings = () => serializeState({
-    height, duration, moduleWidth, moduleFlowThreshold,
+    height, duration, marginExponent, moduleWidth, moduleFlowThreshold,
     streamlineFraction, streamlineOpacity, streamlineThreshold,
     verticalAlign, showModuleId, dropShadow,
     defaultHighlightColor, highlightColors
@@ -136,6 +137,18 @@ export default function Sidebar(props) {
               max: 200,
               step: 10,
               onChange: value => dispatch({ type: "moduleWidth", value })
+            }}
+          />
+        </LabelForSlider>
+        <LabelForSlider content="Margin" detail={2 ** (marginExponent - 1)}>
+          <GreySlider
+            discrete
+            settings={{
+              start: marginExponent,
+              min: 1,
+              max: 10,
+              step: 1,
+              onChange: value => dispatch({ type: "marginExponent", value })
             }}
           />
         </LabelForSlider>
