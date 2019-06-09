@@ -4,7 +4,7 @@ import readAsText from "./read-as-text";
 
 export const serializeState = (state, filename) => {
   const json = JSON.stringify(state, null, 2);
-  const blob = new Blob([json], { type: "text/plain;charset=utf-8" });
+  const blob = new Blob([json], { type: "application/json;charset=utf-8" });
   FileSaver.saveAs(blob, filename);
 };
 
