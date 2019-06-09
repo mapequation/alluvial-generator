@@ -100,14 +100,33 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setModuleColor(alluvialObject: Object) {
-    const { highlightIndex } = alluvialObject;
+  setModuleColor(alluvialObject: Object, allNetworks = false) {
+    const { highlightIndex, networkId } = alluvialObject;
     const module = this.getModule(alluvialObject);
     if (!module) return;
     const leafNodes = Array.from(module.leafNodes());
     leafNodes.forEach(node => node.highlightIndex = highlightIndex);
     this.removeNodes(leafNodes);
     this.addNodes(leafNodes);
+
+    if (allNetworks) {
+      this.alluvialRoot.children
+        .filter(root => root.networkId !== networkId)
+        .forEach(networkRoot => {
+          const nodes = leafNodes.reduce((nodes, node) => {
+            const oppositeNode = networkRoot.getLeafNodeByName(node.name);
+            if (oppositeNode) {
+              oppositeNode.highlightIndex = highlightIndex;
+              nodes.push(oppositeNode);
+            }
+            return nodes;
+          }, []);
+
+          this.removeNodes(nodes);
+          this.addNodes(nodes);
+        });
+    }
+
     this.dirty = true;
   }
 
@@ -162,17 +181,9 @@ export default class Diagram {
       }
 
       if (streamlineNode.hasTarget) {
-        const oppositeStreamlineIsDangling = StreamlineId.has(streamlineNode.targetId);
-        if (oppositeStreamlineIsDangling && oppositeNode /* oppositeNode always exists if we have a target id */) {
-          const oppositeSide = opposite(branch.side);
-          oppositeNode.removeFromSide(oppositeSide);
-          this.addNodeToSide(oppositeNode, oppositeSide);
-        } else {
-          throw new Error(
-            "Streamline node for the opposite node must be dangling " +
-            "before it has has this node to connect to."
-          );
-        }
+        const oppositeSide = opposite(branch.side);
+        oppositeNode.removeFromSide(oppositeSide);
+        this.addNodeToSide(oppositeNode, oppositeSide);
       }
 
       streamlineNode.addChild(node);

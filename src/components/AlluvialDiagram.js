@@ -87,6 +87,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     moduleFlowThreshold: PropTypes.number.isRequired,
     selectedModuleNameChangeBit: PropTypes.number.isRequired,
     selectedModuleColorChangeBit: PropTypes.number.isRequired,
+    selectedModuleColorChangeAllBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
     marginExponent: PropTypes.number,
@@ -114,7 +115,12 @@ export default class AlluvialDiagram extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { selectedModule, selectedModuleNameChangeBit, selectedModuleColorChangeBit } = this.props;
+    const {
+      selectedModule,
+      selectedModuleNameChangeBit,
+      selectedModuleColorChangeBit,
+      selectedModuleColorChangeAllBit
+    } = this.props;
 
     if (selectedModule) {
       if (selectedModuleNameChangeBit !== prevProps.selectedModuleNameChangeBit) {
@@ -123,6 +129,9 @@ export default class AlluvialDiagram extends React.PureComponent {
       }
       if (selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit) {
         this.diagram.setModuleColor(selectedModule);
+      }
+      if (selectedModuleColorChangeAllBit !== prevProps.selectedModuleColorChangeAllBit) {
+        this.diagram.setModuleColor(selectedModule, true);
       }
     }
 
@@ -140,7 +149,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleWidth,
       moduleFlowThreshold,
       verticalAlign,
-      selectedModuleColorChangeBit
+      selectedModuleColorChangeBit,
+      selectedModuleColorChangeAllBit
     } = this.props;
 
     const heightChanged = height !== prevProps.height;
@@ -149,7 +159,9 @@ export default class AlluvialDiagram extends React.PureComponent {
     const moduleWidthChanged = moduleWidth !== prevProps.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
-    const selectedModuleColorChanged = selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit;
+    const selectedModuleColorChanged =
+      selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit ||
+      selectedModuleColorChangeAllBit !== prevProps.selectedModuleColorChangeAllBit;
 
     return (
       heightChanged ||

@@ -38,6 +38,8 @@ function reducer(state, action) {
       return { ...state, selectedModuleNameChangeBit: state.selectedModuleNameChangeBit ? 0 : 1 };
     case "selectedModuleColorChange":
       return { ...state, selectedModuleColorChangeBit: state.selectedModuleColorChangeBit ? 0 : 1 };
+    case "selectedModuleColorChangeAll":
+      return { ...state, selectedModuleColorChangeAllBit: state.selectedModuleColorChangeAllBit ? 0 : 1 };
     case "sidebarVisible":
       return { ...state, sidebarVisible: action.value };
     case "loadState":
@@ -65,6 +67,7 @@ export default function Layout(props) {
     selectedModule: null,
     selectedModuleNameChangeBit: 0,
     selectedModuleColorChangeBit: 0,
+    selectedModuleColorChangeAllBit: 0,
     sidebarVisible: true
   };
 

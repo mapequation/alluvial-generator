@@ -1,6 +1,6 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { GithubPicker } from "react-color";
-import { Icon, Input, Table } from "semantic-ui-react";
+import { Checkbox, Icon, Input, Table } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 
 
@@ -13,6 +13,7 @@ export default function SelectedModule(props) {
   const { dispatch } = useContext(Dispatch);
   const [name, setName] = useState("");
   const [networkName, setNetworkName] = useState("");
+  const [all, setAll] = useState(false);
 
   const handleChange = (setName, prop) => (e, { value }) => {
     if (!module) return;
@@ -26,7 +27,7 @@ export default function SelectedModule(props) {
 
   const handleColorChange = color => {
     module.highlightIndex = highlightColors.indexOf(color.hex);
-    dispatch({ type: "selectedModuleColorChange" });
+    dispatch({ type: all ? "selectedModuleColorChangeAll" : "selectedModuleColorChange" });
   };
 
   useLayoutEffect(() => {
@@ -100,6 +101,12 @@ export default function SelectedModule(props) {
         triangle="hide"
         colors={[...highlightColors, defaultHighlightColor]}
         onChangeComplete={handleColorChange}
+      />
+      <Checkbox
+        checked={all}
+        style={{ display: "block", margin: "0.3em 0" }}
+        label="Paint contained nodes in all networks"
+        onChange={(e, { checked }) => setAll(checked)}
       />
     </React.Fragment>
   );
