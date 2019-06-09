@@ -99,15 +99,6 @@ export default class AlluvialNodeBase {
     this.parent.removeChild(this);
   }
 
-  removeFromTree() {
-    this.removeFromParent();
-    if (!this.parent) return;
-    this.parent.flow -= this.flow;
-    if (this.parent.isEmpty) {
-      this.parent.removeFromTree();
-    }
-  }
-
   sortChildren() {
     // no-op
   }
