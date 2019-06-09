@@ -53,3 +53,8 @@ kbd {
     padding: .1em .6em;
     text-shadow: 0 1px 0 #fff;
 }
+
+.github-picker {
+    border: 1px solid rgba(34, 36, 38, .15) !important;
+    box-shadow: none !important;
+}

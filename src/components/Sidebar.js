@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Icon, Label, Menu, Popup, Portal, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
@@ -62,8 +62,6 @@ export default function Sidebar(props) {
 
   const { dispatch } = useContext(Dispatch);
 
-  const [selectedModuleOpen, setSelectedModuleOpen] = useState(false);
-
   let fileInput = null;
 
   const basename = networks.map(network => network.name);
@@ -80,10 +78,6 @@ export default function Sidebar(props) {
       fileInput.value = "";
       dispatch({ type: "loadState", value });
     });
-
-  const selectedModuleName = selectedModule
-    ? selectedModule.name || selectedModule.largestLeafNodes.join(", ")
-    : <span style={{ color: "#777" }}>No module selected</span>;
 
   return (
     <SemanticSidebar
@@ -104,25 +98,13 @@ export default function Sidebar(props) {
       />
       <Menu.Item>
         <Header as="h4">Selected module</Header>
-        {selectedModuleName}
-        {selectedModule &&
-        <Portal
-          open={selectedModuleOpen && !!selectedModule}
-          onClose={() => setSelectedModuleOpen(false)}
-          trigger={<Menu.Menu>
-            <Menu.Item
-              icon={selectedModuleOpen ? "close" : "info circle"}
-              content={selectedModuleOpen ? "Show less" : "Show more"}
-              onClick={() => setSelectedModuleOpen(!selectedModuleOpen)}
-            />
-          </Menu.Menu>}
-        >
-          <SelectedModule
+        {!!selectedModule
+          ? <SelectedModule
             module={selectedModule}
             highlightColors={highlightColors}
             defaultHighlightColor={defaultHighlightColor}
           />
-        </Portal>
+          : <span style={{ color: "#777" }}>No module selected</span>
         }
       </Menu.Item>
       <Menu.Item>

@@ -1,7 +1,6 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
-import Draggable from "react-draggable";
 import { GithubPicker } from "react-color";
-import { Container, Header, Icon, Input, Segment, Table } from "semantic-ui-react";
+import { Icon, Input, Table } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 
 
@@ -37,82 +36,71 @@ export default function SelectedModule(props) {
   }, [module]);
 
   return (
-    <Draggable handle=".draggable">
-      <Segment
-        as={Container}
-        raised
-        text
-        style={{ right: "360px", position: "fixed", bottom: "10px" }}
-      >
-        <Header
-          as="h4"
-          className="draggable"
-          style={{ cursor: "pointer" }}
-          content="Selected module"
-        />
-        <Table celled striped compact fixed singleLine size="small">
-          {module &&
-          <Table.Body>
-            <Table.Row>
-              <Table.Cell width={4}>Network</Table.Cell>
-              <SelectableTableCell>
-                <Input
-                  fluid
-                  transparent
-                  value={networkName}
-                  placeholder="Set network name..."
-                  onChange={handleNetworkNameChange}
-                />
-              </SelectableTableCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Codelength</Table.Cell>
-              <Table.Cell>
-                {toPrecision(module.networkCodelength, module.networkCodelength > 0 ? 4 : 1)} bits
-              </Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Flow</Table.Cell>
-              <Table.Cell>{toPrecision(module.flow)}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Number of nodes</Table.Cell>
-              <Table.Cell>{module.numLeafNodes}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Module id</Table.Cell>
-              <Table.Cell>{module.moduleId}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Level</Table.Cell>
-              <Table.Cell>{module.moduleLevel}</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Module name</Table.Cell>
-              <SelectableTableCell>
-                <Input
-                  fluid
-                  transparent
-                  value={name}
-                  placeholder="Set module name..."
-                  onChange={handleNameChange}
-                  icon={name && <Icon link name="x" onClick={() => handleNameChange(null, { value: "" })}/>}
-                />
-              </SelectableTableCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Largest nodes</Table.Cell>
-              <Table.Cell>{module.largestLeafNodes.join(", ")}</Table.Cell>
-            </Table.Row>
-          </Table.Body>
+    <React.Fragment>
+      <Table celled striped compact fixed singleLine size="small">
+        {module &&
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell width={5}>Network</Table.Cell>
+            <SelectableTableCell>
+              <Input
+                fluid
+                transparent
+                value={networkName}
+                placeholder="Set network name..."
+                onChange={handleNetworkNameChange}
+              />
+            </SelectableTableCell>
+          </Table.Row>
+          {module.networkCodelength &&
+          <Table.Row>
+            <Table.Cell>Codelength</Table.Cell>
+            <Table.Cell>
+              {toPrecision(module.networkCodelength, module.networkCodelength > 0 ? 4 : 1)} bits
+            </Table.Cell>
+          </Table.Row>
           }
-        </Table>
-        <GithubPicker
-          triangle="hide"
-          colors={[...highlightColors, defaultHighlightColor]}
-          onChangeComplete={handleColorChange}
-        />
-      </Segment>
-    </Draggable>
+          <Table.Row>
+            <Table.Cell>Flow</Table.Cell>
+            <Table.Cell>{toPrecision(module.flow)}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Num. nodes</Table.Cell>
+            <Table.Cell>{module.numLeafNodes}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Module id</Table.Cell>
+            <Table.Cell>{module.moduleId}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Level</Table.Cell>
+            <Table.Cell>{module.moduleLevel}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Module name</Table.Cell>
+            <SelectableTableCell>
+              <Input
+                fluid
+                transparent
+                value={name}
+                placeholder="Set module name..."
+                onChange={handleNameChange}
+                icon={name && <Icon link name="x" onClick={() => handleNameChange(null, { value: "" })}/>}
+              />
+            </SelectableTableCell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Largest nodes</Table.Cell>
+            <Table.Cell>{module.largestLeafNodes.join(", ")}</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+        }
+      </Table>
+      <GithubPicker
+        triangle="hide"
+        colors={[...highlightColors, defaultHighlightColor]}
+        onChangeComplete={handleColorChange}
+      />
+    </React.Fragment>
   );
 }
