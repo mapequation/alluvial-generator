@@ -227,7 +227,7 @@ export default function Sidebar(props) {
           <Popup
             on="click"
             basic
-            trigger={<Menu.Item icon="paint brush" content="Choose color"/>}
+            trigger={<Menu.Item icon="paint brush" content="Default color"/>}
             style={{ background: "none", backgroundImage: "none", border: "none", boxShadow: "none" }}
           >
             <SketchPicker
