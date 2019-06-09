@@ -7,6 +7,7 @@ import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
 import MenuHeader from "./MenuHeader";
 import SelectedModule from "./SelectedModule";
+import DefaultHighlightColor from "./DefaultHighlightColor";
 
 
 function LabelForSlider(props) {
@@ -267,27 +268,13 @@ export default function Sidebar(props) {
             popup="Use drop shadow on modules. Sub-modules use drop shadow with less radius than top-level modules. (Slow)"
           />
         </div>
+        <DefaultHighlightColor
+          defaultHighlightColor={defaultHighlightColor}
+          onChange={value => dispatch({ type: "defaultHighlightColor", value })}
+        />
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Settings</Header>
-        <Menu.Menu>
-          <Popup
-            on="click"
-            basic
-            trigger={<Menu.Item icon="paint brush" content="Default color"/>}
-            style={{ background: "none", backgroundImage: "none", border: "none", boxShadow: "none" }}
-          >
-            <SketchPicker
-              disableAlpha
-              color={defaultHighlightColor}
-              onChangeComplete={color => dispatch({ type: "defaultHighlightColor", value: color.hex })}
-              presetColors={[
-                "#C27F87", "#DDBF8D", "#D0CA92", "#AE927A", "#A7CB81", "#64764F", "#D599E1", "#D4A2FF",
-                "#A0BFE4", "#A6CBC1", "#BAD0A1", "#b6b69f", "#414141", "#808080", "#BFBFBF"
-              ]}
-            />
-          </Popup>
-        </Menu.Menu>
         <Menu.Menu>
           <Menu.Item
             icon="download"
