@@ -67,7 +67,7 @@ export default function DefaultHighlightColor(props) {
         <SketchPicker
           disableAlpha
           color={color}
-          onChange={handleChange}
+          onChangeComplete={handleChange}
           presetColors={[
             "#C27F87", "#DDBF8D", "#D0CA92", "#AE927A", "#A7CB81", "#64764F", "#D599E1", "#D4A2FF",
             "#A0BFE4", "#A6CBC1", "#BAD0A1", "#b6b69f", "#414141", "#808080", "#BFBFBF"
