@@ -1,6 +1,6 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { GithubPicker } from "react-color";
-import { Checkbox, Icon, Input, Table } from "semantic-ui-react";
+import { Button, Icon, Input, Table } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 
 
@@ -8,12 +8,31 @@ const SelectableTableCell = props => <Table.Cell selectable style={{ padding: "0
 
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
+function Swatch(props) {
+  return <div style={{
+    margin: "0 1px 2px",
+    padding: "4px",
+    background: "#fff",
+    borderRadius: "4px",
+    boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+    display: "inline-block",
+    cursor: "pointer"
+  }}>
+    <div style={{
+      width: "25px",
+      height: "25px",
+      background: props.background
+    }}/>
+  </div>;
+}
+
 export default function SelectedModule(props) {
   const { module, highlightColors, defaultHighlightColor } = props;
   const { dispatch } = useContext(Dispatch);
+
   const [name, setName] = useState("");
   const [networkName, setNetworkName] = useState("");
-  const [all, setAll] = useState(false);
+  const [color, setColor] = useState(defaultHighlightColor);
 
   const handleChange = (setName, prop) => (e, { value }) => {
     if (!module) return;
@@ -25,9 +44,18 @@ export default function SelectedModule(props) {
   const handleNameChange = handleChange(setName, "name");
   const handleNetworkNameChange = handleChange(setNetworkName, "networkName");
 
-  const handleColorChange = color => {
-    module.highlightIndex = highlightColors.indexOf(color.hex);
-    dispatch({ type: all ? "selectedModuleColorChangeAll" : "selectedModuleColorChange" });
+  const highlightIndex = color => highlightColors.indexOf(color);
+
+  const handleColorChange = color => setColor(color.hex);
+
+  const paintModule = () => {
+    module.highlightIndex = highlightIndex(color);
+    dispatch({ type: "selectedModuleColorChange" });
+  };
+
+  const paintNodes = () => {
+    module.highlightIndex = highlightIndex(color);
+    dispatch({ type: "selectedModuleColorChangeAll" });
   };
 
   useLayoutEffect(() => {
@@ -97,17 +125,21 @@ export default function SelectedModule(props) {
         </Table.Body>
         }
       </Table>
+      <Swatch background={color}/>
       <GithubPicker
-        triangle="hide"
         colors={[...highlightColors, defaultHighlightColor]}
         onChangeComplete={handleColorChange}
       />
-      <Checkbox
-        checked={all}
-        style={{ display: "block", margin: "0.3em 0" }}
-        label="Paint contained nodes in all networks"
-        onChange={(e, { checked }) => setAll(checked)}
-      />
+      <Button.Group compact size="tiny" basic style={{ margin: "4px 0 0 0" }}>
+        <Button
+          content="Paint module"
+          onClick={paintModule}
+        />
+        <Button
+          content="Paint nodes in all networks"
+          onClick={paintNodes}
+        />
+      </Button.Group>
     </React.Fragment>
   );
 }
