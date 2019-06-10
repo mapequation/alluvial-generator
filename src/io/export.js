@@ -11,7 +11,12 @@ export const saveSvg = (elementId, filename) => {
 export const savePng = (elementId, filename) => {
   const svg = document.getElementById(elementId);
   const { width, height } = svg.getBoundingClientRect();
+
+  svg.setAttribute("width", width);
+  svg.setAttribute("height", height);
   const string = new XMLSerializer().serializeToString(svg);
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
