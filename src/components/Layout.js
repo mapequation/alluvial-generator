@@ -36,16 +36,16 @@ function reducer(state, action) {
       return { ...state, dropShadow: action.value };
     case "selectedModule":
       return { ...state, selectedModule: action.value };
-    case "selectedModuleNameChange":
-      return { ...state, selectedModuleNameChangeBit: flip(state.selectedModuleNameChangeBit) };
-    case "selectedModuleColorChange":
-      return { ...state, selectedModuleColorChangeBit: flip(state.selectedModuleColorChangeBit) };
-    case "selectedModuleColorChangeAll":
-      return { ...state, selectedModuleColorChangeAllBit: flip(state.selectedModuleColorChangeAllBit) };
-    case "sidebarVisible":
-      return { ...state, sidebarVisible: action.value };
+    case "changeName":
+      return { ...state, nameChangeBit: flip(state.nameChangeBit) };
+    case "changeColor":
+      return { ...state, colorChangeBit: flip(state.colorChangeBit) };
+    case "changeAllColor":
+      return { ...state, colorChangeAllBit: flip(state.colorChangeAllBit) };
     case "saveDiagram":
       return { ...state, saveDiagramBit: flip(state.saveDiagramBit) };
+    case "sidebarVisible":
+      return { ...state, sidebarVisible: action.value };
     default:
       throw new Error();
   }
@@ -67,9 +67,9 @@ export default function Layout(props) {
     showModuleId: false,
     dropShadow: false,
     selectedModule: null,
-    selectedModuleNameChangeBit: 0,
-    selectedModuleColorChangeBit: 0,
-    selectedModuleColorChangeAllBit: 0,
+    nameChangeBit: 0,
+    colorChangeBit: 0,
+    colorChangeAllBit: 0,
     saveDiagramBit: 0,
     sidebarVisible: true,
     ...props.state

@@ -38,7 +38,7 @@ export default function SelectedModule(props) {
     if (!module) return;
     module[prop] = value;
     setName(value);
-    dispatch({ type: "selectedModuleNameChange" });
+    dispatch({ type: "changeName" });
   };
 
   const handleNameChange = handleChange(setName, "name");
@@ -50,12 +50,12 @@ export default function SelectedModule(props) {
 
   const paintModule = () => {
     module.highlightIndex = highlightIndex(color);
-    dispatch({ type: "selectedModuleColorChange" });
+    dispatch({ type: "changeColor" });
   };
 
   const paintNodes = () => {
     module.highlightIndex = highlightIndex(color);
-    dispatch({ type: "selectedModuleColorChangeAll" });
+    dispatch({ type: "changeAllColor" });
   };
 
   useLayoutEffect(() => {

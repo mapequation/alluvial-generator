@@ -88,9 +88,9 @@ export default class AlluvialDiagram extends React.PureComponent {
     streamlineThreshold: PropTypes.number.isRequired,
     streamlineOpacity: PropTypes.number.isRequired,
     moduleFlowThreshold: PropTypes.number.isRequired,
-    selectedModuleNameChangeBit: PropTypes.number.isRequired,
-    selectedModuleColorChangeBit: PropTypes.number.isRequired,
-    selectedModuleColorChangeAllBit: PropTypes.number.isRequired,
+    nameChangeBit: PropTypes.number.isRequired,
+    colorChangeBit: PropTypes.number.isRequired,
+    colorChangeAllBit: PropTypes.number.isRequired,
     saveDiagramBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
@@ -135,21 +135,21 @@ export default class AlluvialDiagram extends React.PureComponent {
       defaultHighlightColor,
       highlightColors,
       selectedModule,
-      selectedModuleNameChangeBit,
-      selectedModuleColorChangeBit,
-      selectedModuleColorChangeAllBit,
+      nameChangeBit,
+      colorChangeBit,
+      colorChangeAllBit,
       saveDiagramBit
     } = this.props;
 
     if (selectedModule) {
-      if (flipped(selectedModuleNameChangeBit, prevProps.selectedModuleNameChangeBit)) {
+      if (flipped(nameChangeBit, prevProps.nameChangeBit)) {
         this.diagram.setModuleName(selectedModule);
         this.diagram.setNetworkName(selectedModule);
       }
-      if (flipped(selectedModuleColorChangeBit, prevProps.selectedModuleColorChangeBit)) {
+      if (flipped(colorChangeBit, prevProps.colorChangeBit)) {
         this.diagram.setModuleColor(selectedModule);
       }
-      if (flipped(selectedModuleColorChangeAllBit, prevProps.selectedModuleColorChangeAllBit)) {
+      if (flipped(colorChangeAllBit, prevProps.colorChangeAllBit)) {
         this.diagram.setModuleColor(selectedModule, true);
       }
     }
@@ -187,8 +187,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleWidth,
       moduleFlowThreshold,
       verticalAlign,
-      selectedModuleColorChangeBit,
-      selectedModuleColorChangeAllBit
+      colorChangeBit,
+      colorChangeAllBit
     } = this.props;
 
     const heightChanged = height !== prevProps.height;
@@ -197,9 +197,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const moduleWidthChanged = moduleWidth !== prevProps.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prevProps.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prevProps.verticalAlign;
-    const selectedModuleColorChanged =
-      selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit ||
-      selectedModuleColorChangeAllBit !== prevProps.selectedModuleColorChangeAllBit;
+    const colorChanged = colorChangeBit !== prevProps.colorChangeBit || colorChangeAllBit !== prevProps.colorChangeAllBit;
 
     return (
       heightChanged ||
@@ -208,7 +206,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleWidthChanged ||
       moduleFlowThresholdChanged ||
       verticalAlignChanged ||
-      selectedModuleColorChanged
+      colorChanged
     );
   }
 
