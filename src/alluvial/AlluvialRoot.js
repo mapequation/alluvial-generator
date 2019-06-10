@@ -105,7 +105,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             node.sortChildren();
             const margin =
               i + 1 < nodes.length
-                ? 2 ** (marginExponent - differenceIndex(node.path, nodes[i + 1].path))
+                ? 2 ** (marginExponent - 2 * differenceIndex(node.path, nodes[i + 1].path))
                 : 0;
             moduleHeight = node.flow * height;
             y -= moduleHeight;
