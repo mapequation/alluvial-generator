@@ -100,7 +100,7 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setModuleColor(alluvialObject: Object, allNetworks = false) {
+  setModuleColor(alluvialObject: Object, allNetworks: boolean = false) {
     const { highlightIndex, networkId } = alluvialObject;
     const module = this.getModule(alluvialObject);
     if (!module) return;
