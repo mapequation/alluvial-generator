@@ -127,7 +127,7 @@ export default function SelectedModule(props) {
       </Table>
       <Swatch background={color}/>
       <GithubPicker
-        colors={[...highlightColors, defaultHighlightColor]}
+        colors={[defaultHighlightColor, ...highlightColors]}
         onChangeComplete={handleColorChange}
       />
       <Button.Group compact size="tiny" basic style={{ margin: "4px 0 0 0" }}>
