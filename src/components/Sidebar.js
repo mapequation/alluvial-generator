@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Checkbox, Header, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
-import { parseState, serializeState } from "../io/serialize-state";
 import DefaultHighlightColor from "./DefaultHighlightColor";
 import MenuHeader from "./MenuHeader";
 import SelectedModule from "./SelectedModule";
@@ -62,33 +61,7 @@ export default function Sidebar(props) {
 
   const { dispatch } = useContext(Dispatch);
 
-  let fileInput = null;
-
   const basename = networks.map(network => network.name);
-
-  const saveSettings = () => serializeState({
-    height, duration, marginExponent, moduleWidth, moduleFlowThreshold,
-    streamlineFraction, streamlineOpacity, streamlineThreshold,
-    verticalAlign, showModuleId, dropShadow,
-    defaultHighlightColor, highlightColors
-  }, "alluvial-settings.json");
-
-  const parseSettings = () => parseState(fileInput.files[0])
-    .then(value => {
-      fileInput.value = "";
-      dispatch({ type: "loadState", value });
-    });
-
-  const saveDiagram = () => {
-    const settings = {
-      height, duration, marginExponent, moduleWidth, moduleFlowThreshold,
-      streamlineFraction, streamlineOpacity, streamlineThreshold,
-      verticalAlign, showModuleId, dropShadow,
-      defaultHighlightColor, highlightColors
-    };
-
-    dispatch({ type: "saveDiagram", value: settings });
-  };
 
   return (
     <SemanticSidebar
@@ -250,34 +223,11 @@ export default function Sidebar(props) {
         />
       </Menu.Item>
       <Menu.Item>
-        <Header as="h4">Settings</Header>
-        <Menu.Menu>
-          <Menu.Item
-            icon="download"
-            onClick={saveSettings}
-            content="Save settings"
-          />
-        </Menu.Menu>
-        <Menu.Menu>
-          <label className="link item" htmlFor="upload">
-            <Icon name="upload"/>Load settings
-          </label>
-          <input
-            style={{ display: "none" }}
-            type="file"
-            id="upload"
-            onChange={parseSettings}
-            accept={".json"}
-            ref={input => fileInput = input}
-          />
-        </Menu.Menu>
-      </Menu.Item>
-      <Menu.Item>
         <Header as="h4">Export</Header>
         <Menu.Menu>
           <Menu.Item
             icon="download"
-            onClick={saveDiagram}
+            onClick={() => dispatch({ type: "saveDiagram" })}
             content="Save diagram"
           />
         </Menu.Menu>

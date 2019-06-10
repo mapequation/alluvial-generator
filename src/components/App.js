@@ -6,15 +6,15 @@ import Layout from "./Layout";
 
 
 export default function App() {
-  const [networks, setNetworks] = useState([]);
+  const [state, setState] = useState({ networks: [] });
 
-  if (networks.length === 0) {
+  if (state.networks.length === 0) {
     return <React.Fragment>
       <Header/>
-      <LoadNetworks onSubmit={setNetworks}/>
+      <LoadNetworks onSubmit={setState}/>
       <Documentation/>
     </React.Fragment>;
   }
 
-  return <Layout networks={networks}/>;
+  return <Layout {...state}/>;
 }

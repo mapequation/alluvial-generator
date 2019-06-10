@@ -44,10 +44,8 @@ function reducer(state, action) {
       return { ...state, selectedModuleColorChangeAllBit: flip(state.selectedModuleColorChangeAllBit) };
     case "sidebarVisible":
       return { ...state, sidebarVisible: action.value };
-    case "loadState":
-      return { ...state, ...action.value };
     case "saveDiagram":
-      return { ...state, saveDiagramBit: flip(state.saveDiagramBit), settings: action.value };
+      return { ...state, saveDiagramBit: flip(state.saveDiagramBit) };
     default:
       throw new Error();
   }
@@ -73,8 +71,8 @@ export default function Layout(props) {
     selectedModuleColorChangeBit: 0,
     selectedModuleColorChangeAllBit: 0,
     saveDiagramBit: 0,
-    settings: {},
-    sidebarVisible: true
+    sidebarVisible: true,
+    ...props.state
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

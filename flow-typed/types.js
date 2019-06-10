@@ -9,6 +9,7 @@ declare interface Node {
   +stateId?: number;
   +insignificant?: boolean;
   +highlightIndex?: number;
+  +moduleLevel?: number;
 }
 
 declare interface Network {

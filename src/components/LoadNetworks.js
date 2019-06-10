@@ -42,12 +42,15 @@ export default class LoadNetworks extends React.Component {
     onSubmit: values => console.log(values)
   };
 
+  withLoadingState = callback => () =>
+    this.setState({ loading: true }, () => setTimeout(callback, 50));
+
   loadSelectedFiles = () => {
     const validFiles = [];
 
     for (let file of this.input.files) {
       const extension = fileExtension(file.name);
-      if (isValidExtension(extension)) {
+      if (isValidExtension(extension) || extension === "json") {
         file.format = extension;
         validFiles.push(file);
       } else {
@@ -74,15 +77,26 @@ export default class LoadNetworks extends React.Component {
       });
   };
 
-  removeFile = index =>
-    this.setState(({ files }) => {
-      files.splice(index, 1);
-      return { files };
-    });
-
   parseNetworks = () => {
     const { files } = this.state;
     const { onSubmit } = this.props;
+
+    const hasJson = files.some(file => file.format === "json");
+
+    if (hasJson) {
+      if (files.length > 1) {
+        files.forEach(file => {
+          if (file.format !== "json") {
+            file.error = true;
+          }
+        });
+        this.setState({ loading: false });
+        return;
+      }
+      const json = JSON.parse(files[0].contents);
+      onSubmit(json);
+      return;
+    }
 
     const networks = files.map((file, i) => {
       try {
@@ -114,11 +128,8 @@ export default class LoadNetworks extends React.Component {
       return;
     }
 
-    onSubmit(networks);
+    onSubmit({ networks });
   };
-
-  withLoadingState = callback => () =>
-    this.setState({ loading: true }, () => setTimeout(callback, 50));
 
   loadExample = () => {
     const { onSubmit } = this.props;
@@ -133,6 +144,16 @@ export default class LoadNetworks extends React.Component {
         this.setState({ loading: false });
       });
   };
+
+  removeFile = index =>
+    this.setState(({ files }) => {
+      files.splice(index, 1);
+      const hasJson = files.some(file => file.format === "json");
+      if (!hasJson) {
+        files.forEach(file => file.error = false);
+      }
+      return { files };
+    });
 
   moveRow = (toIndex, fromIndex) =>
     this.setState(state => {
@@ -176,7 +197,7 @@ export default class LoadNetworks extends React.Component {
           >
             <Step.Content>
               <Step.Title>Add networks</Step.Title>
-              <Step.Description><code>clu</code>, <code>map</code>, <code>tree</code>, <code>ftree</code></Step.Description>
+              <Step.Description>clu, map, tree, ftree, json</Step.Description>
             </Step.Content>
             <input
               style={{ display: "none" }}
@@ -184,7 +205,7 @@ export default class LoadNetworks extends React.Component {
               multiple
               id="upload"
               onChange={this.withLoadingState(this.loadSelectedFiles)}
-              accept={acceptedFormats}
+              accept={acceptedFormats + ",.json"}
               ref={input => (this.input = input)}
             />
           </Step>

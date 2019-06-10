@@ -38,14 +38,38 @@ export const savePng = (elementId, filename) => {
 
 export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
   const filename = networks.map(network => network.name).join(",") + ".json";
-  const obj = {
+
+  const networkRoot = id => {
+    const networkRoot = alluvialRoot.getNetworkRoot(id);
+    if (!networkRoot) {
+      console.error(`No network found with id ${id}`);
+      return;
+    }
+    return networkRoot;
+  };
+
+  const nodes = id => {
+    const root = networkRoot(id);
+    return root ? Array.from(root.leafNodes()).map(node => node.toNode()) : null;
+  };
+
+  const name = id => {
+    const root = networkRoot(id);
+    return root ? root.name : null;
+  };
+
+  const json = JSON.stringify({
     version,
     timestamp: +new Date(),
     state,
-    alluvialRoot,
-    networks
-  };
-  const json = JSON.stringify(obj, null, 2);
+    networks: networks.map(network => ({
+      id: network.id,
+      name: name(network.id) || network.name,
+      codelength: network.codelength,
+      nodes: nodes(network.id) || []
+    }))
+  }, null, 2);
+
   const blob = new Blob([json], { type: "application/json;charset=utf-8" });
   FileSaver.saveAs(blob, filename);
 };

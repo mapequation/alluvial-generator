@@ -121,7 +121,19 @@ export default class AlluvialDiagram extends React.PureComponent {
   componentDidUpdate(prevProps) {
     const {
       networks,
-      settings: sidebarSettings,
+      height,
+      duration,
+      marginExponent,
+      moduleWidth,
+      moduleFlowThreshold,
+      streamlineFraction,
+      streamlineOpacity,
+      streamlineThreshold,
+      verticalAlign,
+      showModuleId,
+      dropShadow,
+      defaultHighlightColor,
+      highlightColors,
       selectedModule,
       selectedModuleNameChangeBit,
       selectedModuleColorChangeBit,
@@ -148,7 +160,22 @@ export default class AlluvialDiagram extends React.PureComponent {
     this.draw();
 
     if (flipped(saveDiagramBit, prevProps.saveDiagramBit)) {
-      saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.asObject(), sidebarSettings);
+      const state = {
+        height,
+        duration,
+        marginExponent,
+        moduleWidth,
+        moduleFlowThreshold,
+        streamlineFraction,
+        streamlineOpacity,
+        streamlineThreshold,
+        verticalAlign,
+        showModuleId,
+        dropShadow,
+        defaultHighlightColor,
+        highlightColors
+      };
+      saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.alluvialRoot, state);
     }
   }
 

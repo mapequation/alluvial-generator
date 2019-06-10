@@ -11,11 +11,12 @@ import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {
   name: string;
+  nodeId: number;
   insignificant: boolean;
   highlightIndex: number;
   treePath: TreePath;
   depth = LEAF_NODE;
-  moduleLevel: number = 1;
+  moduleLevel: number;
 
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
@@ -24,12 +25,28 @@ export default class LeafNode extends AlluvialNodeBase {
     super(null, networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
+    this.nodeId = node.id || node.stateId || 0;
     this.treePath = new TreePath(node.path);
     this.insignificant = node.insignificant || false;
     this.highlightIndex =
       node.highlightIndex != null && Number.isInteger(node.highlightIndex)
         ? node.highlightIndex
         : -1;
+    this.moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
+      ? node.moduleLevel
+      : 1;
+  }
+
+  toNode(): Node {
+    return {
+      path: this.id,
+      flow: this.flow,
+      name: this.name,
+      id: this.nodeId,
+      insignificant: this.insignificant,
+      highlightIndex: this.highlightIndex,
+      moduleLevel: this.moduleLevel
+    };
   }
 
   get level(): number {
