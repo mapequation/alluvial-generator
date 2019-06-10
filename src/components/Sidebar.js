@@ -4,9 +4,9 @@ import { Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar 
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import { parseState, serializeState } from "../io/serialize-state";
+import DefaultHighlightColor from "./DefaultHighlightColor";
 import MenuHeader from "./MenuHeader";
 import SelectedModule from "./SelectedModule";
-import DefaultHighlightColor from "./DefaultHighlightColor";
 
 
 function LabelForSlider(props) {
@@ -78,6 +78,17 @@ export default function Sidebar(props) {
       fileInput.value = "";
       dispatch({ type: "loadState", value });
     });
+
+  const saveDiagram = () => {
+    const settings = {
+      height, duration, marginExponent, moduleWidth, moduleFlowThreshold,
+      streamlineFraction, streamlineOpacity, streamlineThreshold,
+      verticalAlign, showModuleId, dropShadow,
+      defaultHighlightColor, highlightColors
+    };
+
+    dispatch({ type: "saveDiagram", value: settings });
+  };
 
   return (
     <SemanticSidebar
@@ -263,6 +274,13 @@ export default function Sidebar(props) {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Export</Header>
+        <Menu.Menu>
+          <Menu.Item
+            icon="download"
+            onClick={saveDiagram}
+            content="Save diagram"
+          />
+        </Menu.Menu>
         <Menu.Menu>
           <Menu.Item
             icon="download"

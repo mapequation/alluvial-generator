@@ -4,6 +4,7 @@ import React from "react";
 
 import Diagram from "../alluvial/Diagram";
 import Dispatch from "../context/Dispatch";
+import { saveDiagram } from "../io/export";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -70,6 +71,8 @@ function wiggle() {
     .attr("transform", "translate(0 0)");
 }
 
+const flipped = (a, b) => a !== b;
+
 export default class AlluvialDiagram extends React.PureComponent {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
@@ -88,6 +91,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     selectedModuleNameChangeBit: PropTypes.number.isRequired,
     selectedModuleColorChangeBit: PropTypes.number.isRequired,
     selectedModuleColorChangeAllBit: PropTypes.number.isRequired,
+    saveDiagramBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
     marginExponent: PropTypes.number,
@@ -116,21 +120,24 @@ export default class AlluvialDiagram extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const {
+      networks,
+      settings: sidebarSettings,
       selectedModule,
       selectedModuleNameChangeBit,
       selectedModuleColorChangeBit,
-      selectedModuleColorChangeAllBit
+      selectedModuleColorChangeAllBit,
+      saveDiagramBit
     } = this.props;
 
     if (selectedModule) {
-      if (selectedModuleNameChangeBit !== prevProps.selectedModuleNameChangeBit) {
+      if (flipped(selectedModuleNameChangeBit, prevProps.selectedModuleNameChangeBit)) {
         this.diagram.setModuleName(selectedModule);
         this.diagram.setNetworkName(selectedModule);
       }
-      if (selectedModuleColorChangeBit !== prevProps.selectedModuleColorChangeBit) {
+      if (flipped(selectedModuleColorChangeBit, prevProps.selectedModuleColorChangeBit)) {
         this.diagram.setModuleColor(selectedModule);
       }
-      if (selectedModuleColorChangeAllBit !== prevProps.selectedModuleColorChangeAllBit) {
+      if (flipped(selectedModuleColorChangeAllBit, prevProps.selectedModuleColorChangeAllBit)) {
         this.diagram.setModuleColor(selectedModule, true);
       }
     }
@@ -139,6 +146,10 @@ export default class AlluvialDiagram extends React.PureComponent {
       this.update();
 
     this.draw();
+
+    if (flipped(saveDiagramBit, prevProps.saveDiagramBit)) {
+      saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.asObject(), sidebarSettings);
+    }
   }
 
   shouldUpdateLayout(prevProps) {
@@ -176,7 +187,12 @@ export default class AlluvialDiagram extends React.PureComponent {
 
   update() {
     const { height, marginExponent, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
-    this.diagram.updateLayout(height, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, marginExponent);
+    this.diagram.updateLayout(height,
+      streamlineFraction,
+      moduleWidth,
+      moduleFlowThreshold,
+      verticalAlign,
+      marginExponent);
   }
 
   draw() {

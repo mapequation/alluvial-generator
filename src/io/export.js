@@ -35,3 +35,17 @@ export const savePng = (elementId, filename) => {
 
   image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(string);
 };
+
+export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
+  const filename = networks.map(network => network.name).join(",") + ".json";
+  const obj = {
+    version,
+    timestamp: +new Date(),
+    state,
+    alluvialRoot,
+    networks
+  };
+  const json = JSON.stringify(obj, null, 2);
+  const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+  FileSaver.saveAs(blob, filename);
+};

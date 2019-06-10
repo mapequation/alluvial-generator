@@ -1,10 +1,12 @@
+import { schemePaired } from "d3";
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
-import { schemePaired } from "d3";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
 import Sidebar from "./Sidebar";
 
+
+const flip = bit => bit ? 0 : 1;
 
 function reducer(state, action) {
   switch (action.type) {
@@ -35,15 +37,17 @@ function reducer(state, action) {
     case "selectedModule":
       return { ...state, selectedModule: action.value };
     case "selectedModuleNameChange":
-      return { ...state, selectedModuleNameChangeBit: state.selectedModuleNameChangeBit ? 0 : 1 };
+      return { ...state, selectedModuleNameChangeBit: flip(state.selectedModuleNameChangeBit) };
     case "selectedModuleColorChange":
-      return { ...state, selectedModuleColorChangeBit: state.selectedModuleColorChangeBit ? 0 : 1 };
+      return { ...state, selectedModuleColorChangeBit: flip(state.selectedModuleColorChangeBit) };
     case "selectedModuleColorChangeAll":
-      return { ...state, selectedModuleColorChangeAllBit: state.selectedModuleColorChangeAllBit ? 0 : 1 };
+      return { ...state, selectedModuleColorChangeAllBit: flip(state.selectedModuleColorChangeAllBit) };
     case "sidebarVisible":
       return { ...state, sidebarVisible: action.value };
     case "loadState":
       return { ...state, ...action.value };
+    case "saveDiagram":
+      return { ...state, saveDiagramBit: flip(state.saveDiagramBit), settings: action.value };
     default:
       throw new Error();
   }
@@ -68,6 +72,8 @@ export default function Layout(props) {
     selectedModuleNameChangeBit: 0,
     selectedModuleColorChangeBit: 0,
     selectedModuleColorChangeAllBit: 0,
+    saveDiagramBit: 0,
+    settings: {},
     sidebarVisible: true
   };
 
