@@ -8,6 +8,11 @@ import HighlightGroup from "./HighlightGroup";
 import NetworkRoot from "./NetworkRoot";
 
 
+type CustomName = {
+  name: string,
+  flow: number,
+};
+
 export default class Module extends AlluvialNodeBase {
   parent: ?NetworkRoot;
   children: HighlightGroup[] = [];
@@ -15,10 +20,10 @@ export default class Module extends AlluvialNodeBase {
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
-  _name: ?string = null;
+  _name: ?Array<string> = null;
   depth = MODULE;
 
-  static customNames: Map<string, string> = new Map();
+  static customNames: Map<string, CustomName> = new Map();
 
   constructor(
     parent: NetworkRoot,
@@ -29,21 +34,32 @@ export default class Module extends AlluvialNodeBase {
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
-    this._name = Module.customNames.get(this.id) || null;
+    this._name = Module.customNames.has(this.id)
+      ? [Module.customNames.get(this.id).name]
+      : this.subModuleNames();
     parent.addChild(this);
+  }
+
+  subModuleNames(): ?Array<string> {
+    const names = Array.from(Module.customNames.keys())
+      .filter(id => id.startsWith(this.id))
+      .map(id => Module.customNames.get(id))
+      .sort((a, b) => a.flow - b.flow)
+      .map(each => each.name);
+    return names.length ? names : null;
   }
 
   set name(name: ?string) {
     if (!name || name === "") {
       Module.customNames.delete(this.id);
-      this._name = null;
+      this._name = this.subModuleNames();
     } else {
-      Module.customNames.set(this.id, name);
-      this._name = name;
+      Module.customNames.set(this.id, { name, flow: this.flow });
+      this._name = [name];
     }
   }
 
-  get name(): ?string {
+  get name(): ?Array<string> {
     return this._name;
   }
 

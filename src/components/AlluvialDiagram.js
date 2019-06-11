@@ -556,11 +556,9 @@ export default class AlluvialDiagram extends React.PureComponent {
         .selectAll(".name")
         .selectAll("tspan")
         .data(
-          d => d.name
-            ? [{ name: d.name, x: d.moduleNamePosition.x[index] }]
-            : d.largestLeafNodes
-              .slice(0, numVisibleModuleNames(d.height))
-              .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
+          d => (d.name || d.largestLeafNodes)
+            .slice(0, numVisibleModuleNames(d.height))
+            .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
           function(d) {
             return d ? d.name : this.id;
           }
