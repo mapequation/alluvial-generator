@@ -27,13 +27,17 @@ export default class Diagram {
   }
 
   addNetwork(network: Network) {
-    const { nodes, id, codelength, name } = network;
+    const { nodes, id, codelength, name, moduleNames } = network;
 
     if (this.alluvialRoot.hasNetwork(id)) {
       throw new Error(`Network with id ${id} already exists`);
     }
 
     const networkRoot = new NetworkRoot(this.alluvialRoot, id, name, codelength);
+
+    if (moduleNames) {
+      Module.customNames = new Map(moduleNames);
+    }
 
     const leafNodes = nodes.map(node => new LeafNode(node, id));
     networkRoot.createLeafNodeByNameMap(leafNodes);

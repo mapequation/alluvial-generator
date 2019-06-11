@@ -54,6 +54,11 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.nodesByName.get(name);
   }
 
+  getModuleNames() {
+    return Array.from(Module.customNames.entries())
+      .filter(([key, val]) => key.startsWith(this.id));
+  }
+
   asObject(): Object {
     return {
       id: this.id,

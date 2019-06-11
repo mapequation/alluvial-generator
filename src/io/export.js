@@ -58,6 +58,11 @@ export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
     return root ? root.name : null;
   };
 
+  const moduleNames = id => {
+    const root = networkRoot(id);
+    return root ? root.getModuleNames() : [];
+  };
+
   const json = JSON.stringify({
     version,
     timestamp: +new Date(),
@@ -66,6 +71,7 @@ export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
       id: network.id,
       name: name(network.id) || network.name,
       codelength: network.codelength,
+      moduleNames: moduleNames(network.id),
       nodes: nodes(network.id) || []
     }))
   }, null, 2);
