@@ -128,7 +128,7 @@ export default function Sidebar(props) {
           <GreySlider
             start={streamlineFraction}
             min={0}
-            max={3}
+            max={10}
             step={0.1}
             onChange={value => dispatch({ type: "streamlineFraction", value })}
           />
