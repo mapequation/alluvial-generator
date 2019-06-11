@@ -134,6 +134,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       verticalAlign,
       showModuleId,
       dropShadow,
+      fontSize,
       defaultHighlightColor,
       highlightColors,
       selectedModule,
@@ -174,6 +175,7 @@ export default class AlluvialDiagram extends React.PureComponent {
         verticalAlign,
         showModuleId,
         dropShadow,
+        fontSize,
         defaultHighlightColor,
         highlightColors
       };
