@@ -34,6 +34,8 @@ function reducer(state, action) {
       return { ...state, showModuleId: action.value };
     case "dropShadow":
       return { ...state, dropShadow: action.value };
+    case "fontSize":
+      return { ...state, fontSize: action.value };
     case "selectedModule":
       return { ...state, selectedModule: action.value };
     case "changeName":
@@ -66,6 +68,7 @@ export default function Layout(props) {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
+    fontSize: 10,
     selectedModule: null,
     nameChangeBit: 0,
     colorChangeBit: 0,

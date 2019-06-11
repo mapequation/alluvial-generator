@@ -98,6 +98,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
     dropShadow: PropTypes.bool,
+    fontSize: PropTypes.number,
     defaultHighlightColor: PropTypes.string,
     highlightColors: PropTypes.arrayOf(PropTypes.string).isRequired
   };
@@ -108,6 +109,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     verticalAlign: "bottom",
     showModuleId: false,
     dropShadow: false,
+    fontSize: 10,
     defaultHighlightColor: "#b6b69f"
   };
 
@@ -212,7 +214,8 @@ export default class AlluvialDiagram extends React.PureComponent {
 
   update() {
     const { height, marginExponent, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign } = this.props;
-    this.diagram.updateLayout(height,
+    this.diagram.updateLayout(
+      height,
       streamlineFraction,
       moduleWidth,
       moduleFlowThreshold,
@@ -228,7 +231,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       streamlineOpacity,
       streamlineThreshold,
       showModuleId,
-      dropShadow
+      dropShadow,
+      fontSize
     } = this.props;
     const { dispatch } = this.context;
 
@@ -313,6 +317,11 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     networkNames.exit().remove();
 
+    networkNames
+      .select("text")
+      .transition(t)
+      .attr("font-size", fontSize);
+
     const networkNamesEnter = networkNames
       .enter()
       .append("g")
@@ -332,7 +341,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .attr("x", d => d.textX)
       .attr("y", d => d.textY)
       .attr("text-anchor", "middle")
-      .attr("font-size", 12)
+      .attr("font-size", fontSize)
       .attr("dy", 3);
 
     const networkNameUpdateDelay = 0.5 * delay;
@@ -502,6 +511,11 @@ export default class AlluvialDiagram extends React.PureComponent {
         .call(makeTransparent)
         .remove();
 
+      moduleNames
+        .select("text")
+        .transition(t)
+        .attr("font-size", fontSize);
+
       const moduleNamesEnter = moduleNames
         .enter()
         .append("g")
@@ -519,7 +533,7 @@ export default class AlluvialDiagram extends React.PureComponent {
         .attr("text-anchor", ["end", "start"][index])
         .attr("class", "name")
         .attr("y", d => d.moduleNamePosition.y)
-        .attr("font-size", 9);
+        .attr("font-size", fontSize);
 
       moduleNames
         .select(".name")
@@ -628,6 +642,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleId
         .transition(t)
         .delay(moduleNameUpdateDelay)
+        .attr("font-size", fontSize)
         .attr("y", d => d.moduleIdPosition.y)
         .attr("x", d => d.moduleIdPosition.x);
 
@@ -638,7 +653,7 @@ export default class AlluvialDiagram extends React.PureComponent {
         .attr("pointer-events", "none")
         .text(d => d.moduleId)
         .attr("text-anchor", "middle")
-        .attr("font-size", 12)
+        .attr("font-size", fontSize)
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
         .attr("paint-order", "stroke")

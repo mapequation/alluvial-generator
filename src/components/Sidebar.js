@@ -55,6 +55,7 @@ export default function Sidebar(props) {
     verticalAlign,
     showModuleId,
     dropShadow,
+    fontSize,
     sidebarVisible,
     selectedModule
   } = props;
@@ -182,6 +183,19 @@ export default function Sidebar(props) {
             max={1}
             step={0.01}
             onChange={transparency => dispatch({ type: "streamlineOpacity", value: 1 - transparency })}
+          />
+        </LabelForSlider>
+        <LabelForSlider
+          content="Font size"
+          detail={fontSize}
+          popup="Font size for module and network names."
+        >
+          <GreySlider
+            start={fontSize}
+            min={5}
+            max={20}
+            step={1}
+            onChange={value => dispatch({ type: "fontSize", value })}
           />
         </LabelForSlider>
         <LabelForSlider
