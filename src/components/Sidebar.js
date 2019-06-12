@@ -15,7 +15,7 @@ function LabelForSlider(props) {
     basic
     horizontal
     {...rest}
-    style={{ float: "left", margin: "0.08em 0" }}
+    style={{ width: "50%", textAlign: "left", fontWeight: 400, float: "left", margin: "0.08em 0" }}
   />;
 
   return (
@@ -28,10 +28,7 @@ function LabelForSlider(props) {
   );
 }
 
-const GreySlider = props => {
-  const { start, ...settings } = props;
-  return <Slider color="grey" value={start} settings={{ start, ...settings }}/>;
-};
+const GreySlider = props => <Slider color="grey" value={props.start} settings={props}/>;
 
 const MyCheckbox = props => {
   const { popup, ...rest } = props;

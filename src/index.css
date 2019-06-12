@@ -58,3 +58,7 @@ kbd {
     border: 1px solid rgba(34, 36, 38, .15) !important;
     box-shadow: none !important;
 }
+
+.ui.label>.detail {
+    float: right;
+}
