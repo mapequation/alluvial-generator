@@ -4,8 +4,6 @@ import { Button, Icon, Input, Table } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 
 
-const SelectableTableCell = props => <Table.Cell selectable style={{ padding: "0 8px" }} {...props}/>;
-
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
 
 function Swatch(props) {
@@ -66,10 +64,16 @@ export default function SelectedModule(props) {
     setButtonsEnabled(true);
   }, [module]);
 
+  if (!module) {
+    return;
+  }
+
+  const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
+  const selectable = { selectable: true, style: { padding: "0 8px" } };
+
   return (
     <React.Fragment>
-      {module &&
-      <Button.Group compact size="tiny" basic>
+      <Button.Group {...buttonProps}>
         <Button
           content="Expand module"
           onClick={() => {
@@ -87,13 +91,11 @@ export default function SelectedModule(props) {
           disabled={!buttonsEnabled || module.moduleLevel === 1}
         />
       </Button.Group>
-      }
       <Table celled striped compact fixed singleLine size="small">
-        {module &&
         <Table.Body>
           <Table.Row>
             <Table.Cell width={5}>Network</Table.Cell>
-            <SelectableTableCell>
+            <Table.Cell {...selectable}>
               <Input
                 fluid
                 transparent
@@ -101,7 +103,7 @@ export default function SelectedModule(props) {
                 placeholder="Set network name..."
                 onChange={handleNetworkNameChange}
               />
-            </SelectableTableCell>
+            </Table.Cell>
           </Table.Row>
           {module.networkCodelength &&
           <Table.Row>
@@ -129,7 +131,7 @@ export default function SelectedModule(props) {
           </Table.Row>
           <Table.Row>
             <Table.Cell>Module name</Table.Cell>
-            <SelectableTableCell>
+            <Table.Cell {...selectable}>
               <Input
                 fluid
                 transparent
@@ -138,21 +140,20 @@ export default function SelectedModule(props) {
                 onChange={handleNameChange}
                 icon={name && <Icon link name="x" onClick={() => handleNameChange(null, { value: "" })}/>}
               />
-            </SelectableTableCell>
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>Largest nodes</Table.Cell>
             <Table.Cell>{module.largestLeafNodes.join(", ")}</Table.Cell>
           </Table.Row>
         </Table.Body>
-        }
       </Table>
       <Swatch background={color}/>
       <GithubPicker
         colors={[defaultHighlightColor, ...highlightColors]}
         onChangeComplete={handleColorChange}
       />
-      <Button.Group compact size="tiny" basic style={{ margin: "4px 0 0 0" }}>
+      <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
         <Button
           content="Paint module"
           onClick={paintModule}
