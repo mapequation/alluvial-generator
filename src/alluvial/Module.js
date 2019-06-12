@@ -17,6 +17,7 @@ export default class Module extends AlluvialNodeBase {
   parent: ?NetworkRoot;
   children: HighlightGroup[] = [];
   moduleLevel: number = 1;
+  maxModuleLevel: number = 1;
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
@@ -86,6 +87,7 @@ export default class Module extends AlluvialNodeBase {
     const queue = new PriorityQueue(6);
     for (let node of this.leafNodes()) {
       queue.push(node);
+      this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
     return queue.map(node => node.name);
   }
@@ -105,6 +107,7 @@ export default class Module extends AlluvialNodeBase {
       name,
       largestLeafNodes: this.getLargestLeafNodeNames(),
       numLeafNodes: this.numLeafNodes,
+      maxModuleLevel: this.maxModuleLevel,
       moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
         y: y + height / 2

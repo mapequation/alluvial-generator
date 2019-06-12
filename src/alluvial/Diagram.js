@@ -12,7 +12,6 @@ import StreamlineNode from "./StreamlineNode";
 
 
 type Event = {
-  altKey: boolean,
   shiftKey: boolean
 };
 
@@ -57,7 +56,6 @@ export default class Diagram {
 
   doubleClick(alluvialObject: Object, event: ?Event): boolean {
     const noKeyModifiers: Event = {
-      altKey: false,
       shiftKey: false
     };
 

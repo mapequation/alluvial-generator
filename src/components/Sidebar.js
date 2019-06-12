@@ -89,7 +89,7 @@ export default function Sidebar(props) {
             highlightColors={highlightColors}
             defaultHighlightColor={defaultHighlightColor}
           />
-          : <span style={{ color: "#777" }}>No module selected</span>
+          : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
         }
       </Menu.Item>
       <Menu.Item>

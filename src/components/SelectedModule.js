@@ -33,6 +33,7 @@ export default function SelectedModule(props) {
   const [name, setName] = useState("");
   const [networkName, setNetworkName] = useState("");
   const [color, setColor] = useState(defaultHighlightColor);
+  const [buttonsEnabled, setButtonsEnabled] = useState(true);
 
   const handleChange = (setName, prop) => (e, { value }) => {
     if (!module) return;
@@ -62,10 +63,31 @@ export default function SelectedModule(props) {
     if (!module) return;
     setName(module.name || "");
     setNetworkName(module.networkName);
+    setButtonsEnabled(true);
   }, [module]);
 
   return (
     <React.Fragment>
+      {module &&
+      <Button.Group compact size="tiny" basic>
+        <Button
+          content="Expand module"
+          onClick={() => {
+            dispatch({ type: "expand" });
+            setButtonsEnabled(false);
+          }}
+          disabled={!buttonsEnabled || module.moduleLevel === module.maxModuleLevel}
+        />
+        <Button
+          content="Regroup with siblings"
+          onClick={() => {
+            dispatch({ type: "regroup" })
+            setButtonsEnabled(false);
+          }}
+          disabled={!buttonsEnabled || module.moduleLevel === 1}
+        />
+      </Button.Group>
+      }
       <Table celled striped compact fixed singleLine size="small">
         {module &&
         <Table.Body>
