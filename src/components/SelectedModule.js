@@ -81,7 +81,7 @@ export default function SelectedModule(props) {
         <Button
           content="Regroup with siblings"
           onClick={() => {
-            dispatch({ type: "regroup" })
+            dispatch({ type: "regroup" });
             setButtonsEnabled(false);
           }}
           disabled={!buttonsEnabled || module.moduleLevel === 1}
