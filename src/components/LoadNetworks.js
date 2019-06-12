@@ -5,7 +5,7 @@ import { Container, Divider, Icon, Segment, Step, Table } from "semantic-ui-reac
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
-import DraggableTableRow from "./DraggableTableRow";
+import withDraggable from "./withDraggable";
 
 
 function humanFileSize(bytes) {
@@ -27,6 +27,8 @@ const fileExtension = filename => {
   if (index === -1 || index + 1 === filename.length) return "";
   return filename.substring(index + 1).toLowerCase();
 };
+
+const DraggableTableRow = withDraggable(Table.Row);
 
 export default class LoadNetworks extends React.Component {
   state = {
@@ -234,7 +236,13 @@ export default class LoadNetworks extends React.Component {
 
           <Table.Body>
             {files.map((file, i) =>
-              <DraggableTableRow key={i} index={i} action={this.moveRow}>
+              <DraggableTableRow
+                key={i}
+                draggable
+                className="draggable"
+                index={i}
+                action={this.moveRow}
+              >
                 <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
                 <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                 <Table.Cell>{file.format}</Table.Cell>
