@@ -17,4 +17,5 @@ declare interface Network {
   +id: string;
   +codelength: number;
   +name: string;
+  +moduleNames: ?Array<[string, Object]>;
 }

@@ -35,18 +35,16 @@ export default class Module extends AlluvialNodeBase {
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
-    this._name = Module.customNames.has(this.id)
-      ? [Module.customNames.get(this.id).name]
-      : this.subModuleNames();
+    const customName = Module.customNames.get(this.id);
+    this._name = customName ? [customName.name] : this.subModuleNames();
     parent.addChild(this);
   }
 
   subModuleNames(): ?Array<string> {
-    const names = Array.from(Module.customNames.keys())
-      .filter(id => id.startsWith(this.id))
-      .map(id => Module.customNames.get(id))
-      .sort((a, b) => a.flow - b.flow)
-      .map(each => each.name);
+    const names = Array.from(Module.customNames.entries())
+      .filter(([id, ...rest]) => id.startsWith(this.id))
+      .sort((a, b) => a[1].flow - b[1].flow)
+      .map(([id, { name }]) => name);
     return names.length ? names : null;
   }
 
