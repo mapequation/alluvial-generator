@@ -75,6 +75,7 @@ export default function SelectedModule(props) {
     <React.Fragment>
       <Button.Group {...buttonProps}>
         <Button
+          icon="plus"
           content="Expand module"
           onClick={() => {
             dispatch({ type: "expand" });
@@ -83,6 +84,7 @@ export default function SelectedModule(props) {
           disabled={!buttonsEnabled || module.moduleLevel === module.maxModuleLevel}
         />
         <Button
+          icon="minus"
           content="Contract module"
           onClick={() => {
             dispatch({ type: "regroup" });
