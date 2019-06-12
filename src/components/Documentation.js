@@ -4,10 +4,7 @@ import expandModuleMov from "../videos/expand.mov";
 import regroupModuleMov from "../videos/regroup.mov";
 
 
-const Video = (props) =>
-  <video autoPlay loop className="ui" width={400} height={300}>
-    <source src={props.src} type="video/mp4"/>
-  </video>;
+const videoProps = { autoPlay: true, loop: true, className: "ui", width: 400, height: 300 };
 
 const Documentation = () =>
   <Container style={{ padding: "40px 0 100px 0" }}>
@@ -33,7 +30,9 @@ const Documentation = () =>
         </p>
 
         <Header>Show sub-modules</Header>
-        <Video src={expandModuleMov}/>
+        <video {...videoProps}>
+          <source src={expandModuleMov} type="video/mp4"/>
+        </video>
         <p>
           By default, we show the top level modules for each network. To show the sub-modules within any module, double
           click on it. If the modules shakes back and forth, the module is already expanded to its deepest level.
@@ -43,7 +42,9 @@ const Documentation = () =>
         </p>
 
         <Header>Regroup sub-modules</Header>
-        <Video src={regroupModuleMov}/>
+        <video {...videoProps}>
+          <source src={regroupModuleMov} type="video/mp4"/>
+        </video>
         <p>
           To regroup sub-modules into their parent module, double click on any sub-module while holding
           the <kbd>shift</kbd> key.
