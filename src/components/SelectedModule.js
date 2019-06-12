@@ -83,7 +83,7 @@ export default function SelectedModule(props) {
           disabled={!buttonsEnabled || module.moduleLevel === module.maxModuleLevel}
         />
         <Button
-          content="Regroup with siblings"
+          content="Contract module"
           onClick={() => {
             dispatch({ type: "regroup" });
             setButtonsEnabled(false);
