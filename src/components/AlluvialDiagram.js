@@ -402,7 +402,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
 
-    const onDoubleClick = context => function(d) {
+    const onDoubleClick = (context => function(d) {
       const success = context.diagram.doubleClick(d, d3.event);
       if (success) {
         context.update();
@@ -410,7 +410,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       } else {
         wiggle.call(this, d);
       }
-    };
+    })(this);
 
     streamlines
       .enter()
@@ -418,7 +418,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .attr("class", "streamline")
       .style("cursor", "pointer")
       .on("click", onClick)
-      .on("dblclick", onDoubleClick(this))
+      .on("dblclick", onDoubleClick)
       .on("mouseover", highlightStreamline)
       .on("mouseout", dehighlightStreamline)
       .call(LinearGradients.fill)
@@ -460,7 +460,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .attr("stroke", "#f00")
       .attr("stroke-opacity", 0)
       .call(restoreMouseOver)
-      .on("dblclick", onDoubleClick(this))
+      .on("dblclick", onDoubleClick)
       .on("click", function(d) {
         console.log(d);
 
