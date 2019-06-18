@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Grid, Header, Icon } from "semantic-ui-react";
-import expandModuleMov from "../videos/expand.mov";
-import regroupModuleMov from "../videos/regroup.mov";
+import expandModuleMov from "../images/expand.mov";
+import regroupModuleMov from "../images/regroup.mov";
 
 
 const videoProps = { autoPlay: true, loop: true, className: "ui", width: 400, height: 300 };
