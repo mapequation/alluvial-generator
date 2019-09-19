@@ -190,7 +190,7 @@ export default function Sidebar(props) {
           <GreySlider
             start={fontSize}
             min={5}
-            max={20}
+            max={40}
             step={1}
             onChange={value => dispatch({ type: "fontSize", value })}
           />
