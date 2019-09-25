@@ -4,18 +4,27 @@ import id from "../lib/id";
 
 type ObjectParser = (object: Object, name: string) => Network;
 
-const setNodeNameToId = (object) => {
+const setNodeIdentifiers = (object, identifier) => {
+  const id = (node) => (node.stateId !== null ? node.stateId : node.id).toString();
+  const name = (node) => node.name;
+
+  let nodeId = null;
+
+  if (identifier === "name")
+    nodeId = name;
+  else if (identifier === "id")
+    nodeId = id;
+  else
+    return object;
+
   for (let node of object.nodes) {
-    const id = node.stateId !== null ? node.stateId : node.id;
-    node.name = id.toString();
+    node.identifier = nodeId(node);
   }
   return object;
 };
 
-const parse: ObjectParser = (object, name, useNodeIdAsName = false) => {
-  if (useNodeIdAsName) {
-    setNodeNameToId(object);
-  }
+const parse: ObjectParser = (object, name, nodeIdentifier = "name") => {
+  setNodeIdentifiers(object, nodeIdentifier);
 
   return ({
     id: id(),
@@ -24,10 +33,8 @@ const parse: ObjectParser = (object, name, useNodeIdAsName = false) => {
   });
 };
 
-const parseClu: ObjectParser = (object, name, useNodeIdAsName = false) => {
-  if (useNodeIdAsName) {
-    setNodeNameToId(object);
-  }
+const parseClu: ObjectParser = (object, name, nodeIdentifier = "name") => {
+  setNodeIdentifiers(object, nodeIdentifier);
 
   const numNodes = object.nodes.length;
   const normalizedWeight = 1 / (numNodes || 1);

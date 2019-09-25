@@ -107,7 +107,7 @@ export default function SelectedModule(props) {
               />
             </Table.Cell>
           </Table.Row>
-          {module.networkCodelength &&
+          {module.networkCodelength != null &&
           <Table.Row>
             <Table.Cell>Codelength</Table.Cell>
             <Table.Cell>

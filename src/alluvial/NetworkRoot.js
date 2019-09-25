@@ -15,7 +15,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
   name: string;
   depth = NETWORK_ROOT;
   codelength: number;
-  nodesByName: Map<string, LeafNode> = new Map();
+  nodesByIdentifier: Map<string, LeafNode> = new Map();
   modulesById: Map<string, Module> = new Map();
 
   constructor(
@@ -45,13 +45,13 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
-    this.nodesByName = new Map(
-      Array.from(nodes, node => [node.name, node])
+    this.nodesByIdentifier = new Map(
+      Array.from(nodes, node => [node.identifier, node])
     );
   }
 
-  getLeafNodeByName(name: string): ?LeafNode {
-    return this.nodesByName.get(name);
+  getLeafNode(identifier: string): ?LeafNode {
+    return this.nodesByIdentifier.get(identifier);
   }
 
   getModuleNames() {

@@ -44,7 +44,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     const networkRoot = this.getNeighborNetwork(node.networkId, side);
     if (!networkRoot) return;
 
-    return networkRoot.getLeafNodeByName(node.name);
+    return networkRoot.getLeafNode(node.identifier);
   }
 
   updateLayout(

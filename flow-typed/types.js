@@ -5,6 +5,7 @@ declare interface Node {
   +path: string;
   +flow: number;
   +name: string;
+  +identifier: string;
   +id?: number;
   +stateId?: number;
   +insignificant?: boolean;

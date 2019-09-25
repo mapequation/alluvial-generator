@@ -116,7 +116,7 @@ export default class Diagram {
         .filter(root => root.networkId !== networkId)
         .forEach(networkRoot => {
           const nodes = leafNodes.reduce((nodes, node) => {
-            const oppositeNode = networkRoot.getLeafNodeByName(node.name);
+            const oppositeNode = networkRoot.getLeafNode(node.identifier);
             if (oppositeNode) {
               oppositeNode.highlightIndex = highlightIndex;
               nodes.push(oppositeNode);

@@ -82,6 +82,20 @@ export default class LoadNetworks extends React.Component {
       });
   };
 
+  setIdentifiersInJsonFormat = (json) => {
+    if (json.version) {
+      const minorVersion = +json.version.split(".")[1];
+      if (minorVersion < 3) {
+        for (let network of json.networks) {
+          for (let node of network.nodes) {
+            node.identifier = node.name;
+          }
+        }
+      }
+    }
+    return json;
+  };
+
   parseNetworks = () => {
     const { files, useNodeIds } = this.state;
     const { onSubmit } = this.props;
@@ -99,6 +113,7 @@ export default class LoadNetworks extends React.Component {
         return;
       }
       const json = JSON.parse(files[0].contents);
+      this.setIdentifiersInJsonFormat(json);
       onSubmit(json);
       return;
     }
@@ -109,7 +124,7 @@ export default class LoadNetworks extends React.Component {
         const lines = file.contents.split("\n").filter(Boolean);
         const object = getParserForExtension(file.format)(lines, parseLinks);
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name, useNodeIds);
+        const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name");
 
         // names must be unique
         const uniqueNames = new Set();
@@ -143,6 +158,7 @@ export default class LoadNetworks extends React.Component {
 
     fetch(`./data/${filename}`)
       .then(res => res.json())
+      .then(this.setIdentifiersInJsonFormat)
       .then(onSubmit)
       .catch(err => {
         console.log(err);
