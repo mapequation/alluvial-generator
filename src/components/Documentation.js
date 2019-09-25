@@ -20,7 +20,11 @@ const Documentation = () =>
         <Header>Limitations</Header>
         <p>
           Two nodes in different networks are considered equal if their names are the same. For this to work, all nodes
-          in a network must have unique names.
+          in a network <i>must have unique names</i>.
+        </p>
+        <p>
+          If your network <i>does not have unique names</i>, you can try the option "Use node ids as identifiers",
+          which uses the node ids to determine if two nodes are equal.
         </p>
 
         <Header>Navigation</Header>

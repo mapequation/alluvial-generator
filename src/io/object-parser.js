@@ -4,13 +4,31 @@ import id from "../lib/id";
 
 type ObjectParser = (object: Object, name: string) => Network;
 
-const parse: ObjectParser = (object, name) => ({
-  id: id(),
-  name,
-  ...object
-});
+const setNodeNameToId = (object) => {
+  for (let node of object.nodes) {
+    const id = node.stateId !== null ? node.stateId : node.id;
+    node.name = id.toString();
+  }
+  return object;
+};
 
-const parseClu: ObjectParser = (object, name) => {
+const parse: ObjectParser = (object, name, useNodeIdAsName = false) => {
+  if (useNodeIdAsName) {
+    setNodeNameToId(object);
+  }
+
+  return ({
+    id: id(),
+    name,
+    ...object
+  });
+};
+
+const parseClu: ObjectParser = (object, name, useNodeIdAsName = false) => {
+  if (useNodeIdAsName) {
+    setNodeNameToId(object);
+  }
+
   const numNodes = object.nodes.length;
   const normalizedWeight = 1 / (numNodes || 1);
 

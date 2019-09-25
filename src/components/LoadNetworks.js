@@ -1,7 +1,7 @@
 import { getParserForExtension } from "@mapequation/infoparse";
 import PropTypes from "prop-types";
 import React from "react";
-import { Container, Divider, Icon, Segment, Step, Table } from "semantic-ui-react";
+import { Checkbox, Container, Divider, Icon, Segment, Step, Table } from "semantic-ui-react";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
@@ -33,7 +33,8 @@ const DraggableTableRow = withDraggable(Table.Row);
 export default class LoadNetworks extends React.Component {
   state = {
     files: [],
-    loading: false
+    loading: false,
+    useNodeIds: false
   };
 
   static propTypes = {
@@ -43,6 +44,8 @@ export default class LoadNetworks extends React.Component {
   static defaultProps = {
     onSubmit: values => console.log(values)
   };
+
+  onUseNodeIdsChange = () => this.setState((prevState) => ({ useNodeIds: !prevState.useNodeIds }));
 
   withLoadingState = callback => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
@@ -80,7 +83,7 @@ export default class LoadNetworks extends React.Component {
   };
 
   parseNetworks = () => {
-    const { files } = this.state;
+    const { files, useNodeIds } = this.state;
     const { onSubmit } = this.props;
 
     const hasJson = files.some(file => file.format === "json");
@@ -106,7 +109,7 @@ export default class LoadNetworks extends React.Component {
         const lines = file.contents.split("\n").filter(Boolean);
         const object = getParserForExtension(file.format)(lines, parseLinks);
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name);
+        const parsed = objectParser(object, file.name, useNodeIds);
 
         // names must be unique
         const uniqueNames = new Set();
@@ -167,7 +170,7 @@ export default class LoadNetworks extends React.Component {
     });
 
   render() {
-    const { files, loading } = this.state;
+    const { files, loading, useNodeIds } = this.state;
 
     return (
       <Segment
@@ -222,6 +225,8 @@ export default class LoadNetworks extends React.Component {
             </Step.Content>
           </Step>
         </Step.Group>
+
+        <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
 
         {files.length > 0 &&
         <Table celled singleLine fixed unstackable striped size="small">
