@@ -96,18 +96,28 @@ export default function Sidebar(props) {
         }
         <Header as="h5" content="Paint all modules"/>
         <Button.Group {...buttonProps}>
-          <Button
-            content="Auto paint modules"
-            onClick={autoPaint}
-          />
-          <Button
-            icon
-            labelPosition="right"
-            onClick={removeColors}
-          >
-            <Icon name="x" style={{ background: "transparent" }}/>
-            Remove all colors
-          </Button>
+          <Popup
+            content="Paint all networks based on the modules in the selected network. (Select network by clicking on any module.)"
+            inverted size="small"
+            trigger={
+              <Button
+                content="Auto paint modules"
+                onClick={autoPaint}
+              />
+            }/>
+          <Popup
+            content="Use the default color for all networks."
+            inverted size="small"
+            trigger={
+              <Button
+                icon
+                labelPosition="right"
+                onClick={removeColors}
+              >
+                <Icon name="x" style={{ background: "transparent" }}/>
+                Remove all colors
+              </Button>
+            }/>
         </Button.Group>
       </Menu.Item>
       <Menu.Item>
@@ -237,7 +247,7 @@ export default function Sidebar(props) {
             popup="Justify vertical module alignment or align modules to bottom."
           />
           <MyCheckbox
-            label="Module ids"
+            label="Show module ids"
             checked={showModuleId}
             onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
             popup="Show or hide module designations."
