@@ -261,7 +261,7 @@ export default class LoadNetworks extends React.Component {
 
         <Transition
           animation="glow"
-          duration={1000}
+          duration={5000}
           visible={animateUseNodeIds}
         >
           <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
