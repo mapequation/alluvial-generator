@@ -127,13 +127,15 @@ export default class LoadNetworks extends React.Component {
         const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name");
 
         // names must be unique
-        const uniqueNames = new Set();
-        parsed.nodes.forEach(node => {
-          if (uniqueNames.has(node.name)) {
-            throw new Error(`Network contains nodes with duplicate names: "${node.name}"`);
-          }
-          uniqueNames.add(node.name);
-        });
+        if (!useNodeIds) {
+          const uniqueNames = new Set();
+          parsed.nodes.forEach(node => {
+            if (uniqueNames.has(node.name)) {
+              throw new Error(`Network contains nodes with duplicate names: "${node.name}"`);
+            }
+            uniqueNames.add(node.name);
+          });
+        }
 
         return parsed;
       } catch (e) {
