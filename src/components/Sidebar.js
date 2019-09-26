@@ -51,6 +51,8 @@ export default function Sidebar(props) {
     highlightColors,
     verticalAlign,
     showModuleId,
+    showModuleNames,
+    showNetworkNames,
     dropShadow,
     fontSize,
     sidebarVisible,
@@ -250,7 +252,19 @@ export default function Sidebar(props) {
             label="Show module ids"
             checked={showModuleId}
             onChange={(e, { checked }) => dispatch({ type: "showModuleId", value: checked })}
-            popup="Show or hide module designations."
+            popup="Show or hide module designations. (Visible on top of modules.)"
+          />
+          <MyCheckbox
+            label="Show module names"
+            checked={showModuleNames}
+            onChange={(e, { checked }) => dispatch({ type: "showModuleNames", value: checked })}
+            popup="Show or hide module names. (Visible to the left and right of outermost networks.)"
+          />
+          <MyCheckbox
+            label="Show network names"
+            checked={showNetworkNames}
+            onChange={(e, { checked }) => dispatch({ type: "showNetworkNames", value: checked })}
+            popup="Show or hide network names. (Visible below each network.)"
           />
           <MyCheckbox
             label="Drop shadow"

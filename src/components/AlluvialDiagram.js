@@ -99,6 +99,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     marginExponent: PropTypes.number,
     verticalAlign: PropTypes.string,
     showModuleId: PropTypes.bool,
+    showModuleNames: PropTypes.bool,
+    showNetworkNames: PropTypes.bool,
     dropShadow: PropTypes.bool,
     fontSize: PropTypes.number,
     defaultHighlightColor: PropTypes.string,
@@ -135,6 +137,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       streamlineThreshold,
       verticalAlign,
       showModuleId,
+      showModuleNames,
+      showNetworkNames,
       dropShadow,
       fontSize,
       defaultHighlightColor,
@@ -193,6 +197,8 @@ export default class AlluvialDiagram extends React.PureComponent {
         streamlineThreshold,
         verticalAlign,
         showModuleId,
+        showModuleNames,
+        showNetworkNames,
         dropShadow,
         fontSize,
         defaultHighlightColor,
@@ -262,6 +268,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       streamlineOpacity,
       streamlineThreshold,
       showModuleId,
+      showModuleNames,
+      showNetworkNames,
       dropShadow,
       fontSize
     } = this.props;
@@ -342,48 +350,57 @@ export default class AlluvialDiagram extends React.PureComponent {
     /**
      * Network names
      */
-    const networkNames = networkRoots
-      .selectAll(".networkName")
-      .data(d => [d.networkName]);
-
-    networkNames.exit().remove();
-
-    networkNames
-      .select("text")
-      .transition(t)
-      .attr("font-size", fontSize);
-
-    const networkNamesEnter = networkNames
-      .enter()
-      .append("g")
-      .attr("class", "networkName")
-      .call(makeTransparent);
-
-    networkNamesEnter
-      .transition(t)
-      .delay(delay)
-      .call(makeOpaque);
-
-    networkNamesEnter
-      .append("text")
-      .attr("class", "name")
-      .style("cursor", "default")
-      .text(d => d.name)
-      .attr("x", d => d.textX)
-      .attr("y", d => d.textY)
-      .attr("text-anchor", "middle")
-      .attr("font-size", fontSize)
-      .attr("dy", 3);
-
     const networkNameUpdateDelay = 0.5 * delay;
 
-    networkNames
-      .select(".name")
-      .text(d => d.name)
-      .transition(t)
-      .delay(networkNameUpdateDelay)
-      .attr("x", d => d.textX)
-      .attr("y", d => d.textY);
+    if (showNetworkNames) {
+      const networkNames = networkRoots
+        .selectAll(".networkName")
+        .data(d => [d.networkName]);
+
+      networkNames.exit().remove();
+
+      networkNames
+        .select("text")
+        .transition(t)
+        .attr("font-size", fontSize);
+
+      const networkNamesEnter = networkNames
+        .enter()
+        .append("g")
+        .attr("class", "networkName")
+        .call(makeTransparent);
+
+      networkNamesEnter
+        .transition(t)
+        .delay(delay)
+        .call(makeOpaque);
+
+      networkNamesEnter
+        .append("text")
+        .attr("class", "name")
+        .style("cursor", "default")
+        .text(d => d.name)
+        .attr("x", d => d.textX)
+        .attr("y", d => d.textY)
+        .attr("text-anchor", "middle")
+        .attr("font-size", fontSize)
+        .attr("dy", 3);
+
+      networkNames
+        .select(".name")
+        .text(d => d.name)
+        .transition(t)
+        .delay(networkNameUpdateDelay)
+        .attr("x", d => d.textX)
+        .attr("y", d => d.textY);
+    } else {
+      networkRoots
+        .selectAll(".networkName")
+        .transition(t)
+        .call(makeTransparent)
+        .delay(networkNameUpdateDelay)
+        .remove();
+    }
 
     /**
      * Streamlines
@@ -504,113 +521,122 @@ export default class AlluvialDiagram extends React.PureComponent {
     /**
      * Module names
      */
-    const leftModuleNames = networkRoots
-      .filter((d, i) => i === 0)
-      .selectAll(".moduleName")
-      .data(d => d.children, key);
-
-    const rightModuleNames = networkRoots
-      .filter((d, i, el) => el.length > 1 && i === el.length - 1)
-      .selectAll(".moduleName")
-      .data(d => d.children, key);
-
-    networkRoots
-      .filter((d, i, el) => i > 0 && i < el.length - 1)
-      .selectAll(".moduleName")
-      .transition(t)
-      .call(makeTransparent)
-      .remove();
-
-    const numVisibleModuleNames = d3
-      .scaleQuantize()
-      .domain([0, 100])
-      .range([1, 2, 3, 4]);
-
-    const tspanDy = (d, i, nodes) =>
-      nodes.length === 1
-        ? "0.35em"
-        : i === 0
-        ? `${-0.6 * (nodes.length - 1) + 0.35}em`
-        : "1.2em";
-
     const moduleNameUpdateDelay = networkNameUpdateDelay;
 
-    for (let [index, moduleNames] of [leftModuleNames, rightModuleNames].entries()) {
-      moduleNames
-        .exit()
+    if (showModuleNames) {
+      const leftModuleNames = networkRoots
+        .filter((d, i) => i === 0)
+        .selectAll(".moduleName")
+        .data(d => d.children, key);
+
+      const rightModuleNames = networkRoots
+        .filter((d, i, el) => el.length > 1 && i === el.length - 1)
+        .selectAll(".moduleName")
+        .data(d => d.children, key);
+
+      networkRoots
+        .filter((d, i, el) => i > 0 && i < el.length - 1)
+        .selectAll(".moduleName")
         .transition(t)
         .call(makeTransparent)
         .remove();
 
-      moduleNames
-        .select("text")
+      const numVisibleModuleNames = d3
+        .scaleQuantize()
+        .domain([0, 100])
+        .range([1, 2, 3, 4]);
+
+      const tspanDy = (d, i, nodes) =>
+        nodes.length === 1
+          ? "0.35em"
+          : i === 0
+          ? `${-0.6 * (nodes.length - 1) + 0.35}em`
+          : "1.2em";
+
+      for (let [index, moduleNames] of [leftModuleNames, rightModuleNames].entries()) {
+        moduleNames
+          .exit()
+          .transition(t)
+          .call(makeTransparent)
+          .remove();
+
+        moduleNames
+          .select("text")
+          .transition(t)
+          .attr("font-size", fontSize);
+
+        const moduleNamesEnter = moduleNames
+          .enter()
+          .append("g")
+          .attr("class", "moduleName")
+          .style("cursor", "default")
+          .call(makeTransparent);
+
+        moduleNamesEnter
+          .transition(t)
+          .delay(delay)
+          .call(makeOpaque);
+
+        moduleNamesEnter
+          .append("text")
+          .attr("text-anchor", ["end", "start"][index])
+          .attr("class", "name")
+          .attr("y", d => d.moduleNamePosition.y)
+          .attr("font-size", fontSize);
+
+        moduleNames
+          .select(".name")
+          .each(function(d) {
+            d3.select(this)
+              .selectAll("tspan")
+              .transition(t)
+              .delay(moduleNameUpdateDelay)
+              .attr("x", d.moduleNamePosition.x[index]);
+          })
+          .transition(t)
+          .delay(moduleNameUpdateDelay)
+          .attr("y", d => d.moduleNamePosition.y);
+
+        moduleNames = moduleNamesEnter.merge(moduleNames);
+
+        const moduleNamesTspan = moduleNames
+          .selectAll(".name")
+          .selectAll("tspan")
+          .data(
+            d => (d.name || d.largestLeafNodes)
+              .slice(0, numVisibleModuleNames(d.height))
+              .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
+            function(d) {
+              return d ? d.name : this.id;
+            }
+          );
+
+        moduleNamesTspan
+          .exit()
+          .transition(t)
+          .call(makeTransparent)
+          .remove();
+
+        moduleNamesTspan
+          .enter()
+          .append("tspan")
+          .text(d => d.name)
+          .attr("x", d => d.x)
+          .attr("dx", [3, -3][index])
+          .attr("dy", tspanDy)
+          .call(makeTransparent)
+          .merge(moduleNamesTspan)
+          .transition(t)
+          .call(makeOpaque)
+          .attr("dy", tspanDy);
+      }
+    } else {
+      networkRoots
+        .selectAll(".moduleName")
         .transition(t)
-        .attr("font-size", fontSize);
-
-      const moduleNamesEnter = moduleNames
-        .enter()
-        .append("g")
-        .attr("class", "moduleName")
-        .style("cursor", "default")
-        .call(makeTransparent);
-
-      moduleNamesEnter
-        .transition(t)
-        .delay(delay)
-        .call(makeOpaque);
-
-      moduleNamesEnter
-        .append("text")
-        .attr("text-anchor", ["end", "start"][index])
-        .attr("class", "name")
-        .attr("y", d => d.moduleNamePosition.y)
-        .attr("font-size", fontSize);
-
-      moduleNames
-        .select(".name")
-        .each(function(d) {
-          d3.select(this)
-            .selectAll("tspan")
-            .transition(t)
-            .delay(moduleNameUpdateDelay)
-            .attr("x", d.moduleNamePosition.x[index]);
-        })
-        .transition(t)
+        .call(makeTransparent)
         .delay(moduleNameUpdateDelay)
-        .attr("y", d => d.moduleNamePosition.y);
-
-      moduleNames = moduleNamesEnter.merge(moduleNames);
-
-      const moduleNamesTspan = moduleNames
-        .selectAll(".name")
-        .selectAll("tspan")
-        .data(
-          d => (d.name || d.largestLeafNodes)
-            .slice(0, numVisibleModuleNames(d.height))
-            .map(name => ({ name, x: d.moduleNamePosition.x[index] })),
-          function(d) {
-            return d ? d.name : this.id;
-          }
-        );
-
-      moduleNamesTspan
-        .exit()
-        .transition(t)
-        .call(makeTransparent)
         .remove();
-
-      moduleNamesTspan
-        .enter()
-        .append("tspan")
-        .text(d => d.name)
-        .attr("x", d => d.x)
-        .attr("dx", [3, -3][index])
-        .attr("dy", tspanDy)
-        .call(makeTransparent)
-        .merge(moduleNamesTspan)
-        .transition(t)
-        .call(makeOpaque)
-        .attr("dy", tspanDy);
     }
 
     /**

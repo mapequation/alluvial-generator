@@ -32,6 +32,10 @@ function reducer(state, action) {
       return { ...state, verticalAlign: action.value };
     case "showModuleId":
       return { ...state, showModuleId: action.value };
+    case "showModuleNames":
+      return { ...state, showModuleNames: action.value };
+    case "showNetworkNames":
+      return { ...state, showNetworkNames: action.value };
     case "dropShadow":
       return { ...state, dropShadow: action.value };
     case "fontSize":
@@ -75,6 +79,8 @@ export default function Layout(props) {
     highlightColors: schemePaired,
     verticalAlign: "bottom",
     showModuleId: false,
+    showModuleNames: true,
+    showNetworkNames: true,
     dropShadow: false,
     fontSize: 10,
     selectedModule: null,
