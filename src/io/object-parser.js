@@ -2,7 +2,7 @@
 import id from "../lib/id";
 
 
-type ObjectParser = (object: Object, name: string) => Network;
+type ObjectParser = (object: Object, name: string, nodeIdentifier: string) => Network;
 
 const setNodeIdentifiers = (object, identifier) => {
   const id = (node) => (node.stateId !== null ? node.stateId : node.id).toString();
@@ -23,7 +23,11 @@ const setNodeIdentifiers = (object, identifier) => {
   return object;
 };
 
-const parse: ObjectParser = (object, name, nodeIdentifier = "name") => {
+const parse: ObjectParser = (object, name, nodeIdentifier = "name", isMultiplex = false) => {
+  if (isMultiplex) {
+    object.nodes.forEach(node => node.stateId = null);
+  }
+
   setNodeIdentifiers(object, nodeIdentifier);
 
   return ({

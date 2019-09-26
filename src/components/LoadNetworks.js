@@ -50,6 +50,13 @@ export default class LoadNetworks extends React.Component {
 
   animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
 
+  setMultiplex = (i) => this.setState(prevState => {
+    const file = prevState.files[i];
+    if (!file) return;
+    file.multiplex = !file.multiplex;
+    return { files: prevState.files };
+  });
+
   withLoadingState = callback => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
 
@@ -75,6 +82,7 @@ export default class LoadNetworks extends React.Component {
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
+          multiplex: false,
           error: false
         }));
 
@@ -127,7 +135,7 @@ export default class LoadNetworks extends React.Component {
         const lines = file.contents.split("\n").filter(Boolean);
         const object = getParserForExtension(file.format)(lines, parseLinks);
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name");
+        const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name", file.multiplex);
 
         // if we found an error before, and switched to using node ids now, we need to reset any errors
         file.error = false;
@@ -283,7 +291,9 @@ export default class LoadNetworks extends React.Component {
                   <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
                   <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                   <Table.Cell>{file.format}</Table.Cell>
-                  <Table.Cell></Table.Cell>
+                  <Table.Cell>
+                    <Checkbox checked={file.multiplex} onChange={() => this.setMultiplex(i)}/>
+                  </Table.Cell>
                   <Table.Cell
                     selectable
                     negative
