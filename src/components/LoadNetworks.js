@@ -1,7 +1,7 @@
 import { getParserForExtension } from "@mapequation/infoparse";
 import PropTypes from "prop-types";
 import React from "react";
-import { Checkbox, Container, Divider, Icon, Segment, Step, Table } from "semantic-ui-react";
+import { Checkbox, Container, Divider, Icon, Segment, Step, Table, Transition } from "semantic-ui-react";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
@@ -34,7 +34,8 @@ export default class LoadNetworks extends React.Component {
   state = {
     files: [],
     loading: false,
-    useNodeIds: false
+    useNodeIds: false,
+    animateUseNodeIds: true
   };
 
   static propTypes = {
@@ -45,7 +46,9 @@ export default class LoadNetworks extends React.Component {
     onSubmit: values => console.log(values)
   };
 
-  onUseNodeIdsChange = () => this.setState((prevState) => ({ useNodeIds: !prevState.useNodeIds }));
+  onUseNodeIdsChange = () => this.setState(prevState => ({ useNodeIds: !prevState.useNodeIds }));
+
+  animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
 
   withLoadingState = callback => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
@@ -126,6 +129,9 @@ export default class LoadNetworks extends React.Component {
         const objectParser = getParser(file.format);
         const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name");
 
+        // if we found an error before, and switched to using node ids now, we need to reset any errors
+        file.error = false;
+
         // names must be unique
         if (!useNodeIds) {
           const uniqueNames = new Set();
@@ -146,6 +152,7 @@ export default class LoadNetworks extends React.Component {
     });
 
     if (files.some(file => file.error)) {
+      this.animateUseNodeIds();
       this.setState({ loading: false });
       return;
     }
@@ -188,7 +195,7 @@ export default class LoadNetworks extends React.Component {
     });
 
   render() {
-    const { files, loading, useNodeIds } = this.state;
+    const { files, loading, useNodeIds, animateUseNodeIds } = this.state;
 
     return (
       <Segment
@@ -196,7 +203,7 @@ export default class LoadNetworks extends React.Component {
         loading={loading}
         text
         textAlign="center"
-        style={{ padding: "50px 100px" }}
+        style={{ padding: "50px 50px" }}
       >
         <Step.Group>
           <Step link onClick={this.withLoadingState(this.loadExample)}>
@@ -244,40 +251,49 @@ export default class LoadNetworks extends React.Component {
           </Step>
         </Step.Group>
 
-        <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
+        <Transition
+          animation="glow"
+          duration={1000}
+          visible={animateUseNodeIds}
+        >
+          <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
+        </Transition>
 
         {files.length > 0 &&
-        <Table celled singleLine fixed unstackable striped size="small">
+        <Table celled unstackable striped size="small">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell width={3}>Size</Table.HeaderCell>
-              <Table.HeaderCell width={3}>Format</Table.HeaderCell>
-              <Table.HeaderCell width={3}>Remove</Table.HeaderCell>
+              <Table.HeaderCell>Size</Table.HeaderCell>
+              <Table.HeaderCell>Format</Table.HeaderCell>
+              <Table.HeaderCell>Multiplex</Table.HeaderCell>
+              <Table.HeaderCell>Remove</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
             {files.map((file, i) =>
-              <DraggableTableRow
-                key={i}
-                draggable
-                className="draggable"
-                index={i}
-                action={this.moveRow}
-              >
-                <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
-                <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
-                <Table.Cell>{file.format}</Table.Cell>
-                <Table.Cell
-                  selectable
-                  negative
-                  style={{ cursor: "pointer" }}
-                  onClick={() => this.removeFile(i)}
+              <Transition key={i} animation="shake" duration={800} visible={!file.error}>
+                <DraggableTableRow
+                  draggable
+                  className="draggable"
+                  index={i}
+                  action={this.moveRow}
                 >
-                  <a>Remove</a>
-                </Table.Cell>
-              </DraggableTableRow>
+                  <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
+                  <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                  <Table.Cell>{file.format}</Table.Cell>
+                  <Table.Cell></Table.Cell>
+                  <Table.Cell
+                    selectable
+                    negative
+                    style={{ cursor: "pointer" }}
+                    onClick={() => this.removeFile(i)}
+                  >
+                    <a>Remove</a>
+                  </Table.Cell>
+                </DraggableTableRow>
+              </Transition>
             )}
           </Table.Body>
         </Table>
