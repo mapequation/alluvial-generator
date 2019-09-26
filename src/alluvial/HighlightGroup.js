@@ -30,6 +30,10 @@ export default class HighlightGroup extends AlluvialNodeBase {
     this.insignificant = insignificant;
   }
 
+  get isHighlighted(): boolean {
+    return this.highlightIndex !== NOT_HIGHLIGHTED;
+  }
+
   asObject() {
     return {
       id: this.id,

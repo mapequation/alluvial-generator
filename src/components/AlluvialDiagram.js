@@ -91,6 +91,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     nameChangeBit: PropTypes.number.isRequired,
     colorChangeBit: PropTypes.number.isRequired,
     colorChangeAllBit: PropTypes.number.isRequired,
+    autoPaintBit: PropTypes.number.isRequired,
+    removeColorsBit: PropTypes.number.isRequired,
     saveDiagramBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
     duration: PropTypes.number,
@@ -141,6 +143,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       nameChangeBit,
       colorChangeBit,
       colorChangeAllBit,
+      autoPaintBit,
+      removeColorsBit,
       expandBit,
       regroupBit,
       saveDiagramBit
@@ -162,6 +166,14 @@ export default class AlluvialDiagram extends React.PureComponent {
       } else if (flipped(regroupBit, prev.regroupBit)) {
         this.diagram.doubleClick(selectedModule, { shiftKey: true });
       }
+    }
+
+    if (flipped(autoPaintBit, prev.autoPaintBit)) {
+      this.diagram.autoPaint(selectedModule);
+    }
+
+    if (flipped(removeColorsBit, prev.removeColorsBit)) {
+      this.diagram.removeColors();
     }
 
     if (this.shouldUpdateLayout(prev))
@@ -200,6 +212,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       verticalAlign,
       colorChangeBit,
       colorChangeAllBit,
+      autoPaintBit,
+      removeColorsBit,
       expandBit,
       regroupBit
     } = this.props;
@@ -210,7 +224,9 @@ export default class AlluvialDiagram extends React.PureComponent {
     const moduleWidthChanged = moduleWidth !== prev.moduleWidth;
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prev.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prev.verticalAlign;
-    const colorChanged = colorChangeBit !== prev.colorChangeBit || colorChangeAllBit !== prev.colorChangeAllBit;
+    const colorChanged =
+      colorChangeBit !== prev.colorChangeBit || colorChangeAllBit !== prev.colorChangeAllBit ||
+      autoPaintBit !== prev.autoPaintBit || removeColorsBit !== prev.removeColorsBit;
     const expanded = expandBit !== prev.expandBit;
     const regrouped = regroupBit !== prev.regroupBit;
 

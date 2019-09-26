@@ -44,6 +44,10 @@ function reducer(state, action) {
       return { ...state, colorChangeBit: flip(state.colorChangeBit) };
     case "changeAllColor":
       return { ...state, colorChangeAllBit: flip(state.colorChangeAllBit) };
+    case "autoPaint":
+      return { ...state, autoPaintBit: flip(state.autoPaintBit) };
+    case "removeColors":
+      return { ...state, removeColorsBit: flip(state.removeColorsBit) };
     case "expand":
       return { ...state, expandBit: flip(state.expandBit) };
     case "regroup":
@@ -77,6 +81,8 @@ export default function Layout(props) {
     nameChangeBit: 0,
     colorChangeBit: 0,
     colorChangeAllBit: 0,
+    autoPaintBit: 0,
+    removeColorsBit: 0,
     expandBit: 0,
     regroupBit: 0,
     saveDiagramBit: 0,

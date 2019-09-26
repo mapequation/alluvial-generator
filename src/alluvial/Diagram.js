@@ -1,7 +1,7 @@
 // @flow
 import AlluvialRoot from "./AlluvialRoot";
 import Depth from "./Depth";
-import HighlightGroup from "./HighlightGroup";
+import HighlightGroup, { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
@@ -127,6 +127,48 @@ export default class Diagram {
           this.removeNodes(nodes);
           this.addNodes(nodes);
         });
+    }
+
+    this.dirty = true;
+  }
+
+  autoPaint(alluvialObject: ?Object = null) {
+    const networkId = alluvialObject ? alluvialObject.networkId : this.alluvialRoot.children[0].networkId;
+
+    if (!networkId) {
+      console.warn("Tried to auto paint but could not find a network id!");
+      return;
+    }
+
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    const modules = networkRoot.children.filter(module => module.flow > 0);
+
+    const highlightIndices = modules.length <= 6 ?
+      [1, 3, 5, 7, 9, 11] :
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+    modules.forEach((module, i) =>
+      this.setModuleColor({
+        ...module.asObject(),
+        highlightIndex: highlightIndices[i % highlightIndices.length]
+      }, true));
+  }
+
+  removeColors() {
+    for (let networkRoot of this.alluvialRoot) {
+      const modules = [];
+      for (let module of networkRoot) {
+        for (let highlightGroup of module) {
+          if (highlightGroup.isHighlighted) {
+            modules.push(module);
+            break;
+          }
+        }
+      }
+      modules.forEach(module => this.setModuleColor({
+        ...module.asObject(),
+        highlightIndex: NOT_HIGHLIGHTED
+      }));
     }
 
     this.dirty = true;

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Checkbox, Header, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import DefaultHighlightColor from "./DefaultHighlightColor";
@@ -61,6 +61,12 @@ export default function Sidebar(props) {
 
   const basename = networks.map(network => network.name);
 
+  const autoPaint = () => dispatch({ type: "autoPaint" });
+
+  const removeColors = () => dispatch({ type: "removeColors" });
+
+  const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
+
   return (
     <SemanticSidebar
       as={Menu}
@@ -88,6 +94,21 @@ export default function Sidebar(props) {
           />
           : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
         }
+        <Header as="h5" content="Paint all modules"/>
+        <Button.Group {...buttonProps}>
+          <Button
+            content="Auto paint modules"
+            onClick={autoPaint}
+          />
+          <Button
+            icon
+            labelPosition="right"
+            onClick={removeColors}
+          >
+            <Icon name="x" style={{ background: "transparent" }}/>
+            Remove all colors
+          </Button>
+        </Button.Group>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Layout</Header>

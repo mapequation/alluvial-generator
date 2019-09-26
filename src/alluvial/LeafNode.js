@@ -3,6 +3,7 @@ import TreePath from "../lib/treepath";
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
+import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineId from "./StreamlineId";
@@ -33,7 +34,7 @@ export default class LeafNode extends AlluvialNodeBase {
     this.highlightIndex =
       node.highlightIndex != null && Number.isInteger(node.highlightIndex)
         ? node.highlightIndex
-        : -1;
+        : NOT_HIGHLIGHTED;
     this.moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
       ? node.moduleLevel
       : 1;
