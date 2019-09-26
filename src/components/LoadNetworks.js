@@ -1,7 +1,7 @@
 import { getParserForExtension } from "@mapequation/infoparse";
 import PropTypes from "prop-types";
 import React from "react";
-import { Checkbox, Container, Divider, Icon, Segment, Step, Table, Transition } from "semantic-ui-react";
+import { Checkbox, Container, Divider, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
@@ -83,7 +83,8 @@ export default class LoadNetworks extends React.Component {
           size: validFiles[i].size,
           format: validFiles[i].format,
           multiplex: false,
-          error: false
+          error: false,
+          errorMessage: null
         }));
 
         this.setState(({ files }) => ({
@@ -118,6 +119,7 @@ export default class LoadNetworks extends React.Component {
         files.forEach(file => {
           if (file.format !== "json") {
             file.error = true;
+            file.errorMessage = "When a json file is present, all other files must be removed.";
           }
         });
         this.setState({ loading: false });
@@ -139,13 +141,16 @@ export default class LoadNetworks extends React.Component {
 
         // if we found an error before, and switched to using node ids now, we need to reset any errors
         file.error = false;
+        file.errorMessage = null;
 
         // names must be unique
         if (!useNodeIds) {
           const uniqueNames = new Set();
           parsed.nodes.forEach(node => {
             if (uniqueNames.has(node.name)) {
-              throw new Error(`Network contains nodes with duplicate names: "${node.name}"`);
+              const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
+              file.errorMessage = message;
+              throw new Error(message);
             }
             uniqueNames.add(node.name);
           });
@@ -275,20 +280,30 @@ export default class LoadNetworks extends React.Component {
               <Table.HeaderCell>Size</Table.HeaderCell>
               <Table.HeaderCell>Format</Table.HeaderCell>
               <Table.HeaderCell>Multiplex</Table.HeaderCell>
-              <Table.HeaderCell>Remove</Table.HeaderCell>
+              <Table.HeaderCell></Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
             {files.map((file, i) =>
-              <Transition key={i} animation="shake" duration={800} visible={!file.error}>
+              <Transition key={i} animation="shake" duration={700} visible={!file.error}>
                 <DraggableTableRow
                   draggable
                   className="draggable"
                   index={i}
                   action={this.moveRow}
                 >
-                  <Table.Cell style={{ cursor: "grab" }} error={file.error}>{file.name}</Table.Cell>
+                  <Table.Cell style={{ cursor: "grab" }} error={file.error}>
+                    {file.name}
+                    {file.error &&
+                    <Popup
+                      inverted
+                      content={file.errorMessage}
+                      trigger={
+                        <Icon name="warning sign" style={{ float: "right", cursor: "pointer" }}/>
+                      }/>
+                    }
+                  </Table.Cell>
                   <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                   <Table.Cell>{file.format}</Table.Cell>
                   <Table.Cell>
@@ -296,11 +311,11 @@ export default class LoadNetworks extends React.Component {
                   </Table.Cell>
                   <Table.Cell
                     selectable
-                    negative
+                    textAlign="center"
                     style={{ cursor: "pointer" }}
                     onClick={() => this.removeFile(i)}
                   >
-                    <a>Remove</a>
+                    <Icon name="x"/>
                   </Table.Cell>
                 </DraggableTableRow>
               </Transition>
