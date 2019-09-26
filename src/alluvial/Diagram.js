@@ -132,7 +132,10 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  autoPaint(alluvialObject: ?Object = null) {
+  autoPaint(
+    alluvialObject: ?Object = null,
+    highlightIndices: number[] = [1, 3, 5, 7, 9, 11, 0, 2, 4, 6, 8, 10]
+  ) {
     const networkId = alluvialObject ? alluvialObject.networkId : this.alluvialRoot.children[0].networkId;
 
     if (!networkId) {
@@ -141,17 +144,24 @@ export default class Diagram {
     }
 
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    const modules = networkRoot.children.filter(module => module.flow > 0);
 
-    const highlightIndices = modules.length <= 6 ?
-      [1, 3, 5, 7, 9, 11] :
-      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    if (!networkRoot) {
+      console.warn(`No network root found with id ${networkId}`);
+      return;
+    }
 
-    modules.forEach((module, i) =>
-      this.setModuleColor({
-        ...module.asObject(),
-        highlightIndex: highlightIndices[i % highlightIndices.length]
-      }, true));
+    if (highlightIndices.length === 0) {
+      console.warn("Zero length array of highlight indices")
+      return;
+    }
+
+    networkRoot.children
+      .filter(module => module.flow > 0)
+      .forEach((module, i) =>
+        this.setModuleColor({
+          ...module.asObject(),
+          highlightIndex: highlightIndices[i % highlightIndices.length]
+        }, true));
   }
 
   removeColors() {
