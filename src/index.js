@@ -11,7 +11,10 @@ Sentry.init({
   beforeSend(event) {
     // Check if it is an exception, and if so, show the report dialog
     if (event.exception) {
-      Sentry.showReportDialog({ eventId: event.event_id });
+      Sentry.showReportDialog({
+        eventId: event.event_id,
+        subtitle2: "If you'd like to help, tell us what happened below. Your network data stay on your computer."
+      });
     }
     return event;
   }
