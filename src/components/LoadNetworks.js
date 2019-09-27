@@ -1,4 +1,5 @@
 import { getParserForExtension } from "@mapequation/infoparse";
+import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
 import { Checkbox, Container, Divider, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
@@ -91,7 +92,7 @@ export default class LoadNetworks extends React.Component {
           files: [...files, ...newFiles],
           loading: false
         }));
-      });
+      }).catch(err => Sentry.captureException(err));
   };
 
   setIdentifiersInJsonFormat = (json) => {
@@ -185,6 +186,7 @@ export default class LoadNetworks extends React.Component {
       .catch(err => {
         console.log(err);
         this.setState({ loading: false });
+        Sentry.captureException(err);
       });
   };
 
@@ -280,7 +282,7 @@ export default class LoadNetworks extends React.Component {
               <Table.HeaderCell>Size</Table.HeaderCell>
               <Table.HeaderCell>Format</Table.HeaderCell>
               <Table.HeaderCell>Multiplex</Table.HeaderCell>
-              <Table.HeaderCell></Table.HeaderCell>
+              <Table.HeaderCell/>
             </Table.Row>
           </Table.Header>
 
