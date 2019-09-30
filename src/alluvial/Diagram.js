@@ -286,7 +286,7 @@ export default class Diagram {
 
   removeNodes(nodes: Iterable<LeafNode>) {
     for (let node of nodes) {
-      node.remove();
+      node.remove(false);
     }
   }
 

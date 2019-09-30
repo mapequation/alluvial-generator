@@ -86,7 +86,7 @@ export default class LeafNode extends AlluvialNodeBase {
     if (this.rightParent) this.rightParent.removeChild(this);
   }
 
-  remove() {
+  remove(removeNetworkRoot: boolean = true) {
     const group = this.getAncestor(HIGHLIGHT_GROUP);
 
     this.removeFromSide(LEFT);
@@ -118,7 +118,7 @@ export default class LeafNode extends AlluvialNodeBase {
       return;
     }
     networkRoot.flow -= this.flow;
-    if (networkRoot.isEmpty) {
+    if (removeNetworkRoot && networkRoot.isEmpty) {
       networkRoot.removeFromParent();
     }
 
