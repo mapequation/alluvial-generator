@@ -1,6 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Slider } from "react-semantic-ui-range";
-import { Button, Checkbox, Header, Icon, Label, Menu, Popup, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import {
+  Button,
+  Checkbox,
+  Header,
+  Icon,
+  Label,
+  List,
+  Menu,
+  Modal,
+  Popup,
+  Sidebar as SemanticSidebar
+} from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
 import DefaultHighlightColor from "./DefaultHighlightColor";
@@ -68,6 +79,8 @@ export default function Sidebar(props) {
   const removeColors = () => dispatch({ type: "removeColors" });
 
   const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
+
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
   return (
     <SemanticSidebar
@@ -301,7 +314,37 @@ export default function Sidebar(props) {
             content="Download PNG"
           />
         </Menu.Menu>
+        <Menu.Menu>
+          <Menu.Item
+            icon="help"
+            onClick={() => setPdfModalOpen(true)}
+            content="Converting to PDF"
+          />
+        </Menu.Menu>
       </Menu.Item>
+      <Modal
+        size="small"
+        dimmer="inverted"
+        open={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+      >
+        <Modal.Header>Converting to PDF</Modal.Header>
+        <Modal.Content>
+          <p>Currently, export to PDF does not work.</p>
+          <p>The easiest way to convert to PDF is to download the diagram as SVG and convert from SVG to PDF.</p>
+
+          <Header as='h3'>How to convert SVG to PDF</Header>
+          <List ordered>
+            <List.Item>Download the diagram as SVG</List.Item>
+            <List.Item>Open the SVG in your browser</List.Item>
+            <List.Item>Open the <i>print dialog</i> (Ctrl-P on Windows, &#8984;P on Mac)</List.Item>
+            <List.Item>Choose <i>Print to PDF</i></List.Item>
+          </List>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button onClick={() => setPdfModalOpen(false)}>Close</Button>
+        </Modal.Actions>
+      </Modal>
     </SemanticSidebar>
   );
 }
