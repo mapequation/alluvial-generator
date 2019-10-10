@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
 import { Checkbox, Container, Divider, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
+import Background from "../images/background.svg";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
@@ -212,120 +213,129 @@ export default class LoadNetworks extends React.Component {
   render() {
     const { files, loading, useNodeIds, animateUseNodeIds } = this.state;
 
+    const background = {
+      padding: "100px 0 100px 0",
+      background: `linear-gradient(hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0.7)), url(${Background}) no-repeat`,
+      backgroundSize: "115% auto",
+      backgroundPosition: "20% 20%"
+    };
+
     return (
-      <Segment
-        as={Container}
-        loading={loading}
-        text
-        textAlign="center"
-        style={{ padding: "50px 50px" }}
-      >
-        <Step.Group>
-          <Step link onClick={this.withLoadingState(this.loadExample)}>
-            <Icon name="book"/>
-            <Step.Content>
-              <Step.Title>Load example</Step.Title>
-              <Step.Description>Citation networks</Step.Description>
-            </Step.Content>
-          </Step>
-        </Step.Group>
-
-        <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
-
-        <Step.Group ordered>
-          <Step
-            as="label"
-            link
-            completed={files.length > 0}
-            active={files.length === 0}
-            htmlFor="upload"
-          >
-            <Step.Content>
-              <Step.Title>Add networks</Step.Title>
-              <Step.Description>clu, map, tree, ftree, json</Step.Description>
-            </Step.Content>
-            <input
-              style={{ display: "none" }}
-              type="file"
-              multiple
-              id="upload"
-              onChange={this.withLoadingState(this.loadSelectedFiles)}
-              accept={acceptedFormats + ",.json"}
-              ref={input => (this.input = input)}
-            />
-          </Step>
-          <Step
-            link
-            active={files.length > 0}
-            disabled={files.length === 0}
-            onClick={this.withLoadingState(this.parseNetworks)}
-          >
-            <Step.Content>
-              <Step.Title>Create diagram</Step.Title>
-            </Step.Content>
-          </Step>
-        </Step.Group>
-
-        <Transition
-          animation="glow"
-          duration={5000}
-          visible={animateUseNodeIds}
+      <div style={background}>
+        <Segment
+          as={Container}
+          loading={loading}
+          text
+          textAlign="center"
+          style={{ padding: "50px 50px" }}
         >
-          <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
-        </Transition>
+          <Step.Group>
+            <Step link onClick={this.withLoadingState(this.loadExample)}>
+              <Icon name="book"/>
+              <Step.Content>
+                <Step.Title>Load example</Step.Title>
+                <Step.Description>Citation networks</Step.Description>
+              </Step.Content>
+            </Step>
+          </Step.Group>
 
-        {files.length > 0 &&
-        <Table celled unstackable striped size="small">
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Size</Table.HeaderCell>
-              <Table.HeaderCell>Format</Table.HeaderCell>
-              <Table.HeaderCell>Multiplex</Table.HeaderCell>
-              <Table.HeaderCell/>
-            </Table.Row>
-          </Table.Header>
+          <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
 
-          <Table.Body>
-            {files.map((file, i) =>
-              <Transition key={i} animation="shake" duration={700} visible={!file.error}>
-                <DraggableTableRow
-                  draggable
-                  className="draggable"
-                  index={i}
-                  action={this.moveRow}
-                >
-                  <Table.Cell style={{ cursor: "grab" }} error={file.error}>
-                    {file.name}
-                    {file.error &&
-                    <Popup
-                      inverted
-                      content={file.errorMessage}
-                      trigger={
-                        <Icon name="warning sign" style={{ float: "right", cursor: "pointer" }}/>
-                      }/>
-                    }
-                  </Table.Cell>
-                  <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
-                  <Table.Cell>{file.format}</Table.Cell>
-                  <Table.Cell>
-                    <Checkbox checked={file.multiplex} onChange={() => this.setMultiplex(i)}/>
-                  </Table.Cell>
-                  <Table.Cell
-                    selectable
-                    textAlign="center"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => this.removeFile(i)}
+          <Step.Group ordered>
+            <Step
+              as="label"
+              link
+              completed={files.length > 0}
+              active={files.length === 0}
+              htmlFor="upload"
+            >
+              <Step.Content>
+                <Step.Title>Add networks</Step.Title>
+                <Step.Description>clu, map, tree, ftree, json</Step.Description>
+              </Step.Content>
+              <input
+                style={{ display: "none" }}
+                type="file"
+                multiple
+                id="upload"
+                onChange={this.withLoadingState(this.loadSelectedFiles)}
+                accept={acceptedFormats + ",.json"}
+                ref={input => (this.input = input)}
+              />
+            </Step>
+            <Step
+              link
+              active={files.length > 0}
+              disabled={files.length === 0}
+              onClick={this.withLoadingState(this.parseNetworks)}
+            >
+              <Step.Content>
+                <Step.Title>Create diagram</Step.Title>
+              </Step.Content>
+            </Step>
+          </Step.Group>
+
+          <Transition
+            animation="glow"
+            duration={5000}
+            visible={animateUseNodeIds}
+          >
+            <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
+          </Transition>
+
+          {files.length > 0 &&
+          <Table celled unstackable striped size="small">
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Size</Table.HeaderCell>
+                <Table.HeaderCell>Format</Table.HeaderCell>
+                <Table.HeaderCell>Multiplex</Table.HeaderCell>
+                <Table.HeaderCell/>
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {files.map((file, i) =>
+                <Transition key={i} animation="shake" duration={700} visible={!file.error}>
+                  <DraggableTableRow
+                    draggable
+                    className="draggable"
+                    index={i}
+                    action={this.moveRow}
                   >
-                    <Icon name="x"/>
-                  </Table.Cell>
-                </DraggableTableRow>
-              </Transition>
-            )}
-          </Table.Body>
-        </Table>
-        }
-      </Segment>
+                    <Table.Cell style={{ cursor: "grab" }} error={file.error}>
+                      {file.name}
+                      {file.error &&
+                      <Popup
+                        inverted
+                        content={file.errorMessage}
+                        trigger={
+                          <Icon name="warning sign" style={{ float: "right", cursor: "pointer" }}/>
+                        }/>
+                      }
+                    </Table.Cell>
+                    <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                    <Table.Cell>{file.format}</Table.Cell>
+                    <Table.Cell>
+                      <Checkbox checked={file.multiplex} onChange={() => this.setMultiplex(i)}/>
+                    </Table.Cell>
+                    <Table.Cell
+                      selectable
+                      textAlign="center"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => this.removeFile(i)}
+                    >
+                      <Icon name="x"/>
+                    </Table.Cell>
+                  </DraggableTableRow>
+                </Transition>
+              )}
+            </Table.Body>
+          </Table>
+          }
+        </Segment>
+      </div>
     );
   }
 }

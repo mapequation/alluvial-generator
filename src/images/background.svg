@@ -1,0 +1,367 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="width:100vw;height:100vh" viewBox="100 450 1300 1150">
+  <defs>
+    <linearGradient id="i">
+      <stop offset="15%" stop-color="#b6b69f"/>
+      <stop offset="85%" stop-color="#b6b69f"/>
+    </linearGradient>
+    <linearGradient id="j">
+      <stop offset="15%" stop-color="#A0A04F"/>
+      <stop offset="85%" stop-color="#A0A04F"/>
+    </linearGradient>
+    <linearGradient id="G">
+      <stop offset="15%" stop-color="#b6b69f"/>
+      <stop offset="85%" stop-color="#b2df8a"/>
+    </linearGradient>
+    <linearGradient id="H">
+      <stop offset="15%" stop-color="#A0A04F"/>
+      <stop offset="85%" stop-color="#7CE221"/>
+    </linearGradient>
+    <linearGradient id="y">
+      <stop offset="15%" stop-color="#b6b69f"/>
+      <stop offset="85%" stop-color="#fb9a99"/>
+    </linearGradient>
+    <linearGradient id="z">
+      <stop offset="15%" stop-color="#A0A04F"/>
+      <stop offset="85%" stop-color="#FF2422"/>
+    </linearGradient>
+    <linearGradient id="q">
+      <stop offset="15%" stop-color="#b6b69f"/>
+      <stop offset="85%" stop-color="#fdbf6f"/>
+    </linearGradient>
+    <linearGradient id="r">
+      <stop offset="15%" stop-color="#A0A04F"/>
+      <stop offset="85%" stop-color="#FF9500"/>
+    </linearGradient>
+    <linearGradient id="s">
+      <stop offset="15%" stop-color="#a6cee3"/>
+      <stop offset="85%" stop-color="#1f78b4"/>
+    </linearGradient>
+    <linearGradient id="t">
+      <stop offset="15%" stop-color="#43AAE0"/>
+      <stop offset="85%" stop-color="#054068"/>
+    </linearGradient>
+    <linearGradient id="e">
+      <stop offset="15%" stop-color="#a6cee3"/>
+      <stop offset="85%" stop-color="#cab2d6"/>
+    </linearGradient>
+    <linearGradient id="f">
+      <stop offset="15%" stop-color="#43AAE0"/>
+      <stop offset="85%" stop-color="#A459C9"/>
+    </linearGradient>
+    <linearGradient id="m">
+      <stop offset="15%" stop-color="#1f78b4"/>
+      <stop offset="85%" stop-color="#1f78b4"/>
+    </linearGradient>
+    <linearGradient id="n">
+      <stop offset="15%" stop-color="#054068"/>
+      <stop offset="85%" stop-color="#054068"/>
+    </linearGradient>
+    <linearGradient id="E">
+      <stop offset="15%" stop-color="#1f78b4"/>
+      <stop offset="85%" stop-color="#b2df8a"/>
+    </linearGradient>
+    <linearGradient id="F">
+      <stop offset="15%" stop-color="#054068"/>
+      <stop offset="85%" stop-color="#7CE221"/>
+    </linearGradient>
+    <linearGradient id="o">
+      <stop offset="15%" stop-color="#b2df8a"/>
+      <stop offset="85%" stop-color="#b6b69f"/>
+    </linearGradient>
+    <linearGradient id="p">
+      <stop offset="15%" stop-color="#7CE221"/>
+      <stop offset="85%" stop-color="#A0A04F"/>
+    </linearGradient>
+    <linearGradient id="c">
+      <stop offset="15%" stop-color="#b2df8a"/>
+      <stop offset="85%" stop-color="#b2df8a"/>
+    </linearGradient>
+    <linearGradient id="d">
+      <stop offset="15%" stop-color="#7CE221"/>
+      <stop offset="85%" stop-color="#7CE221"/>
+    </linearGradient>
+    <linearGradient id="A">
+      <stop offset="15%" stop-color="#fb9a99"/>
+      <stop offset="85%" stop-color="#fb9a99"/>
+    </linearGradient>
+    <linearGradient id="B">
+      <stop offset="15%" stop-color="#FF2422"/>
+      <stop offset="85%" stop-color="#FF2422"/>
+    </linearGradient>
+    <linearGradient id="k">
+      <stop offset="15%" stop-color="#e31a1c"/>
+      <stop offset="85%" stop-color="#fb9a99"/>
+    </linearGradient>
+    <linearGradient id="l">
+      <stop offset="15%" stop-color="#970002"/>
+      <stop offset="85%" stop-color="#FF2422"/>
+    </linearGradient>
+    <linearGradient id="w">
+      <stop offset="15%" stop-color="#fdbf6f"/>
+      <stop offset="85%" stop-color="#fb9a99"/>
+    </linearGradient>
+    <linearGradient id="x">
+      <stop offset="15%" stop-color="#FF9500"/>
+      <stop offset="85%" stop-color="#FF2422"/>
+    </linearGradient>
+    <linearGradient id="a">
+      <stop offset="15%" stop-color="#fdbf6f"/>
+      <stop offset="85%" stop-color="#fdbf6f"/>
+    </linearGradient>
+    <linearGradient id="b">
+      <stop offset="15%" stop-color="#FF9500"/>
+      <stop offset="85%" stop-color="#FF9500"/>
+    </linearGradient>
+    <linearGradient id="u">
+      <stop offset="15%" stop-color="#fdbf6f"/>
+      <stop offset="85%" stop-color="#cab2d6"/>
+    </linearGradient>
+    <linearGradient id="v">
+      <stop offset="15%" stop-color="#FF9500"/>
+      <stop offset="85%" stop-color="#A459C9"/>
+    </linearGradient>
+    <linearGradient id="g">
+      <stop offset="15%" stop-color="#ff7f00"/>
+      <stop offset="85%" stop-color="#fb9a99"/>
+    </linearGradient>
+    <linearGradient id="h">
+      <stop offset="15%" stop-color="#A84C00"/>
+      <stop offset="85%" stop-color="#FF2422"/>
+    </linearGradient>
+    <linearGradient id="I">
+      <stop offset="15%" stop-color="#cab2d6"/>
+      <stop offset="85%" stop-color="#fdbf6f"/>
+    </linearGradient>
+    <linearGradient id="J">
+      <stop offset="15%" stop-color="#A459C9"/>
+      <stop offset="85%" stop-color="#FF9500"/>
+    </linearGradient>
+    <linearGradient id="C">
+      <stop offset="15%" stop-color="#cab2d6"/>
+      <stop offset="85%" stop-color="#6a3d9a"/>
+    </linearGradient>
+    <linearGradient id="D">
+      <stop offset="15%" stop-color="#A459C9"/>
+      <stop offset="85%" stop-color="#37155C"/>
+    </linearGradient>
+  </defs>
+  <svg xmlns="http://www.w3.org/2000/svg" style="width:100vw;height:100vh">
+    <rect width="100%" height="100%" fill="#fff" class="background"/>
+    <g class="alluvialDiagram" transform="matrix(1.17895 0 0 1.17895 131.7486 408.3592)">
+      <g class="networkRoot">
+        <path fill="url(#a)" stroke="url(#b)" d="M110 624.7896c159.5 0 159.5-.8537 319-.8537V469.432c-159.5 0-159.5-14.4714-319-14.4714z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#c)" stroke="url(#d)" d="M110 172.0308c159.5 0 159.5 25.3072 319 25.3072v-85.3204c-159.5 0-159.5-21.3562-319-21.3562z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#e)" stroke="url(#f)" d="M110 439.5776c159.5 0 159.5-32.123 319-32.123v-21.647c-159.5 0-159.5 33.8402-319 33.8402z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#g)" stroke="url(#h)" d="M110 402.0763c159.5 0 159.5 46.4955 319 46.4955v-16.4196c-159.5 0-159.5-45.638-319-45.638z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 378.1215c159.5 0 159.5-1.1071 319-1.1071v-10.2667c-159.5 0-159.5-1.2175-319-1.2175z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#k)" stroke="url(#l)" d="M110 339.4677c159.5 0 159.5 92.6845 319 92.6845v-10.6898c-159.5 0-159.5-90.9251-319-90.9251z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 356.6658c159.5 0 159.5.8611 319 .8611v-9.555c-159.5 0-159.5-.3918-319-.3918zM110 306.026c159.5 0 159.5 33.6872 319 33.6872v-9.6638c-159.5 0-159.5-31.4515-319-31.4515z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#m)" stroke="url(#n)" d="M110 321.513c159.5 0 159.5-112.7282 319-112.7282v-6.5517c-159.5 0-159.5 112.3287-319 112.3287z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 275.0549c159.5 0 159.5 6.3385 319 6.3385v-4.9352c-159.5 0-159.5-6.8938-319-6.8938z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#o)" stroke="url(#p)" d="M110 90.6614c159.5 0 159.5-11.48 319-11.48v-4.8579c-159.5 0-159.5 10.8658-319 10.8658z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 406.4505c159.5 0 159.5-84.8124 319-84.8124v-5.401c-159.5 0-159.5 86.0645-319 86.0645z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#q)" stroke="url(#r)" d="M110 287.9787c159.5 0 159.5 180.5149 319 180.5149v-5.0628c-159.5 0-159.5-179.6947-319-179.6947z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#s)" stroke="url(#t)" d="M110 419.6478c159.5 0 159.5-112.2906 319-112.2906v-4.5776c-159.5 0-159.5 112.6593-319 112.6593z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 52.0146c159.5 0 159.5-10.9053 319-10.9053V37.206c-159.5 0-159.5 10.386-319 10.386zM110 260.198c159.5 0 159.5 34.5252 319 34.5252v-4.4329c-159.5 0-159.5-33.9326-319-33.9326zM110 248.1571c159.5 0 159.5 19.8926 319 19.8926v-4.1824c-159.5 0-159.5-19.474-319-19.474z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#u)" stroke="url(#v)" d="M110 452.7713c159.5 0 159.5-42.255 319-42.255v-3.0618c-159.5 0-159.5 41.918-319 41.918z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 235.9172c159.5 0 159.5 19.3442 319 19.3442v-3.2405c-159.5 0-159.5-18.862-319-18.862z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#w)" stroke="url(#x)" d="M110 454.9605c159.5 0 159.5-3.9455 319-3.9455v-1.8885c-159.5 0-159.5 3.6448-319 3.6448z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#fdbf6f" stroke="none" d="M0 448.6765h110V630H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#a6cee3" stroke="none" d="M0 415.4389h110v25.2377H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 402.2683h110v5.1706H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 386.5141h110v15.7541H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 365.3697h110v13.1444H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 347.5535h110v9.8162H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#a6cee3" stroke="none" d="M0 339.553h110v.0005H0z"/>
+          <path fill="#e31a1c" stroke="none" d="M0 330.4771h110v9.0759H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#1f78b4" stroke="none" d="M0 314.4909h110v7.9863H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 298.5963h110v7.8946H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 298.5903h110v.006H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 283.7051h110v6.8852H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 269.5644h110v6.1407H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 256.3135h110v5.2509H0z"/>
+          <path fill="#a6cee3" stroke="none" d="M0 256.3027h110v.0108H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 256.2153h110v.0874H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 244.3933h110v3.822H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 244.3473h110v.0461H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 233.1584h110v3.1888H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 233.1549h110v.0036H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 222.064h110v3.0909H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 222.0635h110v.0005H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 210.9852h110v3.0783H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b2df8a" stroke="none" d="M0 85.1624h110v93.8229H0z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M0 47.5918h110v5.5705H0z"/>
+          <path fill="#ff7f00" stroke="none" d="M0 47.5645h110v.0273H0z"/>
+        </g>
+        <path fill="url(#y)" stroke="url(#z)" d="M110 212.7728c159.5 0 159.5 208.6384 319 208.6384v-1.458c-159.5 0-159.5-208.9671-319-208.9671z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M110 52.8938c159.5 0 159.5 21.4297 319 21.4297v-.8873c-159.5 0-159.5-21.4216-319-21.4216z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+      </g>
+      <g class="networkRoot">
+        <path fill="url(#a)" stroke="url(#b)" d="M539 625.3749c159.5 0 159.5-8.811 319-8.811V497.477c-159.5 0-159.5-32.0059-319-32.0059z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#c)" stroke="url(#d)" d="M539 197.9969c159.5 0 159.5-14.2849 319-14.2849V95.2716C698.5 95.2716 698.5 112 539 112z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#A)" stroke="url(#B)" d="M539 453.481c159.5 0 159.5 29.599 319 29.599V447.43c-159.5 0-159.5-27.312-319-27.312z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#C)" stroke="url(#D)" d="M539 409.3035c159.5 0 159.5 28.056 319 28.056v-20.3337c-159.5 0-159.5-31.0144-319-31.0144z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 339.6238c159.5 0 159.5 66.769 319 66.769v-12.319c-159.5 0-159.5-64.0399-319-64.0399z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 357.1214c159.5 0 159.5 26.6981 319 26.6981V373.547c-159.5 0-159.5-25.4378-319-25.4378z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 376.7142c159.5 0 159.5-12.9586 319-12.9586v-9.3052c-159.5 0-159.5 12.3658-319 12.3658z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#E)" stroke="url(#F)" d="M539 208.833c159.5 0 159.5-17.7291 319-17.7291v-7.3919c-159.5 0-159.5 18.486-319 18.486z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 321.687c159.5 0 159.5 20.8697 319 20.8697v-5.667c-159.5 0-159.5-20.6574-319-20.6574z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#m)" stroke="url(#n)" d="M539 308.1951c159.5 0 159.5 4.5279 319 4.5279v-5.5814c-159.5 0-159.5-4.362-319-4.362z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 294.5692c159.5 0 159.5 33.3583 319 33.3583v-5.7764c-159.5 0-159.5-31.8552-319-31.8552z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#G)" stroke="url(#H)" d="M539 78.8476c159.5 0 159.5 16.424 319 16.424v-5.1617c-159.5 0-159.5-15.9895-319-15.9895z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 281.2501c159.5 0 159.5 17.0304 319 17.0304v-4.8775c-159.5 0-159.5-16.9407-319-16.9407zM539 268.2998c159.5 0 159.5 3.3742 319 3.3742v-4.3403c-159.5 0-159.5-3.4007-319-3.4007zM539 41.2024c159.5 0 159.5 14.827 319 14.827v-4.2729c-159.5 0-159.5-14.5506-319-14.5506zM539 255.34c159.5 0 159.5-19.7327 319-19.7327v-3.2888c-159.5 0-159.5 19.6911-319 19.6911z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#i)" stroke="url(#j)" d="M539 243.7132c159.5 0 159.5 3.4088 319 3.4088v-3.0119c-159.5 0-159.5-3.2374-319-3.2374z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <path fill="url(#I)" stroke="url(#J)" d="M539 411.3063c159.5 0 159.5 86.0478 319 86.0478v-1.321c-159.5 0-159.5-86.5827-319-86.5827z" class="streamline" cursor="pointer" opacity=".89" paint-order="stroke" vector-effect="non-scaling-stroke"/>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#fdbf6f" stroke="none" d="M429 462.4225h110V630H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#fb9a99" stroke="none" d="M429 419.9519h110v34.4706H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#cab2d6" stroke="none" d="M429 385.4046h110v26.5472H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 366.2272h110v11.1775H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 347.9224h110v10.3048H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 330.0339h110v9.8885H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 330.0071h110v.0268H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 316.2323h110v5.7748H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 316.231h110v.0013H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#1f78b4" stroke="none" d="M429 302.7796h110v5.4514H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 290.2899h110v4.4897H429z"/>
+          <path fill="#33a02c" stroke="none" d="M429 289.5504h110v.7395H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 289.4691h110v.0813H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 276.458h110v5.0111H429z"/>
+          <path fill="#e31a1c" stroke="none" d="M429 276.457h110v.001H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 263.8673h110v4.5897H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 263.8647h110v.0026H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 252.0096h110v3.8551H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 240.8722h110v3.1374H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 240.8343h110v.0379H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#1f78b4" stroke="none" d="M429 202.198h110v6.6363H429z"/>
+          <path fill="#b2df8a" stroke="none" d="M429 111.9928h110v90.2052H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 73.4362h110v6.5566H429z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M429 37.2059h110v4.2303H429z"/>
+          <path fill="#ff7f00" stroke="none" d="M429 37.1819h110v.024H429z"/>
+        </g>
+      </g>
+      <g class="networkRoot">
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#fdbf6f" stroke="none" d="M858 495.3372h110V630H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#a6cee3" stroke="none" d="M858 487.3184h110v.0094H858z"/>
+          <path fill="#fb9a99" stroke="none" d="M858 447.2791h110v40.0392H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#6a3d9a" stroke="none" d="M858 416.9728h110v22.3063H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 394.0629h110v14.9099H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 373.5122h110v12.5506H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 354.2691h110v11.2432H858z"/>
+          <path fill="#1f78b4" stroke="none" d="M858 353.9837h110v.2854H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 336.8897h110v9.0939H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 322.1433h110v6.7464H858z"/>
+          <path fill="#a6cee3" stroke="none" d="M858 322.1298h110v.0068H858z"/>
+          <path fill="#33a02c" stroke="none" d="M858 321.7653h110v.3645H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#1f78b4" stroke="none" d="M858 307.1392h110v6.6261H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 293.3994h110v5.7399H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 279.9694h110v5.4299H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 267.3337h110v4.6357H858z"/>
+          <path fill="#33a02c" stroke="none" d="M858 267.3179h110v.0079H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 255.6425h110v3.6754H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 244.1101h110v3.5324H858z"/>
+          <path fill="#e31a1c" stroke="none" d="M858 243.8369h110v.1366H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 232.3185h110v3.5183H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b2df8a" stroke="none" d="M858 90.0246h110v110.2939H858z"/>
+        </g>
+        <g stroke="red" stroke-opacity="0" class="module" cursor="pointer">
+          <path fill="#b6b69f" stroke="none" d="M858 51.7565h110v6.2681H858z"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</svg>
