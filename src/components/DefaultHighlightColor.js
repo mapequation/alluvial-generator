@@ -59,7 +59,7 @@ export default function DefaultHighlightColor(props) {
         inverted
         size="small"
         trigger={<span style={styles.label}>Default color</span>}
-        content="Choose the default diagram color."
+        content="Choose the default color."
       />
       {visible &&
       <div style={styles.popover}>

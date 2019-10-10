@@ -140,7 +140,7 @@ export default function Sidebar(props) {
         <LabelForSlider
           content="Height"
           detail={height}
-          popup="Total height of the diagram (arbitrary units)."
+          popup="Total height (arbitrary units)."
         >
           <GreySlider
             start={height}

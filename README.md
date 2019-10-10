@@ -1,4 +1,4 @@
-# [Alluvial Diagram Generator](https://alluvial.mapequation.org)
+# [Alluvial Generator](https://alluvial.mapequation.org)
 
 ## Feedback
 If you have any questions, feedback, or issues, please add them to the [issues page](https://github.com/mapequation/alluvial-generator/issues).
