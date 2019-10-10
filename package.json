@@ -60,8 +60,7 @@
     "build": "node scripts/build.js",
     "flow": "$(npm bin)/flow",
     "test": "node scripts/test.js --env=jsdom",
-    "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial",
-    "postbuild": "react-snap"
+    "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial"
   },
   "jest": {
     "collectCoverageFrom": [
