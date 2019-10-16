@@ -27,4 +27,9 @@ if (rootElement.hasChildNodes()) {
   render(<App/>, rootElement);
 }
 
-unregister();
+try {
+  unregister();
+} catch (e) {
+  // this might fail on some browsers, don't throw exception
+  console.warn(e);
+}
