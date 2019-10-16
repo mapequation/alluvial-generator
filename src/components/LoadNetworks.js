@@ -98,10 +98,12 @@ export default class LoadNetworks extends React.Component {
 
   setIdentifiersInJsonFormat = (json) => {
     if (json.version) {
-      const minorVersion = +json.version.split(".")[1];
-      if (minorVersion < 3) {
+      const version = json.version.split(".").map(Number);
+      const [major, minor] = version;
+      if (major === 0 && minor < 3) {
         for (let network of json.networks) {
           for (let node of network.nodes) {
+            // "node.name" was the only available identifier before version 0.3.0
             node.identifier = node.name;
           }
         }
