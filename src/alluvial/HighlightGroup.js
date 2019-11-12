@@ -57,6 +57,10 @@ export default class HighlightGroup extends AlluvialNodeBase {
     return this.left.isEmpty && this.right.isEmpty;
   }
 
+  get numLeafNodes(): number {
+    return this.left.numLeafNodes;
+  }
+
   * leafNodes(): Iterable<AlluvialNode> {
     yield* this.left.leafNodes();
   }

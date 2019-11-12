@@ -60,6 +60,8 @@ function reducer(state, action) {
       return { ...state, saveDiagramBit: flip(state.saveDiagramBit) };
     case "sidebarVisible":
       return { ...state, sidebarVisible: action.value };
+    case "moduleSize":
+      return { ...state, moduleSize: action.value };
     default:
       throw new Error();
   }
@@ -93,6 +95,7 @@ export default function Layout(props) {
     regroupBit: 0,
     saveDiagramBit: 0,
     sidebarVisible: true,
+    moduleSize: "flow",
     ...props.state
   };
 

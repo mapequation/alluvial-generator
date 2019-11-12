@@ -47,6 +47,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
     return true;
   }
 
+  get numLeafNodes(): number {
+    return this.children.length;
+  }
+
   makeDangling() {
     this.streamlineId = this.streamlineId.getDangling();
     this.id = this.streamlineId.toString();

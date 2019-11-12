@@ -1,12 +1,15 @@
 // @flow
+import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
-import Depth, { ALLUVIAL_ROOT } from "./Depth";
+import Depth, { ALLUVIAL_ROOT, NETWORK_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
 import NetworkRoot from "./NetworkRoot";
 import type { Side } from "./Side";
 
 
 export type VerticalAlign = "bottom" | "justify" | "top";
+
+export type ModuleSize = "flow" | "nodes";
 
 export default class AlluvialRoot extends AlluvialNodeBase {
   children: NetworkRoot[] = [];
@@ -53,7 +56,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     moduleWidth: number,
     flowThreshold: number,
     verticalAlign: VerticalAlign = "bottom",
-    marginExponent: number
+    marginExponent: number,
+    moduleSize: ModuleSize = "flow"
   ) {
     const numNetworks = this.numChildren;
 
@@ -82,6 +86,16 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       return differenceIndex;
     };
 
+    const getNodeSizeForNetwork = ({ numLeafNodes }: NetworkRoot) => (node: AlluvialNode): number => {
+      if (moduleSize === "flow") {
+        return node.flow;
+      } else if (moduleSize === "nodes") {
+        return node.numLeafNodes / numLeafNodes;
+      }
+      return 0;
+    };
+
+    let getNodeSize = null;
     let moduleHeight = 0;
     let moduleMargin = 0;
 
@@ -95,6 +109,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       (node, i, nodes) => {
         switch (node.depth) {
           case Depth.NETWORK_ROOT:
+            getNodeSize = getNodeSizeForNetwork(node);
             node.flowThreshold = flowThreshold;
             networkIndex = i;
             node.sortChildren();
@@ -102,25 +117,34 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             y = height;
             break;
           case Depth.MODULE:
+            if (!getNodeSize) {
+              console.error("getNodeSize was not set!");
+              return;
+            }
             node.sortChildren();
             const margin =
               i + 1 < nodes.length
                 ? 2 ** (marginExponent - 2 * differenceIndex(node.path, nodes[i + 1].path))
                 : 0;
-            moduleHeight = node.flow * height;
+            const nodeSize = getNodeSize(node);
+            moduleHeight = nodeSize * height;
             y -= moduleHeight;
             node.margin = margin;
             node.layout = { x, y, width: moduleWidth, height: moduleHeight };
             y -= moduleMargin = margin;
             totalMargins[networkIndex] += margin;
-            visibleFlows[networkIndex] += node.flow;
+            visibleFlows[networkIndex] += nodeSize;
             visibleModules[networkIndex]++;
             break;
           case Depth.HIGHLIGHT_GROUP:
+            if (!getNodeSize) {
+              console.error("getNodeSize was not set!");
+              return;
+            }
             if (i === 0) {
               y += moduleHeight + moduleMargin;
             }
-            const groupHeight = node.flow * height;
+            const groupHeight = getNodeSize(node) * height;
             y -= groupHeight;
             node.layout = { x, y, width: moduleWidth, height: groupHeight };
             if (i + 1 === nodes.length) {
@@ -198,6 +222,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     x = 0;
     y = height;
 
+    getNodeSize = null;
+
     this.forEachDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
@@ -213,21 +239,41 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             y = height;
             break;
           case Depth.MODULE:
-            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
+            if (!getNodeSize) {
+              console.error("getNodeSize was not set!");
+              return;
+            }
+            node.layout = { x, y, width: moduleWidth, height: getNodeSize(node) * usableHeight };
             y -= node.margin;
             break;
           case Depth.HIGHLIGHT_GROUP:
-            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
+            if (!getNodeSize) {
+              console.error("getNodeSize was not set!");
+              return;
+            }
+            node.layout = { x, y, width: moduleWidth, height: getNodeSize(node) * usableHeight };
             break;
           case Depth.BRANCH:
-            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
+            if (!getNodeSize) {
+              console.error("getNodeSize was not set!");
+              return;
+            }
+            let branchHeight = getNodeSize(node) * usableHeight;
+            node.layout = { x, y, width: moduleWidth, height: branchHeight };
             if (node.isLeft) {
-              y += node.flow * usableHeight;
+              y += branchHeight;
             }
             break;
           case Depth.STREAMLINE_NODE:
-            y -= node.flow * usableHeight;
-            node.layout = { x, y, width: moduleWidth, height: node.flow * usableHeight };
+            const network = node.getAncestor(NETWORK_ROOT);
+            if (!network) {
+              console.error("Streamline node has no NetworkRoot parent");
+              return;
+            }
+            getNodeSize = getNodeSizeForNetwork(network);
+            const nodeHeight = getNodeSize(node) * usableHeight;
+            y -= nodeHeight;
+            node.layout = { x, y, width: moduleWidth, height: nodeHeight };
             break;
           default:
             break;

@@ -47,6 +47,8 @@ const MyCheckbox = props => {
   return popup ? <Popup content={popup} inverted size="small" trigger={checkbox}/> : checkbox;
 };
 
+const SliderCheckbox = props => <MyCheckbox slider {...props}/>;
+
 export default function Sidebar(props) {
   const {
     networks,
@@ -67,7 +69,8 @@ export default function Sidebar(props) {
     dropShadow,
     fontSize,
     sidebarVisible,
-    selectedModule
+    selectedModule,
+    moduleSize
   } = props;
 
   const { dispatch } = useContext(Dispatch);
@@ -255,6 +258,12 @@ export default function Sidebar(props) {
           />
         </LabelForSlider>
         <div style={{ clear: "both", paddingTop: "0.5em" }}>
+          <SliderCheckbox
+            label={`Module size based on: ${moduleSize}`}
+            checked={moduleSize === "flow"}
+            onChange={(e, { checked }) => dispatch({ type: "moduleSize", value: checked ? "flow" : "nodes" })}
+            popup="The height of the modules can be proportional to the flow or the number of nodes in the module."
+          />
           <MyCheckbox
             label="Bottom align"
             checked={verticalAlign === "bottom"}
