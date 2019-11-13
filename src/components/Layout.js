@@ -62,6 +62,8 @@ function reducer(state, action) {
       return { ...state, sidebarVisible: action.value };
     case "moduleSize":
       return { ...state, moduleSize: action.value };
+    case "sortModulesBy":
+      return { ...state, sortModulesBy: action.value };
     default:
       throw new Error();
   }
@@ -96,6 +98,7 @@ export default function Layout(props) {
     saveDiagramBit: 0,
     sidebarVisible: true,
     moduleSize: "flow",
+    sortModulesBy: "flow",
     ...props.state
   };
 

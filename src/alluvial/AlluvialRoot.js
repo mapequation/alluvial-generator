@@ -57,7 +57,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     flowThreshold: number,
     verticalAlign: VerticalAlign = "bottom",
     marginExponent: number,
-    moduleSize: ModuleSize = "flow"
+    moduleSize: ModuleSize = "flow",
+    sortModulesBy: ModuleSize = "flow"
   ) {
     const numNetworks = this.numChildren;
 
@@ -86,10 +87,10 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       return differenceIndex;
     };
 
-    const getNodeSizeForNetwork = ({ numLeafNodes }: NetworkRoot) => (node: AlluvialNode): number => {
-      if (moduleSize === "flow") {
+    const getNodeSizeForNetwork = ({ numLeafNodes }: NetworkRoot) => (property: string) => (node: AlluvialNode): number => {
+      if (property === "flow") {
         return node.flow;
-      } else if (moduleSize === "nodes") {
+      } else if (property === "nodes") {
         return node.numLeafNodes / numLeafNodes;
       }
       return 0;
@@ -112,7 +113,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             getNodeSize = getNodeSizeForNetwork(node);
             node.flowThreshold = flowThreshold;
             networkIndex = i;
-            node.sortChildren();
+            node.sortChildren(getNodeSize(sortModulesBy));
             if (i > 0) x += networkWidth;
             y = height;
             break;
@@ -126,7 +127,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               i + 1 < nodes.length
                 ? 2 ** (marginExponent - 2 * differenceIndex(node.path, nodes[i + 1].path))
                 : 0;
-            const nodeSize = getNodeSize(node);
+            const nodeSize = getNodeSize(moduleSize)(node);
             moduleHeight = nodeSize * height;
             y -= moduleHeight;
             node.margin = margin;
@@ -144,7 +145,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
             if (i === 0) {
               y += moduleHeight + moduleMargin;
             }
-            const groupHeight = getNodeSize(node) * height;
+            const groupHeight = getNodeSize(moduleSize)(node) * height;
             y -= groupHeight;
             node.layout = { x, y, width: moduleWidth, height: groupHeight };
             if (i + 1 === nodes.length) {
@@ -243,7 +244,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               console.error("getNodeSize was not set!");
               return;
             }
-            node.layout = { x, y, width: moduleWidth, height: getNodeSize(node) * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: getNodeSize(moduleSize)(node) * usableHeight };
             y -= node.margin;
             break;
           case Depth.HIGHLIGHT_GROUP:
@@ -251,14 +252,14 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               console.error("getNodeSize was not set!");
               return;
             }
-            node.layout = { x, y, width: moduleWidth, height: getNodeSize(node) * usableHeight };
+            node.layout = { x, y, width: moduleWidth, height: getNodeSize(moduleSize)(node) * usableHeight };
             break;
           case Depth.BRANCH:
             if (!getNodeSize) {
               console.error("getNodeSize was not set!");
               return;
             }
-            let branchHeight = getNodeSize(node) * usableHeight;
+            let branchHeight = getNodeSize(moduleSize)(node) * usableHeight;
             node.layout = { x, y, width: moduleWidth, height: branchHeight };
             if (node.isLeft) {
               y += branchHeight;
@@ -271,7 +272,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               return;
             }
             getNodeSize = getNodeSizeForNetwork(network);
-            const nodeHeight = getNodeSize(node) * usableHeight;
+            const nodeHeight = getNodeSize(moduleSize)(node) * usableHeight;
             y -= nodeHeight;
             node.layout = { x, y, width: moduleWidth, height: nodeHeight };
             break;

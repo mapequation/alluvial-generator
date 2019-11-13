@@ -105,24 +105,20 @@ export default class NetworkRoot extends AlluvialNodeBase {
     }
   }
 
-  sortChildren() {
+  sortChildren(getModuleSize: any) {
     type TreeNode = {
       path: number,
-      flow: number,
+      moduleSize: number,
       nodes: Array<any>
     };
 
-    function flatten(arr: TreeNode) {
-      return arr.nodes.reduce(function(flat, toFlatten) {
-        return flat.concat(Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten);
-      }, []);
-    }
-
-    const tree: TreeNode = {
-      path: 0,
-      flow: 0,
+    const createTreeNode = (path: number): TreeNode => ({
+      path,
+      moduleSize: 0,
       nodes: []
-    };
+    });
+
+    const tree = createTreeNode(0);
 
     this.children.forEach(module => {
       let parent = tree;
@@ -131,29 +127,30 @@ export default class NetworkRoot extends AlluvialNodeBase {
         let node = parent.nodes.find(node => node.path === path);
 
         if (!node) {
-          node = {
-            path,
-            flow: 0,
-            nodes: []
-          };
-
+          node = createTreeNode(path);
           parent.nodes.push(node);
         }
 
-        node.flow += module.flow;
+        node.moduleSize += getModuleSize(module);
         parent = node;
       }
 
       parent.nodes.push(module);
     });
 
-    const sortDepthFirst = node => {
+    const sortDepthFirst = (node: TreeNode) => {
       if (!node.nodes) return;
-      node.nodes.sort((a, b) => b.flow - a.flow);
+      node.nodes.sort((a, b) => b.moduleSize - a.moduleSize);
       node.nodes.forEach(node => sortDepthFirst(node));
     };
 
     sortDepthFirst(tree);
+
+    function flatten(arr: TreeNode) {
+      return arr.nodes.reduce(function(flat, toFlatten) {
+        return flat.concat(Array.isArray(toFlatten.nodes) ? flatten(toFlatten) : toFlatten);
+      }, []);
+    }
 
     this.children = flatten(tree);
   }

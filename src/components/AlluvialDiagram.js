@@ -105,6 +105,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     fontSize: PropTypes.number,
     defaultHighlightColor: PropTypes.string,
     moduleSize: PropTypes.string,
+    sortModulesBy: PropTypes.string,
     highlightColors: PropTypes.arrayOf(PropTypes.string).isRequired
   };
 
@@ -116,6 +117,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     dropShadow: false,
     fontSize: 10,
     moduleSize: "flow",
+    sortModulesBy: "flow",
     defaultHighlightColor: "#b6b69f"
   };
 
@@ -154,7 +156,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       expandBit,
       regroupBit,
       saveDiagramBit,
-      moduleSize
+      moduleSize,
+      sortModulesBy
     } = this.props;
 
     if (selectedModule) {
@@ -206,7 +209,8 @@ export default class AlluvialDiagram extends React.PureComponent {
         fontSize,
         defaultHighlightColor,
         highlightColors,
-        moduleSize
+        moduleSize,
+        sortModulesBy
       };
       saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.alluvialRoot, state);
     }
@@ -226,7 +230,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       removeColorsBit,
       expandBit,
       regroupBit,
-      moduleSize
+      moduleSize,
+      sortModulesBy
     } = this.props;
 
     const heightChanged = height !== prev.height;
@@ -241,6 +246,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const expanded = expandBit !== prev.expandBit;
     const regrouped = regroupBit !== prev.regroupBit;
     const moduleSizeChanged = moduleSize !== prev.moduleSize;
+    const moduleOrderChanged = sortModulesBy !== prev.sortModulesBy;
 
     return (
       heightChanged ||
@@ -252,12 +258,16 @@ export default class AlluvialDiagram extends React.PureComponent {
       colorChanged ||
       expanded ||
       regrouped ||
-      moduleSizeChanged
+      moduleSizeChanged ||
+      moduleOrderChanged
     );
   }
 
   update() {
-    const { height, marginExponent, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, moduleSize } = this.props;
+    const {
+      height, marginExponent, streamlineFraction, moduleWidth, moduleFlowThreshold, verticalAlign, moduleSize, sortModulesBy
+    } = this.props;
+
     this.diagram.updateLayout(
       height,
       streamlineFraction,
@@ -265,7 +275,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleFlowThreshold,
       verticalAlign,
       marginExponent,
-      moduleSize);
+      moduleSize,
+      sortModulesBy);
   }
 
   draw() {

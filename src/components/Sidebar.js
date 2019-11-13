@@ -70,7 +70,8 @@ export default function Sidebar(props) {
     fontSize,
     sidebarVisible,
     selectedModule,
-    moduleSize
+    moduleSize,
+    sortModulesBy
   } = props;
 
   const { dispatch } = useContext(Dispatch);
@@ -263,6 +264,12 @@ export default function Sidebar(props) {
             checked={moduleSize === "flow"}
             onChange={(e, { checked }) => dispatch({ type: "moduleSize", value: checked ? "flow" : "nodes" })}
             popup="The height of the modules can be proportional to the flow or the number of nodes in the module."
+          />
+          <SliderCheckbox
+            label={`Sort modules by: ${sortModulesBy}`}
+            checked={sortModulesBy === "flow"}
+            onChange={(e, { checked }) => dispatch({ type: "sortModulesBy", value: checked ? "flow" : "nodes" })}
+            popup="Modules can be sorted by flow or the number of nodes."
           />
           <MyCheckbox
             label="Bottom align"
