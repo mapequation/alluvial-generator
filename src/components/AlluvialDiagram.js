@@ -153,7 +153,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       removeColorsBit,
       expandBit,
       regroupBit,
-      saveDiagramBit
+      saveDiagramBit,
+      moduleSize
     } = this.props;
 
     if (selectedModule) {
@@ -204,7 +205,8 @@ export default class AlluvialDiagram extends React.PureComponent {
         dropShadow,
         fontSize,
         defaultHighlightColor,
-        highlightColors
+        highlightColors,
+        moduleSize
       };
       saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.alluvialRoot, state);
     }
