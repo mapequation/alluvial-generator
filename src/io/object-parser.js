@@ -53,7 +53,8 @@ const parseClu: ObjectParser = (object, name, nodeIdentifier = "name") => {
       ...node,
       flow: node.flow || normalizedWeight
     })),
-    codelength: object.codelength
+    codelength: object.codelength,
+    moduleNames: null
   };
 };
 
