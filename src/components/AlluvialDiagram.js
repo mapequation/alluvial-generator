@@ -106,6 +106,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     defaultHighlightColor: PropTypes.string,
     moduleSize: PropTypes.string,
     sortModulesBy: PropTypes.string,
+    modulesVisibleInFilter: PropTypes.object,
     highlightColors: PropTypes.arrayOf(PropTypes.string).isRequired
   };
 
@@ -157,7 +158,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       regroupBit,
       saveDiagramBit,
       moduleSize,
-      sortModulesBy
+      sortModulesBy,
+      modulesVisibleInFilter
     } = this.props;
 
     if (selectedModule) {
@@ -184,6 +186,11 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     if (flipped(removeColorsBit, prev.removeColorsBit)) {
       this.diagram.removeColors();
+    }
+
+    if (modulesVisibleInFilter) {
+      const { networkId, moduleIds } = modulesVisibleInFilter;
+      this.diagram.setVisibleModules(networkId, moduleIds);
     }
 
     if (this.shouldUpdateLayout(prev))
@@ -231,7 +238,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       expandBit,
       regroupBit,
       moduleSize,
-      sortModulesBy
+      sortModulesBy,
+      modulesVisibleInFilter
     } = this.props;
 
     const heightChanged = height !== prev.height;
@@ -247,6 +255,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const regrouped = regroupBit !== prev.regroupBit;
     const moduleSizeChanged = moduleSize !== prev.moduleSize;
     const moduleOrderChanged = sortModulesBy !== prev.sortModulesBy;
+    const visibleModulesChanged = modulesVisibleInFilter !== prev.modulesVisibleInFilter;
 
     return (
       heightChanged ||
@@ -259,7 +268,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       expanded ||
       regrouped ||
       moduleSizeChanged ||
-      moduleOrderChanged
+      moduleOrderChanged ||
+      visibleModulesChanged
     );
   }
 

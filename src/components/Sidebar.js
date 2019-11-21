@@ -3,6 +3,8 @@ import { Slider } from "react-semantic-ui-range";
 import {
   Button,
   Checkbox,
+  Dropdown,
+  Form,
   Header,
   Icon,
   Label,
@@ -10,7 +12,8 @@ import {
   Menu,
   Modal,
   Popup,
-  Sidebar as SemanticSidebar
+  Sidebar as SemanticSidebar,
+  TextArea
 } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
@@ -86,6 +89,25 @@ export default function Sidebar(props) {
 
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
+  const networkIds = networks.map(({ name, id }, key) => ({ key, text: name, value: id }));
+
+  const [networkId, setNetworkId] = useState("");
+
+  const [moduleIds, setModuleIds] = useState([]);
+
+  const applyFilter = () => dispatch({
+    type: "changeVisibleModules",
+    value: { networkId, moduleIds }
+  });
+
+  const clearFilter = () => {
+    setModuleIds([]);
+    dispatch({
+      type: "changeVisibleModules",
+      value: { networkId: null, moduleIds: [] }
+    });
+  };
+
   return (
     <SemanticSidebar
       as={Menu}
@@ -110,8 +132,55 @@ export default function Sidebar(props) {
             module={selectedModule}
             highlightColors={highlightColors}
             defaultHighlightColor={defaultHighlightColor}
+            networkId={networkId}
+            setNetworkId={setNetworkId}
+            moduleIds={moduleIds}
+            setModuleIds={setModuleIds}
           />
           : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
+        }
+      </Menu.Item>
+      <Menu.Item>
+        <Header as="h4" content="Module filter"/>
+        <Dropdown
+          placeholder="Select network"
+          selection
+          clearable
+          onChange={(e, { value }) => {
+            if (value !== networkId || value === "") {
+              clearFilter();
+            }
+            setNetworkId(value);
+          }}
+          value={networkId}
+          options={networkIds}
+        />
+        {networkId !== "" &&
+        <Form>
+          <p>Comma-separated list of module ids</p>
+          <TextArea
+            rows={2}
+            value={moduleIds.join(", ")}
+            onChange={(e, { value }) => setModuleIds(value.split(", "))}
+          />
+          <Button.Group
+            style={{ margin: "4px 0 0 0 " }}
+            {...buttonProps}
+          >
+            <Button
+              type="submit"
+              onClick={applyFilter}
+              content="Update"
+            />
+            <Button
+              onClick={clearFilter}
+              icon
+              labelPosition="right">
+              <Icon name="x" style={{ background: "transparent" }}/>
+              Clear filter
+            </Button>
+          </Button.Group>
+        </Form>
         }
       </Menu.Item>
       <Menu.Item>

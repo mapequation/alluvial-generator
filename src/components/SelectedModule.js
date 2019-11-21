@@ -25,7 +25,16 @@ function Swatch(props) {
 }
 
 export default function SelectedModule(props) {
-  const { module, highlightColors, defaultHighlightColor } = props;
+  const {
+    module,
+    highlightColors,
+    defaultHighlightColor,
+    networkId,
+    setNetworkId,
+    moduleIds,
+    setModuleIds
+  } = props;
+
   const { dispatch } = useContext(Dispatch);
 
   const [name, setName] = useState("");
@@ -91,6 +100,27 @@ export default function SelectedModule(props) {
             setButtonsEnabled(false);
           }}
           disabled={!buttonsEnabled || module.moduleLevel === 1}
+        />
+      </Button.Group>
+      <Button.Group
+        {...buttonProps}
+        style={{ margin: "4px 0 0 0 " }}
+      >
+        <Button
+          content="Add to module filter"
+          onClick={() => {
+            const ids = networkId === module.networkId ? moduleIds : [];
+            setNetworkId(module.networkId);
+            setModuleIds([...ids, module.moduleId]);
+          }}
+          disabled={moduleIds.includes(module.moduleId)}
+        />
+        <Button
+          content="Remove from module filter"
+          onClick={() => {
+            setModuleIds(moduleIds.filter(moduleId => moduleId !== module.moduleId));
+          }}
+          disabled={!moduleIds.includes(module.moduleId)}
         />
       </Button.Group>
       <Table celled striped compact fixed singleLine size="small">

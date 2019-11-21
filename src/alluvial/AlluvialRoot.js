@@ -100,12 +100,14 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     let moduleHeight = 0;
     let moduleMargin = 0;
 
+    const moduleIsVisible = (module: AlluvialNode) => module.flow >= flowThreshold && module.isVisible;
+
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
     this.forEachDepthFirstPreOrderWhile(
       node =>
         node.depth < Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold) ||
+        (node.depth === Depth.MODULE && moduleIsVisible(node)) ||
         node.depth === Depth.HIGHLIGHT_GROUP,
       (node, i, nodes) => {
         switch (node.depth) {
@@ -193,7 +195,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       this.forEachDepthFirstWhile(
         node =>
           node.depth < Depth.MODULE ||
-          (node.depth === Depth.MODULE && node.flow >= flowThreshold),
+          (node.depth === Depth.MODULE && moduleIsVisible(node)),
         (node, i) => {
           if (node.depth === Depth.NETWORK_ROOT) {
             totalMargin = totalMargins[i];
@@ -228,7 +230,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     this.forEachDepthFirstPostOrderWhile(
       node =>
         node.depth !== Depth.MODULE ||
-        (node.depth === Depth.MODULE && node.flow >= flowThreshold),
+        (node.depth === Depth.MODULE && moduleIsVisible(node)),
       node => {
         switch (node.depth) {
           case Depth.ALLUVIAL_ROOT:

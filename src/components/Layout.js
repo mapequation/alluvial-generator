@@ -64,6 +64,8 @@ function reducer(state, action) {
       return { ...state, moduleSize: action.value };
     case "sortModulesBy":
       return { ...state, sortModulesBy: action.value };
+    case "changeVisibleModules":
+      return { ...state, modulesVisibleInFilter: action.value };
     default:
       throw new Error();
   }

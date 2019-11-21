@@ -59,6 +59,22 @@ export default class NetworkRoot extends AlluvialNodeBase {
       .filter(([key, val]) => key.startsWith(this.id));
   }
 
+  setVisibleModules(moduleIds: string[]) {
+    const filterActive = this.children.some(module => moduleIds.includes(module.moduleId));
+
+    this.children.forEach(module => {
+      module.filterActive = filterActive;
+      module.visibleInFilter = moduleIds.includes(module.moduleId);
+    });
+  }
+
+  clearFilter() {
+    this.children.forEach(module => {
+      module.filterActive = false;
+      module.visibleInFilter = false;
+    });
+  }
+
   asObject(): Object {
     return {
       id: this.id,
@@ -79,6 +95,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
       links: Array.from(this.rightStreamlines(), link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
+        .filter(module => module.isVisible)
         .reduce((filtered, child) => {
           if (child.flow >= this.flowThreshold)
             filtered.push(child.asObject());
@@ -90,15 +107,22 @@ export default class NetworkRoot extends AlluvialNodeBase {
   * rightStreamlines(): Iterable<StreamlineLink> {
     for (let module of this) {
       // Skip if left module if below threshold
-      if (module.flow < this.flowThreshold) continue;
+      if (module.flow < this.flowThreshold || !module.isVisible) {
+        continue;
+      }
+
       for (let group of module) {
         for (let streamlineNode of group.right) {
           // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOpposite();
           if (!oppositeStreamlineNode) continue;
           const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
-          if (oppositeModule && oppositeModule.flow < this.flowThreshold)
-            continue;
+
+          if (oppositeModule) {
+            if (oppositeModule.flow < this.flowThreshold || !oppositeModule.isVisible)
+              continue;
+          }
+
           if (streamlineNode.link) yield streamlineNode.link;
         }
       }

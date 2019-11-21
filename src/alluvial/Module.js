@@ -22,6 +22,8 @@ export default class Module extends AlluvialNodeBase {
   moduleId: string;
   margin: number = 0;
   _name: ?Array<string> = null;
+  visibleInFilter: boolean = false;
+  filterActive: boolean = false;
   depth = MODULE;
 
   static customNames: Map<string, CustomName> = new Map();
@@ -60,6 +62,10 @@ export default class Module extends AlluvialNodeBase {
 
   get name(): ?Array<string> {
     return this._name;
+  }
+
+  get isVisible(): boolean {
+    return this.filterActive ? this.visibleInFilter : true;
   }
 
   getSiblings(): Module[] {

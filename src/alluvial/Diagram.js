@@ -151,7 +151,7 @@ export default class Diagram {
     }
 
     if (highlightIndices.length === 0) {
-      console.warn("Zero length array of highlight indices")
+      console.warn("Zero length array of highlight indices");
       return;
     }
 
@@ -182,6 +182,52 @@ export default class Diagram {
     }
 
     this.dirty = true;
+  }
+
+  setVisibleModules(networkId: ?string, moduleIds: string[]) {
+    // 0. Clear filter if no network id is supplied
+    if (networkId == null) {
+      this.alluvialRoot.children.forEach(networkRoot => networkRoot.clearFilter());
+      return;
+    }
+
+    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+
+    if (!networkRoot) {
+      console.warn("Invalid network id");
+      return;
+    }
+
+    // 1. Apply filter to selected network
+    networkRoot.setVisibleModules(moduleIds);
+
+    const visibleModules = networkRoot.children.filter(module => module.isVisible);
+
+    // 2. Clear filter on all other networks
+    const otherNetworks = this.alluvialRoot.children.filter(networkRoot => networkRoot.networkId !== networkId);
+
+    otherNetworks.forEach(networkRoot => networkRoot.clearFilter());
+
+    // 3. Apply filter on all other networks
+    const otherVisibleModules = new Map(otherNetworks.map(networkRoot => [networkRoot, []]));
+
+    visibleModules.forEach(module => {
+      for (let node of module.leafNodes()) {
+        for (let otherNetwork of otherNetworks) {
+          const otherNode = otherNetwork.getLeafNode(node.identifier);
+          if (!otherNode)
+            continue;
+          const otherModuleIds = otherVisibleModules.get(otherNetwork);
+          if (!otherModuleIds)
+            continue;
+          otherModuleIds.push(otherNode.moduleId);
+        }
+      }
+    });
+
+    for (let [networkRoot, otherModuleIds] of otherVisibleModules) {
+      networkRoot.setVisibleModules(otherModuleIds);
+    }
   }
 
   updateLayout() {
