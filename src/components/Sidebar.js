@@ -113,7 +113,9 @@ export default function Sidebar(props) {
           />
           : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
         }
-        <Header as="h5" content="Paint all modules"/>
+      </Menu.Item>
+      <Menu.Item>
+        <Header as="h4" content="Paint networks"/>
         <Button.Group {...buttonProps}>
           <Popup
             content="Paint all networks based on the modules in the selected network. (Select network by clicking on any module.)"
