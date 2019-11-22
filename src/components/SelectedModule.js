@@ -29,8 +29,8 @@ export default function SelectedModule(props) {
     module,
     highlightColors,
     defaultHighlightColor,
-    networkId,
-    setNetworkId,
+    selectedNetworkId,
+    setSelectedNetworkId,
     moduleIds,
     setModuleIds
   } = props;
@@ -109,8 +109,8 @@ export default function SelectedModule(props) {
         <Button
           content="Add to module filter"
           onClick={() => {
-            const ids = networkId === module.networkId ? moduleIds : [];
-            setNetworkId(module.networkId);
+            const ids = selectedNetworkId === module.networkId ? moduleIds : [];
+            setSelectedNetworkId(module.networkId);
             setModuleIds([...ids, module.moduleId]);
           }}
           disabled={moduleIds.includes(module.moduleId)}

@@ -20,7 +20,6 @@ export default class Diagram {
 
   dirty: boolean = true;
   _asObject: Object = {};
-  _visibleModules: Map<string, Array<string>> = new Map();
 
   constructor(networks: Network[]) {
     networks.forEach(network => this.addNetwork(network));
@@ -186,66 +185,33 @@ export default class Diagram {
   }
 
   getVisibleModules(): Map<string, Array<string>> {
-    if (this.dirty) {
-      const networkRoots = this.alluvialRoot.children;
-      const visibleModules = new Map(networkRoots.map(networkRoot => [networkRoot.networkId, []]));
+    const networkRoots = this.alluvialRoot.children;
+    const visibleModules = new Map(networkRoots.map(networkRoot => [networkRoot.networkId, []]));
 
-      networkRoots.forEach(networkRoot => {
-        const moduleIds = visibleModules.get(networkRoot.networkId);
-        if (!moduleIds) return;
+    networkRoots.forEach(networkRoot => {
+      const moduleIds = visibleModules.get(networkRoot.networkId);
+      if (!moduleIds) return;
 
-        networkRoot.children.forEach(module => moduleIds.push(module.moduleId));
-      });
-
-      this._visibleModules = visibleModules;
-    }
-
-    return this._visibleModules;
-  }
-
-  setVisibleModules(networkId: ?string, moduleIds: string[]) {
-    // 0. Clear filter if no network id is supplied
-    if (networkId == null) {
-      this.alluvialRoot.children.forEach(networkRoot => networkRoot.clearFilter());
-      return;
-    }
-
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-
-    if (!networkRoot) {
-      console.warn("Invalid network id");
-      return;
-    }
-
-    // 1. Apply filter to selected network
-    networkRoot.setVisibleModules(moduleIds);
-
-    const visibleModules = networkRoot.children.filter(module => module.isVisible);
-
-    // 2. Clear filter on all other networks
-    const otherNetworks = this.alluvialRoot.children.filter(networkRoot => networkRoot.networkId !== networkId);
-
-    otherNetworks.forEach(networkRoot => networkRoot.clearFilter());
-
-    // 3. Apply filter on all other networks
-    const otherVisibleModules = new Map(otherNetworks.map(networkRoot => [networkRoot, []]));
-
-    visibleModules.forEach(module => {
-      for (let node of module.leafNodes()) {
-        for (let otherNetwork of otherNetworks) {
-          const otherNode = otherNetwork.getLeafNode(node.identifier);
-          if (!otherNode)
-            continue;
-          const otherModuleIds = otherVisibleModules.get(otherNetwork);
-          if (!otherModuleIds)
-            continue;
-          otherModuleIds.push(otherNode.moduleId);
-        }
-      }
+      networkRoot.children.forEach(module => moduleIds.push(module.moduleId));
     });
 
-    for (let [networkRoot, otherModuleIds] of otherVisibleModules) {
-      networkRoot.setVisibleModules(otherModuleIds);
+    return visibleModules;
+  }
+
+  clearFilters() {
+    this.alluvialRoot.children.forEach(networkRoot => networkRoot.clearFilter());
+  }
+
+  setVisibleModules(visibleModules: Map<string, Array<string>>) {
+    for (let [networkId, moduleIds] of visibleModules.entries()) {
+      const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+
+      if (!networkRoot) {
+        console.warn(`Invalid network id ${networkId}`);
+        return;
+      }
+
+      networkRoot.setVisibleModules(moduleIds);
     }
   }
 

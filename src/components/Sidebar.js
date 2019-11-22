@@ -89,28 +89,33 @@ export default function Sidebar(props) {
 
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
-  const networkIds = networks.map(({ name, id }, key) => ({ key, text: name, value: id }));
+  const [selectedNetworkId, setSelectedNetworkId] = useState("");
 
-  const [networkId, setNetworkId] = useState("");
+  const [moduleIds, setModuleIds] = useState(new Map(networks.map(({ id }) => [id, []])));
 
-  const [moduleIds, setModuleIds] = useState([]);
+  const networkIdOptions = networks.map(({ name, id }, key) => ({ key, text: name, value: id }));
 
-  const visibleModulesForNetworkId = (() => {
-    const visibleModuleIds = visibleModules.get(networkId) || [];
+  const moduleIdOptions = (() => {
+    const visibleModuleIds = visibleModules.get(selectedNetworkId) || [];
     return visibleModuleIds.map((moduleId, key) => ({ key, text: moduleId, value: moduleId }));
   })();
 
-  const applyFilter = () => dispatch({
-    type: "changeVisibleModules",
-    value: { networkId, moduleIds }
-  });
+  const moduleIdsForNetwork = networkId => moduleIds.get(networkId) || [];
+
+  const moduleIdsForSelectedNetwork = moduleIdsForNetwork(selectedNetworkId);
+
+  const setModuleIdsForNetwork = networkId => newModuleIds => {
+    if (!moduleIds.has(networkId)) return;
+    setModuleIds(new Map(moduleIds.set(networkId, newModuleIds)));
+  };
+
+  const setModuleIdsForSelectedNetwork = setModuleIdsForNetwork(selectedNetworkId);
+
+  const applyFilter = () => dispatch({ type: "changeVisibleModules", value: moduleIds });
 
   const clearFilter = () => {
-    setModuleIds([]);
-    dispatch({
-      type: "changeVisibleModules",
-      value: { networkId: null, moduleIds: [] }
-    });
+    setModuleIds(new Map(networks.map(({ id }) => [id, []])));
+    dispatch({ type: "clearFilters" });
   };
 
   return (
@@ -137,10 +142,10 @@ export default function Sidebar(props) {
             module={selectedModule}
             highlightColors={highlightColors}
             defaultHighlightColor={defaultHighlightColor}
-            networkId={networkId}
-            setNetworkId={setNetworkId}
-            moduleIds={moduleIds}
-            setModuleIds={setModuleIds}
+            selectedNetworkId={selectedNetworkId}
+            setSelectedNetworkId={setSelectedNetworkId}
+            moduleIds={moduleIdsForNetwork(selectedModule.networkId)}
+            setModuleIds={setModuleIdsForNetwork(selectedModule.networkId)}
           />
           : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
         }
@@ -152,27 +157,27 @@ export default function Sidebar(props) {
           selection
           clearable
           onChange={(e, { value }) => {
-            if (value !== networkId || value === "") {
+            if (value === "") {
               clearFilter();
             }
-            setNetworkId(value);
+            setSelectedNetworkId(value);
           }}
-          value={networkId}
-          options={networkIds}
+          value={selectedNetworkId}
+          options={networkIdOptions}
         />
-        {networkId !== "" &&
+        {selectedNetworkId !== "" &&
         <Form>
           <Dropdown
-            placeholder="Select module ids"
+            placeholder="Select module ids to include"
             fluid
             autoComplete="on"
             allowAdditions={false}
             multiple
             search
             selection
-            options={visibleModulesForNetworkId}
-            value={moduleIds}
-            onChange={(e, { value }) => setModuleIds(value)}
+            options={moduleIdOptions}
+            value={moduleIdsForSelectedNetwork}
+            onChange={(e, { value }) => setModuleIdsForSelectedNetwork(value)}
           />
           <Button.Group
             style={{ margin: "4px 0 0 0 " }}
@@ -181,18 +186,23 @@ export default function Sidebar(props) {
             <Button
               type="submit"
               onClick={applyFilter}
-              content="Update"
+              content="Apply filter"
             />
-            <Button
-              onClick={clearFilter}
-              icon
-              labelPosition="right">
-              <Icon name="x" style={{ background: "transparent" }}/>
-              Clear filter
-            </Button>
           </Button.Group>
         </Form>
         }
+        <Button.Group
+          style={{ margin: "4px 0 0 0 " }}
+          {...buttonProps}
+        >
+          <Button
+            onClick={clearFilter}
+            icon
+            labelPosition="right">
+            <Icon name="x" style={{ background: "transparent" }}/>
+            Clear filter
+          </Button>
+        </Button.Group>
       </Menu.Item>
       <Menu.Item>
         <Header as="h4" content="Paint networks"/>

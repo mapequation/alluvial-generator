@@ -106,7 +106,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     defaultHighlightColor: PropTypes.string,
     moduleSize: PropTypes.string,
     sortModulesBy: PropTypes.string,
-    modulesVisibleInFilter: PropTypes.object,
+    clearFiltersBit: PropTypes.number,
     highlightColors: PropTypes.arrayOf(PropTypes.string).isRequired
   };
 
@@ -160,7 +160,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       saveDiagramBit,
       moduleSize,
       sortModulesBy,
-      modulesVisibleInFilter
+      modulesVisibleInFilter,
+      clearFiltersBit
     } = this.props;
 
     const { dispatch } = this.context;
@@ -192,8 +193,11 @@ export default class AlluvialDiagram extends React.PureComponent {
     }
 
     if (modulesVisibleInFilter) {
-      const { networkId, moduleIds } = modulesVisibleInFilter;
-      this.diagram.setVisibleModules(networkId, moduleIds);
+      this.diagram.setVisibleModules(modulesVisibleInFilter);
+    }
+
+    if (flipped(clearFiltersBit, prev.clearFiltersBit)) {
+      this.diagram.clearFilters();
     }
 
     if (this.shouldUpdateLayout(prev)) {
@@ -244,7 +248,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       regroupBit,
       moduleSize,
       sortModulesBy,
-      modulesVisibleInFilter
+      modulesVisibleInFilter,
+      clearFiltersBit
     } = this.props;
 
     const heightChanged = height !== prev.height;
@@ -261,6 +266,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     const moduleSizeChanged = moduleSize !== prev.moduleSize;
     const moduleOrderChanged = sortModulesBy !== prev.sortModulesBy;
     const visibleModulesChanged = modulesVisibleInFilter !== prev.modulesVisibleInFilter;
+    const clearFilterChanged = clearFiltersBit !== prev.clearFiltersBit;
 
     return (
       heightChanged ||
@@ -274,7 +280,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       regrouped ||
       moduleSizeChanged ||
       moduleOrderChanged ||
-      visibleModulesChanged
+      visibleModulesChanged ||
+      clearFilterChanged
     );
   }
 
