@@ -156,12 +156,7 @@ export default function Sidebar(props) {
           placeholder="Select network"
           selection
           clearable
-          onChange={(e, { value }) => {
-            if (value === "") {
-              clearFilter();
-            }
-            setSelectedNetworkId(value);
-          }}
+          onChange={(e, { value }) => setSelectedNetworkId(value)}
           value={selectedNetworkId}
           options={networkIdOptions}
         />
