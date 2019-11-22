@@ -117,9 +117,7 @@ export default function SelectedModule(props) {
         />
         <Button
           content="Remove from module filter"
-          onClick={() => {
-            setModuleIds(moduleIds.filter(moduleId => moduleId !== module.moduleId));
-          }}
+          onClick={() => setModuleIds(moduleIds.filter(moduleId => moduleId !== module.moduleId))}
           disabled={!moduleIds.includes(module.moduleId)}
         />
       </Button.Group>

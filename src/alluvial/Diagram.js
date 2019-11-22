@@ -20,6 +20,7 @@ export default class Diagram {
 
   dirty: boolean = true;
   _asObject: Object = {};
+  _visibleModules: Map<string, Array<string>> = new Map();
 
   constructor(networks: Network[]) {
     networks.forEach(network => this.addNetwork(network));
@@ -182,6 +183,24 @@ export default class Diagram {
     }
 
     this.dirty = true;
+  }
+
+  getVisibleModules(): Map<string, Array<string>> {
+    if (this.dirty) {
+      const networkRoots = this.alluvialRoot.children;
+      const visibleModules = new Map(networkRoots.map(networkRoot => [networkRoot.networkId, []]));
+
+      networkRoots.forEach(networkRoot => {
+        const moduleIds = visibleModules.get(networkRoot.networkId);
+        if (!moduleIds) return;
+
+        networkRoot.children.forEach(module => moduleIds.push(module.moduleId));
+      });
+
+      this._visibleModules = visibleModules;
+    }
+
+    return this._visibleModules;
   }
 
   setVisibleModules(networkId: ?string, moduleIds: string[]) {

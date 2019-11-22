@@ -127,6 +127,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     this.diagram = new Diagram(this.props.networks);
     this.update();
     this.draw();
+    this.context.dispatch({ type: "setVisibleModules", value: this.diagram.getVisibleModules() });
   }
 
   componentDidUpdate(prev) {
@@ -162,6 +163,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       modulesVisibleInFilter
     } = this.props;
 
+    const { dispatch } = this.context;
+
     if (selectedModule) {
       if (flipped(nameChangeBit, prev.nameChangeBit)) {
         this.diagram.setModuleName(selectedModule);
@@ -193,8 +196,10 @@ export default class AlluvialDiagram extends React.PureComponent {
       this.diagram.setVisibleModules(networkId, moduleIds);
     }
 
-    if (this.shouldUpdateLayout(prev))
+    if (this.shouldUpdateLayout(prev)) {
       this.update();
+      dispatch({ type: "setVisibleModules", value: this.diagram.getVisibleModules() });
+    }
 
     this.draw();
 
@@ -468,6 +473,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       const success = context.diagram.doubleClick(d, d3.event);
       if (success) {
         context.update();
+        dispatch({ type: "setVisibleModules", value: context.diagram.getVisibleModules() });
         context.draw();
       } else {
         wiggle.call(this, d);

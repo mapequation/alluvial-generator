@@ -64,6 +64,8 @@ function reducer(state, action) {
       return { ...state, moduleSize: action.value };
     case "sortModulesBy":
       return { ...state, sortModulesBy: action.value };
+    case "setVisibleModules":
+      return { ...state, visibleModules: action.value };
     case "changeVisibleModules":
       return { ...state, modulesVisibleInFilter: action.value };
     default:
@@ -101,6 +103,8 @@ export default function Layout(props) {
     sidebarVisible: true,
     moduleSize: "flow",
     sortModulesBy: "flow",
+    visibleModules: new Map(),
+    modulesVisibleInFilter: {},
     ...props.state
   };
 

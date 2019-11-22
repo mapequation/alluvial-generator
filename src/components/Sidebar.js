@@ -12,8 +12,7 @@ import {
   Menu,
   Modal,
   Popup,
-  Sidebar as SemanticSidebar,
-  TextArea
+  Sidebar as SemanticSidebar
 } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import { savePng, saveSvg } from "../io/export";
@@ -74,7 +73,8 @@ export default function Sidebar(props) {
     sidebarVisible,
     selectedModule,
     moduleSize,
-    sortModulesBy
+    sortModulesBy,
+    visibleModules
   } = props;
 
   const { dispatch } = useContext(Dispatch);
@@ -94,6 +94,11 @@ export default function Sidebar(props) {
   const [networkId, setNetworkId] = useState("");
 
   const [moduleIds, setModuleIds] = useState([]);
+
+  const visibleModulesForNetworkId = (() => {
+    const visibleModuleIds = visibleModules.get(networkId) || [];
+    return visibleModuleIds.map((moduleId, key) => ({ key, text: moduleId, value: moduleId }));
+  })();
 
   const applyFilter = () => dispatch({
     type: "changeVisibleModules",
@@ -157,11 +162,17 @@ export default function Sidebar(props) {
         />
         {networkId !== "" &&
         <Form>
-          <p>Comma-separated list of module ids</p>
-          <TextArea
-            rows={2}
-            value={moduleIds.join(", ")}
-            onChange={(e, { value }) => setModuleIds(value.split(", "))}
+          <Dropdown
+            placeholder="Select module ids"
+            fluid
+            autoComplete="on"
+            allowAdditions={false}
+            multiple
+            search
+            selection
+            options={visibleModulesForNetworkId}
+            value={moduleIds}
+            onChange={(e, { value }) => setModuleIds(value)}
           />
           <Button.Group
             style={{ margin: "4px 0 0 0 " }}
