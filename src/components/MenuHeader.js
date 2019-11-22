@@ -12,8 +12,9 @@ export default function MenuHeader() {
     />
     <div className="content">
       <span className="brand">
-        <span className="brand-infomap">Alluvial</span> <span className="brand-nn">Generator</span> {process.env.REACT_APP_VERSION}
+        <span className="brand-infomap">Alluvial</span> <span className="brand-nn">Generator</span>
       </span>
+      <span style={{ marginLeft: "55px", color: "#666", fontSize: "0.6em" }}>v {process.env.REACT_APP_VERSION}</span>
     </div>
   </Header>;
 }
