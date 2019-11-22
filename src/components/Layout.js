@@ -69,7 +69,7 @@ function reducer(state, action) {
     case "changeVisibleModules":
       return { ...state, modulesVisibleInFilter: action.value };
     case "clearFilters":
-      return { ...state, clearFiltersBit: flip(state.clearFiltersBit) };
+      return { ...state, clearFiltersBit: flip(state.clearFiltersBit), modulesVisibleInFilter: new Map() };
     default:
       throw new Error();
   }
