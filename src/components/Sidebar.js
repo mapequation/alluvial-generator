@@ -74,7 +74,8 @@ export default function Sidebar(props) {
     selectedModule,
     moduleSize,
     sortModulesBy,
-    visibleModules
+    visibleModules,
+    modulesVisibleInFilter
   } = props;
 
   const { dispatch } = useContext(Dispatch);
@@ -91,22 +92,27 @@ export default function Sidebar(props) {
 
   const [selectedNetworkId, setSelectedNetworkId] = useState("");
 
-  const [moduleIds, setModuleIds] = useState(new Map(networks.map(({ id }) => [id, []])));
+  const emptyModuleIds = {};
+  networks.forEach(({ id }) => emptyModuleIds[id] = []);
+
+  const [moduleIds, setModuleIds] = useState({ ...emptyModuleIds, ...modulesVisibleInFilter });
 
   const networkIdOptions = networks.map(({ name, id }, key) => ({ key, text: name, value: id }));
 
   const moduleIdOptions = (() => {
-    const visibleModuleIds = visibleModules.get(selectedNetworkId) || [];
+    const visibleModuleIds = visibleModules[selectedNetworkId] || [];
     return visibleModuleIds.map((moduleId, key) => ({ key, text: moduleId, value: moduleId }));
   })();
 
-  const moduleIdsForNetwork = networkId => moduleIds.get(networkId) || [];
+  const moduleIdsForNetwork = networkId => moduleIds[networkId] || [];
 
   const moduleIdsForSelectedNetwork = moduleIdsForNetwork(selectedNetworkId);
 
   const setModuleIdsForNetwork = networkId => newModuleIds => {
-    if (!moduleIds.has(networkId)) return;
-    setModuleIds(new Map(moduleIds.set(networkId, newModuleIds)));
+    if (!moduleIds[networkId]) return;
+    const updated = Object.assign({}, moduleIds);
+    updated[networkId] = newModuleIds;
+    setModuleIds(updated);
   };
 
   const setModuleIdsForSelectedNetwork = setModuleIdsForNetwork(selectedNetworkId);
@@ -114,7 +120,7 @@ export default function Sidebar(props) {
   const applyFilter = () => dispatch({ type: "changeVisibleModules", value: moduleIds });
 
   const clearFilter = () => {
-    setModuleIds(new Map(networks.map(({ id }) => [id, []])));
+    setModuleIds(emptyModuleIds);
     dispatch({ type: "clearFilters" });
   };
 

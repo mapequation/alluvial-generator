@@ -125,6 +125,11 @@ export default class AlluvialDiagram extends React.PureComponent {
   componentDidMount() {
     this.svg = d3.select(this.node);
     this.diagram = new Diagram(this.props.networks);
+
+    if (this.props.modulesVisibleInFilter) {
+      this.diagram.setVisibleModules(this.props.modulesVisibleInFilter);
+    }
+
     this.update();
     this.draw();
     this.context.dispatch({ type: "setVisibleModules", value: this.diagram.getVisibleModules() });
@@ -226,7 +231,8 @@ export default class AlluvialDiagram extends React.PureComponent {
         defaultHighlightColor,
         highlightColors,
         moduleSize,
-        sortModulesBy
+        sortModulesBy,
+        modulesVisibleInFilter
       };
       saveDiagram(process.env.REACT_APP_VERSION, networks, this.diagram.alluvialRoot, state);
     }

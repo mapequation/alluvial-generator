@@ -69,7 +69,7 @@ function reducer(state, action) {
     case "changeVisibleModules":
       return { ...state, modulesVisibleInFilter: action.value };
     case "clearFilters":
-      return { ...state, clearFiltersBit: flip(state.clearFiltersBit), modulesVisibleInFilter: new Map() };
+      return { ...state, clearFiltersBit: flip(state.clearFiltersBit), modulesVisibleInFilter: {} };
     default:
       throw new Error();
   }
@@ -105,8 +105,8 @@ export default function Layout(props) {
     sidebarVisible: true,
     moduleSize: "flow",
     sortModulesBy: "flow",
-    visibleModules: new Map(),
-    modulesVisibleInFilter: new Map(),
+    visibleModules: {},
+    modulesVisibleInFilter: {},
     clearFiltersBit: 0,
     ...props.state
   };

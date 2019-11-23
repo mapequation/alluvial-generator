@@ -184,16 +184,13 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  getVisibleModules(): Map<string, Array<string>> {
+  getVisibleModules(): { [key: string]: Array<string> } {
     const networkRoots = this.alluvialRoot.children;
-    const visibleModules = new Map(networkRoots.map(networkRoot => [networkRoot.networkId, []]));
 
-    networkRoots.forEach(networkRoot => {
-      const moduleIds = visibleModules.get(networkRoot.networkId);
-      if (!moduleIds) return;
+    const visibleModules = {};
 
-      networkRoot.children.forEach(module => moduleIds.push(module.moduleId));
-    });
+    networkRoots.forEach(({ networkId, children }) =>
+      visibleModules[networkId] = children.map(module => module.moduleId));
 
     return visibleModules;
   }
@@ -202,8 +199,8 @@ export default class Diagram {
     this.alluvialRoot.children.forEach(networkRoot => networkRoot.clearFilter());
   }
 
-  setVisibleModules(visibleModules: Map<string, Array<string>>) {
-    for (let [networkId, moduleIds] of visibleModules.entries()) {
+  setVisibleModules(visibleModules: { [key: string]: Array<string> }) {
+    for (let [networkId, moduleIds] of Object.entries(visibleModules)) {
       const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
 
       if (!networkRoot) {
