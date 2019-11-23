@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Grid, Header, Icon } from "semantic-ui-react";
 import expandModuleMov from "../images/expand.mov";
 import regroupModuleMov from "../images/regroup.mov";
+import Changelog from "./Changelog";
 
 
 const videoProps = { autoPlay: true, loop: true, className: "ui", width: 400, height: 300 };
@@ -58,6 +59,8 @@ const Documentation = () =>
         </p>
       </Grid.Column>
       <Grid.Column>
+        <Header as="h1">Changelog</Header>
+        <Changelog/>
         <Header as="h1">Feedback</Header>
         <p>
           If you have any questions, suggestions or issues regarding the software, please add them to <a
