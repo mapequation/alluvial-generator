@@ -124,6 +124,16 @@ export default function Sidebar(props) {
     dispatch({ type: "clearFilters" });
   };
 
+  Object.entries(moduleIds).forEach(([networkId, moduleIds]) => {
+    const visible = visibleModules[networkId] || [];
+    for (let moduleId of moduleIds) {
+      if (!visible.includes(moduleId)) {
+        clearFilter();
+        break;
+      }
+    }
+  });
+
   return (
     <SemanticSidebar
       as={Menu}
