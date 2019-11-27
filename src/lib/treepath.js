@@ -1,12 +1,15 @@
 // @flow
 type Path = TreePath | string; // eslint-disable-line no-use-before-define
 
+const insignificantPathRexeg = /(\d+)([:;])+/g;
+
 /**
  * Class that represents a path in a tree
  */
 export default class TreePath {
   path: string;
   pathArr: string[];
+  insignificant: boolean[] = [];
   ancestorPaths: Map<number, string> = new Map();
 
   /**
@@ -14,7 +17,28 @@ export default class TreePath {
    */
   constructor(path: Path) {
     this.path = path.toString();
-    this.pathArr = this.path.split(":");
+
+    const lastChar = this.path.slice(-1);
+
+    if (lastChar === ";") {
+      // node is insignificant at some level
+      this.pathArr = [];
+
+      let match = null;
+      while ((match = insignificantPathRexeg.exec(this.path)) !== null) {
+        this.pathArr.push(match[1]);
+        this.insignificant.push(match[2] === ";");
+      }
+
+    } else {
+      if (lastChar === ":") {
+        this.path = this.path.slice(0, -1);
+      }
+
+      this.pathArr = this.path.split(":");
+      this.insignificant = this.pathArr.map(() => false);
+    }
+
     this.ancestorPaths.set(0, "root");
     for (let level = 1; level < this.pathArr.length; level++) {
       this.ancestorPaths.set(level, this.pathArr.slice(0, level).join(":"));

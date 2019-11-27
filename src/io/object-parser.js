@@ -62,7 +62,8 @@ const objectParsers = {
   clu: parseClu,
   map: parse,
   tree: parse,
-  ftree: parse
+  ftree: parse,
+  stree: parse
 };
 
 export const validExtensions: string[] = Object.keys(objectParsers);

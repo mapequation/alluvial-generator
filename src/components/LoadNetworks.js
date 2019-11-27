@@ -7,6 +7,7 @@ import Background from "../images/background.svg";
 
 import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
 import readAsText from "../io/read-as-text";
+import streeParser from "../io/stree-parser";
 import withDraggable from "./withDraggable";
 
 
@@ -67,7 +68,7 @@ export default class LoadNetworks extends React.Component {
 
     for (let file of this.input.files) {
       const extension = fileExtension(file.name);
-      if (isValidExtension(extension) || extension === "json") {
+      if (isValidExtension(extension) || extension === "json" || extension === "stree") {
         file.format = extension;
         validFiles.push(file);
       } else {
@@ -139,7 +140,8 @@ export default class LoadNetworks extends React.Component {
       try {
         const parseLinks = false;
         const lines = file.contents.split("\n").filter(Boolean);
-        const object = getParserForExtension(file.format)(lines, parseLinks);
+        const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
+        const object = parser(lines, parseLinks);
         const objectParser = getParser(file.format);
         const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name", file.multiplex);
 

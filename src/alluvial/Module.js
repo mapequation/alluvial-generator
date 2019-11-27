@@ -79,12 +79,16 @@ export default class Module extends AlluvialNodeBase {
     return modules.filter(module => parentPath.isAncestor(module.moduleId));
   }
 
-  getGroup(highlightIndex: number): ?HighlightGroup {
-    return this.children.find(group => group.highlightIndex === highlightIndex);
+  getGroup(highlightIndex: number, insignificant: boolean): ?HighlightGroup {
+    return this.children.find(group => group.highlightIndex === highlightIndex && group.insignificant === insignificant);
   }
 
   sortChildren() {
-    this.sortBy((a: HighlightGroup, b: HighlightGroup) => a.highlightIndex - b.highlightIndex);
+    this.sortBy((a: HighlightGroup, b: HighlightGroup) => {
+      const byHighlightIndex = a.highlightIndex - b.highlightIndex;
+      if (byHighlightIndex !== 0) return byHighlightIndex;
+      return a.insignificant ? 1 : -1;
+    });
   }
 
   getLargestLeafNodeNames() {

@@ -5,6 +5,7 @@ import React from "react";
 import Diagram from "../alluvial/Diagram";
 import Dispatch from "../context/Dispatch";
 import { saveDiagram } from "../io/export";
+import highlightColor from "../lib/highlight-color";
 import { streamlineHorizontal } from "../lib/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -709,14 +710,11 @@ export default class AlluvialDiagram extends React.PureComponent {
       .append("g")
       .attr("class", "group");
 
-    const highlightColor = d =>
-      d.highlightIndex === -1
-        ? defaultHighlightColor
-        : highlightColors[d.highlightIndex];
+    const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
 
     groups
       .select("rect")
-      .attr("fill", highlightColor);
+      .attr("fill", groupFillColor);
 
     const rect = groupsEnter
       .append("rect")
@@ -724,7 +722,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .call(setHeightY)
       .call(makeTransparent)
       .on("click", onClick)
-      .attr("fill", highlightColor);
+      .attr("fill", groupFillColor);
 
     rect
       .transition(t)

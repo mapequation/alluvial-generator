@@ -1,4 +1,4 @@
-import { schemePaired } from "d3";
+import { schemeTableau10 } from "d3";
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
@@ -83,10 +83,10 @@ export default function Layout(props) {
     moduleWidth: 100,
     streamlineFraction: 2,
     streamlineThreshold: 1,
-    streamlineOpacity: 0.6,
+    streamlineOpacity: 0.9,
     moduleFlowThreshold: 8e-3,
     defaultHighlightColor: "#b6b69f",
-    highlightColors: schemePaired,
+    highlightColors: schemeTableau10,
     verticalAlign: "bottom",
     showModuleId: false,
     showModuleNames: true,

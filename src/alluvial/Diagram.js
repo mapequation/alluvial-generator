@@ -140,7 +140,7 @@ export default class Diagram {
 
   autoPaint(
     alluvialObject: ?Object = null,
-    highlightIndices: number[] = [1, 3, 5, 7, 9, 11, 0, 2, 4, 6, 8, 10]
+    highlightIndices: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   ) {
     const networkId = alluvialObject ? alluvialObject.networkId : this.alluvialRoot.children[0].networkId;
 
@@ -250,7 +250,7 @@ export default class Diagram {
     networkRoot.flow += node.flow;
 
     const module = networkRoot.getModule(node.moduleId) || new Module(networkRoot, node.moduleId, node.moduleLevel);
-    const group = module.getGroup(node.highlightIndex) || new HighlightGroup(module, node.highlightIndex);
+    const group = module.getGroup(node.highlightIndex, node.insignificant) || new HighlightGroup(module, node.highlightIndex, node.insignificant);
 
     module.flow += node.flow;
     group.flow += node.flow;

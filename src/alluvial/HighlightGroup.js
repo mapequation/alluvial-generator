@@ -7,7 +7,6 @@ import Module from "./Module";
 
 
 export const NOT_HIGHLIGHTED = -1;
-export const INSIGNIFICANT = -2;
 
 export default class HighlightGroup extends AlluvialNodeBase {
   parent: ?Module;
@@ -41,7 +40,8 @@ export default class HighlightGroup extends AlluvialNodeBase {
       flow: this.flow,
       depth: this.depth,
       ...this.layout,
-      highlightIndex: this.highlightIndex
+      highlightIndex: this.highlightIndex,
+      insignificant: this.insignificant
     };
   }
 

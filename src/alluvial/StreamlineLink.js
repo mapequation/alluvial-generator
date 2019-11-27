@@ -50,6 +50,8 @@ export default class StreamlineLink {
     const rightGroup: ?HighlightGroup = rightBranch ? rightBranch.parent : null;
     const leftHighlightIndex = leftGroup ? leftGroup.highlightIndex : -1;
     const rightHighlightIndex = rightGroup ? rightGroup.highlightIndex : -1;
+    const leftInsignificant = leftGroup ? leftGroup.insignificant : false;
+    const rightInsignificant = rightGroup ? rightGroup.insignificant : false;
     const leftModuleId = leftGroup && leftGroup.parent ? leftGroup.parent.moduleId : 0;
     const rightModuleId = rightGroup && rightGroup.parent ? rightGroup.parent.moduleId : 0;
 
@@ -80,7 +82,9 @@ export default class StreamlineLink {
         h1: h1 / 2
       },
       leftHighlightIndex,
-      rightHighlightIndex
+      rightHighlightIndex,
+      leftInsignificant,
+      rightInsignificant
     };
   }
 }
