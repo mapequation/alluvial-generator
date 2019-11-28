@@ -14,11 +14,10 @@ export default class LeafNode extends AlluvialNodeBase {
   name: string;
   nodeId: number;
   identifier: string;
-  insignificant: boolean;
   highlightIndex: number;
   treePath: TreePath;
   depth = LEAF_NODE;
-  _moduleLevel: number;
+  moduleLevel: number;
 
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
@@ -34,19 +33,13 @@ export default class LeafNode extends AlluvialNodeBase {
       node.highlightIndex != null && Number.isInteger(node.highlightIndex)
         ? node.highlightIndex
         : NOT_HIGHLIGHTED;
-    this._moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
+    this.moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
       ? node.moduleLevel
       : 1;
-    this.insignificant = this.treePath.insignificant[this._moduleLevel - 1] || false;
   }
 
-  get moduleLevel(): number {
-    return this._moduleLevel;
-  }
-
-  set moduleLevel(moduleLevel: number) {
-    this._moduleLevel = moduleLevel;
-    this.insignificant = this.treePath.insignificant[moduleLevel - 1] || false;
+  get insignificant(): boolean {
+    return this.treePath.insignificant[this.moduleLevel - 1] || false;
   }
 
   toNode(): Node {
