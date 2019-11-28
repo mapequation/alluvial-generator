@@ -41,9 +41,6 @@ export default class StreamlineNode extends AlluvialNodeBase {
     this.nodeIndexById.set(moved.id, index);
     this.nodeIndexById.delete(node.id);
 
-    if (!this.children.length) {
-      this.flow = 0;
-    }
     return true;
   }
 

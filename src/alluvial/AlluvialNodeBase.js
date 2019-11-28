@@ -23,7 +23,6 @@ export type IteratorCallback = (
 ) => void;
 
 export default class AlluvialNodeBase {
-  flow: number = 0;
   networkId: string;
   id: string;
   depth: Depth = 0;
@@ -46,6 +45,10 @@ export default class AlluvialNodeBase {
     if (this.depth === depth) return this;
     if (!this.parent || this.depth < depth) return null;
     return this.parent.getAncestor(depth);
+  }
+
+  get flow(): number {
+    return this.children.reduce((total, child) => total + child.flow, 0);
   }
 
   get numLeafNodes(): number {
@@ -75,9 +78,7 @@ export default class AlluvialNodeBase {
       this.children[index] = this.children[this.children.length - 1];
       this.children.pop();
     }
-    if (!this.children.length) {
-      this.flow = 0;
-    }
+
     return found;
   }
 

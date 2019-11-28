@@ -12,6 +12,7 @@ import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {
   name: string;
+  _flow: number;
   nodeId: number;
   identifier: string;
   highlightIndex: number;
@@ -25,7 +26,7 @@ export default class LeafNode extends AlluvialNodeBase {
   constructor(node: Node, networkId: string) {
     super(null, networkId, node.path);
     this.name = node.name;
-    this.flow = node.flow;
+    this._flow = node.flow;
     this.identifier = node.identifier;
     this.nodeId = node.id || node.stateId || 0;
     this.treePath = new TreePath(node.path);
@@ -40,6 +41,10 @@ export default class LeafNode extends AlluvialNodeBase {
 
   get insignificant(): boolean {
     return this.treePath.insignificant[this.moduleLevel - 1] || false;
+  }
+
+  get flow(): number {
+    return this._flow;
   }
 
   toNode(): Node {
@@ -99,7 +104,7 @@ export default class LeafNode extends AlluvialNodeBase {
       console.warn(`Node ${this.id} was removed without belonging to a group.`);
       return;
     }
-    group.flow -= this.flow;
+
     if (group.isEmpty) {
       group.removeFromParent();
     }
@@ -109,7 +114,7 @@ export default class LeafNode extends AlluvialNodeBase {
       console.warn(`Node ${this.id} was removed without belonging to a module.`);
       return;
     }
-    module.flow -= this.flow;
+
     if (module.isEmpty) {
       module.removeFromParent();
     }
@@ -119,14 +124,10 @@ export default class LeafNode extends AlluvialNodeBase {
       console.warn(`Node ${this.id} was removed without belonging to a network root.`);
       return;
     }
-    networkRoot.flow -= this.flow;
+
     if (removeNetworkRoot && networkRoot.isEmpty) {
       networkRoot.removeFromParent();
     }
-
-    const alluvialRoot = networkRoot.parent;
-    if (!alluvialRoot) return;
-    alluvialRoot.flow -= this.flow;
   }
 
   removeFromSide(side: Side) {
@@ -139,7 +140,6 @@ export default class LeafNode extends AlluvialNodeBase {
 
     // Do not remove node parent, it is used in addToSide later
     streamlineNode.removeChild(this);
-    streamlineNode.flow -= this.flow;
 
     if (streamlineNode.isEmpty) {
       // We are deleting streamlineNode,
@@ -153,11 +153,9 @@ export default class LeafNode extends AlluvialNodeBase {
 
         const alreadyDanglingStreamlineNode = StreamlineId.get(oppositeStreamlineNode.id);
         // Does the (new) dangling id already exist? Move nodes from it.
-        // Note: as we move nodes around we don't need to propagate flow.
         if (alreadyDanglingStreamlineNode) {
           for (let node of oppositeStreamlineNode) {
             alreadyDanglingStreamlineNode.addChild(node);
-            alreadyDanglingStreamlineNode.flow += node.flow;
             node.setParent(alreadyDanglingStreamlineNode, opposite(side));
           }
 
@@ -175,9 +173,7 @@ export default class LeafNode extends AlluvialNodeBase {
     const branch = streamlineNode.parent;
     if (!branch) {
       console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
-      return;
     }
-    branch.flow -= this.flow;
   }
 
   asObject(): Object {

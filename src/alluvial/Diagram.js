@@ -246,17 +246,12 @@ export default class Diagram {
       return;
     }
 
-    this.alluvialRoot.flow += node.flow;
-    networkRoot.flow += node.flow;
-
     const module = networkRoot.getModule(node.moduleId) || new Module(networkRoot, node.moduleId, node.moduleLevel);
-    const group = module.getGroup(node.highlightIndex, node.insignificant) || new HighlightGroup(module, node.highlightIndex, node.insignificant);
-
-    module.flow += node.flow;
-    group.flow += node.flow;
+    const group = module.getGroup(node.highlightIndex, node.insignificant) || new HighlightGroup(module,
+      node.highlightIndex,
+      node.insignificant);
 
     for (let branch of group) {
-      branch.flow += node.flow;
 
       const oppositeNode = this.alluvialRoot.getOppositeNode(node, branch.side);
 
@@ -277,7 +272,6 @@ export default class Diagram {
       }
 
       streamlineNode.addChild(node);
-      streamlineNode.flow += node.flow;
       node.setParent(streamlineNode, branch.side);
     }
   }
@@ -312,11 +306,7 @@ export default class Diagram {
       }
     }
 
-    const branch = streamlineNode.parent;
-    if (branch) branch.flow += node.flow;
-
     streamlineNode.addChild(node);
-    streamlineNode.flow += node.flow;
     node.setParent(streamlineNode, side);
   }
 
