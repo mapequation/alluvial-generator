@@ -1,0 +1,7 @@
+# Codelength = 8.07337 bits.
+# path flow name physicalId
+1:1:1 0.2 "node 1" 1
+1:1:2 0.2 "node 2" 82
+1:2:3 0.2 "node 3" 144
+2:1:1 0.2 "node 4" 171
+2:2:2 0.2 "node 5" 179
