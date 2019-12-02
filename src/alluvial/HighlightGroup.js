@@ -35,11 +35,11 @@ export default class HighlightGroup extends AlluvialNodeBase {
 
   asObject() {
     return {
+      ...this.layout,
       id: this.id,
       networkId: this.networkId,
       flow: this.flow,
       depth: this.depth,
-      ...this.layout,
       highlightIndex: this.highlightIndex,
       insignificant: this.insignificant
     };

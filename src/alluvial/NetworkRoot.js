@@ -31,13 +31,15 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   addChild(module: Module) {
-    super.addChild(module);
+    const length = super.addChild(module);
     this.modulesById.set(module.moduleId, module);
+    return length;
   }
 
   removeChild(module: Module) {
-    super.removeChild(module);
+    const found = super.removeChild(module);
     this.modulesById.delete(module.moduleId);
+    return found;
   }
 
   getModule(moduleId: string): ?Module {
@@ -54,7 +56,7 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.nodesByIdentifier.get(identifier);
   }
 
-  getModuleNames() {
+  getModuleNames(): Array<any> {
     return Array.from(Module.customNames.entries())
       .filter(([key, val]) => key.startsWith(this.id));
   }
@@ -77,12 +79,12 @@ export default class NetworkRoot extends AlluvialNodeBase {
 
   asObject(): Object {
     return {
+      ...this.layout,
       id: this.id,
       networkId: this.networkId,
       codelength: this.codelength,
       flow: this.flow,
       depth: this.depth,
-      ...this.layout,
       networkName: {
         name: this.name,
         x: this.x,

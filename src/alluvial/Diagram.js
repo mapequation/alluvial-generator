@@ -15,12 +15,6 @@ type Event = {
   shiftKey: boolean
 };
 
-// Flow incorrectly cast Object.entries to 'mixed'
-// See: https://github.com/facebook/flow/issues/2221
-function Object_entries<T>(obj: { [key: string]: T }): Array<[string, T[]]> {
-  return Object.entries(obj);
-}
-
 export default class Diagram {
   alluvialRoot = new AlluvialRoot();
 
@@ -206,7 +200,7 @@ export default class Diagram {
   }
 
   setVisibleModules(visibleModules: { [key: string]: Array<string> }) {
-    for (let [networkId, moduleIds] of Object_entries(visibleModules)) {
+    for (let [networkId, moduleIds] of Object.entries(visibleModules)) { // $FlowFixMe
       const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
 
       if (!networkRoot) {
@@ -214,6 +208,7 @@ export default class Diagram {
         return;
       }
 
+      // $FlowFixMe
       networkRoot.setVisibleModules(moduleIds);
     }
   }

@@ -26,8 +26,10 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   addChild(node: LeafNode) {
-    const index = super.addChild(node) - 1;
+    const length = super.addChild(node);
+    const index = length - 1;
     this.nodeIndexById.set(node.id, index);
+    return length;
   }
 
   removeChild(node: LeafNode) {

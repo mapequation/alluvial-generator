@@ -14,6 +14,7 @@ type Size = {
 
 type Layout = Position & Size;
 
+// $FlowFixMe - deprecated utility
 export type AlluvialNode = $Subtype<AlluvialNodeBase>; // eslint-disable-line no-use-before-define
 
 export type IteratorCallback = (
@@ -117,11 +118,11 @@ export default class AlluvialNodeBase {
 
   asObject(): Object {
     return {
+      ...this.layout,
       id: this.id,
       networkId: this.networkId,
       flow: this.flow,
       depth: this.depth,
-      ...this.layout,
       children: this.children.map(child => child.asObject())
     };
   }
