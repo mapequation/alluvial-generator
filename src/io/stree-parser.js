@@ -20,7 +20,7 @@ export default function streeParser(lines) {
     }
     const match = matchStree(line);
     if (match) {
-      const [_, path, flow, name, id, physId] = match;
+      const [_, path, flow, name, id, physId] = match;  // eslint-disable-line no-unused-vars
       result.nodes.push({
         path,
         flow: +flow,

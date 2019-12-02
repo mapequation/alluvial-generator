@@ -1,5 +1,10 @@
 // @flow
+import shim from "string.prototype.matchall/shim";
+
+
 type Path = TreePath | string; // eslint-disable-line no-use-before-define
+
+shim();
 
 const insignificantPathRexeg = /(\d+)([:;])+/g;
 
@@ -23,15 +28,15 @@ export default class TreePath {
     if (lastChar === ";") {
       // node is insignificant at some level
       this.pathArr = [];
+      const matches = this.path.matchAll(insignificantPathRexeg);
 
-      let match = null;
-      while ((match = insignificantPathRexeg.exec(this.path)) !== null) {
+      for (let match of matches) {
         this.pathArr.push(match[1]);
         this.insignificant.push(match[2] === ";");
       }
-
     } else {
       if (lastChar === ":") {
+        // remove last colon if we have stree path
         this.path = this.path.slice(0, -1);
       }
 
