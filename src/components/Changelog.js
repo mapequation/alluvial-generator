@@ -6,8 +6,8 @@ import CHANGELOG_md from "../CHANGELOG.md";
 
 const Header = ({ level, ...props }) => <SemanticHeader as={`h${level}`} {...props} />;
 
-const List = props => <SemanticList as="ul" {...props} />;
-const ListItem = props => <SemanticList as="li" {...props} />;
+const List = ({ tight, ...props }) => <SemanticList {...props} />;
+const ListItem = ({ tight, ordered, ...props }) => <SemanticList.Item {...props} />;
 
 export default class Changelog extends React.Component {
   state = {
