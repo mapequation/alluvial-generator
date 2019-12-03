@@ -3,8 +3,8 @@ import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Depth, { ALLUVIAL_ROOT, NETWORK_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
+import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
-import type { Side } from "./Side";
 
 
 export type VerticalAlign = "bottom" | "justify" | "top";
@@ -23,31 +23,101 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     return this.children.find(root => root.networkId === networkId);
   }
 
-  hasNetwork(networkId: string): boolean {
-    return this.children.some(network => network.networkId === networkId);
+  addNetwork(network: Network) {
+    const { nodes, id, codelength, name, moduleNames } = network;
+
+    if (this.children.some(network => network.networkId === id)) {
+      throw new Error(`Network with id ${id} already exists`);
+    }
+
+    const networkRoot = new NetworkRoot(this, id, name, codelength);
+
+    if (moduleNames) {
+      Module.customNames = new Map([...Module.customNames, ...moduleNames]);
+    }
+
+    const leafNodes = nodes.map(node => new LeafNode(node, networkRoot));
+    networkRoot.createLeafNodeMap(leafNodes);
+
+    leafNodes.forEach(node => node.add());
   }
 
-  getNeighborNetwork(networkId: string, side: Side): ?NetworkRoot {
-    const networkIndex = this.children.findIndex(networkRoot => networkRoot.networkId === networkId);
-    if (networkIndex === -1) return;
-    const neighborNetworkIndex = networkIndex + side;
-    if (
-      neighborNetworkIndex < 0 ||
-      neighborNetworkIndex === this.children.length
-    )
-      return;
-    return this.children[neighborNetworkIndex];
+  expandModule(moduleId: string, networkId: string) {
+    const networkRoot = this.getNetworkRoot(networkId);
+    if (!networkRoot) {
+      console.warn(`No network id ${networkId}`);
+      return false;
+    }
+
+    const module = networkRoot.getModule(moduleId);
+    if (!module) {
+      console.warn(`No module found with id ${moduleId} in network ${networkId}`);
+      return false;
+    }
+
+    const leafNodes: LeafNode[] = Array.from(module.leafNodes());
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return false;
+    }
+
+    const newModuleLevel = module.moduleLevel + 1;
+
+    const alreadyExpanded = leafNodes.some(node => node.level <= newModuleLevel);
+    if (alreadyExpanded) {
+      console.warn(
+        `Module can't be expanded to level ${newModuleLevel} ` +
+        `because some nodes are at level ${newModuleLevel - 1}`
+      );
+      return false;
+    }
+
+    leafNodes.forEach(node => {
+      node.moduleLevel = newModuleLevel;
+      node.update();
+    });
+
+    return true;
   }
 
-  get networkIds(): string[] {
-    return this.children.map(networkRoot => networkRoot.networkId);
-  }
+  regroupModule(moduleId: string, networkId: string) {
+    const networkRoot = this.getNetworkRoot(networkId);
+    if (!networkRoot) {
+      console.warn(`No network id ${networkId}`);
+      return false;
+    }
 
-  getOppositeNode(node: LeafNode, side: Side): ?LeafNode {
-    const networkRoot = this.getNeighborNetwork(node.networkId, side);
-    if (!networkRoot) return;
+    const module = networkRoot.getModule(moduleId);
+    if (!module) {
+      console.warn(`No module found with id ${moduleId} in network ${networkId}`);
+      return false;
+    }
 
-    return networkRoot.getLeafNode(node.identifier);
+    if (module.moduleLevel <= 1) {
+      console.warn(`Module with id ${moduleId} is already at module level ${module.moduleLevel}`);
+      return false;
+    }
+
+    const modules = module.getSiblings();
+
+    const leafNodes = [].concat.apply(
+      [],
+      modules.map(module => [...module.leafNodes()])
+    );
+
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return false;
+    }
+
+    const newModuleLevel = module.moduleLevel - 1;
+
+    leafNodes.forEach(node => {
+      node.moduleLevel = newModuleLevel;
+      node.update();
+    });
+
+    return true;
   }
 
   updateLayout(

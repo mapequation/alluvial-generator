@@ -4,6 +4,7 @@ import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
+import type { Side } from "./Side";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
 
@@ -46,7 +47,21 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.modulesById.get(moduleId);
   }
 
-  createLeafNodeByNameMap(nodes: Iterable<LeafNode>) {
+  getNeighbor(side: Side) {
+    const alluvialRoot = this.parent;
+    if (!alluvialRoot) return;
+    const networkIndex = alluvialRoot.children.findIndex(networkRoot => networkRoot.networkId === this.networkId);
+    if (networkIndex === -1) return;
+    const neighborNetworkIndex = networkIndex + side;
+    if (
+      neighborNetworkIndex < 0 ||
+      neighborNetworkIndex === alluvialRoot.children.length
+    )
+      return;
+    return alluvialRoot.children[neighborNetworkIndex];
+  }
+
+  createLeafNodeMap(nodes: Iterable<LeafNode>) {
     this.nodesByIdentifier = new Map(
       Array.from(nodes, node => [node.identifier, node])
     );

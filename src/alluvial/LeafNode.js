@@ -3,7 +3,9 @@ import TreePath from "../lib/treepath";
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
-import { NOT_HIGHLIGHTED } from "./HighlightGroup";
+import HighlightGroup, { NOT_HIGHLIGHTED } from "./HighlightGroup";
+import Module from "./Module";
+import NetworkRoot from "./NetworkRoot";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineId from "./StreamlineId";
@@ -23,8 +25,15 @@ export default class LeafNode extends AlluvialNodeBase {
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
 
-  constructor(node: Node, networkId: string) {
-    super(null, networkId, node.path);
+  oppositeNodes: {
+    LEFT: ?LeafNode,
+    RIGHT: ?LeafNode
+  } = {};
+
+  networkRoot: NetworkRoot;
+
+  constructor(node: Node, networkRoot: NetworkRoot) {
+    super(null, networkRoot.networkId, node.path);
     this.name = node.name;
     this._flow = node.flow;
     this.identifier = node.identifier;
@@ -37,6 +46,7 @@ export default class LeafNode extends AlluvialNodeBase {
     this.moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
       ? node.moduleLevel
       : 1;
+    this.networkRoot = networkRoot;
   }
 
   get insignificant(): boolean {
@@ -88,12 +98,83 @@ export default class LeafNode extends AlluvialNodeBase {
     }
   }
 
+  add() {
+    const module = this.networkRoot.getModule(this.moduleId) || new Module(this.networkRoot,
+      this.moduleId,
+      this.moduleLevel);
+    const group = module.getGroup(this.highlightIndex, this.insignificant) || new HighlightGroup(module,
+      this.highlightIndex,
+      this.insignificant);
+
+    for (let branch of group) {
+      let oppositeNode = this.oppositeNodes[branch.side];
+
+      if (!oppositeNode) {
+        const neighborNetwork = this.networkRoot.getNeighbor(branch.side);
+        oppositeNode = neighborNetwork ? neighborNetwork.getLeafNode(this.identifier) : null;
+        this.oppositeNodes[branch.side] = oppositeNode;
+      }
+
+      const streamlineId = StreamlineId.create(this, branch.side, oppositeNode);
+      let streamlineNode = StreamlineId.get(streamlineId);
+
+      if (!streamlineNode) {
+        streamlineNode = new StreamlineNode(branch, streamlineId);
+        StreamlineId.set(streamlineId, streamlineNode);
+      }
+
+      if (streamlineNode.hasTarget) {
+        const oppositeSide = opposite(branch.side);
+        if (oppositeNode) {
+          oppositeNode.removeFromSide(oppositeSide);
+          oppositeNode.addToSide(oppositeSide, this);
+        }
+      }
+
+      streamlineNode.addChild(this);
+      this.setParent(streamlineNode, branch.side);
+    }
+  }
+
+  addToSide(side: Side, oppositeNode: ?LeafNode) {
+    const streamlineId = StreamlineId.create(this, side, oppositeNode);
+    let streamlineNode = StreamlineId.get(streamlineId);
+
+    if (!streamlineNode) {
+      const oldStreamlineNode = this.getParent(side);
+      if (!oldStreamlineNode) {
+        console.warn(`Node ${this.id} has no ${sideToString(side)} parent`);
+        return;
+      }
+      const branch = oldStreamlineNode.parent;
+      if (!branch) {
+        console.warn(`Streamline node with id ${oldStreamlineNode.id} has no parent`);
+        return;
+      }
+
+      streamlineNode = new StreamlineNode(branch, streamlineId);
+      StreamlineId.set(streamlineId, streamlineNode);
+
+      if (oppositeNode) {
+        const oppositeId = StreamlineId.oppositeId(streamlineId);
+        const oppositeStreamlineNode = StreamlineId.get(oppositeId);
+
+        if (oppositeStreamlineNode) {
+          streamlineNode.linkTo(oppositeStreamlineNode);
+        }
+      }
+    }
+
+    streamlineNode.addChild(this);
+    this.setParent(streamlineNode, side);
+  }
+
   removeFromParent() {
     if (this.leftParent) this.leftParent.removeChild(this);
     if (this.rightParent) this.rightParent.removeChild(this);
   }
 
-  remove(removeNetworkRoot: boolean = true) {
+  remove(removeNetworkRoot: boolean = false) {
     const group = this.getAncestor(HIGHLIGHT_GROUP);
 
     this.removeFromSide(LEFT);
@@ -174,6 +255,11 @@ export default class LeafNode extends AlluvialNodeBase {
     if (!branch) {
       console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
     }
+  }
+
+  update() {
+    this.remove();
+    this.add();
   }
 
   asObject(): Object {

@@ -34,7 +34,7 @@ export default class AlluvialNodeBase {
   width: number = 0;
 
   +children: AlluvialNode[] = [];
-  parent: ?AlluvialNode = null;
+  parent: ?AlluvialNode;
 
   constructor(parent: ?AlluvialNode, networkId: string, id: string = "") {
     this.networkId = networkId;
