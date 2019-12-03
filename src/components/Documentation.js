@@ -59,7 +59,6 @@ const Documentation = () =>
         </p>
       </Grid.Column>
       <Grid.Column>
-        <Header as="h1">Changelog</Header>
         <Changelog/>
         <Header as="h1">Feedback</Header>
         <p>
