@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/mapequation/alluvial-generator/compare/v0.3.3...v0.4.0) (2019-12-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Internal API has changed
+
+### Bug Fixes
+
+* Silence proptypes warnings for changelog ([db590e1](https://github.com/mapequation/alluvial-generator/commit/db590e159769614cb66a03b5b46023541194e067))
+
+
+* API refactor to separate interface vs internal structure ([19874a9](https://github.com/mapequation/alluvial-generator/commit/19874a9b20d109a77caecc10af02de3a87ccf4d6))
+
 ### [0.3.3](https://github.com/mapequation/alluvial-generator/compare/v0.3.2...v0.3.3) (2019-12-02)
 
 
