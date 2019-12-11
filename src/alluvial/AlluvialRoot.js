@@ -12,14 +12,11 @@ export type VerticalAlign = "bottom" | "justify" | "top";
 export type ModuleSize = "flow" | "nodes";
 
 const differenceIndex = (array1, array2) => {
-  let differenceIndex = 0;
   const minLength = Math.min(array1.length, array2.length);
   for (let i = 0; i < minLength; i++) {
-    if (array1[i] === array2[i]) continue;
-    differenceIndex = i;
-    break;
+    if (array1[i] !== array2[i]) return i;
   }
-  return differenceIndex;
+  return 0;
 };
 
 type GetNodeSize = (node: AlluvialNode) => number;
