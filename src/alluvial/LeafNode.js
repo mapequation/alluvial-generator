@@ -99,12 +99,10 @@ export default class LeafNode extends AlluvialNodeBase {
   }
 
   add() {
-    const module = this.networkRoot.getModule(this.moduleId) || new Module(this.networkRoot,
-      this.moduleId,
-      this.moduleLevel);
-    const group = module.getGroup(this.highlightIndex, this.insignificant) || new HighlightGroup(module,
-      this.highlightIndex,
-      this.insignificant);
+    const module = this.networkRoot.getModule(this.moduleId) ||
+      new Module(this.networkRoot, this.moduleId, this.moduleLevel);
+    const group = module.getGroup(this.highlightIndex, this.insignificant) ||
+      new HighlightGroup(module, this.highlightIndex, this.insignificant);
 
     for (let branch of group) {
       let oppositeNode = this.oppositeNodes[branch.side];

@@ -77,18 +77,17 @@ export default class Diagram {
     if (allNetworks) {
       this.alluvialRoot.children
         .filter(root => root.networkId !== networkId)
-        .forEach(networkRoot => {
-          const nodes = leafNodes.reduce((nodes, node) => {
-            const oppositeNode = networkRoot.getLeafNode(node.identifier);
-            if (oppositeNode) {
-              oppositeNode.highlightIndex = highlightIndex;
-              nodes.push(oppositeNode);
-            }
-            return nodes;
-          }, []);
-
-          nodes.forEach(node => node.update());
-        });
+        .forEach(networkRoot =>
+          leafNodes
+            .reduce((nodes, node) => {
+              const oppositeNode = networkRoot.getLeafNode(node.identifier);
+              if (oppositeNode) {
+                oppositeNode.highlightIndex = highlightIndex;
+                nodes.push(oppositeNode);
+              }
+              return nodes;
+            }, [])
+            .forEach(node => node.update()));
     }
 
     this.dirty = true;
