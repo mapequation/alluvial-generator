@@ -44,11 +44,7 @@ export default class StreamlineId {
     return new StreamlineId(source, target);
   }
 
-  static createId(
-    node: LeafNode,
-    side: Side,
-    oppositeNode: ?LeafNode = null
-  ): Id {
+  static createId(node: LeafNode, side: Side, oppositeNode: ?LeafNode = null): Id {
     const source = createId(node, side);
     if (!oppositeNode) {
       return source;
@@ -62,9 +58,8 @@ export default class StreamlineId {
     return this.source;
   }
 
-  static getOpposite(id: Id): ?StreamlineNode {
-    const oppositeId = id.split("--").reverse().join("--");
-    return StreamlineId.get(oppositeId);
+  static oppositeId(id: Id): Id {
+    return id.split("--").reverse().join("--");
   }
 
   toString(): string {
