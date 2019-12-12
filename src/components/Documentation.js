@@ -34,19 +34,20 @@ const Documentation = () =>
           any module.
         </p>
 
-        <Header>Show sub-modules</Header>
+        <Header>Expand sub-modules</Header>
         <video {...videoProps}>
           <source src={expandModuleMov} type="video/mp4"/>
         </video>
         <p>
-          By default, we show the top level modules for each network. To show the sub-modules within any module, double
-          click on it. If the modules shakes back and forth, the module is already expanded to its deepest level.
+          To show the sub-modules within any module, double click on it.
+          If the modules wiggles back and forth, the module is already expanded to its deepest level.
+          We currently don't support expanding modules to it's individual nodes.
         </p>
         <p>
           To keep the heights proportional to the contained flow, we re-scale the heights of all other modules.
         </p>
 
-        <Header>Regroup sub-modules</Header>
+        <Header>Contract sub-modules</Header>
         <video {...videoProps}>
           <source src={regroupModuleMov} type="video/mp4"/>
         </video>
