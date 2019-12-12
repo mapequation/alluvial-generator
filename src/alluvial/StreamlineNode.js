@@ -16,34 +16,12 @@ export default class StreamlineNode extends AlluvialNodeBase {
   side: Side;
   streamlineId: StreamlineId;
   depth = STREAMLINE_NODE;
-  nodeIndexById: Map<string, number> = new Map();
 
   constructor(parent: Branch, id: string) {
     super(parent, parent.networkId, id);
     parent.addChild(this);
     this.side = parent.side;
     this.streamlineId = StreamlineId.fromId(id);
-  }
-
-  addChild(node: LeafNode) {
-    const length = super.addChild(node);
-    const index = length - 1;
-    this.nodeIndexById.set(node.id, index);
-    return length;
-  }
-
-  removeChild(node: LeafNode) {
-    const index = this.nodeIndexById.get(node.id);
-    if (index == null) {
-      return false;
-    }
-    const moved = this.children[index] = this.children[this.children.length - 1];
-    this.children.pop();
-
-    this.nodeIndexById.set(moved.id, index);
-    this.nodeIndexById.delete(node.id);
-
-    return true;
   }
 
   get numLeafNodes(): number {
