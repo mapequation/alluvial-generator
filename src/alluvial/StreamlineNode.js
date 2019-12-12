@@ -22,7 +22,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
     super(parent, parent.networkId, id);
     parent.addChild(this);
     this.side = parent.side;
-    this.streamlineId = StreamlineId.fromString(id);
+    this.streamlineId = StreamlineId.fromId(id);
   }
 
   addChild(node: LeafNode) {
@@ -51,8 +51,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   makeDangling() {
-    this.streamlineId = this.streamlineId.getDangling();
-    this.id = this.streamlineId.toString();
+    this.id = this.streamlineId.makeDangling();
   }
 
   get sourceId() {
@@ -64,7 +63,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   get hasTarget(): boolean {
-    return !!this.targetId;
+    return !!this.streamlineId.target;
   }
 
   getOpposite(): ?StreamlineNode {
@@ -84,7 +83,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   linkTo(opposite: StreamlineNode) {
-    let reverse = this.side === LEFT;
+    const reverse = this.side === LEFT;
     StreamlineLink.linkNodes(this, opposite, reverse);
   }
 

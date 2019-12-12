@@ -101,24 +101,25 @@ export default class LeafNode extends AlluvialNodeBase {
       new HighlightGroup(module, this.highlightIndex, this.insignificant);
 
     for (let branch of group) {
-      let oppositeNode = this.oppositeNodes[branch.side];
+      const { side } = branch;
+      let oppositeNode = this.oppositeNodes[side];
 
       if (!oppositeNode) {
-        const neighborNetwork = this.networkRoot.getNeighbor(branch.side);
+        const neighborNetwork = this.networkRoot.getNeighbor(side);
         oppositeNode = neighborNetwork ? neighborNetwork.getLeafNode(this.identifier) : null;
-        this.oppositeNodes[branch.side] = oppositeNode;
+        this.oppositeNodes[side] = oppositeNode;
       }
 
-      const streamlineId = StreamlineId.create(this, branch.side, oppositeNode);
+      const streamlineId = StreamlineId.createId(this, side, oppositeNode);
       let streamlineNode = StreamlineId.get(streamlineId);
 
       if (!streamlineNode) {
         streamlineNode = new StreamlineNode(branch, streamlineId);
-        StreamlineId.set(streamlineId, streamlineNode);
+        StreamlineId.set(streamlineNode.id, streamlineNode);
       }
 
       if (streamlineNode.hasTarget) {
-        const oppositeSide = opposite(branch.side);
+        const oppositeSide = opposite(side);
         if (oppositeNode) {
           oppositeNode.removeFromSide(oppositeSide);
           oppositeNode.addToSide(oppositeSide, this);
@@ -126,12 +127,12 @@ export default class LeafNode extends AlluvialNodeBase {
       }
 
       streamlineNode.addChild(this);
-      this.setParent(streamlineNode, branch.side);
+      this.setParent(streamlineNode, side);
     }
   }
 
   addToSide(side: Side, oppositeNode: ?LeafNode) {
-    const streamlineId = StreamlineId.create(this, side, oppositeNode);
+    const streamlineId = StreamlineId.createId(this, side, oppositeNode);
     let streamlineNode = StreamlineId.get(streamlineId);
 
     if (!streamlineNode) {
@@ -140,6 +141,7 @@ export default class LeafNode extends AlluvialNodeBase {
         console.warn(`Node ${this.id} has no ${sideToString(side)} parent`);
         return;
       }
+
       const branch = oldStreamlineNode.parent;
       if (!branch) {
         console.warn(`Streamline node with id ${oldStreamlineNode.id} has no parent`);
@@ -147,11 +149,10 @@ export default class LeafNode extends AlluvialNodeBase {
       }
 
       streamlineNode = new StreamlineNode(branch, streamlineId);
-      StreamlineId.set(streamlineId, streamlineNode);
+      StreamlineId.set(streamlineNode.id, streamlineNode);
 
       if (oppositeNode) {
-        const oppositeId = StreamlineId.oppositeId(streamlineId);
-        const oppositeStreamlineNode = StreamlineId.get(oppositeId);
+        const oppositeStreamlineNode = StreamlineId.getOpposite(streamlineNode.id);
 
         if (oppositeStreamlineNode) {
           streamlineNode.linkTo(oppositeStreamlineNode);
