@@ -33,6 +33,8 @@ export default class AlluvialNodeBase {
   height: number = 0;
   width: number = 0;
 
+  flow: number = 0;
+
   +children: AlluvialNode[] = [];
   parent: ?AlluvialNode;
 
@@ -46,10 +48,6 @@ export default class AlluvialNodeBase {
     if (this.depth === depth) return this;
     if (!this.parent || this.depth < depth) return null;
     return this.parent.getAncestor(depth);
-  }
-
-  get flow(): number {
-    return this.children.reduce((total, child) => total + child.flow, 0);
   }
 
   get numLeafNodes(): number {

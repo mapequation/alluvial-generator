@@ -14,7 +14,7 @@ import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase {
   name: string;
-  _flow: number;
+  flow: number;
   nodeId: number;
   identifier: string;
   highlightIndex: number;
@@ -35,7 +35,7 @@ export default class LeafNode extends AlluvialNodeBase {
   constructor(node: Node, networkRoot: NetworkRoot) {
     super(null, networkRoot.networkId, node.path);
     this.name = node.name;
-    this._flow = node.flow;
+    this.flow = node.flow;
     this.identifier = node.identifier;
     this.nodeId = node.id || node.stateId || 0;
     this.treePath = new TreePath(node.path);
@@ -51,10 +51,6 @@ export default class LeafNode extends AlluvialNodeBase {
 
   get insignificant(): boolean {
     return this.treePath.insignificant[this.moduleLevel - 1] || false;
-  }
-
-  get flow(): number {
-    return this._flow;
   }
 
   toNode(): Node {

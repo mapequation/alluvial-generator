@@ -176,6 +176,7 @@ export default class Diagram {
 
   updateLayout() {
     this.dirty = true;
+    this.alluvialRoot.calcFlow();
     this.alluvialRoot.updateLayout(...arguments);
   }
 

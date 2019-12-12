@@ -61,6 +61,16 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     leafNodes.forEach(node => node.add());
   }
 
+  calcFlow() {
+    this.forEachDepthFirstPostOrder(node => {
+      if (node.depth === Depth.HIGHLIGHT_GROUP) {
+        node.flow = node.left.flow;
+      } else if (node.depth < Depth.LEAF_NODE) {
+        node.flow = node.children.reduce((total, child) => total + child.flow, 0);
+      }
+    });
+  }
+
   expandModule(moduleId: string, networkId: string) {
     const networkRoot = this.getNetworkRoot(networkId);
     if (!networkRoot) {
