@@ -112,11 +112,10 @@ export default class NetworkRoot extends AlluvialNodeBase {
       links: Array.from(this.rightStreamlines(), link => link.asObject())
         .sort((a, b) => b.avgHeight - a.avgHeight),
       children: this.children
-        .filter(module => module.isVisible)
-        .reduce((filtered, child) => {
-          if (child.flow >= this.flowThreshold)
-            filtered.push(child.asObject());
-          return filtered;
+        .reduce((modules, module) => {
+          if (module.isVisible && module.flow >= this.flowThreshold)
+            modules.push(module.asObject());
+          return modules;
         }, [])
     };
   }
@@ -130,12 +129,12 @@ export default class NetworkRoot extends AlluvialNodeBase {
 
       for (let group of module) {
         for (let streamlineNode of group.right) {
-          // Skip if right module is below threshold
           const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOpposite();
           if (!oppositeStreamlineNode) continue;
           const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
 
           if (oppositeModule) {
+            // Skip if right module is below threshold
             if (oppositeModule.flow < this.flowThreshold || !oppositeModule.isVisible)
               continue;
           }
