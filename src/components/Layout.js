@@ -113,10 +113,50 @@ export default function Layout(props) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const sharedProps = {
+    height: state.height,
+    duration: state.duration,
+    marginExponent: state.marginExponent,
+    moduleWidth: state.moduleWidth,
+    streamlineFraction: state.streamlineFraction,
+    streamlineThreshold: state.streamlineThreshold,
+    streamlineOpacity: state.streamlineOpacity,
+    moduleFlowThreshold: state.moduleFlowThreshold,
+    defaultHighlightColor: state.defaultHighlightColor,
+    highlightColors: state.highlightColors,
+    verticalAlign: state.verticalAlign,
+    showModuleId: state.showModuleId,
+    showModuleNames: state.showModuleNames,
+    showNetworkNames: state.showNetworkNames,
+    dropShadow: state.dropShadow,
+    fontSize: state.fontSize,
+    selectedModule: state.selectedModule,
+    moduleSize: state.moduleSize,
+    sortModulesBy: state.sortModulesBy,
+    visibleModules: state.visibleModules,
+    modulesVisibleInFilter: state.modulesVisibleInFilter
+  };
+
+  const sidebarProps = {
+    sidebarVisible: state.sidebarVisible
+  };
+
+  const alluvialProps = {
+    clearFiltersBit: state.clearFiltersBit,
+    nameChangeBit: state.nameChangeBit,
+    colorChangeBit: state.colorChangeBit,
+    colorChangeAllBit: state.colorChangeAllBit,
+    autoPaintBit: state.autoPaintBit,
+    removeColorsBit: state.removeColorsBit,
+    expandBit: state.expandBit,
+    regroupBit: state.regroupBit,
+    saveDiagramBit: state.saveDiagramBit
+  };
+
   return (
     <Dispatch.Provider value={{ dispatch }}>
       <SemanticSidebar.Pushable style={{ height: "100vh", overflow: "hidden" }}>
-        <Sidebar {...state} {...props}/>
+        <Sidebar {...sidebarProps} {...sharedProps} {...props}/>
         <SemanticSidebar.Pusher>
           <Rail internal position="right" style={{ padding: 0, margin: 0, height: 0, width: "182px" }}>
             <Menu vertical size="small">
@@ -128,7 +168,7 @@ export default function Layout(props) {
             </Menu>
           </Rail>
           <React.StrictMode>
-            <AlluvialDiagram {...state} {...props}/>
+            <AlluvialDiagram {...alluvialProps} {...sharedProps} {...props}/>
           </React.StrictMode>
         </SemanticSidebar.Pusher>
       </SemanticSidebar.Pushable>
