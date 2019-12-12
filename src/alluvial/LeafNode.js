@@ -206,6 +206,13 @@ export default class LeafNode extends AlluvialNodeBase {
 
     if (removeNetworkRoot && networkRoot.isEmpty) {
       networkRoot.removeFromParent();
+
+      [LEFT, RIGHT].forEach(side => {
+        if (this.oppositeNodes[side]) {
+          // Delete this node from opposite
+          this.oppositeNodes[side].opposideNodes[opposite(side)] = null;
+        }
+      });
     }
   }
 
@@ -247,11 +254,6 @@ export default class LeafNode extends AlluvialNodeBase {
 
       StreamlineId.delete(streamlineNode.id);
       streamlineNode.removeFromParent();
-    }
-
-    const branch = streamlineNode.parent;
-    if (!branch) {
-      console.warn(`Streamline node with id ${streamlineNode.id} has no parent`);
     }
   }
 
