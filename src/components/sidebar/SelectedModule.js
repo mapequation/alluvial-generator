@@ -1,7 +1,7 @@
 import React, { useContext, useLayoutEffect, useState } from "react";
 import { GithubPicker } from "react-color";
 import { Button, Icon, Input, Table } from "semantic-ui-react";
-import Dispatch from "../context/Dispatch";
+import Dispatch from "../../context/Dispatch";
 
 
 const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
@@ -23,6 +23,9 @@ function Swatch(props) {
     }}/>
   </div>;
 }
+
+const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
+const selectable = { selectable: true, style: { padding: "0 8px" } };
 
 export default function SelectedModule(props) {
   const {
@@ -52,17 +55,13 @@ export default function SelectedModule(props) {
   const handleNameChange = handleChange(setName, "name");
   const handleNetworkNameChange = handleChange(setNetworkName, "networkName");
 
-  const highlightIndex = color => highlightColors.indexOf(color);
-
-  const handleColorChange = color => setColor(color.hex);
-
   const paintModule = () => {
-    module.highlightIndex = highlightIndex(color);
+    module.highlightIndex = highlightColors.indexOf(color);
     dispatch({ type: "changeColor" });
   };
 
   const paintNodes = () => {
-    module.highlightIndex = highlightIndex(color);
+    module.highlightIndex = highlightColors.indexOf(color);
     dispatch({ type: "changeAllColor" });
   };
 
@@ -76,9 +75,6 @@ export default function SelectedModule(props) {
   if (!module) {
     return;
   }
-
-  const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
-  const selectable = { selectable: true, style: { padding: "0 8px" } };
 
   return (
     <React.Fragment>
@@ -181,7 +177,7 @@ export default function SelectedModule(props) {
       <Swatch background={color}/>
       <GithubPicker
         colors={[defaultHighlightColor, ...highlightColors]}
-        onChangeComplete={handleColorChange}
+        onChangeComplete={color => setColor(color.hex)}
       />
       <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
         <Button

@@ -3,11 +3,11 @@ import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
 import { Checkbox, Container, Divider, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
-import Background from "../images/background.svg";
+import Background from "../../images/background.svg";
 
-import { acceptedFormats, getParser, isValidExtension } from "../io/object-parser";
-import readAsText from "../io/read-as-text";
-import streeParser from "../io/stree-parser";
+import { acceptedFormats, getParser, isValidExtension } from "../../io/object-parser";
+import readAsText from "../../io/read-as-text";
+import streeParser from "../../io/stree-parser";
 import withDraggable from "./withDraggable";
 
 

@@ -7,39 +7,20 @@ import {
   Form,
   Header,
   Icon,
-  Label,
-  List,
   Menu,
-  Modal,
   Popup,
   Sidebar as SemanticSidebar
 } from "semantic-ui-react";
-import Dispatch from "../context/Dispatch";
-import { savePng, saveSvg } from "../io/export";
+import Dispatch from "../../context/Dispatch";
+import { savePng, saveSvg } from "../../io/export";
+import ConvertToPdfModal from "./ConvertToPdfModal";
 import DefaultHighlightColor from "./DefaultHighlightColor";
+import Export from "./Export";
+import LabelForSlider from "./LabelForSlider";
 import MenuHeader from "./MenuHeader";
+import PaintNetworks from "./PaintNetworks";
 import SelectedModule from "./SelectedModule";
 
-
-function LabelForSlider(props) {
-  const { children, popup, ...rest } = props;
-
-  const label = <Label
-    basic
-    horizontal
-    {...rest}
-    style={{ width: "50%", textAlign: "left", fontWeight: 400, float: "left", margin: "0.08em 0" }}
-  />;
-
-  return (
-    <div style={{ clear: "both" }}>
-      {popup ? <Popup content={popup} inverted size="small" trigger={label}/> : label}
-      <div style={{ width: "50%", display: "inline-block", float: "right" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
 
 const GreySlider = props => <Slider color="grey" value={props.start} settings={props}/>;
 
@@ -50,6 +31,8 @@ const MyCheckbox = props => {
 };
 
 const SliderCheckbox = props => <MyCheckbox slider {...props}/>;
+
+const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
 export default function Sidebar(props) {
   const {
@@ -82,12 +65,6 @@ export default function Sidebar(props) {
 
   const basename = networks.map(network => network.name);
 
-  const autoPaint = () => dispatch({ type: "autoPaint" });
-
-  const removeColors = () => dispatch({ type: "removeColors" });
-
-  const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
-
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
   const [selectedNetworkId, setSelectedNetworkId] = useState("");
@@ -106,18 +83,12 @@ export default function Sidebar(props) {
 
   const moduleIdsForNetwork = networkId => moduleIds[networkId] || [];
 
-  const moduleIdsForSelectedNetwork = moduleIdsForNetwork(selectedNetworkId);
-
   const setModuleIdsForNetwork = networkId => newModuleIds => {
     if (!moduleIds[networkId]) return;
     const updated = Object.assign({}, moduleIds);
     updated[networkId] = newModuleIds;
     setModuleIds(updated);
   };
-
-  const setModuleIdsForSelectedNetwork = setModuleIdsForNetwork(selectedNetworkId);
-
-  const applyFilter = () => dispatch({ type: "changeVisibleModules", value: moduleIds });
 
   const clearFilter = () => {
     setModuleIds(emptyModuleIds);
@@ -126,11 +97,8 @@ export default function Sidebar(props) {
 
   Object.entries(moduleIds).forEach(([networkId, moduleIds]) => {
     const visible = visibleModules[networkId] || [];
-    for (let moduleId of moduleIds) {
-      if (!visible.includes(moduleId)) {
-        clearFilter();
-        break;
-      }
+    if (moduleIds.some(moduleId => !visible.includes(moduleId))) {
+      clearFilter();
     }
   });
 
@@ -187,8 +155,8 @@ export default function Sidebar(props) {
             search
             selection
             options={moduleIdOptions}
-            value={moduleIdsForSelectedNetwork}
-            onChange={(e, { value }) => setModuleIdsForSelectedNetwork(value)}
+            value={moduleIdsForNetwork(selectedNetworkId)}
+            onChange={(e, { value }) => setModuleIdsForNetwork(selectedNetworkId)(value)}
           />
           <Button.Group
             style={{ margin: "4px 0 0 0 " }}
@@ -196,7 +164,7 @@ export default function Sidebar(props) {
           >
             <Button
               type="submit"
-              onClick={applyFilter}
+              onClick={() => dispatch({ type: "changeVisibleModules", value: moduleIds })}
               content="Apply filter"
             />
           </Button.Group>
@@ -216,31 +184,11 @@ export default function Sidebar(props) {
         </Button.Group>
       </Menu.Item>
       <Menu.Item>
-        <Header as="h4" content="Paint networks"/>
-        <Button.Group {...buttonProps}>
-          <Popup
-            content="Paint all networks based on the modules in the selected network. (Select network by clicking on any module.)"
-            inverted size="small"
-            trigger={
-              <Button
-                content="Auto paint modules"
-                onClick={autoPaint}
-              />
-            }/>
-          <Popup
-            content="Use the default color for all networks."
-            inverted size="small"
-            trigger={
-              <Button
-                icon
-                labelPosition="right"
-                onClick={removeColors}
-              >
-                <Icon name="x" style={{ background: "transparent" }}/>
-                Remove all colors
-              </Button>
-            }/>
-        </Button.Group>
+        <PaintNetworks
+          buttonProps={buttonProps}
+          onAutoPaintClick={() => dispatch({ type: "autoPaint" })}
+          onRemoveColorsClick={() => dispatch({ type: "removeColors" })}
+        />
       </Menu.Item>
       <Menu.Item>
         <Header as="h4">Layout</Header>
@@ -411,59 +359,14 @@ export default function Sidebar(props) {
         />
       </Menu.Item>
       <Menu.Item>
-        <Header as="h4">Export</Header>
-        <Menu.Menu>
-          <Menu.Item
-            icon="download"
-            onClick={() => dispatch({ type: "saveDiagram" })}
-            content="Save diagram"
-          />
-        </Menu.Menu>
-        <Menu.Menu>
-          <Menu.Item
-            icon="download"
-            onClick={() => saveSvg("alluvialSvg", basename + ".svg")}
-            content="Download SVG"
-          />
-        </Menu.Menu>
-        <Menu.Menu>
-          <Menu.Item
-            icon="image"
-            onClick={() => savePng("alluvialSvg", basename + ".png")}
-            content="Download PNG"
-          />
-        </Menu.Menu>
-        <Menu.Menu>
-          <Menu.Item
-            icon="help"
-            onClick={() => setPdfModalOpen(true)}
-            content="Converting to PDF"
-          />
-        </Menu.Menu>
+        <Export
+          onSaveClick={() => dispatch({ type: "saveDiagram" })}
+          onDownloadSvgClick={() => saveSvg("alluvialSvg", basename + ".svg")}
+          onDownloadPngClick={() => savePng("alluvialSvg", basename + ".png")}
+          onConvertToPdfClick={() => setPdfModalOpen(true)}
+        />
       </Menu.Item>
-      <Modal
-        size="small"
-        dimmer="inverted"
-        open={pdfModalOpen}
-        onClose={() => setPdfModalOpen(false)}
-      >
-        <Modal.Header>Converting to PDF</Modal.Header>
-        <Modal.Content>
-          <p>Currently, export to PDF does not work.</p>
-          <p>The easiest way to convert to PDF is to download the diagram as SVG and convert from SVG to PDF.</p>
-
-          <Header as='h3'>How to convert SVG to PDF</Header>
-          <List ordered>
-            <List.Item>Download the diagram as SVG</List.Item>
-            <List.Item>Open the SVG in your browser</List.Item>
-            <List.Item>Open the <i>print dialog</i> (Ctrl-P on Windows, &#8984;P on Mac)</List.Item>
-            <List.Item>Choose <i>Print to PDF</i></List.Item>
-          </List>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button onClick={() => setPdfModalOpen(false)}>Close</Button>
-        </Modal.Actions>
-      </Modal>
+      <ConvertToPdfModal open={pdfModalOpen} onClose={() => setPdfModalOpen(false)}/>
     </SemanticSidebar>
   );
 }

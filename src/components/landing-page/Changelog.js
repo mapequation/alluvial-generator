@@ -1,7 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { Header as SemanticHeader, List as SemanticList } from "semantic-ui-react";
-import CHANGELOG_md from "../CHANGELOG.md";
+import CHANGELOG_md from "../../CHANGELOG.md";
 
 
 const Header = ({ level, ...props }) => <SemanticHeader as={`h${level}`} {...props} />;

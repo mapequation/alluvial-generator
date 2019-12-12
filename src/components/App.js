@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Documentation from "./Documentation";
-import Header from "./Header";
-import LoadNetworks from "./LoadNetworks";
+import Documentation from "./landing-page/Documentation";
+import Header from "./landing-page/Header";
+import LoadNetworks from "./landing-page/LoadNetworks";
 import Layout from "./Layout";
 
 

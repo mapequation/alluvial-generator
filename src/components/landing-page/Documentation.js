@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Grid, Header, Icon } from "semantic-ui-react";
-import expandModuleMov from "../images/expand.mov";
-import regroupModuleMov from "../images/regroup.mov";
+import expandModuleMov from "../../images/expand.mov";
+import regroupModuleMov from "../../images/regroup.mov";
 import Changelog from "./Changelog";
 
 

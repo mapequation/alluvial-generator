@@ -3,7 +3,7 @@ import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar/Sidebar";
 
 
 const flip = bit => bit ? 0 : 1;
