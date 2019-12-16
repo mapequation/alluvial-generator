@@ -81,22 +81,12 @@ export default class AlluvialNodeBase {
     return found;
   }
 
-  getChild(index: number): ?AlluvialNode {
-    if (index < 0 || index > this.children.length - 1) return null;
-    return this.children[index];
-  }
-
   get numChildren(): number {
     return this.children.length;
   }
 
   get isEmpty(): boolean {
     return this.numChildren === 0;
-  }
-
-  removeFromParent() {
-    if (!this.parent) return;
-    this.parent.removeChild(this);
   }
 
   sortChildren() {
@@ -123,6 +113,12 @@ export default class AlluvialNodeBase {
       depth: this.depth,
       children: this.children.map(child => child.asObject())
     };
+  }
+
+  * leafNodes(): Iterable<AlluvialNode> {
+    for (let child of this) {
+      yield* child.leafNodes();
+    }
   }
 
   forEachDepthFirst(callback: IteratorCallback, preOrder: boolean = true) {
@@ -175,11 +171,5 @@ export default class AlluvialNodeBase {
       child.forEachDepthFirstPostOrderWhile(predicate, callback);
       callback(child, childIndex, children);
     });
-  }
-
-  * leafNodes(): Iterable<AlluvialNode> {
-    for (let child of this) {
-      yield* child.leafNodes();
-    }
   }
 }

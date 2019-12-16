@@ -172,18 +172,14 @@ export default class LeafNode extends AlluvialNodeBase {
       return;
     }
 
-    if (group.isEmpty) {
-      group.removeFromParent();
-    }
-
     const module = group.parent;
     if (!module) {
       console.warn(`Node ${this.id} was removed without belonging to a module.`);
       return;
     }
 
-    if (module.isEmpty) {
-      module.removeFromParent();
+    if (group.isEmpty) {
+      module.removeChild(group);
     }
 
     const networkRoot = module.parent;
@@ -192,8 +188,14 @@ export default class LeafNode extends AlluvialNodeBase {
       return;
     }
 
+    if (module.isEmpty) {
+      networkRoot.removeChild(module);
+    }
+
     if (removeNetworkRoot && networkRoot.isEmpty) {
-      networkRoot.removeFromParent();
+      if (networkRoot.parent) {
+        networkRoot.parent.removeChild(networkRoot);
+      }
 
       [LEFT, RIGHT].forEach(side => {
         if (this.oppositeNodes[side]) {
@@ -234,7 +236,10 @@ export default class LeafNode extends AlluvialNodeBase {
             node.setParent(alreadyDanglingStreamlineNode, opposite(side));
           }
 
-          oppositeStreamlineNode.removeFromParent();
+          const branch = oppositeStreamlineNode.parent;
+          if (branch) {
+            branch.removeChild(oppositeStreamlineNode);
+          }
         } else {
           // Update with the new dangling id
           StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
@@ -242,7 +247,10 @@ export default class LeafNode extends AlluvialNodeBase {
       }
 
       StreamlineId.delete(streamlineNode.id);
-      streamlineNode.removeFromParent();
+      const branch = streamlineNode.parent;
+      if (branch) {
+        branch.removeChild(streamlineNode);
+      }
     }
   }
 
