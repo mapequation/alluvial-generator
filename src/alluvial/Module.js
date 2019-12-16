@@ -83,14 +83,6 @@ export default class Module extends AlluvialNodeBase {
     return this.children.find(group => group.highlightIndex === highlightIndex && group.insignificant === insignificant);
   }
 
-  sortChildren() {
-    this.sortBy((a: HighlightGroup, b: HighlightGroup) => {
-      const byHighlightIndex = a.highlightIndex - b.highlightIndex;
-      if (byHighlightIndex !== 0) return byHighlightIndex;
-      return a.insignificant ? 1 : -1;
-    });
-  }
-
   getLargestLeafNodeNames() {
     const queue = new PriorityQueue(6);
     for (let node of this.leafNodes()) {

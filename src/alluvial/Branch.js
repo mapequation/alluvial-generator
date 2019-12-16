@@ -33,9 +33,4 @@ export default class Branch extends AlluvialNodeBase {
   get isRight(): boolean {
     return this.side === RIGHT;
   }
-
-  sortChildren(moduleFlowThreshold: number = 0) {
-    this.sortBy((a: StreamlineNode, b: StreamlineNode) =>
-      a.oppositeStreamlinePosition(moduleFlowThreshold) - b.oppositeStreamlinePosition(moduleFlowThreshold));
-  }
 }

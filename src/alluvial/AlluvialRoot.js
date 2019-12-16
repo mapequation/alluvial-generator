@@ -2,9 +2,12 @@
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Depth, { ALLUVIAL_ROOT, NETWORK_ROOT } from "./Depth";
+import HighlightGroup from "./HighlightGroup";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
+import StreamlineNode from "./StreamlineNode";
+import Tree from "./Tree";
 
 
 export type VerticalAlign = "bottom" | "justify" | "top";
@@ -213,7 +216,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     moduleSize: ModuleSize = "flow",
     sortModulesBy: ModuleSize = "flow"
   ) {
-    const numNetworks = this.numChildren;
+    const numNetworks = this.children.length;
 
     if (!numNetworks) return;
 
@@ -248,11 +251,16 @@ export default class AlluvialRoot extends AlluvialNodeBase {
           getNodeSize = getNodeSizeByProp(moduleSize);
           node.flowThreshold = flowThreshold;
           networkIndex = i;
-          node.sortChildren(getNodeSizeByProp(sortModulesBy));
+          const tree = new Tree(node.children, getNodeSizeByProp(sortModulesBy));
+          node.children = tree.sort().flatten();
           if (i > 0) x += networkWidth;
           y = height;
         } else if (node.depth === Depth.MODULE && getNodeSize) {
-          node.sortChildren();
+          node.children.sort((a: HighlightGroup, b: HighlightGroup) => {
+            const byHighlightIndex = a.highlightIndex - b.highlightIndex;
+            if (byHighlightIndex !== 0) return byHighlightIndex;
+            return a.insignificant ? 1 : -1;
+          });
           const margin =
             i + 1 < nodes.length
               ? 2 ** (marginExponent - 2 * differenceIndex(node.path, nodes[i + 1].path))
@@ -337,7 +345,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       node => node.depth <= Depth.BRANCH,
       node => {
         if (node.depth === Depth.BRANCH) {
-          node.sortChildren(flowThreshold);
+          node.children.sort((a: StreamlineNode, b: StreamlineNode) =>
+            a.oppositeStreamlinePosition(flowThreshold) - b.oppositeStreamlinePosition(flowThreshold));
         }
       }
     );

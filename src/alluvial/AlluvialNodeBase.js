@@ -50,10 +50,6 @@ export default class AlluvialNodeBase {
     return this.parent.getAncestor(depth);
   }
 
-  get numLeafNodes(): number {
-    return this.children.reduce((num, children) => num + children.numLeafNodes, 0);
-  }
-
   set layout({ x, y, width, height }: Layout) {
     this.x = x;
     this.y = y;
@@ -81,20 +77,18 @@ export default class AlluvialNodeBase {
     return found;
   }
 
-  get numChildren(): number {
-    return this.children.length;
-  }
-
   get isEmpty(): boolean {
-    return this.numChildren === 0;
+    return this.children.length === 0;
   }
 
-  sortChildren() {
-    // no-op
+  get numLeafNodes(): number {
+    return this.children.reduce((num, children) => num + children.numLeafNodes, 0);
   }
 
-  sortBy(compareFn: (a: AlluvialNode, b: AlluvialNode) => number) {
-    this.children.sort(compareFn);
+  * leafNodes(): Iterable<AlluvialNode> {
+    for (let child of this) {
+      yield* child.leafNodes();
+    }
   }
 
   /*:: @@iterator(): Iterator<AlluvialNode> { return this.children.values() } */
@@ -113,12 +107,6 @@ export default class AlluvialNodeBase {
       depth: this.depth,
       children: this.children.map(child => child.asObject())
     };
-  }
-
-  * leafNodes(): Iterable<AlluvialNode> {
-    for (let child of this) {
-      yield* child.leafNodes();
-    }
   }
 
   forEachDepthFirst(callback: IteratorCallback, preOrder: boolean = true) {
