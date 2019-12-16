@@ -556,7 +556,6 @@ export default class AlluvialDiagram extends React.PureComponent {
         d3.selectAll(".module")
           .call(removeEventHandler(this), "mouseover")
           .call(removeEventHandler(this), "mouseout")
-          .transition()
           .attr("stroke-opacity", (context => function() {
             return context === this ? 1 : 0;
           })(this));
@@ -798,7 +797,6 @@ export default class AlluvialDiagram extends React.PureComponent {
         <ZoomableSvg onClick={() => {
           d3.selectAll(".module")
             .call(restoreMouseOver)
-            .transition()
             .attr("stroke-opacity", 0);
 
           dispatch({ type: "selectedModule", value: null });
