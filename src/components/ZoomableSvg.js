@@ -48,7 +48,7 @@ export default class ZoomableSvg extends React.PureComponent {
         xmlnsXlink={d3.namespaces.xlink}
       >
         <rect className="background" width="100%" height="100%" fill="#fff"/>
-        <g id="zoomable">{children}</g>
+        <g id="zoomable" children={children}/>
       </svg>
     );
   }

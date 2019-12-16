@@ -118,7 +118,8 @@ export default class Module extends AlluvialNodeBase {
         y: y + height / 2
       },
       networkName: parent ? parent.name : "",
-      networkCodelength: parent && parent.codelength ? parent.codelength : 0
+      networkCodelength: parent && parent.codelength ? parent.codelength : 0,
+      leafNodes: Array.from(this.leafNodes(), node => node.toNode())
     };
   }
 }

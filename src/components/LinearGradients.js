@@ -54,39 +54,42 @@ export default class LinearGradients extends React.PureComponent {
     const leftOffset = "15%";
     const rightOffset = "85%";
 
+    const insignificant = cross([true, false], [true, false]);
+
     return (
-      <React.Fragment>
+      <>
         {
-          [true, false].map((leftInsignificant, l_key) =>
-            [true, false].map((rightInsignificant, r_key) =>
-              pairs.map(([leftHighlightIndex, rightHighlightIndex], key) => (
-                <React.Fragment key={`${key}_${l_key}_${r_key}}`}>
-                  <linearGradient
-                    id={id(leftHighlightIndex, rightHighlightIndex, leftInsignificant, rightInsignificant)}>
-                    <stop offset={leftOffset}
-                          stopColor={color({ highlightIndex: leftHighlightIndex, insignificant: leftInsignificant })}/>
-                    <stop offset={rightOffset}
-                          stopColor={color({
-                            highlightIndex: rightHighlightIndex,
-                            insignificant: rightInsignificant
-                          })}/>
-                  </linearGradient>
-                  <linearGradient id={strokeId(leftHighlightIndex, rightHighlightIndex)}>
-                    <stop offset={leftOffset}
-                          stopColor={stroke(color({
-                            highlightIndex: leftHighlightIndex,
-                            insignificant: leftInsignificant
-                          }), leftHighlightIndex)}/>
-                    <stop offset={rightOffset}
-                          stopColor={stroke(color({
-                            highlightIndex: rightHighlightIndex,
-                            insignificant: rightInsignificant
-                          }), rightHighlightIndex)}/>
-                  </linearGradient>
-                </React.Fragment>
-              ))))
+          insignificant.map(([leftInsignificant, rightInsignificant], i) =>
+            pairs.map(([leftHighlightIndex, rightHighlightIndex], j) =>
+              <React.Fragment key={`${i}_${j}}`}>
+                <linearGradient
+                  id={id(leftHighlightIndex, rightHighlightIndex, leftInsignificant, rightInsignificant)}>
+                  <stop
+                    offset={leftOffset}
+                    stopColor={color({ highlightIndex: leftHighlightIndex, insignificant: leftInsignificant })}
+                  />
+                  <stop
+                    offset={rightOffset}
+                    stopColor={color({ highlightIndex: rightHighlightIndex, insignificant: rightInsignificant })}
+                  />
+                </linearGradient>
+                <linearGradient id={strokeId(leftHighlightIndex, rightHighlightIndex)}>
+                  <stop
+                    offset={leftOffset}
+                    stopColor={stroke(color({ highlightIndex: leftHighlightIndex, insignificant: leftInsignificant }),
+                      leftHighlightIndex)
+                    }
+                  />
+                  <stop
+                    offset={rightOffset}
+                    stopColor={stroke(color({ highlightIndex: rightHighlightIndex, insignificant: rightInsignificant }),
+                      rightHighlightIndex)}
+                  />
+                </linearGradient>
+              </React.Fragment>
+            ))
         }
-      </React.Fragment>
+      </>
     );
   }
 }

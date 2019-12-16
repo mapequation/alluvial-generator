@@ -16,9 +16,7 @@ export default class LabelForSlider extends React.PureComponent {
     return (
       <div style={{ clear: "both" }}>
         {popup ? <Popup content={popup} inverted size="small" trigger={label}/> : label}
-        <div style={{ width: "50%", display: "inline-block", float: "right" }}>
-          {children}
-        </div>
+        <div style={{ width: "50%", display: "inline-block", float: "right" }} children={children}/>
       </div>
     );
   }

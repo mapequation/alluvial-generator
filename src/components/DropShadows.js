@@ -26,7 +26,7 @@ export default class DropShadows extends React.PureComponent {
     const x = level => maxLevel + 1 - level;
 
     return (
-      <React.Fragment>
+      <>
         {levels.map((level, key) => (
           <filter
             key={key}
@@ -44,7 +44,7 @@ export default class DropShadows extends React.PureComponent {
             />
           </filter>
         ))}
-      </React.Fragment>
+      </>
     );
   }
 }

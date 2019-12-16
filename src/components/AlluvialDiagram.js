@@ -72,8 +72,6 @@ function wiggle() {
     .attr("transform", "translate(0 0)");
 }
 
-const flipped = (a, b) => a !== b;
-
 export default class AlluvialDiagram extends React.PureComponent {
   svg = d3.select(null);
   streamlineGenerator = streamlineHorizontal();
@@ -173,28 +171,28 @@ export default class AlluvialDiagram extends React.PureComponent {
     const { dispatch } = this.context;
 
     if (selectedModule) {
-      if (flipped(nameChangeBit, prev.nameChangeBit)) {
+      if (nameChangeBit !== prev.nameChangeBit) {
         this.diagram.setModuleName(selectedModule);
         this.diagram.setNetworkName(selectedModule);
       }
-      if (flipped(colorChangeBit, prev.colorChangeBit)) {
+      if (colorChangeBit !== prev.colorChangeBit) {
         this.diagram.setModuleColor(selectedModule);
       }
-      if (flipped(colorChangeAllBit, prev.colorChangeAllBit)) {
+      if (colorChangeAllBit !== prev.colorChangeAllBit) {
         this.diagram.setModuleColor(selectedModule, true);
       }
-      if (flipped(expandBit, prev.expandBit)) {
+      if (expandBit !== prev.expandBit) {
         this.diagram.doubleClick(selectedModule);
-      } else if (flipped(regroupBit, prev.regroupBit)) {
+      } else if (regroupBit !== prev.regroupBit) {
         this.diagram.doubleClick(selectedModule, { shiftKey: true });
       }
     }
 
-    if (flipped(autoPaintBit, prev.autoPaintBit)) {
+    if (autoPaintBit !== prev.autoPaintBit) {
       this.diagram.autoPaint(selectedModule);
     }
 
-    if (flipped(removeColorsBit, prev.removeColorsBit)) {
+    if (removeColorsBit !== prev.removeColorsBit) {
       this.diagram.removeColors();
     }
 
@@ -202,7 +200,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       this.diagram.setVisibleModules(modulesVisibleInFilter);
     }
 
-    if (flipped(clearFiltersBit, prev.clearFiltersBit)) {
+    if (clearFiltersBit !== prev.clearFiltersBit) {
       this.diagram.clearFilters();
     }
 
@@ -213,7 +211,7 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     this.draw();
 
-    if (flipped(saveDiagramBit, prev.saveDiagramBit)) {
+    if (saveDiagramBit !== prev.saveDiagramBit) {
       const state = {
         height,
         duration,

@@ -9,11 +9,11 @@ export default function App() {
   const [state, setState] = useState({ networks: [] });
 
   if (state.networks.length === 0) {
-    return <React.Fragment>
+    return <>
       <Header/>
       <LoadNetworks onSubmit={setState}/>
       <Documentation/>
-    </React.Fragment>;
+    </>;
   }
 
   return <Layout {...state}/>;
