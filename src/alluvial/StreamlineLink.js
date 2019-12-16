@@ -57,8 +57,8 @@ export default class StreamlineLink {
 
     return {
       id,
-      sourceId,
-      targetId,
+      sourceId: sourceId.replace("_right", ""),
+      targetId: targetId.replace("_left", ""),
       leftNetworkId,
       rightNetworkId,
       leftModuleId,

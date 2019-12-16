@@ -28,7 +28,7 @@ function highlightStreamline(d) {
     .call(highlightConnectedModules, d, 0.5, "#f00");
 }
 
-function dehighlightStreamline(d) {
+function clearStreamlineHighlight(d) {
   d3.select(this)
     .call(LinearGradients.stroke);
 
@@ -502,7 +502,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       .on("click", onClick)
       .on("dblclick", onDoubleClick)
       .on("mouseover", highlightStreamline)
-      .on("mouseout", dehighlightStreamline)
+      .on("mouseout", clearStreamlineHighlight)
       .call(LinearGradients.fill)
       .call(LinearGradients.stroke)
       .attr("stroke-width", 1)
