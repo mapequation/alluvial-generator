@@ -48,6 +48,6 @@ export default class Tree {
   flatten(tree = this.root): Child[] {
     return tree.nodes.reduce((flattened, toFlatten) =>
         flattened.concat(Array.isArray(toFlatten.nodes) ? this.flatten(toFlatten) : toFlatten),
-      [])
+      []);
   }
 }

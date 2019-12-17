@@ -25,6 +25,7 @@ export default class Module extends AlluvialNodeBase {
   visibleInFilter: boolean = false;
   filterActive: boolean = false;
   depth = MODULE;
+  index: number;
 
   static customNames: Map<string, CustomName> = new Map();
 
@@ -39,7 +40,7 @@ export default class Module extends AlluvialNodeBase {
     this.path = TreePath.toArray(moduleId);
     const customName = Module.customNames.get(this.id);
     this._name = customName ? [customName.name] : this.subModuleNames();
-    parent.addChild(this);
+    this.index = parent.addChild(this) - 1;
   }
 
   subModuleNames(): ?Array<string> {
