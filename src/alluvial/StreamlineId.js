@@ -5,11 +5,6 @@ import { opposite, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
 
-const typeSuffix = node => `${node.insignificant ? "i" : ""}${node.highlightIndex}`;
-
-const createId = (node, side) =>
-  `${node.networkId}_module${node.moduleId}_group${typeSuffix(node)}_${sideToString(side)}`;
-
 type Id = string;
 
 export default class StreamlineId {
@@ -45,12 +40,14 @@ export default class StreamlineId {
   }
 
   static createId(node: LeafNode, side: Side, oppositeNode: ?LeafNode = null): Id {
-    const source = createId(node, side);
     if (!oppositeNode) {
-      return source;
+      return `${node.networkId}_module${node.moduleId}_group${
+        node.insignificant ? "i" : ""}${node.highlightIndex}_${sideToString(side)}`;
     }
-    const target = createId(oppositeNode, opposite(side));
-    return `${source}--${target}`;
+    return `${node.networkId}_module${node.moduleId}_group${
+      node.insignificant ? "i" : ""}${node.highlightIndex}_${sideToString(side)}--${
+      oppositeNode.networkId}}_module${oppositeNode.moduleId}_group${
+      oppositeNode.insignificant ? "i" : ""}}${oppositeNode.highlightIndex}_${sideToString(opposite(side))}`;
   }
 
   makeDangling(): string {
