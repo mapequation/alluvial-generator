@@ -52,12 +52,17 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   oppositeStreamlinePosition(flowThreshold: number) {
-    const atBottom = -Infinity;
-    const opposite = this.getOpposite();
-    if (!opposite) return atBottom;
-    const group = opposite.getAncestor(HIGHLIGHT_GROUP);
-    if (!group || group.flow < flowThreshold) return atBottom;
-    return -group.y;
+    const oppositeStreamlineNode = this.getOpposite();
+    if (oppositeStreamlineNode) {
+      const group = oppositeStreamlineNode.getAncestor(HIGHLIGHT_GROUP);
+      if (group) {
+        const module = group.parent;
+        if (module && module.flow >= flowThreshold) {
+          return -group.y;
+        }
+      }
+    }
+    return -Infinity;
   }
 
   linkTo(opposite: StreamlineNode) {
