@@ -74,14 +74,6 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
-  set parent(parent: ?StreamlineNode) {
-    this.leftParent = this.rightParent = parent;
-  }
-
-  get parent(): ?StreamlineNode {
-    return this.leftParent || this.rightParent;
-  }
-
   getParent(side: Side): ?StreamlineNode {
     return side === LEFT ? this.leftParent : this.rightParent;
   }
@@ -92,11 +84,6 @@ export default class LeafNode extends AlluvialNodeBase {
     } else {
       this.rightParent = parent;
     }
-  }
-
-  removeFromParent() {
-    if (this.leftParent) this.leftParent.removeChild(this);
-    if (this.rightParent) this.rightParent.removeChild(this);
   }
 
   add() {
