@@ -98,8 +98,9 @@ export default class LeafNode extends AlluvialNodeBase {
 
       if (!oppositeNode) {
         const neighborNetwork = this.networkRoot.getNeighbor(side);
-        oppositeNode = neighborNetwork ? neighborNetwork.getLeafNode(this.identifier) : null;
-        this.oppositeNodes[side] = oppositeNode;
+        if (neighborNetwork) {
+          oppositeNode = this.oppositeNodes[side] = neighborNetwork.getLeafNode(this.identifier);
+        }
       }
 
       const streamlineId = StreamlineId.createId(this, side, oppositeNode);
@@ -110,7 +111,7 @@ export default class LeafNode extends AlluvialNodeBase {
         StreamlineId.set(streamlineNode.id, streamlineNode);
       }
 
-      if (streamlineNode.hasTarget && oppositeNode) {
+      if (oppositeNode && streamlineNode.hasTarget) {
         const oppositeSide = opposite(side);
         oppositeNode.removeFromSide(oppositeSide);
         const oppositeId = StreamlineId.oppositeId(streamlineNode.id);
@@ -153,43 +154,34 @@ export default class LeafNode extends AlluvialNodeBase {
     this.removeFromSide(LEFT);
     this.removeFromSide(RIGHT);
 
-    // No need to remove branches here
-    if (!group) {
-      console.warn(`Node ${this.id} was removed without belonging to a group.`);
-      return;
-    }
-
-    const module = group.parent;
-    if (!module) {
-      console.warn(`Node ${this.id} was removed without belonging to a module.`);
-      return;
-    }
-
-    if (group.isEmpty) {
-      module.removeChild(group);
-    }
-
-    const networkRoot = module.parent;
-    if (!networkRoot) {
-      console.warn(`Node ${this.id} was removed without belonging to a network root.`);
-      return;
-    }
-
-    if (module.isEmpty) {
-      networkRoot.removeChild(module);
-    }
-
-    if (removeNetworkRoot && networkRoot.isEmpty) {
-      if (networkRoot.parent) {
-        networkRoot.parent.removeChild(networkRoot);
-      }
-
-      [LEFT, RIGHT].forEach(side => {
-        if (this.oppositeNodes[side]) {
-          // Delete this node from opposite
-          this.oppositeNodes[side].opposideNodes[opposite(side)] = null;
+    if (group) {
+      const module = group.parent;
+      if (module) {
+        if (group.isEmpty) {
+          module.removeChild(group);
         }
-      });
+
+        const networkRoot = module.parent;
+        if (networkRoot) {
+          if (module.isEmpty) {
+            networkRoot.removeChild(module);
+          }
+
+          const alluvialRoot = networkRoot.parent;
+          if (alluvialRoot) {
+            if (removeNetworkRoot && networkRoot.isEmpty) {
+              alluvialRoot.removeChild(networkRoot);
+
+              if (this.oppositeNodes[LEFT]) {
+                this.oppositeNodes[LEFT].oppositeNodes[RIGHT] = null;
+              }
+              if (this.oppositeNodes[RIGHT]) {
+                this.oppositeNodes[RIGHT].oppositeNodes[LEFT] = null;
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -218,9 +210,10 @@ export default class LeafNode extends AlluvialNodeBase {
         const alreadyDanglingStreamlineNode = StreamlineId.get(oppositeStreamlineNode.id);
         // Does the (new) dangling id already exist? Move nodes from it.
         if (alreadyDanglingStreamlineNode) {
+          const oppositeSide = opposite(side);
           for (let node of oppositeStreamlineNode) {
             alreadyDanglingStreamlineNode.addChild(node);
-            node.setParent(alreadyDanglingStreamlineNode, opposite(side));
+            node.setParent(alreadyDanglingStreamlineNode, oppositeSide);
           }
 
           const branch = oppositeStreamlineNode.parent;
