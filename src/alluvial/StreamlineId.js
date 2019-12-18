@@ -39,15 +39,19 @@ export default class StreamlineId {
     return new StreamlineId(source, target);
   }
 
-  static createId(node: LeafNode, side: Side, oppositeNode: ?LeafNode = null): Id {
-    if (!oppositeNode) {
-      return `${node.networkId}_module${node.moduleId}_group${
-        node.insignificant ? "i" : ""}${node.highlightIndex}_${sideToString(side)}`;
+  static createId(source: LeafNode, side: Side, target: ?LeafNode = null): Id {
+    if (!target) {
+      return `${
+        source.networkId}_module${source.moduleId}_group${
+        source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)
+      }`;
     }
-    return `${node.networkId}_module${node.moduleId}_group${
-      node.insignificant ? "i" : ""}${node.highlightIndex}_${sideToString(side)}--${
-      oppositeNode.networkId}}_module${oppositeNode.moduleId}_group${
-      oppositeNode.insignificant ? "i" : ""}}${oppositeNode.highlightIndex}_${sideToString(opposite(side))}`;
+    return `${
+      source.networkId}_module${source.moduleId}_group${
+      source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)}--${
+      target.networkId}_module${target.moduleId}_group${
+      target.insignificant ? "i" : ""}${target.highlightIndex}_${sideToString(opposite(side))
+    }`;
   }
 
   makeDangling(): string {
