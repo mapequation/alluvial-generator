@@ -22,6 +22,9 @@ export default class LeafNode extends AlluvialNodeBase {
   depth = LEAF_NODE;
   moduleLevel: number;
 
+  leftIndex: number = -1;
+  rightIndex: number = -1;
+
   leftParent: ?StreamlineNode;
   rightParent: ?StreamlineNode;
 
@@ -83,6 +86,18 @@ export default class LeafNode extends AlluvialNodeBase {
       this.leftParent = parent;
     } else {
       this.rightParent = parent;
+    }
+  }
+
+  getIndex(side: Side): number {
+    return side === LEFT ? this.leftIndex : this.rightIndex;
+  }
+
+  setIndex(index: number, side: Side) {
+    if (side === LEFT) {
+      this.leftIndex = index;
+    } else {
+      this.rightIndex = index;
     }
   }
 
