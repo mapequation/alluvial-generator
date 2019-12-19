@@ -47,18 +47,15 @@ export default class NetworkRoot extends AlluvialNodeBase {
     return this.modulesById.get(moduleId);
   }
 
-  getNeighbor(side: Side) {
+  getNeighbor(side: Side): ?NetworkRoot {
     const alluvialRoot = this.parent;
-    if (!alluvialRoot) return;
-    const networkIndex = alluvialRoot.children.findIndex(networkRoot => networkRoot.networkId === this.networkId);
-    if (networkIndex === -1) return;
-    const neighborNetworkIndex = networkIndex + side;
-    if (
-      neighborNetworkIndex < 0 ||
-      neighborNetworkIndex === alluvialRoot.children.length
-    )
-      return;
-    return alluvialRoot.children[neighborNetworkIndex];
+    if (alluvialRoot) {
+      const networkIndex = alluvialRoot.children.findIndex(networkRoot => networkRoot.networkId === this.networkId);
+      const neighborNetworkIndex = networkIndex + side;
+      if (networkIndex > -1 && neighborNetworkIndex > -1 && neighborNetworkIndex < alluvialRoot.children.length) {
+        return alluvialRoot.children[neighborNetworkIndex];
+      }
+    }
   }
 
   createLeafNodeMap(nodes: Iterable<LeafNode>) {
