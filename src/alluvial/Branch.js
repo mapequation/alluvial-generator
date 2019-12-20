@@ -3,7 +3,7 @@ import AlluvialNodeBase from "./AlluvialNodeBase";
 import { BRANCH } from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import type { Side } from "./Side";
-import { LEFT, RIGHT, sideToString } from "./Side";
+import { LEFT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
 
@@ -18,19 +18,7 @@ export default class Branch extends AlluvialNodeBase {
     this.side = side;
   }
 
-  static createLeft(parent: HighlightGroup): Branch {
-    return new Branch(parent, LEFT);
-  }
-
-  static createRight(parent: HighlightGroup): Branch {
-    return new Branch(parent, RIGHT);
-  }
-
   get isLeft(): boolean {
     return this.side === LEFT;
-  }
-
-  get isRight(): boolean {
-    return this.side === RIGHT;
   }
 }

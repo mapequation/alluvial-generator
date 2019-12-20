@@ -4,6 +4,7 @@ import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP } from "./Depth";
 import Module from "./Module";
+import { LEFT, RIGHT } from "./Side";
 
 
 export const NOT_HIGHLIGHTED = -1;
@@ -11,8 +12,8 @@ export const NOT_HIGHLIGHTED = -1;
 export default class HighlightGroup extends AlluvialNodeBase {
   parent: ?Module;
   children: Branch[] = [
-    Branch.createLeft(this),
-    Branch.createRight(this)
+    new Branch(this, LEFT),
+    new Branch(this, RIGHT)
   ];
   depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
