@@ -131,37 +131,27 @@ export default class LeafNode extends AlluvialNodeBase {
         const oppositeSide = opposite(side);
         oppositeNode.removeFromSide(oppositeSide);
         const oppositeId = streamlineNode.oppositeId;
-        oppositeNode.addToSide(oppositeSide, oppositeId, streamlineNode);
+        let oppositeStreamlineNode = streamlineNodesById.get(oppositeId);
+
+        if (!oppositeStreamlineNode) {
+          const oldStreamlineNode = oppositeNode.getParent(oppositeSide);
+          if (!oldStreamlineNode || !oldStreamlineNode.parent) {
+            return;
+          }
+
+          const branch = oldStreamlineNode.parent;
+          oppositeStreamlineNode = new StreamlineNode(branch, oppositeId);
+          streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
+          streamlineNode.linkTo(oppositeStreamlineNode);
+        }
+
+        oppositeStreamlineNode.addChild(oppositeNode);
+        oppositeNode.setParent(oppositeStreamlineNode, oppositeSide);
       }
 
       streamlineNode.addChild(this);
       this.setParent(streamlineNode, side);
     }
-  }
-
-  addToSide(side: Side, streamlineId: string, oppositeStreamlineNode: StreamlineNode) {
-    let streamlineNode = streamlineNodesById.get(streamlineId);
-
-    if (!streamlineNode) {
-      const oldStreamlineNode = this.getParent(side);
-      if (!oldStreamlineNode) {
-        console.warn(`Node ${this.id} has no ${sideToString(side)} parent`);
-        return;
-      }
-
-      const branch = oldStreamlineNode.parent;
-      if (!branch) {
-        console.warn(`Streamline node with id ${oldStreamlineNode.id} has no parent`);
-        return;
-      }
-
-      streamlineNode = new StreamlineNode(branch, streamlineId);
-      streamlineNodesById.set(streamlineNode.id, streamlineNode);
-      streamlineNode.linkTo(oppositeStreamlineNode);
-    }
-
-    streamlineNode.addChild(this);
-    this.setParent(streamlineNode, side);
   }
 
   remove(removeNetworkRoot: boolean = false) {
@@ -209,7 +199,7 @@ export default class LeafNode extends AlluvialNodeBase {
       return;
     }
 
-    // Do not remove node parent, it is used in addToSide later
+    // Do not remove node parent, it is used in add later
     streamlineNode.removeChild(this);
 
     if (streamlineNode.isEmpty) {
