@@ -8,9 +8,10 @@ import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
-import StreamlineId from "./StreamlineId";
 import StreamlineNode from "./StreamlineNode";
 
+
+const streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
 export default class LeafNode extends AlluvialNodeBase {
   name: string;
@@ -118,18 +119,18 @@ export default class LeafNode extends AlluvialNodeBase {
         }
       }
 
-      const streamlineId = StreamlineId.createId(this, side, oppositeNode);
-      let streamlineNode = StreamlineId.get(streamlineId);
+      const streamlineId = StreamlineNode.createId(this, side, oppositeNode);
+      let streamlineNode = streamlineNodesById.get(streamlineId);
 
       if (!streamlineNode) {
         streamlineNode = new StreamlineNode(branch, streamlineId);
-        StreamlineId.set(streamlineNode.id, streamlineNode);
+        streamlineNodesById.set(streamlineNode.id, streamlineNode);
       }
 
-      if (oppositeNode && streamlineNode.hasTarget) {
+      if (oppositeNode) {
         const oppositeSide = opposite(side);
         oppositeNode.removeFromSide(oppositeSide);
-        const oppositeId = StreamlineId.oppositeId(streamlineNode.id);
+        const oppositeId = streamlineNode.oppositeId;
         oppositeNode.addToSide(oppositeSide, oppositeId, streamlineNode);
       }
 
@@ -139,7 +140,7 @@ export default class LeafNode extends AlluvialNodeBase {
   }
 
   addToSide(side: Side, streamlineId: string, oppositeStreamlineNode: StreamlineNode) {
-    let streamlineNode = StreamlineId.get(streamlineId);
+    let streamlineNode = streamlineNodesById.get(streamlineId);
 
     if (!streamlineNode) {
       const oldStreamlineNode = this.getParent(side);
@@ -155,7 +156,7 @@ export default class LeafNode extends AlluvialNodeBase {
       }
 
       streamlineNode = new StreamlineNode(branch, streamlineId);
-      StreamlineId.set(streamlineNode.id, streamlineNode);
+      streamlineNodesById.set(streamlineNode.id, streamlineNode);
       streamlineNode.linkTo(oppositeStreamlineNode);
     }
 
@@ -218,11 +219,11 @@ export default class LeafNode extends AlluvialNodeBase {
 
       if (oppositeStreamlineNode) {
         // Delete the old id
-        StreamlineId.delete(oppositeStreamlineNode.id);
+        streamlineNodesById.delete(oppositeStreamlineNode.id);
         oppositeStreamlineNode.makeDangling();
         oppositeStreamlineNode.removeLink();
 
-        const alreadyDanglingStreamlineNode = StreamlineId.get(oppositeStreamlineNode.id);
+        const alreadyDanglingStreamlineNode = streamlineNodesById.get(oppositeStreamlineNode.id);
         // Does the (new) dangling id already exist? Move nodes from it.
         if (alreadyDanglingStreamlineNode) {
           const oppositeSide = opposite(side);
@@ -237,11 +238,11 @@ export default class LeafNode extends AlluvialNodeBase {
           }
         } else {
           // Update with the new dangling id
-          StreamlineId.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
+          streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
         }
       }
 
-      StreamlineId.delete(streamlineNode.id);
+      streamlineNodesById.delete(streamlineNode.id);
       const branch = streamlineNode.parent;
       if (branch) {
         branch.removeChild(streamlineNode);

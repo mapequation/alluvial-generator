@@ -4,8 +4,7 @@ import Branch from "./Branch";
 import { HIGHLIGHT_GROUP, STREAMLINE_NODE } from "./Depth";
 import LeafNode from "./LeafNode";
 import type { Side } from "./Side";
-import { LEFT } from "./Side";
-import StreamlineId from "./StreamlineId";
+import { LEFT, opposite, sideToString } from "./Side";
 import StreamlineLink from "./StreamlineLink";
 
 
@@ -14,14 +13,17 @@ export default class StreamlineNode extends AlluvialNodeBase {
   children: LeafNode[] = [];
   link: ?StreamlineLink = null;
   side: Side;
-  streamlineId: StreamlineId;
+  sourceId: string;
+  targetId: ?string;
   depth = STREAMLINE_NODE;
 
   constructor(parent: Branch, id: string) {
     super(parent, parent.networkId, id);
     parent.addChild(this);
     this.side = parent.side;
-    this.streamlineId = StreamlineId.fromId(id);
+    const [source, target] = id.split("--");
+    this.sourceId = source;
+    this.targetId = target;
   }
 
   addChild(node: LeafNode): number {
@@ -49,26 +51,32 @@ export default class StreamlineNode extends AlluvialNodeBase {
   }
 
   makeDangling() {
-    this.id = this.streamlineId.makeDangling();
+    this.targetId = null;
   }
 
-  get sourceId() {
-    return this.streamlineId.source;
+  static createId(source: LeafNode, side: Side, target: ?LeafNode = null): string {
+    if (!target) {
+      return `${
+        source.networkId}_module${source.moduleId}_group${
+        source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)
+      }`;
+    }
+    return `${
+      source.networkId}_module${source.moduleId}_group${
+      source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)}--${
+      target.networkId}_module${target.moduleId}_group${
+      target.insignificant ? "i" : ""}${target.highlightIndex}_${sideToString(opposite(side))
+    }`;
   }
 
-  get targetId() {
-    return this.streamlineId.target;
-  }
-
-  get hasTarget(): boolean {
-    return !!this.streamlineId.target;
+  get oppositeId(): string {
+    return `${this.targetId || "NULL"}--${this.sourceId}`
   }
 
   getOpposite(): ?StreamlineNode {
     if (this.link) {
       return this.link.left === this ? this.link.right : this.link.left;
     }
-    return null;
   }
 
   oppositeStreamlinePosition(flowThreshold: number) {
@@ -87,7 +95,7 @@ export default class StreamlineNode extends AlluvialNodeBase {
 
   linkTo(opposite: StreamlineNode) {
     const reverse = this.side === LEFT;
-    StreamlineLink.linkNodes(this, opposite, reverse);
+    this.link = opposite.link = new StreamlineLink(this, opposite, reverse);
   }
 
   removeLink() {

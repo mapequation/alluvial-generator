@@ -14,16 +14,6 @@ export default class StreamlineLink {
   ) {
     this.left = reverse ? right : left;
     this.right = reverse ? left : right;
-    left.link = this;
-    right.link = this;
-  }
-
-  static linkNodes(
-    left: StreamlineNode,
-    right: StreamlineNode,
-    reverse: boolean = false
-  ) {
-    return new StreamlineLink(left, right, reverse);
   }
 
   remove() {
@@ -58,7 +48,7 @@ export default class StreamlineLink {
     return {
       id,
       sourceId: sourceId.replace("_right", ""),
-      targetId: targetId.replace("_left", ""),
+      targetId: targetId ? targetId.replace("_left", "") : "",
       leftNetworkId,
       rightNetworkId,
       leftModuleId,
