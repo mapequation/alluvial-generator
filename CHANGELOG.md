@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/mapequation/alluvial-generator/compare/v0.4.1...v0.4.2) (2019-12-27)
+
+
+### Bug Fixes
+
+* Removed extra characters for target StreamlineNode in createId ([203cda5](https://github.com/mapequation/alluvial-generator/commit/203cda558c25a5409300f6d83115d4401ab4728f))
+* Sort streamlines as long as the opposite module is above threshold ([3af1ccd](https://github.com/mapequation/alluvial-generator/commit/3af1ccd314d5629b56d33ad85aaca9140f4de1b7))
+
 ### [0.4.1](https://github.com/mapequation/alluvial-generator/compare/v0.4.0...v0.4.1) (2019-12-16)
 
 
