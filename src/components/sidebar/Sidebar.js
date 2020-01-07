@@ -109,9 +109,10 @@ export default class Sidebar extends React.PureComponent {
               <ModuleExplorer
                 open={modalOpen}
                 onClose={() => this.setState({ modalOpen: false })}
-                module={selectedModule}
                 activeIndex={activePaneIndex}
                 setActiveIndex={activePaneIndex => this.setState({ activePaneIndex })}
+                module={selectedModule}
+                highlightColors={highlightColors}
               />
               <SelectedModule
                 module={selectedModule}

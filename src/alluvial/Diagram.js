@@ -145,6 +145,24 @@ export default class Diagram {
     this.dirty = true;
   }
 
+  setNodesColors(highlightedNodes: Array<any>) {
+    for (let file of highlightedNodes) {
+      const nodes = new Set();
+
+      for (let networkRoot of this.alluvialRoot) {
+        for (let id of file.content) {
+          const leafNode = networkRoot.getLeafNode(id);
+
+          if (leafNode && !nodes.has(leafNode)) {
+            leafNode.highlightIndex = file.highlightIndex;
+            leafNode.update();
+            nodes.add(leafNode);
+          }
+        }
+      }
+    }
+  }
+
   getVisibleModules(): { [key: string]: Array<string> } {
     const networkRoots = this.alluvialRoot.children;
 
@@ -187,5 +205,4 @@ export default class Diagram {
     }
     return this._asObject;
   }
-
 }

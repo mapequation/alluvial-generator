@@ -159,6 +159,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       colorChangeAllBit,
       autoPaintBit,
       removeColorsBit,
+      highlightNodesBit,
+      highlightedNodes,
       expandBit,
       regroupBit,
       saveDiagramBit,
@@ -202,6 +204,10 @@ export default class AlluvialDiagram extends React.PureComponent {
 
     if (clearFiltersBit !== prev.clearFiltersBit) {
       this.diagram.clearFilters();
+    }
+
+    if (highlightNodesBit !== prev.highlightNodesBit) {
+      this.diagram.setNodesColors(highlightedNodes);
     }
 
     if (this.shouldUpdateLayout(prev)) {
@@ -249,6 +255,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       colorChangeAllBit,
       autoPaintBit,
       removeColorsBit,
+      highlightNodesBit,
       expandBit,
       regroupBit,
       moduleSize,
@@ -265,7 +272,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     const verticalAlignChanged = verticalAlign !== prev.verticalAlign;
     const colorChanged =
       colorChangeBit !== prev.colorChangeBit || colorChangeAllBit !== prev.colorChangeAllBit ||
-      autoPaintBit !== prev.autoPaintBit || removeColorsBit !== prev.removeColorsBit;
+      autoPaintBit !== prev.autoPaintBit || removeColorsBit !== prev.removeColorsBit ||
+      highlightNodesBit !== prev.highlightNodesBit;
     const expanded = expandBit !== prev.expandBit;
     const regrouped = regroupBit !== prev.regroupBit;
     const moduleSizeChanged = moduleSize !== prev.moduleSize;

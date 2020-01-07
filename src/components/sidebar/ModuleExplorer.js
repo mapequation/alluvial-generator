@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Button, Header, Portal, Segment, Tab } from "semantic-ui-react";
+import HighlightNodes from "./HighlightNodes";
 import InfoTable from "./InfoTable";
 
 
@@ -9,14 +10,13 @@ export default class ModuleExplorer extends React.PureComponent {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     setActiveIndex: PropTypes.func.isRequired,
-    activeIndex: PropTypes.number.isRequired,
-    module: PropTypes.object.isRequired,
+    activeIndex: PropTypes.number.isRequired
   };
 
   handleTabChange = (e, { activeIndex }) => this.props.setActiveIndex(activeIndex);
 
   render() {
-    const { open, onClose, module, activeIndex } = this.props;
+    const { open, onClose, module, activeIndex, highlightColors } = this.props;
 
     const styles = {
       segment: {
@@ -32,6 +32,10 @@ export default class ModuleExplorer extends React.PureComponent {
 
     const panes = [
       { menuItem: "Info", render: () => <Tab.Pane><InfoTable module={module}/></Tab.Pane> },
+      {
+        menuItem: "Highlight Nodes",
+        render: () => <Tab.Pane><HighlightNodes highlightColors={highlightColors}/></Tab.Pane>
+      }
     ];
 
     return <Portal open={open} onClose={onClose} closeOnDocumentClick={false}>
