@@ -6,7 +6,11 @@ import InfoTable from "./InfoTable";
 
 export default class ModuleExplorer extends React.PureComponent {
   static propTypes = {
-    setActiveIndex: PropTypes.func.isRequired
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    setActiveIndex: PropTypes.func.isRequired,
+    activeIndex: PropTypes.number.isRequired,
+    module: PropTypes.object.isRequired,
   };
 
   handleTabChange = (e, { activeIndex }) => this.props.setActiveIndex(activeIndex);
