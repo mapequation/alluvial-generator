@@ -10,15 +10,20 @@ const selectable = { selectable: true, style: { padding: "0 8px" } };
 export default class InfoTable extends React.PureComponent {
   static contextType = Dispatch;
 
-  createHandlePropChange = (prop, setProp) => (e, { value }) => {
+  handleNameChange = (e, { value }) => {
     if (!this.props.module) return;
-    this.props.module[prop] = value;
-    setProp(value);
+    this.props.module.name = value;
+    this.setState({ name: value });
     this.context.dispatch({ type: "changeName" });
   };
 
-  handleNameChange = this.createHandlePropChange("name", name => this.setState({ name }));
-  handleNetworkNameChange = this.createHandlePropChange("networkName", networkName => this.setState({ networkName }));
+  handleNetworkNameChange = (e, { value }) => {
+    if (!this.props.module) return;
+    this.props.module.networkName = value;
+    this.setState({ networkName: value });
+    this.context.dispatch({ type: "changeName" });
+  };
+
   clearName = () => this.handleNameChange(null, { value: "" });
   clearNetworkName = () => this.handleNetworkNameChange(null, { value: "" });
 
