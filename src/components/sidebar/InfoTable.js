@@ -68,7 +68,7 @@ export default class InfoTable extends React.PureComponent {
             <Input
               fluid
               transparent
-              value={networkName}
+              value={networkName || ""}
               placeholder="Set network name..."
               onChange={this.handleNetworkNameChange}
               icon={networkName && <Icon link name="x" onClick={this.clearNetworkName}/>}
@@ -103,7 +103,7 @@ export default class InfoTable extends React.PureComponent {
             <Input
               fluid
               transparent
-              value={name}
+              value={name || ""}
               placeholder="Set module name..."
               onChange={this.handleNameChange}
               icon={name && <Icon link name="x" onClick={this.clearName}/>}
