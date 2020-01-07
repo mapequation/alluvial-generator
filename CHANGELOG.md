@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.3](https://github.com/mapequation/alluvial-generator/compare/v0.4.2...v0.4.3) (2020-01-07)
+
+
+### Features
+
+* Simple way to highlight individual nodes ([56e4778](https://github.com/mapequation/alluvial-generator/commit/56e47782d65c2d495adb0e30cb14ea1c4eba2d3b))
+
+
+### Bug Fixes
+
+* Selected module info table inputs should never be null. ([12c13ab](https://github.com/mapequation/alluvial-generator/commit/12c13ab4b1dd367cbb4014a3f5264173fe5d3179))
+
 ### [0.4.2](https://github.com/mapequation/alluvial-generator/compare/v0.4.1...v0.4.2) (2019-12-27)
 
 
