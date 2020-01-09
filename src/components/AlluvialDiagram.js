@@ -500,7 +500,7 @@ export default class AlluvialDiagram extends React.PureComponent {
       }
     })(this);
 
-    streamlines
+    let streamlinesEnter = streamlines
       .enter()
       .append("path")
       .attr("class", "streamline")
@@ -515,11 +515,18 @@ export default class AlluvialDiagram extends React.PureComponent {
       .attr("vector-effect", "non-scaling-stroke")
       .attr("paint-order", "stroke")
       .call(makeTransparent)
-      .call(setStreamlineTransitionPath)
+      .call(setStreamlineTransitionPath);
+
+    streamlinesEnter
       .transition(t)
       .delay(streamlineDelay(1.5 * delay))
       .call(setOpacity, streamlineOpacity)
       .call(setStreamlinePath);
+
+    streamlinesEnter
+      .merge(streamlines)
+      .sort((a, b) =>
+        a.highlightIndex !== b.highlightIndex ? a.highlightIndex - b.highlightIndex : b.avgHeight - a.avgHeight);
 
     /**
      * Modules

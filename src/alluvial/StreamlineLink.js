@@ -73,6 +73,7 @@ export default class StreamlineLink {
       },
       leftHighlightIndex,
       rightHighlightIndex,
+      highlightIndex: Math.max(leftHighlightIndex, rightHighlightIndex),
       leftInsignificant,
       rightInsignificant
     };
