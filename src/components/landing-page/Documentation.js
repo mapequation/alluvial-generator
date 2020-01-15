@@ -58,9 +58,7 @@ const Documentation = () =>
         <p>
           All modules with the same parent will be re-grouped into the parent module.
         </p>
-      </Grid.Column>
-      <Grid.Column>
-        <Changelog/>
+
         <Header as="h1">Feedback</Header>
         <p>
           If you have any questions, suggestions or issues regarding the software, please add them to <a
@@ -93,6 +91,9 @@ const Documentation = () =>
           Read more about Infomap output formats on the <a href="https://www.mapequation.org/code.html#Output">Infomap
           documentation page</a>.
         </p>
+      </Grid.Column>
+      <Grid.Column>
+        <Changelog/>
       </Grid.Column>
     </Grid>
   </Container>;
