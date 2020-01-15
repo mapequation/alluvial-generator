@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.4](https://github.com/mapequation/alluvial-generator/compare/v0.4.3...v0.4.4) (2020-01-15)
+
+
+### Features
+
+* Display highlighted streamlines on top ([0e42d28](https://github.com/mapequation/alluvial-generator/commit/0e42d287c7fb3bff166313214fcd9672bdcf4fba))
+
+
+### Bug Fixes
+
+* Add core-js for supporting older browsers ([ae9c4db](https://github.com/mapequation/alluvial-generator/commit/ae9c4db7a0da412de21b0483f3a35aa9d09559de))
+
 ### [0.4.3](https://github.com/mapequation/alluvial-generator/compare/v0.4.2...v0.4.3) (2020-01-07)
 
 
