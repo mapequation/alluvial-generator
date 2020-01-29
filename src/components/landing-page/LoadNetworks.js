@@ -2,7 +2,7 @@ import { getParserForExtension } from "@mapequation/infoparse";
 import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
-import { Checkbox, Container, Divider, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
+import { Checkbox, Container, Divider, Form, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
 import Background from "../../images/background.svg";
 
 import { acceptedFormats, getParser, isValidExtension } from "../../io/object-parser";
@@ -37,7 +37,7 @@ export default class LoadNetworks extends React.Component {
   state = {
     files: [],
     loading: false,
-    useNodeIds: false,
+    nodeIdentifier: "name",
     animateUseNodeIds: true
   };
 
@@ -49,7 +49,7 @@ export default class LoadNetworks extends React.Component {
     onSubmit: values => console.log(values)
   };
 
-  onUseNodeIdsChange = () => this.setState(prevState => ({ useNodeIds: !prevState.useNodeIds }));
+  onNodeIdentifierChange = (e, { value }) => this.setState({ nodeIdentifier: value });
 
   animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
 
@@ -114,7 +114,7 @@ export default class LoadNetworks extends React.Component {
   };
 
   parseNetworks = () => {
-    const { files, useNodeIds } = this.state;
+    const { files, nodeIdentifier } = this.state;
     const { onSubmit } = this.props;
 
     const hasJson = files.some(file => file.format === "json");
@@ -143,14 +143,14 @@ export default class LoadNetworks extends React.Component {
         const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
         const object = parser(lines, parseLinks);
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name, useNodeIds ? "id" : "name", file.multiplex);
+        const parsed = objectParser(object, file.name, nodeIdentifier, file.multiplex);
 
         // if we found an error before, and switched to using node ids now, we need to reset any errors
         file.error = false;
         file.errorMessage = null;
 
         // names must be unique
-        if (!useNodeIds) {
+        if (nodeIdentifier === "name") {
           const uniqueNames = new Set();
           parsed.nodes.forEach(node => {
             if (uniqueNames.has(node.name)) {
@@ -215,7 +215,7 @@ export default class LoadNetworks extends React.Component {
     });
 
   render() {
-    const { files, loading, useNodeIds, animateUseNodeIds } = this.state;
+    const { files, loading, nodeIdentifier, animateUseNodeIds } = this.state;
 
     const background = {
       padding: "100px 0 100px 0",
@@ -284,18 +284,42 @@ export default class LoadNetworks extends React.Component {
             duration={5000}
             visible={animateUseNodeIds}
           >
-            <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
+            <Form>
+              <Form.Field>
+                Node identifier
+                <Popup trigger={<Icon name="question"/>} inverted>
+                  <p>
+                    Two nodes in different networks are considered equal if their names are the same.
+                    For this to work, all nodes in a network must have unique names.
+                  </p>
+                  <p>
+                    If a network does not have unique names, you can try to use node ids as identifiers,
+                    which uses the node ids to determine if two nodes are equal.
+                  </p>
+                </Popup>
+              </Form.Field>
+              <Form.Field>
+                <Checkbox
+                  radio
+                  label="Node name"
+                  name="nodeIdentifier"
+                  value="name"
+                  checked={nodeIdentifier === "name"}
+                  onChange={this.onNodeIdentifierChange}
+                />
+              </Form.Field>
+              <Form.Field>
+                <Checkbox
+                  radio
+                  label="Node id"
+                  name="nodeIdentifier"
+                  value="id"
+                  checked={nodeIdentifier === "id"}
+                  onChange={this.onNodeIdentifierChange}
+                />
+              </Form.Field>
+            </Form>
           </Transition>
-          <Popup trigger={<Icon name="question"/>} inverted>
-            <p>
-              Two nodes in different networks are considered equal if their names are the same.
-              For this to work, all nodes in a network must have unique names.
-            </p>
-            <p>
-              If a network does not have unique names, you can try to use node ids as identifiers,
-              which uses the node ids to determine if two nodes are equal.
-            </p>
-          </Popup>
 
           {files.length > 0 &&
           <Table celled unstackable striped size="small">
