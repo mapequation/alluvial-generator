@@ -48,7 +48,12 @@ export default function SelectedModule(props) {
 
   const paintNodes = () => {
     module.highlightIndex = highlightIndex;
-    dispatch({ type: "changeAllColor" });
+    dispatch({ type: "changeNodesColor" });
+  };
+
+  const paintModuleIds = () => {
+    module.highlightIndex = highlightIndex;
+    dispatch({ type: "changeModuleIdsColor" });
   };
 
   const [buttonsEnabled, setButtonsEnabled] = useState(true);
@@ -113,6 +118,9 @@ export default function SelectedModule(props) {
       <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
         <Button content="Paint module" onClick={paintModule}/>
         <Button content="Paint nodes in all networks" onClick={paintNodes}/>
+      </Button.Group>
+      <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
+        <Button content="Paint matching module ids in all networks" onClick={paintModuleIds}/>
       </Button.Group>
     </>
   );

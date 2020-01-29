@@ -46,8 +46,10 @@ function reducer(state, action) {
       return { ...state, nameChangeBit: flip(state.nameChangeBit) };
     case "changeColor":
       return { ...state, colorChangeBit: flip(state.colorChangeBit) };
-    case "changeAllColor":
-      return { ...state, colorChangeAllBit: flip(state.colorChangeAllBit) };
+    case "changeNodesColor":
+      return { ...state, colorChangeNodesBit: flip(state.colorChangeNodesBit) };
+    case "changeModuleIdsColor":
+      return { ...state, colorChangeModuleIdsBit: flip(state.colorChangeModuleIdsBit) };
     case "autoPaint":
       return { ...state, autoPaintBit: flip(state.autoPaintBit) };
     case "removeColors":
@@ -98,7 +100,8 @@ export default function Layout(props) {
     selectedModule: null,
     nameChangeBit: 0,
     colorChangeBit: 0,
-    colorChangeAllBit: 0,
+    colorChangeNodesBit: 0,
+    colorChangeModuleIdsBit: 0,
     autoPaintBit: 0,
     removeColorsBit: 0,
     highlightNodesBit: 0,
@@ -149,7 +152,8 @@ export default function Layout(props) {
     clearFiltersBit: state.clearFiltersBit,
     nameChangeBit: state.nameChangeBit,
     colorChangeBit: state.colorChangeBit,
-    colorChangeAllBit: state.colorChangeAllBit,
+    colorChangeNodesBit: state.colorChangeNodesBit,
+    colorChangeModuleIdsBit: state.colorChangeModuleIdsBit,
     autoPaintBit: state.autoPaintBit,
     removeColorsBit: state.removeColorsBit,
     highlightNodesBit: state.highlightNodesBit,

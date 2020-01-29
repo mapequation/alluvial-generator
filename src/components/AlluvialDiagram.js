@@ -89,7 +89,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     moduleFlowThreshold: PropTypes.number.isRequired,
     nameChangeBit: PropTypes.number.isRequired,
     colorChangeBit: PropTypes.number.isRequired,
-    colorChangeAllBit: PropTypes.number.isRequired,
+    colorChangeNodesBit: PropTypes.number.isRequired,
+    colorChangeModuleIdsBit: PropTypes.number.isRequired,
     autoPaintBit: PropTypes.number.isRequired,
     removeColorsBit: PropTypes.number.isRequired,
     saveDiagramBit: PropTypes.number.isRequired,
@@ -156,7 +157,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       selectedModule,
       nameChangeBit,
       colorChangeBit,
-      colorChangeAllBit,
+      colorChangeNodesBit,
+      colorChangeModuleIdsBit,
       autoPaintBit,
       removeColorsBit,
       highlightNodesBit,
@@ -180,8 +182,11 @@ export default class AlluvialDiagram extends React.PureComponent {
       if (colorChangeBit !== prev.colorChangeBit) {
         this.diagram.setModuleColor(selectedModule);
       }
-      if (colorChangeAllBit !== prev.colorChangeAllBit) {
+      if (colorChangeNodesBit !== prev.colorChangeNodesBit) {
         this.diagram.setModuleColor(selectedModule, true);
+      }
+      if (colorChangeModuleIdsBit !== prev.colorChangeModuleIdsBit) {
+        this.diagram.setModuleColor(selectedModule, false, true);
       }
       if (expandBit !== prev.expandBit) {
         this.diagram.doubleClick(selectedModule);
@@ -252,7 +257,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       moduleFlowThreshold,
       verticalAlign,
       colorChangeBit,
-      colorChangeAllBit,
+      colorChangeNodesBit,
+      colorChangeModuleIdsBit,
       autoPaintBit,
       removeColorsBit,
       highlightNodesBit,
@@ -271,7 +277,8 @@ export default class AlluvialDiagram extends React.PureComponent {
     const moduleFlowThresholdChanged = moduleFlowThreshold !== prev.moduleFlowThreshold;
     const verticalAlignChanged = verticalAlign !== prev.verticalAlign;
     const colorChanged =
-      colorChangeBit !== prev.colorChangeBit || colorChangeAllBit !== prev.colorChangeAllBit ||
+      colorChangeBit !== prev.colorChangeBit || colorChangeNodesBit !== prev.colorChangeNodesBit ||
+      colorChangeModuleIdsBit !== prev.colorChangeModuleIdsBit ||
       autoPaintBit !== prev.autoPaintBit || removeColorsBit !== prev.removeColorsBit ||
       highlightNodesBit !== prev.highlightNodesBit;
     const expanded = expandBit !== prev.expandBit;

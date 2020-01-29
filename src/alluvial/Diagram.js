@@ -61,7 +61,9 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setModuleColor(alluvialObject: Object, allNetworks: boolean = false) {
+  setModuleColor(alluvialObject: Object,
+                 paintNodesInAllNetworks: boolean = false,
+                 paintModuleIdsInAllNetworks: boolean = false) {
     const { highlightIndex, networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
@@ -74,7 +76,7 @@ export default class Diagram {
       node.update();
     });
 
-    if (allNetworks) {
+    if (paintNodesInAllNetworks) {
       this.alluvialRoot.children
         .filter(root => root.networkId !== networkId)
         .forEach(networkRoot =>
@@ -88,6 +90,15 @@ export default class Diagram {
               return nodes;
             }, [])
             .forEach(node => node.update()));
+    } else if (paintModuleIdsInAllNetworks) {
+      this.alluvialRoot.children
+        .filter(root => root.networkId !== networkId)
+        .forEach(networkRoot => {
+          const oppositeModule = networkRoot.getModule(moduleId);
+          if (oppositeModule) {
+            this.setModuleColor({ ...oppositeModule.asObject(), highlightIndex });
+          }
+        });
     }
 
     this.dirty = true;
