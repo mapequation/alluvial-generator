@@ -24,7 +24,7 @@ const Documentation = () =>
           in a network <i>must have unique names</i>.
         </p>
         <p>
-          If your network <i>does not have unique names</i>, you can try the option "Use node ids as identifiers",
+          If a network <i>does not have unique names</i>, you can try the option "Use node ids as identifiers",
           which uses the node ids to determine if two nodes are equal.
         </p>
 

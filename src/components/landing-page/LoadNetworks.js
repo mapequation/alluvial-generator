@@ -286,6 +286,16 @@ export default class LoadNetworks extends React.Component {
           >
             <Checkbox label="Use node ids as identifiers" checked={useNodeIds} onChange={this.onUseNodeIdsChange}/>
           </Transition>
+          <Popup trigger={<Icon name="question"/>} inverted>
+            <p>
+              Two nodes in different networks are considered equal if their names are the same.
+              For this to work, all nodes in a network must have unique names.
+            </p>
+            <p>
+              If a network does not have unique names, you can try to use node ids as identifiers,
+              which uses the node ids to determine if two nodes are equal.
+            </p>
+          </Popup>
 
           {files.length > 0 &&
           <Table celled unstackable striped size="small">
