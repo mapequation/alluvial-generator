@@ -50,8 +50,10 @@ function reducer(state, action) {
       return { ...state, colorChangeNodesBit: flip(state.colorChangeNodesBit) };
     case "changeModuleIdsColor":
       return { ...state, colorChangeModuleIdsBit: flip(state.colorChangeModuleIdsBit) };
-    case "autoPaint":
-      return { ...state, autoPaintBit: flip(state.autoPaintBit) };
+    case "autoPaintNodes":
+      return { ...state, autoPaintNodesBit: flip(state.autoPaintNodesBit) };
+    case "autoPaintModuleIds":
+      return { ...state, autoPaintModuleIdsBit: flip(state.autoPaintModuleIdsBit) };
     case "removeColors":
       return { ...state, removeColorsBit: flip(state.removeColorsBit) };
     case "highlightNodes":
@@ -102,7 +104,8 @@ export default function Layout(props) {
     colorChangeBit: 0,
     colorChangeNodesBit: 0,
     colorChangeModuleIdsBit: 0,
-    autoPaintBit: 0,
+    autoPaintNodesBit: 0,
+    autoPaintModuleIdsBit: 0,
     removeColorsBit: 0,
     highlightNodesBit: 0,
     highlightedNodes: [],
@@ -154,7 +157,8 @@ export default function Layout(props) {
     colorChangeBit: state.colorChangeBit,
     colorChangeNodesBit: state.colorChangeNodesBit,
     colorChangeModuleIdsBit: state.colorChangeModuleIdsBit,
-    autoPaintBit: state.autoPaintBit,
+    autoPaintNodesBit: state.autoPaintNodesBit,
+    autoPaintModuleIdsBit: state.autoPaintModuleIdsBit,
     removeColorsBit: state.removeColorsBit,
     highlightNodesBit: state.highlightNodesBit,
     highlightedNodes: state.highlightedNodes,

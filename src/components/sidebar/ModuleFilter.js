@@ -46,7 +46,7 @@ export default class ModuleFilter extends React.PureComponent {
           value={moduleIdsForNetwork(selectedNetworkId)}
           onChange={(e, { value }) => setModuleIdsForNetwork(selectedNetworkId)(value)}
         />
-        <Button.Group style={{ margin: "4px 0 0 0 " }}{...buttonProps}>
+        <Button.Group style={{ margin: "4px 0 0 0 " }} {...buttonProps}>
           <Button
             type="submit"
             onClick={() => dispatch({ type: "changeVisibleModules", value: moduleIds })}
@@ -55,7 +55,7 @@ export default class ModuleFilter extends React.PureComponent {
         </Button.Group>
       </Form>
       }
-      <Button.Group style={{ margin: "4px 0 0 0 " }}{...buttonProps}>
+      <Button.Group negative style={{ margin: "4px 0 0 0 " }} {...buttonProps}>
         <Button
           onClick={clearFilter}
           icon

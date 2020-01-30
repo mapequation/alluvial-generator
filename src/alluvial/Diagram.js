@@ -106,8 +106,17 @@ export default class Diagram {
 
   autoPaint(
     alluvialObject: ?Object = null,
+    paintNodesInAllNetworks: boolean = true,
+    paintModuleIdsInAllNetworks: boolean = false,
     highlightIndices: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   ) {
+    if (paintNodesInAllNetworks && paintModuleIdsInAllNetworks) {
+      console.warn("Cannot use paintNodesInAllNetworks and paintModuleIdsInAllNetworks together");
+      return;
+    }
+
+    this.removeColors();
+
     const networkId = alluvialObject ? alluvialObject.networkId : this.alluvialRoot.children[0].networkId;
 
     if (!networkId) {
@@ -133,7 +142,7 @@ export default class Diagram {
         this.setModuleColor({
           ...module.asObject(),
           highlightIndex: highlightIndices[i % highlightIndices.length]
-        }, true));
+        }, paintNodesInAllNetworks, paintModuleIdsInAllNetworks));
   }
 
   removeColors() {

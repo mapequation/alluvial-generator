@@ -91,7 +91,7 @@ export default class AlluvialDiagram extends React.PureComponent {
     colorChangeBit: PropTypes.number.isRequired,
     colorChangeNodesBit: PropTypes.number.isRequired,
     colorChangeModuleIdsBit: PropTypes.number.isRequired,
-    autoPaintBit: PropTypes.number.isRequired,
+    autoPaintNodesBit: PropTypes.number.isRequired,
     removeColorsBit: PropTypes.number.isRequired,
     saveDiagramBit: PropTypes.number.isRequired,
     selectedModule: PropTypes.object,
@@ -159,7 +159,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       colorChangeBit,
       colorChangeNodesBit,
       colorChangeModuleIdsBit,
-      autoPaintBit,
+      autoPaintNodesBit,
+      autoPaintModuleIdsBit,
       removeColorsBit,
       highlightNodesBit,
       highlightedNodes,
@@ -195,8 +196,12 @@ export default class AlluvialDiagram extends React.PureComponent {
       }
     }
 
-    if (autoPaintBit !== prev.autoPaintBit) {
-      this.diagram.autoPaint(selectedModule);
+    if (autoPaintNodesBit !== prev.autoPaintNodesBit) {
+      this.diagram.autoPaint(selectedModule, true);
+    }
+
+    if (autoPaintModuleIdsBit !== prev.autoPaintModuleIdsBit) {
+      this.diagram.autoPaint(selectedModule, false, true);
     }
 
     if (removeColorsBit !== prev.removeColorsBit) {
@@ -259,7 +264,8 @@ export default class AlluvialDiagram extends React.PureComponent {
       colorChangeBit,
       colorChangeNodesBit,
       colorChangeModuleIdsBit,
-      autoPaintBit,
+      autoPaintNodesBit,
+      autoPaintModuleIdsBit,
       removeColorsBit,
       highlightNodesBit,
       expandBit,
@@ -270,36 +276,27 @@ export default class AlluvialDiagram extends React.PureComponent {
       clearFiltersBit
     } = this.props;
 
-    const heightChanged = height !== prev.height;
-    const marginExponentChanged = marginExponent !== prev.marginExponent;
-    const streamlineFractionChanged = streamlineFraction !== prev.streamlineFraction;
-    const moduleWidthChanged = moduleWidth !== prev.moduleWidth;
-    const moduleFlowThresholdChanged = moduleFlowThreshold !== prev.moduleFlowThreshold;
-    const verticalAlignChanged = verticalAlign !== prev.verticalAlign;
+    const layoutChanged =
+      height !== prev.height || marginExponent !== prev.marginExponent ||
+      streamlineFraction !== prev.streamlineFraction || moduleWidth !== prev.moduleWidth ||
+      moduleFlowThreshold !== prev.moduleFlowThreshold || verticalAlign !== prev.verticalAlign ||
+      moduleSize !== prev.moduleSize || sortModulesBy !== prev.sortModulesBy;
     const colorChanged =
       colorChangeBit !== prev.colorChangeBit || colorChangeNodesBit !== prev.colorChangeNodesBit ||
       colorChangeModuleIdsBit !== prev.colorChangeModuleIdsBit ||
-      autoPaintBit !== prev.autoPaintBit || removeColorsBit !== prev.removeColorsBit ||
+      autoPaintNodesBit !== prev.autoPaintNodesBit || autoPaintModuleIdsBit !== prev.autoPaintModuleIdsBit ||
+      removeColorsBit !== prev.removeColorsBit ||
       highlightNodesBit !== prev.highlightNodesBit;
     const expanded = expandBit !== prev.expandBit;
     const regrouped = regroupBit !== prev.regroupBit;
-    const moduleSizeChanged = moduleSize !== prev.moduleSize;
-    const moduleOrderChanged = sortModulesBy !== prev.sortModulesBy;
     const visibleModulesChanged = modulesVisibleInFilter !== prev.modulesVisibleInFilter;
     const clearFilterChanged = clearFiltersBit !== prev.clearFiltersBit;
 
     return (
-      heightChanged ||
-      marginExponentChanged ||
-      streamlineFractionChanged ||
-      moduleWidthChanged ||
-      moduleFlowThresholdChanged ||
-      verticalAlignChanged ||
+      layoutChanged ||
       colorChanged ||
       expanded ||
       regrouped ||
-      moduleSizeChanged ||
-      moduleOrderChanged ||
       visibleModulesChanged ||
       clearFilterChanged
     );

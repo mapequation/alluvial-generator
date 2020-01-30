@@ -136,7 +136,8 @@ export default class Sidebar extends React.PureComponent {
         </Menu.Item>
         <Menu.Item>
           <PaintNetworks
-            onAutoPaintClick={() => dispatch({ type: "autoPaint" })}
+            onAutoPaintNodesClick={() => dispatch({ type: "autoPaintNodes" })}
+            onAutoPaintModuleIdsClick={() => dispatch({ type: "autoPaintModuleIds" })}
             onRemoveColorsClick={() => dispatch({ type: "removeColors" })}
           />
         </Menu.Item>
