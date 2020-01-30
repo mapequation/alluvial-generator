@@ -65,7 +65,13 @@
     "build": "node scripts/build.js",
     "flow": "$(npm bin)/flow",
     "test": "node scripts/test.js --env=jsdom",
+    "release": "standard-version",
     "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial"
+  },
+  "standard-version": {
+    "scripts": {
+      "postbump": "./sentry-release.sh"
+    }
   },
   "jest": {
     "collectCoverageFrom": [
