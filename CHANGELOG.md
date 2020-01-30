@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.6](https://github.com/mapequation/alluvial-generator/compare/v0.4.5...v0.4.6) (2020-01-30)
+
+
+### Features
+
+* Support auto painting all networks by module ids ([065aa7d](https://github.com/mapequation/alluvial-generator/commit/065aa7d9f4782c4b829b059fb3ea3a7eaf2677f0))
+
 ### [0.4.5](https://github.com/mapequation/alluvial-generator/compare/v0.4.4...v0.4.5) (2020-01-30)
 
 
