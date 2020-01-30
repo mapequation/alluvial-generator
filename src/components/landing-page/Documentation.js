@@ -22,6 +22,9 @@ const Documentation = () =>
           modules in the same network.
         </p>
 
+        <Header>Step by step explanation</Header>
+        <img src={compareSvg} alt="Comparing nodes across networks" width={550}/>
+
         <Header>Limitations</Header>
         <p>
           Two nodes in different networks are considered equal if their names are the same. For this to work, all nodes
@@ -31,7 +34,6 @@ const Documentation = () =>
           If a network <i>does not have unique names</i>, you can try the option "Use node ids as identifiers",
           which uses the node ids to determine if two nodes are equal.
         </p>
-        <img src={compareSvg} alt="Comparing nodes across networks" width={500}/>
         <p>
           Currently, we cannot compare state networks, except for the simple case when it is just the same network with
           different Infomap options. This feature is under development!
@@ -67,7 +69,8 @@ const Documentation = () =>
         <p>
           All modules with the same parent will be re-grouped into the parent module.
         </p>
-
+      </Grid.Column>
+      <Grid.Column>
         <Header as="h1">Supported formats</Header>
         <p>
           Currently, we support networks clustered by <a
@@ -111,8 +114,7 @@ const Documentation = () =>
           D. Edler, A. Eriksson and M. Rosvall, The MapEquation software package,
           available online at <a href="https://www.mapequation.org">mapequation.org</a>.
         </p>
-      </Grid.Column>
-      <Grid.Column>
+
         <Changelog/>
       </Grid.Column>
     </Grid>
