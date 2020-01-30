@@ -53,10 +53,10 @@ export default class LoadNetworks extends React.Component {
 
   animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
 
-  setMultiplex = (i) => this.setState(prevState => {
+  setMultilayer = (i) => this.setState(prevState => {
     const file = prevState.files[i];
     if (!file) return;
-    file.multiplex = !file.multiplex;
+    file.multilayer = !file.multilayer;
     return { files: prevState.files };
   });
 
@@ -85,7 +85,7 @@ export default class LoadNetworks extends React.Component {
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
-          multiplex: false,
+          multilayer: false,
           error: false,
           errorMessage: null
         }));
@@ -143,7 +143,7 @@ export default class LoadNetworks extends React.Component {
         const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
         const object = parser(lines, parseLinks);
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name, nodeIdentifier, file.multiplex);
+        const parsed = objectParser(object, file.name, nodeIdentifier, file.multilayer);
 
         // if we found an error before, and switched to using node ids now, we need to reset any errors
         file.error = false;
@@ -328,7 +328,7 @@ export default class LoadNetworks extends React.Component {
                 <Table.HeaderCell>Name</Table.HeaderCell>
                 <Table.HeaderCell>Size</Table.HeaderCell>
                 <Table.HeaderCell>Format</Table.HeaderCell>
-                <Table.HeaderCell>Multiplex</Table.HeaderCell>
+                <Table.HeaderCell>Multilayer</Table.HeaderCell>
                 <Table.HeaderCell/>
               </Table.Row>
             </Table.Header>
@@ -356,7 +356,7 @@ export default class LoadNetworks extends React.Component {
                     <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                     <Table.Cell>{file.format}</Table.Cell>
                     <Table.Cell>
-                      <Checkbox checked={file.multiplex} onChange={() => this.setMultiplex(i)}/>
+                      <Checkbox checked={file.multilayer} onChange={() => this.setMultilayer(i)}/>
                     </Table.Cell>
                     <Table.Cell
                       selectable
