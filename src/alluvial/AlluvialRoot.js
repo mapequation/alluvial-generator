@@ -24,9 +24,9 @@ const differenceIndex = (array1, array2) => {
 
 type GetNodeSize = (node: AlluvialNode) => number;
 
-const getNodeSizeByPropForNetwork = ({ numLeafNodes }: NetworkRoot) => (property: string): GetNodeSize => {
+const getNodeSizeByPropForNetwork = ({ numLeafNodes }: NetworkRoot, maxFlow: number) => (property: string): GetNodeSize => {
   if (property === "flow") {
-    return (node: AlluvialNode) => node.flow;
+    return (node: AlluvialNode) => node.flow / maxFlow;
   } else if (property === "nodes") {
     return (node: AlluvialNode) => node.numLeafNodes / numLeafNodes;
   }
@@ -227,6 +227,8 @@ export default class AlluvialRoot extends AlluvialNodeBase {
     let x = 0;
     let y = height;
 
+    const maxNetworkFlow = Math.max(...this.children.map(network => network.flow));
+
     const totalMargins = new Array(numNetworks).fill(0);
     const visibleFlows = new Array(numNetworks).fill(0);
     const visibleModules = new Array(numNetworks).fill(0);
@@ -247,7 +249,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
         node.depth === Depth.HIGHLIGHT_GROUP,
       (node, i, nodes) => {
         if (node.depth === Depth.NETWORK_ROOT) {
-          const getNodeSizeByProp = getNodeSizeByPropForNetwork(node);
+          const getNodeSizeByProp = getNodeSizeByPropForNetwork(node, maxNetworkFlow);
           getNodeSize = getNodeSizeByProp(moduleSize);
           node.flowThreshold = flowThreshold;
           networkIndex = i;
@@ -371,7 +373,7 @@ export default class AlluvialRoot extends AlluvialNodeBase {
               console.error("Streamline node has no NetworkRoot parent");
               return;
             }
-            getNodeSize = getNodeSizeByPropForNetwork(network)(moduleSize);
+            getNodeSize = getNodeSizeByPropForNetwork(network, maxNetworkFlow)(moduleSize);
           }
           const nodeHeight = getNodeSize(node) * usableHeight;
           y -= nodeHeight;
