@@ -65,10 +65,16 @@ export default class LoadNetworks extends React.Component {
 
   animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
 
-  setMultilayer = (i) => this.setState(prevState => {
+  toggleMultilayer = (i) => this.setState(prevState => {
     const file = prevState.files[i];
     if (!file) return;
     file.multilayer = !file.multilayer;
+
+    // Switch to using id as node identifier if only one file set to multilayer
+    if (i === 0 && prevState.files.length === 1 && file.multilayer) {
+      return { files: prevState.files, nodeIdentifier: "id" };
+    }
+
     return { files: prevState.files };
   });
 
@@ -125,13 +131,15 @@ export default class LoadNetworks extends React.Component {
     return json;
   };
 
-  parseNetworks = () => {
+  createDiagram = () => {
     const { files, nodeIdentifier } = this.state;
     const { onSubmit } = this.props;
 
     const hasJson = files.some(file => file.format === "json");
 
     if (hasJson) {
+      // A JSON file represents a complete diagram, only allow one file
+      // TODO: we should support adding new networks
       if (files.length > 1) {
         files.forEach(file => {
           if (file.format !== "json") {
@@ -142,43 +150,65 @@ export default class LoadNetworks extends React.Component {
         this.setState({ loading: false });
         return;
       }
+
       const json = JSON.parse(files[0].contents);
       this.setIdentifiersInJsonFormat(json);
       onSubmit(json);
       return;
     }
 
-    const networks = files.map((file, i) => {
+    const checkNameConflicts = (nodes, file) => {
+      const uniqueNames = new Set();
+      nodes.forEach(node => {
+        if (uniqueNames.has(node.name)) {
+          const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
+          file.errorMessage = message;
+          throw new Error(message);
+        }
+        uniqueNames.add(node.name);
+      });
+    };
+
+    const networks = [];
+
+    files.forEach((file, i) => {
+      const parseLinks = false;
+      const lines = file.contents.split("\n").filter(Boolean);
+      const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
+      const object = parser(lines, parseLinks);
+
+      // If we found an error before, and switched to using node ids now, we need to reset any errors
+      file.error = false;
+      file.errorMessage = null;
+
       try {
-        const parseLinks = false;
-        const lines = file.contents.split("\n").filter(Boolean);
-        const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
-        const object = parser(lines, parseLinks);
+        // If we only load one file that is set to multilayer, visualize each layer as a network
+        if (files.length === 1 && file.multilayer && file.format === "tree") {
+          const objectParser = getParser("multilevelTree");
+          const parsed = objectParser(object, file.name, nodeIdentifier);
+
+          if (nodeIdentifier === "name") {
+            for (let network of parsed) {
+              checkNameConflicts(network.nodes, file);
+            }
+          }
+
+          networks.push(...parsed);
+          return;
+        }
+
         const objectParser = getParser(file.format);
         const parsed = objectParser(object, file.name, nodeIdentifier, file.multilayer);
 
-        // if we found an error before, and switched to using node ids now, we need to reset any errors
-        file.error = false;
-        file.errorMessage = null;
-
-        // names must be unique
+        // If we use node name as identifier, all names must be unique
         if (nodeIdentifier === "name") {
-          const uniqueNames = new Set();
-          parsed.nodes.forEach(node => {
-            if (uniqueNames.has(node.name)) {
-              const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
-              file.errorMessage = message;
-              throw new Error(message);
-            }
-            uniqueNames.add(node.name);
-          });
+          checkNameConflicts(parsed.nodes, file);
         }
 
-        return parsed;
+        networks.push(parsed);
       } catch (e) {
         files[i].error = true;
         console.warn(e);
-        return null;
       }
     });
 
@@ -284,7 +314,7 @@ export default class LoadNetworks extends React.Component {
               link
               active={files.length > 0}
               disabled={files.length === 0}
-              onClick={this.withLoadingState(this.parseNetworks)}
+              onClick={this.withLoadingState(this.createDiagram)}
             >
               <Step.Content>
                 <Step.Title>Create diagram</Step.Title>
@@ -369,7 +399,7 @@ export default class LoadNetworks extends React.Component {
                     <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                     <Table.Cell>{file.format}</Table.Cell>
                     <Table.Cell>
-                      <Checkbox checked={file.multilayer} onChange={() => this.setMultilayer(i)}/>
+                      <Checkbox checked={file.multilayer} onChange={() => this.toggleMultilayer(i)}/>
                     </Table.Cell>
                     <Table.Cell
                       selectable

@@ -30,6 +30,17 @@ const Documentation = () =>
           modules and sub-modules in the same network.
         </p>
 
+        <Header>Vizualize change in multilayer networks</Header>
+        <p>
+          The Alluvial Generator also supports visualizing inter-layer change in one clustered multilayer networks.
+          This is only supported in <code>tree</code> files in the "states" format created by
+          Infomap <code>1.0.0-beta.50</code> or later that includes the <code>layerId</code> column.
+        </p>
+        <p>
+          To use this feature, load only one <code>_states.tree</code> file and check the multilayer option.
+          Make sure that "node identifier" is set to "node id".
+        </p>
+
         <Header>Step by step explanation</Header>
         <img src={compareSvg} alt="Comparing nodes across networks" width={500}/>
 

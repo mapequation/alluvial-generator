@@ -59,12 +59,30 @@ const parseClu: ObjectParser = (object, name, nodeIdentifier = "name") => {
   };
 };
 
+const parseMultilevelTree = (object, name, nodeIdentifier: string = "name") => {
+  const nodesPerLayer = {};
+
+  object.nodes.forEach(node => {
+    node.stateId = null;
+
+    if (nodesPerLayer[(node.layerId)] == null) {
+      nodesPerLayer[(node.layerId)] = [];
+    }
+
+    nodesPerLayer[(node.layerId)].push(node);
+  });
+
+  return Object.entries(nodesPerLayer).map(([layerId, nodes]) =>
+    parse({ codelength: object.codelength, nodes }, `${name} layer ${layerId}`, nodeIdentifier));
+};
+
 const objectParsers = {
   clu: parseClu,
   map: parse,
   tree: parse,
   ftree: parse,
-  stree: parse
+  stree: parse,
+  multilevelTree: parseMultilevelTree
 };
 
 export const validExtensions: string[] = Object.keys(objectParsers);
