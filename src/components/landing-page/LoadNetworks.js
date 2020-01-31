@@ -2,7 +2,19 @@ import { getParserForExtension } from "@mapequation/infoparse";
 import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
-import { Checkbox, Container, Divider, Form, Icon, Popup, Segment, Step, Table, Transition } from "semantic-ui-react";
+import {
+  Checkbox,
+  Container,
+  Divider,
+  Form,
+  Icon,
+  Label,
+  Popup,
+  Segment,
+  Step,
+  Table,
+  Transition
+} from "semantic-ui-react";
 import Background from "../../images/background.svg";
 
 import { acceptedFormats, getParser, isValidExtension } from "../../io/object-parser";
@@ -233,6 +245,7 @@ export default class LoadNetworks extends React.Component {
           textAlign="center"
           style={{ padding: "50px 50px" }}
         >
+          <Label attached="top right">v {process.env.REACT_APP_VERSION}</Label>
           <Step.Group>
             <Step link onClick={this.withLoadingState(this.loadExample)}>
               <Icon name="book"/>
