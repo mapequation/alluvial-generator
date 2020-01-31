@@ -23,7 +23,7 @@ const Documentation = () =>
         </p>
 
         <Header>Step by step explanation</Header>
-        <img src={compareSvg} alt="Comparing nodes across networks" width={550}/>
+        <img src={compareSvg} alt="Comparing nodes across networks" width={500}/>
 
         <Header>Limitations</Header>
         <p>
