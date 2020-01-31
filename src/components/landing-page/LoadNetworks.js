@@ -183,7 +183,7 @@ export default class LoadNetworks extends React.Component {
 
       try {
         // If we only load one file that is set to multilayer, visualize each layer as a network
-        if (files.length === 1 && file.multilayer && file.format === "tree") {
+        if (files.length === 1 && file.multilayer && (file.format === "tree" || file.format === "ftree")) {
           const objectParser = getParser("multilevelTree");
           const parsed = objectParser(object, file.name, nodeIdentifier);
 
