@@ -14,12 +14,20 @@ const Documentation = () =>
       <Grid.Column>
         <Header as="h1">Instructions</Header>
         <p>
-          Networks are shown as vertical stacks of modules. To highlight change between networks, we connect modules
-          with streamlines.
+          The Alluvial Generator visualizes how clusters change between different networks.
         </p>
         <p>
-          Sub-modules that have the same parent module are drawn closer together than other
-          modules in the same network.
+          The networks are shown as vertical stacks connected by streamlines. In each stack, nodes that are clustered
+          together form a <i>module</i>, drawn as a rectangle.
+        </p>
+        <p>
+          Streamlines connect modules that contains the same nodes. The height of the streamline is proportional to
+          the aggregated flow in the nodes that are present in the connected modules.
+        </p>
+        <p>
+          In hierarchical clusters, modules contain sub-modules. Sub-modules can be revealed by double clicking on
+          the parent module. All sub-modules that have the same parent module are drawn closer together than other
+          modules and sub-modules in the same network.
         </p>
 
         <Header>Step by step explanation</Header>
