@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/mapequation/alluvial-generator/compare/v0.4.6...v0.5.0) (2020-01-31)
+
+
+### Features
+
+* Support inter-layer change in single multilayer networks ([780f062](https://github.com/mapequation/alluvial-generator/commit/780f062980b18ec643e6efb82cffbbe4b1040d2d))
+
+
+### Bug Fixes
+
+* Normalize flow by the max flow in all networks ([4ea0350](https://github.com/mapequation/alluvial-generator/commit/4ea0350c5fb8531735c6537a6c0f7e84065e3d10))
+
 ### [0.4.6](https://github.com/mapequation/alluvial-generator/compare/v0.4.5...v0.4.6) (2020-01-30)
 
 
