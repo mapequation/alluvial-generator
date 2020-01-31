@@ -32,9 +32,15 @@ const Documentation = () =>
 
         <Header>Vizualize change in multilayer networks</Header>
         <p>
-          The Alluvial Generator also supports visualizing inter-layer change in one clustered multilayer networks.
-          This is only supported in <code>tree</code> files in the "states" format created by
-          Infomap <code>1.0.0-beta.50</code> or later that includes the <code>layerId</code> column.
+          The Alluvial Generator also supports visualizing inter-layer change in clustered multilayer networks.
+          This is only supported in <code>tree</code> files created by Infomap 1.0.0-beta.50 or later that includes
+          the <code>stateId</code> and <code>layerId</code> column:
+        </p>
+        <p>
+          <code>
+            # path flow name stateId physicalId layerId<br/>
+            1:1 0.00123 "Node 1" 12 34 1
+          </code>
         </p>
         <p>
           To use this feature, load only one <code>_states.tree</code> file and check the multilayer option.
@@ -50,7 +56,7 @@ const Documentation = () =>
           in a network <i>must have unique names</i>.
         </p>
         <p>
-          If a network <i>does not have unique names</i>, you can try the option "Use node ids as identifiers",
+          If a network <i>does not have unique names</i>, you can try setting node identifier to "node id",
           which uses the node ids to determine if two nodes are equal.
         </p>
         <p>
