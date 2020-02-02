@@ -14,7 +14,8 @@ const Documentation = () =>
       <Grid.Column>
         <Header as="h1">Instructions</Header>
         <p>
-          The Alluvial Generator visualizes how clusters change between different networks.
+          The Alluvial Generator visualizes how clusters change between different networks in an <a
+          href="//en.wikipedia.org/wiki/Alluvial_diagram">alluvial diagram</a>.
         </p>
         <p>
           The networks are shown as vertical stacks connected by streamlines. In each stack, nodes that are clustered
