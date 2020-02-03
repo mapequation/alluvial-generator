@@ -31,6 +31,12 @@ export default class NetworkRoot extends AlluvialNodeBase {
     this.codelength = codelength;
   }
 
+  addNodes(nodes: Node[]) {
+    const leafNodes = nodes.map(node => new LeafNode(node, this));
+    this.nodesByIdentifier = new Map(Array.from(leafNodes, node => [node.identifier, node]));
+    leafNodes.forEach(node => node.add());
+  }
+
   addChild(module: Module) {
     const length = super.addChild(module);
     this.modulesById.set(module.moduleId, module);
@@ -56,12 +62,6 @@ export default class NetworkRoot extends AlluvialNodeBase {
         return alluvialRoot.children[neighborNetworkIndex];
       }
     }
-  }
-
-  createLeafNodeMap(nodes: Iterable<LeafNode>) {
-    this.nodesByIdentifier = new Map(
-      Array.from(nodes, node => [node.identifier, node])
-    );
   }
 
   getLeafNode(identifier: string): ?LeafNode {

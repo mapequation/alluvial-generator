@@ -106,16 +106,11 @@ export default class AlluvialRoot extends AlluvialNodeBase {
       throw new Error(`Network with id ${id} already exists`);
     }
 
-    const networkRoot = new NetworkRoot(this, id, name, codelength);
-
     if (moduleNames) {
       Module.customNames = new Map([...Module.customNames, ...moduleNames]);
     }
 
-    const leafNodes = nodes.map(node => new LeafNode(node, networkRoot));
-    networkRoot.createLeafNodeMap(leafNodes);
-
-    leafNodes.forEach(node => node.add());
+    new NetworkRoot(this, id, name, codelength).addNodes(nodes);
   }
 
   calcFlow() {
