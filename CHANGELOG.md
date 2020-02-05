@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/mapequation/alluvial-generator/compare/v0.5.0...v0.5.1) (2020-02-05)
+
+
+### Features
+
+* Support inter-layer change in ftree files ([ff56555](https://github.com/mapequation/alluvial-generator/commit/ff5655515f1f3d9bde09ba33614f18893a6c201c))
+
+
+### Bug Fixes
+
+* Alert user if they somehow load an unsupported file type ([3440681](https://github.com/mapequation/alluvial-generator/commit/344068179a096f7ce6587fbabef3b27c0d453ebe))
+
 ## [0.5.0](https://github.com/mapequation/alluvial-generator/compare/v0.4.6...v0.5.0) (2020-01-31)
 
 

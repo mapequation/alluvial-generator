@@ -1,6 +1,6 @@
 {
   "name": "alluvial-generator",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "homepage": "/alluvial",
   "dependencies": {
