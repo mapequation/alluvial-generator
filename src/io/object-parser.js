@@ -82,7 +82,7 @@ const objectParsers = {
   tree: parse,
   ftree: parse,
   stree: parse,
-  multilevelTree: parseMultilevelTree
+  multilevelTree: parseMultilevelTree // FIXME: this is not a valid file extension
 };
 
 export const validExtensions: string[] = Object.keys(objectParsers);

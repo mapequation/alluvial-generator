@@ -86,10 +86,11 @@ export default class LoadNetworks extends React.Component {
 
     for (let file of this.input.files) {
       const extension = fileExtension(file.name);
-      if (isValidExtension(extension) || extension === "json" || extension === "stree") {
+      if (isValidExtension(extension) || extension === "json") {
         file.format = extension;
         validFiles.push(file);
       } else {
+        alert(`Invalid format for file ${file.name}`);
         console.error(`Invalid format for file ${file.name}`);
       }
     }
@@ -112,7 +113,11 @@ export default class LoadNetworks extends React.Component {
           files: [...files, ...newFiles],
           loading: false
         }));
-      }).catch(err => Sentry.captureException(err));
+      })
+      .catch(err => {
+        console.log(err);
+        Sentry.captureException(err);
+      });
   };
 
   setIdentifiersInJsonFormat = (json) => {
@@ -122,7 +127,7 @@ export default class LoadNetworks extends React.Component {
       if (major === 0 && minor < 3) {
         for (let network of json.networks) {
           for (let node of network.nodes) {
-            // "node.name" was the only available identifier before version 0.3.0
+            // "node.name" was the only supported identifier before version 0.3.0
             node.identifier = node.name;
           }
         }
