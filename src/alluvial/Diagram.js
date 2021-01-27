@@ -20,7 +20,7 @@ export default class Diagram {
 
   doubleClick(alluvialObject: Object, event: ?Event): boolean {
     const noKeyModifiers: Event = {
-      shiftKey: false
+      shiftKey: false,
     };
 
     const { shiftKey } = event || noKeyModifiers;
@@ -108,7 +108,7 @@ export default class Diagram {
     alluvialObject: ?Object = null,
     paintNodesInAllNetworks: boolean = true,
     paintModuleIdsInAllNetworks: boolean = false,
-    highlightIndices: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    highlightIndices: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   ) {
     if (paintNodesInAllNetworks && paintModuleIdsInAllNetworks) {
       console.warn("Cannot use paintNodesInAllNetworks and paintModuleIdsInAllNetworks together");
@@ -136,13 +136,61 @@ export default class Diagram {
       return;
     }
 
-    networkRoot.children
-      .filter(module => module.flow > 0)
-      .forEach((module, i) =>
-        this.setModuleColor({
-          ...module.asObject(),
-          highlightIndex: highlightIndices[i % highlightIndices.length]
-        }, paintNodesInAllNetworks, paintModuleIdsInAllNetworks));
+    if (paintNodesInAllNetworks) {
+      networkRoot.children
+        .filter(module => module.flow > 0)
+        .forEach((module, i) =>
+          this.setModuleColor({
+            ...module.asObject(),
+            highlightIndex: highlightIndices[i % highlightIndices.length],
+          }, true, false));
+    } else if (paintModuleIdsInAllNetworks) {
+      const moduleIds = new Set();
+
+      this.alluvialRoot.children.forEach(network => {
+        network.children.forEach(module => {
+          moduleIds.add(module.moduleId);
+        });
+      });
+
+      const moduleHighlightindexMap = {};
+
+      const differenceIndex = (array1, array2) => {
+        const minLength = Math.min(array1.length, array2.length);
+        for (let i = 0; i < minLength; i++) {
+          if (array1[i] !== array2[i]) return i;
+        }
+        return 0;
+      };
+
+      Array.from(moduleIds).sort((a, b) => {
+        if (a === b) return 0;
+
+        let aPath = a.split(":");
+        let bPath = b.split(":");
+
+        if (aPath.length === bPath.length) {
+          const i = differenceIndex(aPath, bPath);
+
+          return +aPath[i] < +bPath[i] ? -1 : 1;
+        }
+
+        // different lengths
+        return aPath.length < bPath.length ? -1 : 1;
+      }).forEach((moduleId, i) => {
+        moduleHighlightindexMap[moduleId] = highlightIndices[i % highlightIndices.length];
+      });
+
+      this.alluvialRoot.children.forEach(network => {
+        network.children
+          .filter(module => module.flow > 0)
+          .forEach((module, i) =>
+            this.setModuleColor({
+              ...module.asObject(),
+              highlightIndex: moduleHighlightindexMap[module.moduleId],
+            }, false, false));
+      });
+    }
   }
 
   removeColors() {
@@ -158,7 +206,7 @@ export default class Diagram {
       }
       modules.forEach(module => this.setModuleColor({
         ...module.asObject(),
-        highlightIndex: NOT_HIGHLIGHTED
+        highlightIndex: NOT_HIGHLIGHTED,
       }));
     }
 
