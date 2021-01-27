@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/mapequation/alluvial-generator/compare/v0.5.1...v0.5.2) (2021-01-27)
+
+
+### Features
+
+* Add more colors ([e075c4b](https://github.com/mapequation/alluvial-generator/commit/e075c4bdcd7a18c6405413f397a2c0ca2c15aae3))
+* Allow variable size color schemes ([ff9f3d0](https://github.com/mapequation/alluvial-generator/commit/ff9f3d08a504a279a9e692ef90632d915194faa1))
+
+
+### Bug Fixes
+
+* Auto paint module ids paints in all networks ([d99f2da](https://github.com/mapequation/alluvial-generator/commit/d99f2daa5a408c118e90e297f2edf95604b55cb7))
+
 ### [0.5.1](https://github.com/mapequation/alluvial-generator/compare/v0.5.0...v0.5.1) (2020-02-05)
 
 
