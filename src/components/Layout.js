@@ -1,4 +1,4 @@
-import { schemeTableau10 } from "d3";
+import { schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet1, schemeSet2, schemeSet3 } from "d3";
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
@@ -92,7 +92,7 @@ export default function Layout(props) {
     streamlineOpacity: 0.9,
     moduleFlowThreshold: 8e-3,
     defaultHighlightColor: "#b6b69f",
-    highlightColors: schemeTableau10,
+    highlightColors: [].concat(schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet2),
     verticalAlign: "bottom",
     showModuleId: false,
     showModuleNames: true,
