@@ -1,4 +1,4 @@
-import { schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet1, schemeSet2, schemeSet3 } from "d3";
+import { schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet2 } from "d3";
 import React, { useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
