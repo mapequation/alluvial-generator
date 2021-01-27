@@ -106,10 +106,12 @@ export default class Diagram {
 
   autoPaint(
     alluvialObject: ?Object = null,
+    highlightColors: string[],
     paintNodesInAllNetworks: boolean = true,
     paintModuleIdsInAllNetworks: boolean = false,
-    highlightIndices: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   ) {
+    const highlightIndices = Array.from(highlightColors.keys());
+
     if (paintNodesInAllNetworks && paintModuleIdsInAllNetworks) {
       console.warn("Cannot use paintNodesInAllNetworks and paintModuleIdsInAllNetworks together");
       return;

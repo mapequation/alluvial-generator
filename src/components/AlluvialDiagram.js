@@ -197,11 +197,11 @@ export default class AlluvialDiagram extends React.PureComponent {
     }
 
     if (autoPaintNodesBit !== prev.autoPaintNodesBit) {
-      this.diagram.autoPaint(selectedModule, true);
+      this.diagram.autoPaint(selectedModule, highlightColors, true);
     }
 
     if (autoPaintModuleIdsBit !== prev.autoPaintModuleIdsBit) {
-      this.diagram.autoPaint(selectedModule, false, true);
+      this.diagram.autoPaint(selectedModule, highlightColors, false, true);
     }
 
     if (removeColorsBit !== prev.removeColorsBit) {
