@@ -44,7 +44,7 @@
     "ramda": "^0.25.0",
     "react": "^16.13.1",
     "react-color": "^2.18.1",
-    "react-dev-utils": "^5.0.3",
+    "react-dev-utils": "^11.0.4",
     "react-dom": "^16.13.1",
     "react-markdown": "^4.3.1",
     "react-semantic-ui-range": "^0.6.2",
