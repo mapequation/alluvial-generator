@@ -1,20 +1,29 @@
-import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import PropTypes from "prop-types";
+import { PureComponent } from "react";
 
-const zoom = d3.zoom().scaleExtent([0.1, 1000]);
-const initialTransform = d3.zoomIdentity.translate(0, 50);
+export default class ZoomableSvg extends PureComponent {
+  static defaultProps = {
+    width: "100vw",
+    height: "100vh",
+    onClick: () => null,
+  };
 
-export default function ZoomableSvg({
-  width = "100vw",
-  height = "100vh",
-  onClick = () => null,
-  children,
-}) {
-  const node = useRef(null);
+  static propTypes = {
+    width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    onClick: PropTypes.func,
+  };
 
-  useEffect(() => {
+  componentDidMount() {
+    const { onClick } = this.props;
+
+    const zoom = d3.zoom().scaleExtent([0.1, 1000]);
+
+    const initialTransform = d3.zoomIdentity.translate(0, 50);
+
     const svg = d3
-      .select(node.current)
+      .select(this.node)
       .call(zoom)
       .on("dblclick.zoom", null)
       .call(zoom.transform, initialTransform);
@@ -26,17 +35,20 @@ export default function ZoomableSvg({
     zoom.on("zoom", () => zoomable.attr("transform", d3.event.transform));
 
     svg.select(".background").on("click", onClick);
-  }, [onClick]);
+  }
 
-  return (
-    <svg
-      style={{ width, height }}
-      ref={node}
-      xmlns={d3.namespaces.svg}
-      xmlnsXlink={d3.namespaces.xlink}
-    >
-      <rect className="background" width="100%" height="100%" fill="#fff" />
-      <g id="zoomable" children={children} />
-    </svg>
-  );
+  render() {
+    const { width, height, children } = this.props;
+    return (
+      <svg
+        style={{ width, height }}
+        ref={(node) => (this.node = node)}
+        xmlns={d3.namespaces.svg}
+        xmlnsXlink={d3.namespaces.xlink}
+      >
+        <rect className="background" width="100%" height="100%" fill="#fff" />
+        <g id="zoomable" children={children} />
+      </svg>
+    );
+  }
 }
