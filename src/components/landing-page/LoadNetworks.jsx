@@ -26,9 +26,9 @@ import readAsText from "../../io/read-as-text";
 import streeParser from "../../io/stree-parser";
 import humanFileSize from "../../utils/humanFileSize";
 import fileExtension from "../../utils/extension";
-import withDraggable from "./withDraggable";
+import makeDraggable from "./Draggable";
 
-const DraggableTableRow = withDraggable(Table.Row);
+const DraggableTableRow = makeDraggable(Table.Row);
 
 export default class LoadNetworks extends Component {
   state = {

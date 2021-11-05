@@ -1,5 +1,5 @@
-export default function withDraggable(Component) {
-  return function (props) {
+export default function makeDraggable(Component) {
+  return function Draggable(props) {
     const { action, index, children, ...rest } = props;
 
     const onDragStart = (e) => e.dataTransfer.setData("index", index);
