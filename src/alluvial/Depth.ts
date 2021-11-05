@@ -1,4 +1,3 @@
-// @flow
 export type Depth = number;
 
 export const ALLUVIAL_ROOT: Depth = 0;
@@ -16,5 +15,5 @@ export default {
   HIGHLIGHT_GROUP,
   BRANCH,
   STREAMLINE_NODE,
-  LEAF_NODE
+  LEAF_NODE,
 };

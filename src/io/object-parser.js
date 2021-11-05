@@ -1,4 +1,4 @@
-import id from "../lib/id";
+import id from "../utils/id";
 
 const setNodeIdentifiers = (object, identifier) => {
   const id = (node) =>

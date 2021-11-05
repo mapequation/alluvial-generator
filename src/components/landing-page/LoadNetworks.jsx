@@ -20,28 +20,10 @@ import Background from "../../images/background.svg";
 import { acceptedFormats, getParser, isValidExtension } from "../../io/object-parser";
 import readAsText from "../../io/read-as-text";
 import streeParser from "../../io/stree-parser";
+import humanFileSize from "../../utils/humanFileSize";
+import fileExtension from "../../utils/extension";
 import withDraggable from "./withDraggable";
 
-
-function humanFileSize(bytes) {
-  const thresh = 1000;
-  if (Math.abs(bytes) < thresh) {
-    return bytes + " B";
-  }
-  const units = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  let u = -1;
-  do {
-    bytes /= thresh;
-    ++u;
-  } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-  return bytes.toFixed(1) + " " + units[u];
-}
-
-const fileExtension = filename => {
-  const index = filename.lastIndexOf(".");
-  if (index === -1 || index + 1 === filename.length) return "";
-  return filename.substring(index + 1).toLowerCase();
-};
 
 const DraggableTableRow = withDraggable(Table.Row);
 
@@ -231,7 +213,7 @@ export default class LoadNetworks extends React.Component {
 
     const filename = "science-1998-2001-2007.json";
 
-    fetch(`./data/${filename}`)
+    fetch(`/alluvial/data/${filename}`)
       .then(res => res.json())
       .then(this.setIdentifiersInJsonFormat)
       .then(onSubmit)

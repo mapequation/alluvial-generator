@@ -1,6 +1,6 @@
 // @flow
-import PriorityQueue from "../lib/priority-queue";
-import TreePath from "../lib/treepath";
+import PriorityQueue from "../utils/priority-queue";
+import TreePath from "../utils/treepath";
 
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { MODULE } from "./Depth";

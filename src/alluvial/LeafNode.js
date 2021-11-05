@@ -1,5 +1,5 @@
 // @flow
-import TreePath from "../lib/treepath";
+import TreePath from "../utils/treepath";
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";

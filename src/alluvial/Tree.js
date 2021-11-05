@@ -1,22 +1,17 @@
 class TreeNode {
-  path: number;
-  size: number = 0;
-  nodes: Array<any> = [];
+  path;
+  size = 0;
+  nodes = [];
 
-  constructor(path: number = 0) {
+  constructor(path = 0) {
     this.path = path;
   }
-}
-
-
-type Child = {
-  path: number[];
 }
 
 export default class Tree {
   root = new TreeNode();
 
-  constructor(children: Child[], getSize: (Child => number)) {
+  constructor(children, getSize) {
     children.forEach(child => {
       let parent = this.root;
 
@@ -36,7 +31,7 @@ export default class Tree {
     });
   }
 
-  sort(tree = this.root): Tree {
+  sort(tree = this.root) {
     tree.nodes.sort((a, b) => b.size - a.size);
     tree.nodes.forEach(node => {
       if (node.nodes) this.sort(node);
@@ -45,7 +40,7 @@ export default class Tree {
     return this;
   }
 
-  flatten(tree = this.root): Child[] {
+  flatten(tree = this.root) {
     return tree.nodes.reduce((flattened, toFlatten) =>
         flattened.concat(Array.isArray(toFlatten.nodes) ? this.flatten(toFlatten) : toFlatten),
       []);

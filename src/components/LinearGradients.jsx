@@ -2,7 +2,7 @@ import { cross, hsl as d3_hsl } from "d3";
 import PropTypes from "prop-types";
 import React from "react";
 import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
-import highlightColor from "../lib/highlight-color";
+import highlightColor from "../utils/highlight-color";
 
 
 const id = (left, right, leftInsignificant, rightInsignificant) =>
