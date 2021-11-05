@@ -37,7 +37,6 @@ export default class Sidebar extends PureComponent {
         ...props.modulesVisibleInFilter,
       },
       modalOpen: false,
-      activePaneIndex: 0,
       pdfModalOpen: false,
     };
   }
@@ -52,13 +51,8 @@ export default class Sidebar extends PureComponent {
       visibleModules,
     } = this.props;
 
-    const {
-      selectedNetworkId,
-      moduleIds,
-      modalOpen,
-      activePaneIndex,
-      pdfModalOpen,
-    } = this.state;
+    const { selectedNetworkId, moduleIds, modalOpen, pdfModalOpen } =
+      this.state;
 
     const { dispatch } = this.context;
 
@@ -124,10 +118,6 @@ export default class Sidebar extends PureComponent {
               <ModuleExplorer
                 open={modalOpen}
                 onClose={() => this.setState({ modalOpen: false })}
-                activeIndex={activePaneIndex}
-                setActiveIndex={(activePaneIndex) =>
-                  this.setState({ activePaneIndex })
-                }
                 module={selectedModule}
                 highlightColors={highlightColors}
               />

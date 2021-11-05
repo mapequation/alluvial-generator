@@ -29,19 +29,16 @@ function Swatch(props) {
 
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
-export default function SelectedModule(props) {
-  const {
-    module,
-    highlightColors,
-    defaultHighlightColor,
-    selectedNetworkId,
-    setSelectedNetworkId,
-    moduleIds,
-    setModuleIds,
-  } = props;
-
+export default function SelectedModule({
+  module,
+  highlightColors,
+  defaultHighlightColor,
+  selectedNetworkId,
+  setSelectedNetworkId,
+  moduleIds,
+  setModuleIds,
+}) {
   const { dispatch } = useContext(Dispatch);
-
   const [color, setColor] = useState(defaultHighlightColor);
 
   const highlightIndex = highlightColors.indexOf(color);

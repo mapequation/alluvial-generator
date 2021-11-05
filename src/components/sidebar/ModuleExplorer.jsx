@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button, Header, Portal, Segment, Tab } from "semantic-ui-react";
 import HighlightNodes from "./HighlightNodes";
 import InfoTable from "./InfoTable";
@@ -6,10 +7,12 @@ export default function ModuleExplorer({
   open,
   onClose,
   module,
-  activeIndex,
-  setActiveIndex,
+  // activeIndex,
+  // setActiveIndex,
   highlightColors,
 }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
 
   return (
