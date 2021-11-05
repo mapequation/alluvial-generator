@@ -1,5 +1,10 @@
-import React from "react";
-import { Button, Header, Menu, Sidebar as SemanticSidebar } from "semantic-ui-react";
+import { PureComponent } from "react";
+import {
+  Button,
+  Header,
+  Menu,
+  Sidebar as SemanticSidebar,
+} from "semantic-ui-react";
 import Dispatch from "../../context/Dispatch";
 import { savePng, saveSvg } from "../../io/export";
 import ConvertToPdfModal from "./ConvertToPdfModal";
@@ -11,16 +16,15 @@ import ModuleFilter from "./ModuleFilter";
 import PaintNetworks from "./PaintNetworks";
 import SelectedModule from "./SelectedModule";
 
-
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
-const createEmptyFilter = networks => {
+const createEmptyFilter = (networks) => {
   const emptyFilter = {};
-  networks.forEach(({ id }) => emptyFilter[id] = []);
+  networks.forEach(({ id }) => (emptyFilter[id] = []));
   return emptyFilter;
 };
 
-export default class Sidebar extends React.PureComponent {
+export default class Sidebar extends PureComponent {
   static contextType = Dispatch;
 
   constructor(props) {
@@ -28,10 +32,13 @@ export default class Sidebar extends React.PureComponent {
 
     this.state = {
       selectedNetworkId: "",
-      moduleIds: { ...createEmptyFilter(props.networks), ...props.modulesVisibleInFilter },
+      moduleIds: {
+        ...createEmptyFilter(props.networks),
+        ...props.modulesVisibleInFilter,
+      },
       modalOpen: false,
       activePaneIndex: 0,
-      pdfModalOpen: false
+      pdfModalOpen: false,
     };
   }
 
@@ -42,7 +49,7 @@ export default class Sidebar extends React.PureComponent {
       highlightColors,
       sidebarVisible,
       selectedModule,
-      visibleModules
+      visibleModules,
     } = this.props;
 
     const {
@@ -50,21 +57,29 @@ export default class Sidebar extends React.PureComponent {
       moduleIds,
       modalOpen,
       activePaneIndex,
-      pdfModalOpen
+      pdfModalOpen,
     } = this.state;
 
     const { dispatch } = this.context;
 
-    const networkIdOptions = networks.map(({ name, id }, key) => ({ key, text: name, value: id }));
+    const networkIdOptions = networks.map(({ name, id }, key) => ({
+      key,
+      text: name,
+      value: id,
+    }));
 
     const moduleIdOptions = (() => {
       const visibleModuleIds = visibleModules[selectedNetworkId] || [];
-      return visibleModuleIds.map((moduleId, key) => ({ key, text: moduleId, value: moduleId }));
+      return visibleModuleIds.map((moduleId, key) => ({
+        key,
+        text: moduleId,
+        value: moduleId,
+      }));
     })();
 
-    const moduleIdsForNetwork = networkId => moduleIds[networkId] || [];
+    const moduleIdsForNetwork = (networkId) => moduleIds[networkId] || [];
 
-    const setModuleIdsForNetwork = networkId => newModuleIds => {
+    const setModuleIdsForNetwork = (networkId) => (newModuleIds) => {
       if (!moduleIds[networkId]) return;
       const updated = Object.assign({}, moduleIds);
       updated[networkId] = newModuleIds;
@@ -78,12 +93,12 @@ export default class Sidebar extends React.PureComponent {
 
     Object.entries(moduleIds).forEach(([networkId, moduleIds]) => {
       const visible = visibleModules[networkId] || [];
-      if (moduleIds.some(moduleId => !visible.includes(moduleId))) {
+      if (moduleIds.some((moduleId) => !visible.includes(moduleId))) {
         clearFilter();
       }
     });
 
-    const basename = networks.map(network => network.name);
+    const basename = networks.map((network) => network.name);
 
     return (
       <SemanticSidebar
@@ -95,22 +110,24 @@ export default class Sidebar extends React.PureComponent {
         vertical
       >
         <Menu.Item header href="//www.mapequation.org/alluvial">
-          <MenuHeader/>
+          <MenuHeader />
         </Menu.Item>
         <Menu.Item
-          icon='close'
-          content='Hide sidebar'
+          icon="close"
+          content="Hide sidebar"
           onClick={() => dispatch({ type: "sidebarVisible", value: false })}
         />
         <Menu.Item>
-          <Header as="h4" content="Module explorer"/>
-          {!!selectedModule
-            ? <>
+          <Header as="h4" content="Module explorer" />
+          {!!selectedModule ? (
+            <>
               <ModuleExplorer
                 open={modalOpen}
                 onClose={() => this.setState({ modalOpen: false })}
                 activeIndex={activePaneIndex}
-                setActiveIndex={activePaneIndex => this.setState({ activePaneIndex })}
+                setActiveIndex={(activePaneIndex) =>
+                  this.setState({ activePaneIndex })
+                }
                 module={selectedModule}
                 highlightColors={highlightColors}
               />
@@ -119,7 +136,9 @@ export default class Sidebar extends React.PureComponent {
                 highlightColors={highlightColors}
                 defaultHighlightColor={defaultHighlightColor}
                 selectedNetworkId={selectedNetworkId}
-                setSelectedNetworkId={selectedNetworkId => this.setState({ selectedNetworkId })}
+                setSelectedNetworkId={(selectedNetworkId) =>
+                  this.setState({ selectedNetworkId })
+                }
                 moduleIds={moduleIdsForNetwork(selectedModule.networkId)}
                 setModuleIds={setModuleIdsForNetwork(selectedModule.networkId)}
               />
@@ -131,20 +150,28 @@ export default class Sidebar extends React.PureComponent {
                 onClick={() => this.setState({ modalOpen: !modalOpen })}
               />
             </>
-            : <div style={{ color: "#777" }}>No module selected. <br/>Click on any module.</div>
-          }
+          ) : (
+            <div style={{ color: "#777" }}>
+              No module selected. <br />
+              Click on any module.
+            </div>
+          )}
         </Menu.Item>
         <Menu.Item>
           <PaintNetworks
             onAutoPaintNodesClick={() => dispatch({ type: "autoPaintNodes" })}
-            onAutoPaintModuleIdsClick={() => dispatch({ type: "autoPaintModuleIds" })}
+            onAutoPaintModuleIdsClick={() =>
+              dispatch({ type: "autoPaintModuleIds" })
+            }
             onRemoveColorsClick={() => dispatch({ type: "removeColors" })}
           />
         </Menu.Item>
         <Menu.Item>
           <ModuleFilter
             selectedNetworkId={selectedNetworkId}
-            setSelectedNetworkId={selectedNetworkId => this.setState({ selectedNetworkId })}
+            setSelectedNetworkId={(selectedNetworkId) =>
+              this.setState({ selectedNetworkId })
+            }
             networkIdOptions={networkIdOptions}
             moduleIdsForNetwork={moduleIdsForNetwork}
             setModuleIdsForNetwork={setModuleIdsForNetwork}
@@ -154,7 +181,7 @@ export default class Sidebar extends React.PureComponent {
           />
         </Menu.Item>
         <Menu.Item>
-          <LayoutSettings {...this.props}/>
+          <LayoutSettings {...this.props} />
         </Menu.Item>
         <Menu.Item>
           <Export
@@ -164,7 +191,10 @@ export default class Sidebar extends React.PureComponent {
             onConvertToPdfClick={() => this.setState({ pdfModalOpen: true })}
           />
         </Menu.Item>
-        <ConvertToPdfModal open={pdfModalOpen} onClose={() => this.setState({ pdfModalOpen: false })}/>
+        <ConvertToPdfModal
+          open={pdfModalOpen}
+          onClose={() => this.setState({ pdfModalOpen: false })}
+        />
       </SemanticSidebar>
     );
   }

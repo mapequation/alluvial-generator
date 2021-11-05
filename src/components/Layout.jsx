@@ -1,12 +1,17 @@
-import { schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet2 } from "d3";
-import React, { useReducer } from "react";
+import {
+  schemeTableau10,
+  schemeDark2,
+  schemePastel1,
+  schemePastel2,
+  schemeSet2,
+} from "d3";
+import { StrictMode, useReducer } from "react";
 import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
 import Sidebar from "./sidebar/Sidebar";
 
-
-const flip = bit => bit ? 0 : 1;
+const flip = (bit) => (bit ? 0 : 1);
 
 function reducer(state, action) {
   switch (action.type) {
@@ -49,15 +54,25 @@ function reducer(state, action) {
     case "changeNodesColor":
       return { ...state, colorChangeNodesBit: flip(state.colorChangeNodesBit) };
     case "changeModuleIdsColor":
-      return { ...state, colorChangeModuleIdsBit: flip(state.colorChangeModuleIdsBit) };
+      return {
+        ...state,
+        colorChangeModuleIdsBit: flip(state.colorChangeModuleIdsBit),
+      };
     case "autoPaintNodes":
       return { ...state, autoPaintNodesBit: flip(state.autoPaintNodesBit) };
     case "autoPaintModuleIds":
-      return { ...state, autoPaintModuleIdsBit: flip(state.autoPaintModuleIdsBit) };
+      return {
+        ...state,
+        autoPaintModuleIdsBit: flip(state.autoPaintModuleIdsBit),
+      };
     case "removeColors":
       return { ...state, removeColorsBit: flip(state.removeColorsBit) };
     case "highlightNodes":
-      return { ...state, highlightNodesBit: flip(state.highlightNodesBit), highlightedNodes: action.value };
+      return {
+        ...state,
+        highlightNodesBit: flip(state.highlightNodesBit),
+        highlightedNodes: action.value,
+      };
     case "expand":
       return { ...state, expandBit: flip(state.expandBit) };
     case "regroup":
@@ -75,7 +90,11 @@ function reducer(state, action) {
     case "changeVisibleModules":
       return { ...state, modulesVisibleInFilter: action.value };
     case "clearFilters":
-      return { ...state, clearFiltersBit: flip(state.clearFiltersBit), modulesVisibleInFilter: {} };
+      return {
+        ...state,
+        clearFiltersBit: flip(state.clearFiltersBit),
+        modulesVisibleInFilter: {},
+      };
     default:
       throw new Error();
   }
@@ -92,7 +111,13 @@ export default function Layout(props) {
     streamlineOpacity: 0.9,
     moduleFlowThreshold: 8e-3,
     defaultHighlightColor: "#b6b69f",
-    highlightColors: [].concat(schemeTableau10, schemeDark2, schemePastel1, schemePastel2, schemeSet2),
+    highlightColors: [].concat(
+      schemeTableau10,
+      schemeDark2,
+      schemePastel1,
+      schemePastel2,
+      schemeSet2
+    ),
     verticalAlign: "bottom",
     showModuleId: false,
     showModuleNames: true,
@@ -118,7 +143,7 @@ export default function Layout(props) {
     visibleModules: {},
     modulesVisibleInFilter: {},
     clearFiltersBit: 0,
-    ...props.state
+    ...props.state,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -144,11 +169,11 @@ export default function Layout(props) {
     moduleSize: state.moduleSize,
     sortModulesBy: state.sortModulesBy,
     visibleModules: state.visibleModules,
-    modulesVisibleInFilter: state.modulesVisibleInFilter
+    modulesVisibleInFilter: state.modulesVisibleInFilter,
   };
 
   const sidebarProps = {
-    sidebarVisible: state.sidebarVisible
+    sidebarVisible: state.sidebarVisible,
   };
 
   const alluvialProps = {
@@ -164,26 +189,32 @@ export default function Layout(props) {
     highlightedNodes: state.highlightedNodes,
     expandBit: state.expandBit,
     regroupBit: state.regroupBit,
-    saveDiagramBit: state.saveDiagramBit
+    saveDiagramBit: state.saveDiagramBit,
   };
 
   return (
     <Dispatch.Provider value={{ dispatch }}>
       <SemanticSidebar.Pushable style={{ height: "100vh", overflow: "hidden" }}>
-        <Sidebar {...sidebarProps} {...sharedProps} {...props}/>
+        <Sidebar {...sidebarProps} {...sharedProps} {...props} />
         <SemanticSidebar.Pusher>
-          <Rail internal position="right" style={{ padding: 0, margin: 0, height: 0, width: "182px" }}>
+          <Rail
+            internal
+            position="right"
+            style={{ padding: 0, margin: 0, height: 0, width: "182px" }}
+          >
             <Menu vertical size="small">
               <Menu.Item
                 icon="sidebar"
                 content="Show sidebar"
-                onClick={() => dispatch({ type: "sidebarVisible", value: true })}
+                onClick={() =>
+                  dispatch({ type: "sidebarVisible", value: true })
+                }
               />
             </Menu>
           </Rail>
-          <React.StrictMode>
-            <AlluvialDiagram {...alluvialProps} {...sharedProps} {...props}/>
-          </React.StrictMode>
+          <StrictMode>
+            <AlluvialDiagram {...alluvialProps} {...sharedProps} {...props} />
+          </StrictMode>
         </SemanticSidebar.Pusher>
       </SemanticSidebar.Pushable>
     </Dispatch.Provider>

@@ -1,13 +1,13 @@
-import React from "react";
+import { PureComponent } from "react";
 import { Icon, Input, Table } from "semantic-ui-react";
 import Dispatch from "../../context/Dispatch";
 
-
-const toPrecision = (flow, precision = 3) => Number.parseFloat(flow).toPrecision(precision);
+const toPrecision = (flow, precision = 3) =>
+  Number.parseFloat(flow).toPrecision(precision);
 
 const selectable = { selectable: true, style: { padding: "0 8px" } };
 
-export default class InfoTable extends React.PureComponent {
+export default class InfoTable extends PureComponent {
   static contextType = Dispatch;
 
   handleNameChange = (e, { value }) => {
@@ -33,7 +33,7 @@ export default class InfoTable extends React.PureComponent {
     if (props.module) {
       this.state = {
         name: props.module.name || "",
-        networkName: props.module.networkName
+        networkName: props.module.networkName,
       };
     }
   }
@@ -43,7 +43,7 @@ export default class InfoTable extends React.PureComponent {
     if (module !== prev.module) {
       this.setState({
         name: module.name || "",
-        networkName: module.networkName
+        networkName: module.networkName,
       });
     }
   }
@@ -57,64 +57,73 @@ export default class InfoTable extends React.PureComponent {
       numLeafNodes,
       moduleId,
       moduleLevel,
-      largestLeafNodes
+      largestLeafNodes,
     } = this.props.module;
 
-    return <Table celled striped compact size="small">
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell width={5}>Network</Table.Cell>
-          <Table.Cell {...selectable}>
-            <Input
-              fluid
-              transparent
-              value={networkName || ""}
-              placeholder="Set network name..."
-              onChange={this.handleNetworkNameChange}
-              icon={networkName && <Icon link name="x" onClick={this.clearNetworkName}/>}
-            />
-          </Table.Cell>
-        </Table.Row>
-        {networkCodelength != null &&
-        <Table.Row>
-          <Table.Cell>Codelength</Table.Cell>
-          <Table.Cell>{toPrecision(networkCodelength, networkCodelength > 0 ? 4 : 1)} bits</Table.Cell>
-        </Table.Row>
-        }
-        <Table.Row>
-          <Table.Cell>Flow</Table.Cell>
-          <Table.Cell>{toPrecision(flow)}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Nodes</Table.Cell>
-          <Table.Cell>{numLeafNodes}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Module id</Table.Cell>
-          <Table.Cell>{moduleId}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Level</Table.Cell>
-          <Table.Cell>{moduleLevel}</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Module name</Table.Cell>
-          <Table.Cell {...selectable}>
-            <Input
-              fluid
-              transparent
-              value={name || ""}
-              placeholder="Set module name..."
-              onChange={this.handleNameChange}
-              icon={name && <Icon link name="x" onClick={this.clearName}/>}
-            />
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Largest nodes</Table.Cell>
-          <Table.Cell>{largestLeafNodes.join(", ")}</Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>;
+    return (
+      <Table celled striped compact size="small">
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell width={5}>Network</Table.Cell>
+            <Table.Cell {...selectable}>
+              <Input
+                fluid
+                transparent
+                value={networkName || ""}
+                placeholder="Set network name..."
+                onChange={this.handleNetworkNameChange}
+                icon={
+                  networkName && (
+                    <Icon link name="x" onClick={this.clearNetworkName} />
+                  )
+                }
+              />
+            </Table.Cell>
+          </Table.Row>
+          {networkCodelength != null && (
+            <Table.Row>
+              <Table.Cell>Codelength</Table.Cell>
+              <Table.Cell>
+                {toPrecision(networkCodelength, networkCodelength > 0 ? 4 : 1)}{" "}
+                bits
+              </Table.Cell>
+            </Table.Row>
+          )}
+          <Table.Row>
+            <Table.Cell>Flow</Table.Cell>
+            <Table.Cell>{toPrecision(flow)}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Nodes</Table.Cell>
+            <Table.Cell>{numLeafNodes}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Module id</Table.Cell>
+            <Table.Cell>{moduleId}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Level</Table.Cell>
+            <Table.Cell>{moduleLevel}</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Module name</Table.Cell>
+            <Table.Cell {...selectable}>
+              <Input
+                fluid
+                transparent
+                value={name || ""}
+                placeholder="Set module name..."
+                onChange={this.handleNameChange}
+                icon={name && <Icon link name="x" onClick={this.clearName} />}
+              />
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Largest nodes</Table.Cell>
+            <Table.Cell>{largestLeafNodes.join(", ")}</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    );
   }
 }

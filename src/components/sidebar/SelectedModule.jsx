@@ -1,25 +1,30 @@
-import React, { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { GithubPicker } from "react-color";
 import { Button } from "semantic-ui-react";
 import Dispatch from "../../context/Dispatch";
 
-
 function Swatch(props) {
-  return <div style={{
-    margin: "0 1px 2px",
-    padding: "4px",
-    background: "#fff",
-    borderRadius: "4px",
-    boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-    display: "inline-block",
-    cursor: "pointer"
-  }}>
-    <div style={{
-      width: "25px",
-      height: "25px",
-      background: props.background
-    }}/>
-  </div>;
+  return (
+    <div
+      style={{
+        margin: "0 1px 2px",
+        padding: "4px",
+        background: "#fff",
+        borderRadius: "4px",
+        boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+        display: "inline-block",
+        cursor: "pointer",
+      }}
+    >
+      <div
+        style={{
+          width: "25px",
+          height: "25px",
+          background: props.background,
+        }}
+      />
+    </div>
+  );
 }
 
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
@@ -32,7 +37,7 @@ export default function SelectedModule(props) {
     selectedNetworkId,
     setSelectedNetworkId,
     moduleIds,
-    setModuleIds
+    setModuleIds,
   } = props;
 
   const { dispatch } = useContext(Dispatch);
@@ -80,7 +85,8 @@ export default function SelectedModule(props) {
     setModuleIds([...ids, module.moduleId]);
   };
 
-  const removeFromFilter = () => setModuleIds(moduleIds.filter(moduleId => moduleId !== module.moduleId));
+  const removeFromFilter = () =>
+    setModuleIds(moduleIds.filter((moduleId) => moduleId !== module.moduleId));
 
   return (
     <>
@@ -89,7 +95,9 @@ export default function SelectedModule(props) {
           icon="plus"
           content="Expand module"
           onClick={expandModule}
-          disabled={!buttonsEnabled || module.moduleLevel === module.maxModuleLevel}
+          disabled={
+            !buttonsEnabled || module.moduleLevel === module.maxModuleLevel
+          }
         />
         <Button
           icon="minus"
@@ -98,7 +106,7 @@ export default function SelectedModule(props) {
           disabled={!buttonsEnabled || module.moduleLevel === 1}
         />
       </Button.Group>
-      <Button.Group{...buttonProps} style={{ margin: "4px 0 4px 0 " }}>
+      <Button.Group {...buttonProps} style={{ margin: "4px 0 4px 0 " }}>
         <Button
           content="Add to module filter"
           onClick={addToFilter}
@@ -110,17 +118,20 @@ export default function SelectedModule(props) {
           disabled={!moduleIds.includes(module.moduleId)}
         />
       </Button.Group>
-      <Swatch background={color}/>
+      <Swatch background={color} />
       <GithubPicker
         colors={[defaultHighlightColor, ...highlightColors]}
-        onChangeComplete={color => setColor(color.hex)}
+        onChangeComplete={(color) => setColor(color.hex)}
       />
       <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
-        <Button content="Paint module" onClick={paintModule}/>
-        <Button content="Paint nodes in all networks" onClick={paintNodes}/>
+        <Button content="Paint module" onClick={paintModule} />
+        <Button content="Paint nodes in all networks" onClick={paintNodes} />
       </Button.Group>
       <Button.Group {...buttonProps} style={{ margin: "4px 0 0 0" }}>
-        <Button content="Paint matching module ids in all networks" onClick={paintModuleIds}/>
+        <Button
+          content="Paint matching module ids in all networks"
+          onClick={paintModuleIds}
+        />
       </Button.Group>
     </>
   );

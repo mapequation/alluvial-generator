@@ -1,7 +1,7 @@
 import { getParserForExtension } from "@mapequation/infoparse";
 //import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
-import React from "react";
+import { Component } from "react";
 import {
   Checkbox,
   Container,
@@ -13,54 +13,62 @@ import {
   Segment,
   Step,
   Table,
-  Transition
+  Transition,
 } from "semantic-ui-react";
-import Background from "../../images/background.svg";
+//import Background from "../../images/background.svg";
 
-import { acceptedFormats, getParser, isValidExtension } from "../../io/object-parser";
+import {
+  acceptedFormats,
+  getParser,
+  isValidExtension,
+} from "../../io/object-parser";
 import readAsText from "../../io/read-as-text";
 import streeParser from "../../io/stree-parser";
 import humanFileSize from "../../utils/humanFileSize";
 import fileExtension from "../../utils/extension";
 import withDraggable from "./withDraggable";
 
-
 const DraggableTableRow = withDraggable(Table.Row);
 
-export default class LoadNetworks extends React.Component {
+export default class LoadNetworks extends Component {
   state = {
     files: [],
     loading: false,
     nodeIdentifier: "name",
-    animateUseNodeIds: true
+    animateUseNodeIds: true,
   };
 
   static propTypes = {
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   };
 
   static defaultProps = {
-    onSubmit: values => console.log(values)
+    onSubmit: (values) => console.log(values),
   };
 
-  onNodeIdentifierChange = (e, { value }) => this.setState({ nodeIdentifier: value });
+  onNodeIdentifierChange = (e, { value }) =>
+    this.setState({ nodeIdentifier: value });
 
-  animateUseNodeIds = () => this.setState(prevState => ({ animateUseNodeIds: !prevState.animateUseNodeIds }));
+  animateUseNodeIds = () =>
+    this.setState((prevState) => ({
+      animateUseNodeIds: !prevState.animateUseNodeIds,
+    }));
 
-  toggleMultilayer = (i) => this.setState(prevState => {
-    const file = prevState.files[i];
-    if (!file) return;
-    file.multilayer = !file.multilayer;
+  toggleMultilayer = (i) =>
+    this.setState((prevState) => {
+      const file = prevState.files[i];
+      if (!file) return;
+      file.multilayer = !file.multilayer;
 
-    // Switch to using id as node identifier if only one file set to multilayer
-    if (i === 0 && prevState.files.length === 1 && file.multilayer) {
-      return { files: prevState.files, nodeIdentifier: "id" };
-    }
+      // Switch to using id as node identifier if only one file set to multilayer
+      if (i === 0 && prevState.files.length === 1 && file.multilayer) {
+        return { files: prevState.files, nodeIdentifier: "id" };
+      }
 
-    return { files: prevState.files };
-  });
+      return { files: prevState.files };
+    });
 
-  withLoadingState = callback => () =>
+  withLoadingState = (callback) => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
 
   loadSelectedFiles = () => {
@@ -80,7 +88,7 @@ export default class LoadNetworks extends React.Component {
     this.input.value = "";
 
     Promise.all(validFiles.map(readAsText))
-      .then(files => {
+      .then((files) => {
         const newFiles = files.map((file, i) => ({
           contents: file,
           name: validFiles[i].name,
@@ -88,15 +96,15 @@ export default class LoadNetworks extends React.Component {
           format: validFiles[i].format,
           multilayer: false,
           error: false,
-          errorMessage: null
+          errorMessage: null,
         }));
 
         this.setState(({ files }) => ({
           files: [...files, ...newFiles],
-          loading: false
+          loading: false,
         }));
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         //Sentry.captureException(err);
       });
@@ -122,16 +130,17 @@ export default class LoadNetworks extends React.Component {
     const { files, nodeIdentifier } = this.state;
     const { onSubmit } = this.props;
 
-    const hasJson = files.some(file => file.format === "json");
+    const hasJson = files.some((file) => file.format === "json");
 
     if (hasJson) {
       // A JSON file represents a complete diagram, only allow one file
       // TODO: we should support adding new networks
       if (files.length > 1) {
-        files.forEach(file => {
+        files.forEach((file) => {
           if (file.format !== "json") {
             file.error = true;
-            file.errorMessage = "When a json file is present, all other files must be removed.";
+            file.errorMessage =
+              "When a json file is present, all other files must be removed.";
           }
         });
         this.setState({ loading: false });
@@ -146,7 +155,7 @@ export default class LoadNetworks extends React.Component {
 
     const checkNameConflicts = (nodes, file) => {
       const uniqueNames = new Set();
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         if (uniqueNames.has(node.name)) {
           const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
           file.errorMessage = message;
@@ -161,7 +170,10 @@ export default class LoadNetworks extends React.Component {
     files.forEach((file, i) => {
       const parseLinks = false;
       const lines = file.contents.split("\n").filter(Boolean);
-      const parser = file.format === "stree" ? streeParser : getParserForExtension(file.format);
+      const parser =
+        file.format === "stree"
+          ? streeParser
+          : getParserForExtension(file.format);
       const object = parser(lines, parseLinks);
 
       // If we found an error before, and switched to using node ids now, we need to reset any errors
@@ -170,7 +182,11 @@ export default class LoadNetworks extends React.Component {
 
       try {
         // If we only load one file that is set to multilayer, visualize each layer as a network
-        if (files.length === 1 && file.multilayer && (file.format === "tree" || file.format === "ftree")) {
+        if (
+          files.length === 1 &&
+          file.multilayer &&
+          (file.format === "tree" || file.format === "ftree")
+        ) {
           const objectParser = getParser("multilevelTree");
           const parsed = objectParser(object, file.name, nodeIdentifier);
 
@@ -185,7 +201,12 @@ export default class LoadNetworks extends React.Component {
         }
 
         const objectParser = getParser(file.format);
-        const parsed = objectParser(object, file.name, nodeIdentifier, file.multilayer);
+        const parsed = objectParser(
+          object,
+          file.name,
+          nodeIdentifier,
+          file.multilayer
+        );
 
         // If we use node name as identifier, all names must be unique
         if (nodeIdentifier === "name") {
@@ -199,7 +220,7 @@ export default class LoadNetworks extends React.Component {
       }
     });
 
-    if (files.some(file => file.error)) {
+    if (files.some((file) => file.error)) {
       this.animateUseNodeIds();
       this.setState({ loading: false });
       return;
@@ -214,28 +235,28 @@ export default class LoadNetworks extends React.Component {
     const filename = "science-1998-2001-2007.json";
 
     fetch(`/alluvial/data/${filename}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(this.setIdentifiersInJsonFormat)
       .then(onSubmit)
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
         this.setState({ loading: false });
         //Sentry.captureException(err);
       });
   };
 
-  removeFile = index =>
+  removeFile = (index) =>
     this.setState(({ files }) => {
       files.splice(index, 1);
-      const hasJson = files.some(file => file.format === "json");
+      const hasJson = files.some((file) => file.format === "json");
       if (!hasJson) {
-        files.forEach(file => file.error = false);
+        files.forEach((file) => (file.error = false));
       }
       return { files };
     });
 
   moveRow = (toIndex, fromIndex) =>
-    this.setState(state => {
+    this.setState((state) => {
       const { files } = state;
       const file = files[fromIndex];
       files.splice(fromIndex, 1);
@@ -248,9 +269,9 @@ export default class LoadNetworks extends React.Component {
 
     const background = {
       padding: "100px 0 100px 0",
-      background: `linear-gradient(hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0.7)), url(${Background}) no-repeat`,
+      background: `linear-gradient(hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0.7))`,
       backgroundSize: "115% auto",
-      backgroundPosition: "20% 20%"
+      backgroundPosition: "20% 20%",
     };
 
     return (
@@ -265,7 +286,7 @@ export default class LoadNetworks extends React.Component {
           <Label attached="top right">v {process.env.REACT_APP_VERSION}</Label>
           <Step.Group>
             <Step link onClick={this.withLoadingState(this.loadExample)}>
-              <Icon name="book"/>
+              <Icon name="book" />
               <Step.Content>
                 <Step.Title>Load example</Step.Title>
                 <Step.Description>Citation networks</Step.Description>
@@ -273,7 +294,11 @@ export default class LoadNetworks extends React.Component {
             </Step>
           </Step.Group>
 
-          <Divider horizontal style={{ margin: "20px 0px 30px 0px" }} content="Or"/>
+          <Divider
+            horizontal
+            style={{ margin: "20px 0px 30px 0px" }}
+            content="Or"
+          />
 
           <Step.Group ordered>
             <Step
@@ -294,7 +319,7 @@ export default class LoadNetworks extends React.Component {
                 id="upload"
                 onChange={this.withLoadingState(this.loadSelectedFiles)}
                 accept={acceptedFormats + ",.json"}
-                ref={input => (this.input = input)}
+                ref={(input) => (this.input = input)}
               />
             </Step>
             <Step
@@ -317,14 +342,16 @@ export default class LoadNetworks extends React.Component {
             <Form>
               <Form.Field>
                 Node identifier
-                <Popup trigger={<Icon name="question"/>} inverted>
+                <Popup trigger={<Icon name="question" />} inverted>
                   <p>
-                    Two nodes in different networks are considered equal if their names are the same.
-                    For this to work, all nodes in a network must have unique names.
+                    Two nodes in different networks are considered equal if
+                    their names are the same. For this to work, all nodes in a
+                    network must have unique names.
                   </p>
                   <p>
-                    If a network does not have unique names, you can try to use node ids as identifiers,
-                    which uses the node ids to determine if two nodes are equal.
+                    If a network does not have unique names, you can try to use
+                    node ids as identifiers, which uses the node ids to
+                    determine if two nodes are equal.
                   </p>
                 </Popup>
               </Form.Field>
@@ -351,57 +378,69 @@ export default class LoadNetworks extends React.Component {
             </Form>
           </Transition>
 
-          {files.length > 0 &&
-          <Table celled unstackable striped size="small">
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Name</Table.HeaderCell>
-                <Table.HeaderCell>Size</Table.HeaderCell>
-                <Table.HeaderCell>Format</Table.HeaderCell>
-                <Table.HeaderCell>Multilayer</Table.HeaderCell>
-                <Table.HeaderCell/>
-              </Table.Row>
-            </Table.Header>
+          {files.length > 0 && (
+            <Table celled unstackable striped size="small">
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Name</Table.HeaderCell>
+                  <Table.HeaderCell>Size</Table.HeaderCell>
+                  <Table.HeaderCell>Format</Table.HeaderCell>
+                  <Table.HeaderCell>Multilayer</Table.HeaderCell>
+                  <Table.HeaderCell />
+                </Table.Row>
+              </Table.Header>
 
-            <Table.Body>
-              {files.map((file, i) =>
-                <Transition key={i} animation="shake" duration={700} visible={!file.error}>
-                  <DraggableTableRow
-                    draggable
-                    className="draggable"
-                    index={i}
-                    action={this.moveRow}
+              <Table.Body>
+                {files.map((file, i) => (
+                  <Transition
+                    key={i}
+                    animation="shake"
+                    duration={700}
+                    visible={!file.error}
                   >
-                    <Table.Cell style={{ cursor: "grab" }} error={file.error}>
-                      {file.name}
-                      {file.error &&
-                      <Popup
-                        inverted
-                        content={file.errorMessage}
-                        trigger={
-                          <Icon name="warning sign" style={{ float: "right", cursor: "pointer" }}/>
-                        }/>
-                      }
-                    </Table.Cell>
-                    <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
-                    <Table.Cell>{file.format}</Table.Cell>
-                    <Table.Cell>
-                      <Checkbox checked={file.multilayer} onChange={() => this.toggleMultilayer(i)}/>
-                    </Table.Cell>
-                    <Table.Cell
-                      selectable
-                      textAlign="center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => this.removeFile(i)}
+                    <DraggableTableRow
+                      draggable
+                      className="draggable"
+                      index={i}
+                      action={this.moveRow}
                     >
-                      <Icon name="x"/>
-                    </Table.Cell>
-                  </DraggableTableRow>
-                </Transition>
-              )}
-            </Table.Body>
-          </Table>
-          }
+                      <Table.Cell style={{ cursor: "grab" }} error={file.error}>
+                        {file.name}
+                        {file.error && (
+                          <Popup
+                            inverted
+                            content={file.errorMessage}
+                            trigger={
+                              <Icon
+                                name="warning sign"
+                                style={{ float: "right", cursor: "pointer" }}
+                              />
+                            }
+                          />
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                      <Table.Cell>{file.format}</Table.Cell>
+                      <Table.Cell>
+                        <Checkbox
+                          checked={file.multilayer}
+                          onChange={() => this.toggleMultilayer(i)}
+                        />
+                      </Table.Cell>
+                      <Table.Cell
+                        selectable
+                        textAlign="center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => this.removeFile(i)}
+                      >
+                        <Icon name="x" />
+                      </Table.Cell>
+                    </DraggableTableRow>
+                  </Transition>
+                ))}
+              </Table.Body>
+            </Table>
+          )}
         </Segment>
       </div>
     );

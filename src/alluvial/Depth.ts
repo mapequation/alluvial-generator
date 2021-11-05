@@ -8,7 +8,7 @@ export const BRANCH: Depth = 4;
 export const STREAMLINE_NODE: Depth = 5;
 export const LEAF_NODE: Depth = 6;
 
-export default {
+const depths = {
   ALLUVIAL_ROOT,
   NETWORK_ROOT,
   MODULE,
@@ -16,4 +16,6 @@ export default {
   BRANCH,
   STREAMLINE_NODE,
   LEAF_NODE,
-};
+} as const;
+
+export default depths;
