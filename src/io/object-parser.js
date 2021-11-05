@@ -1,21 +1,15 @@
-// @flow
 import id from "../lib/id";
 
-
-type ObjectParser = (object: Object, name: string, nodeIdentifier: string) => Network;
-
 const setNodeIdentifiers = (object, identifier) => {
-  const id = (node) => (node.stateId !== null ? node.stateId : node.id).toString();
+  const id = (node) =>
+    (node.stateId !== null ? node.stateId : node.id).toString();
   const name = (node) => node.name;
 
   let nodeId = null;
 
-  if (identifier === "name")
-    nodeId = name;
-  else if (identifier === "id")
-    nodeId = id;
-  else
-    return object;
+  if (identifier === "name") nodeId = name;
+  else if (identifier === "id") nodeId = id;
+  else return object;
 
   for (let node of object.nodes) {
     node.identifier = nodeId(node);
@@ -23,22 +17,27 @@ const setNodeIdentifiers = (object, identifier) => {
   return object;
 };
 
-const parse: ObjectParser = (object, name, nodeIdentifier = "name", isMultilayer = false) => {
+const parse = (
+  object,
+  name,
+  nodeIdentifier = "name",
+  isMultilayer = false
+) => {
   if (isMultilayer) {
     // TODO remove support for 0.x
-    object.nodes.forEach(node => node.stateId = null);
+    object.nodes.forEach((node) => (node.stateId = null));
   }
 
   setNodeIdentifiers(object, nodeIdentifier);
 
-  return ({
+  return {
     id: id(),
     name,
-    ...object
-  });
+    ...object,
+  };
 };
 
-const parseClu: ObjectParser = (object, name, nodeIdentifier = "name") => {
+const parseClu = (object, name, nodeIdentifier = "name") => {
   setNodeIdentifiers(object, nodeIdentifier);
 
   const numNodes = object.nodes.length;
@@ -47,33 +46,38 @@ const parseClu: ObjectParser = (object, name, nodeIdentifier = "name") => {
   return {
     id: id(),
     name,
-    nodes: object.nodes.map(node => ({
+    nodes: object.nodes.map((node) => ({
       path: node.module.toString(),
       id: node.id,
       name: node.stateId ? node.stateId.toString() : node.id.toString(),
       ...node,
-      flow: node.flow || normalizedWeight
+      flow: node.flow || normalizedWeight,
     })),
     codelength: object.codelength,
-    moduleNames: null
+    moduleNames: null,
   };
 };
 
-const parseMultilevelTree = (object, name, nodeIdentifier: string = "name") => {
+const parseMultilevelTree = (object, name, nodeIdentifier = "name") => {
   const nodesPerLayer = {};
 
-  object.nodes.forEach(node => {
+  object.nodes.forEach((node) => {
     node.stateId = null;
 
-    if (nodesPerLayer[(node.layerId)] == null) {
-      nodesPerLayer[(node.layerId)] = [];
+    if (nodesPerLayer[node.layerId] == null) {
+      nodesPerLayer[node.layerId] = [];
     }
 
-    nodesPerLayer[(node.layerId)].push(node);
+    nodesPerLayer[node.layerId].push(node);
   });
 
   return Object.entries(nodesPerLayer).map(([layerId, nodes]) =>
-    parse({ codelength: object.codelength, nodes }, `${name} layer ${layerId}`, nodeIdentifier));
+    parse(
+      { codelength: object.codelength, nodes },
+      `${name} layer ${layerId}`,
+      nodeIdentifier
+    )
+  );
 };
 
 const objectParsers = {
@@ -82,13 +86,15 @@ const objectParsers = {
   tree: parse,
   ftree: parse,
   stree: parse,
-  multilevelTree: parseMultilevelTree // FIXME: this is not a valid file extension
+  multilevelTree: parseMultilevelTree, // FIXME: this is not a valid file extension
 };
 
-export const validExtensions: string[] = Object.keys(objectParsers);
+export const validExtensions = Object.keys(objectParsers);
 
-export const isValidExtension = (ext: string) => validExtensions.includes(ext);
+export const isValidExtension = (ext) => validExtensions.includes(ext);
 
-export const getParser = (ext: string) => objectParsers[ext];
+export const getParser = (ext) => objectParsers[ext];
 
-export const acceptedFormats = validExtensions.map(ext => `.${ext}`).join(",");
+export const acceptedFormats = validExtensions
+  .map((ext) => `.${ext}`)
+  .join(",");

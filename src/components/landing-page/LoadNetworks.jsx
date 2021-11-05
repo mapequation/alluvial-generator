@@ -1,5 +1,5 @@
 import { getParserForExtension } from "@mapequation/infoparse";
-import * as Sentry from "@sentry/browser";
+//import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import React from "react";
 import {
@@ -116,7 +116,7 @@ export default class LoadNetworks extends React.Component {
       })
       .catch(err => {
         console.log(err);
-        Sentry.captureException(err);
+        //Sentry.captureException(err);
       });
   };
 
@@ -238,7 +238,7 @@ export default class LoadNetworks extends React.Component {
       .catch(err => {
         console.log(err);
         this.setState({ loading: false });
-        Sentry.captureException(err);
+        //Sentry.captureException(err);
       });
   };
 

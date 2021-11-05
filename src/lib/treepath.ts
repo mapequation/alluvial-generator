@@ -1,10 +1,4 @@
-// @flow
-import shim from "string.prototype.matchall/shim";
-
-
-type Path = TreePath | string; // eslint-disable-line no-use-before-define
-
-shim();
+type Path = TreePath | string;
 
 const insignificantPathRexeg = /(\d+)([:;])+/g;
 
@@ -53,14 +47,14 @@ export default class TreePath {
   /**
    * Construct a new TreePath
    */
-  static fromArray(path: $ReadOnlyArray<number | string>): TreePath {
+  static fromArray(path: number[] | string[]) {
     return !path.length ? TreePath.root() : new TreePath(path.join(":"));
   }
 
   /**
    * Construct a TreePath from two paths
    */
-  static join(parentPath: Path, path: Path): TreePath {
+  static join(parentPath: Path, path: Path) {
     if (TreePath.isRoot(parentPath)) {
       return new TreePath(path);
     }
@@ -70,7 +64,7 @@ export default class TreePath {
   /**
    * Create a DOM friendly id
    */
-  toId(): string {
+  toId() {
     let path = this.toString();
 
     if (TreePath.isTreePath(path)) {
@@ -83,7 +77,7 @@ export default class TreePath {
   /**
    * Get the root
    */
-  static root(): TreePath {
+  static root() {
     return new TreePath("root");
   }
 
@@ -95,19 +89,19 @@ export default class TreePath {
     return treePath.toString() === "root";
   }
 
-  equal(other: Path): boolean {
+  equal(other: Path) {
     return TreePath.equal(this, other);
   }
 
-  static equal(a: Path, b: Path): boolean {
+  static equal(a: Path, b: Path) {
     return a.toString() === b.toString();
   }
 
-  isAncestor(child: Path): boolean {
+  isAncestor(child: Path) {
     return TreePath.isAncestor(this, child);
   }
 
-  static isAncestor(parent: Path, child: Path): boolean {
+  static isAncestor(parent: Path, child: Path) {
     if (TreePath.isRoot(parent)) return true;
 
     const p = parent.toString();
@@ -118,38 +112,38 @@ export default class TreePath {
     return c.startsWith(p);
   }
 
-  get level(): number {
+  get level() {
     return this.isRoot() ? 0 : this.pathArr.length;
   }
 
-  static level(treePath: Path): number {
+  static level(treePath: Path) {
     return TreePath.isRoot(treePath) ? 0 : TreePath.toArray(treePath).length;
   }
 
-  get rank(): number {
+  get rank() {
     if (TreePath.isRoot(this)) return 0;
     const asArray = this.toArray();
     return asArray[asArray.length - 1];
   }
 
-  ancestorAtLevel(level: number): TreePath {
+  ancestorAtLevel(level: number) {
     return TreePath.ancestorAtLevel(this, level);
   }
 
-  ancestorAtLevelAsString(level: number): string {
+  ancestorAtLevelAsString(level: number) {
     return this.ancestorPaths.get(level) || this.path;
   }
 
-  static ancestorAtLevel(treePath: Path, level: number): TreePath {
+  static ancestorAtLevel(treePath: Path, level: number) {
     if (level === 0) return TreePath.root();
     return TreePath.fromArray(TreePath.toArray(treePath).slice(0, level));
   }
 
-  isParentOf(child: Path): boolean {
+  isParentOf(child: Path) {
     return TreePath.isParentOf(this, child);
   }
 
-  static isParentOf(parent: Path, child: Path): boolean {
+  static isParentOf(parent: Path, child: Path) {
     const p = TreePath.parentPath(child);
     if (!p) return false;
     return TreePath.equal(parent, p);
@@ -157,17 +151,14 @@ export default class TreePath {
 
   /**
    * Get the path to the node one step up in the hierarchy.
-   *
-   * @see TreePath.parentPath
    */
-  parentPath(): ?TreePath {
+  parentPath() {
     return TreePath.parentPath(this.toString());
   }
 
   /**
    * Get the path to the node one step up in the hierarchy.
    *
-   * @example
    * > TreePath.parentPath("root")
    * null
    * > TreePath.parentPath(1)
@@ -175,7 +166,7 @@ export default class TreePath {
    * > TreePath.parentPath("1:1")
    * new TreePath("1")
    */
-  static parentPath(path: Path): ?TreePath {
+  static parentPath(path: Path) {
     if (!TreePath.isTreePath(path)) {
       return null;
     }
@@ -185,29 +176,26 @@ export default class TreePath {
     }
 
     const p = path.toString();
-    return new TreePath(p.substr(0, p.lastIndexOf(":")));
+    return new TreePath(p.substr(0, p.lastIndexOf(":"))); // FIXME substr is deprecated
   }
 
   /**
    * Get path as string
    */
-  toString(): string {
+  toString() {
     return this.path;
   }
 
   /**
    * Get path as array
-   *
-   * @see TreePath.toArray
    */
-  toArray(): number[] {
+  toArray() {
     return TreePath.toArray(this.path);
   }
 
   /**
    * Split a tree path string to array and parse to integer.
    *
-   * @example
    * > TreePath.toArray('1:1')
    * [1, 1]
    * > TreePath.toArray('1')
@@ -217,18 +205,15 @@ export default class TreePath {
    * > TreePath.toArray('root')
    * [ NaN ]
    */
-  static toArray(path: Path): number[] {
-    return path
-      .toString()
-      .split(":")
-      .map(Number);
+  static toArray(path: Path) {
+    return path.toString().split(":").map(Number);
   }
 
   /**
    * Check if path matches the format 1:1:1
    * (repeating digit and colon ending with digit)
    */
-  static isTreePath(path: Path): boolean {
+  static isTreePath(path: Path) {
     return /^(\d+:)*\d+$/.test(path.toString());
   }
 }
