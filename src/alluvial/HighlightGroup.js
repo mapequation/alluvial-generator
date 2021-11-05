@@ -1,4 +1,3 @@
-// @flow
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";

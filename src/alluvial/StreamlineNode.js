@@ -1,4 +1,3 @@
-// @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP, STREAMLINE_NODE } from "./Depth";

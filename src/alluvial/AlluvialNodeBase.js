@@ -1,4 +1,3 @@
-// @flow
 import type { Depth } from "./Depth";
 
 type Position = {

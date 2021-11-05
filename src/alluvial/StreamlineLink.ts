@@ -1,6 +1,4 @@
-// @flow
-import HighlightGroup from "./HighlightGroup";
-import StreamlineNode from "./StreamlineNode";
+import type StreamlineNode from "./StreamlineNode";
 
 export default class StreamlineLink {
   left: StreamlineNode;
@@ -23,7 +21,7 @@ export default class StreamlineLink {
   asObject() {
     const {
       left: {
-        layout: leftLayout,
+        layout: leftLayout, // FIXME
         parent: leftBranch,
         networkId: leftNetworkId,
         id,
@@ -32,7 +30,7 @@ export default class StreamlineLink {
         depth,
       },
       right: {
-        layout: rightLayout,
+        layout: rightLayout, // FIXME
         parent: rightBranch,
         networkId: rightNetworkId,
       },
@@ -44,19 +42,13 @@ export default class StreamlineLink {
     const y1 = rightLayout.y;
     const h0 = leftLayout.height;
     const h1 = rightLayout.height;
-    const xAvg = (x0 + x1) / 2;
-    const yAvg = (y0 + y1) / 2;
+    const xMid = (x0 + x1) / 2;
+    const yMid = (y0 + y1) / 2;
 
-    const leftGroup: ?HighlightGroup = leftBranch ? leftBranch.parent : null;
-    const rightGroup: ?HighlightGroup = rightBranch ? rightBranch.parent : null;
-    const leftHighlightIndex = leftGroup ? leftGroup.highlightIndex : -1;
-    const rightHighlightIndex = rightGroup ? rightGroup.highlightIndex : -1;
-    const leftInsignificant = leftGroup ? leftGroup.insignificant : false;
-    const rightInsignificant = rightGroup ? rightGroup.insignificant : false;
-    const leftModuleId =
-      leftGroup && leftGroup.parent ? leftGroup.parent.moduleId : 0;
-    const rightModuleId =
-      rightGroup && rightGroup.parent ? rightGroup.parent.moduleId : 0;
+    const leftGroup = leftBranch ? leftBranch.parent : null;
+    const rightGroup = rightBranch ? rightBranch.parent : null;
+    const leftHighlightIndex = leftGroup?.highlightIndex ?? -1;
+    const rightHighlightIndex = rightGroup?.highlightIndex ?? -1;
 
     return {
       id,
@@ -64,8 +56,8 @@ export default class StreamlineLink {
       targetId: targetId ? targetId.replace("_left", "") : "",
       leftNetworkId,
       rightNetworkId,
-      leftModuleId,
-      rightModuleId,
+      leftModuleId: leftGroup?.parent?.moduleId ?? 0,
+      rightModuleId: rightGroup?.parent?.moduleId ?? 0,
       depth,
       avgHeight: (h0 + h1) / 2,
       path: {
@@ -77,18 +69,18 @@ export default class StreamlineLink {
         h1,
       },
       transitionPath: {
-        x0: xAvg,
-        x1: xAvg,
-        y0: yAvg + h0 / 4,
-        y1: yAvg + h1 / 4,
+        x0: xMid,
+        x1: xMid,
+        y0: yMid + h0 / 4,
+        y1: yMid + h1 / 4,
         h0: h0 / 2,
         h1: h1 / 2,
       },
       leftHighlightIndex,
       rightHighlightIndex,
       highlightIndex: Math.max(leftHighlightIndex, rightHighlightIndex),
-      leftInsignificant,
-      rightInsignificant,
+      leftInsignificant: leftGroup?.insignificant ?? false,
+      rightInsignificant: rightGroup?.insignificant ?? false,
     };
   }
 }

@@ -1,4 +1,3 @@
-// @flow
 import AlluvialRoot from "./AlluvialRoot";
 import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";

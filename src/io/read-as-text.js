@@ -1,4 +1,4 @@
-export default function (file) {
+export default function readAsText(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 

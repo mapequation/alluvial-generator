@@ -1,4 +1,3 @@
-// @flow
 import type { AlluvialNode } from "./AlluvialNodeBase";
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import Depth, { ALLUVIAL_ROOT, NETWORK_ROOT } from "./Depth";
@@ -7,7 +6,7 @@ import LeafNode from "./LeafNode";
 import Module from "./Module";
 import NetworkRoot from "./NetworkRoot";
 import StreamlineNode from "./StreamlineNode";
-import Tree from "./Tree";
+import Tree from "../utils/Tree";
 
 export type VerticalAlign = "bottom" | "justify" | "top";
 

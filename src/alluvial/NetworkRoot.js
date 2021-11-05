@@ -1,4 +1,3 @@
-// @flow
 import AlluvialNodeBase from "./AlluvialNodeBase";
 import AlluvialRoot from "./AlluvialRoot";
 import { MODULE, NETWORK_ROOT } from "./Depth";
