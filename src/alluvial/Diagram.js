@@ -3,9 +3,8 @@ import AlluvialRoot from "./AlluvialRoot";
 import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 
-
 type Event = {
-  shiftKey: boolean
+  shiftKey: boolean,
 };
 
 export default class Diagram {
@@ -15,7 +14,7 @@ export default class Diagram {
   _asObject: Object = {};
 
   constructor(networks: Network[]) {
-    networks.forEach(network => this.alluvialRoot.addNetwork(network));
+    networks.forEach((network) => this.alluvialRoot.addNetwork(network));
   }
 
   doubleClick(alluvialObject: Object, event: ?Event): boolean {
@@ -24,7 +23,9 @@ export default class Diagram {
     };
 
     const { shiftKey } = event || noKeyModifiers;
-    const action = shiftKey ? this.alluvialRoot.regroupModule : this.alluvialRoot.expandModule;
+    const action = shiftKey
+      ? this.alluvialRoot.regroupModule
+      : this.alluvialRoot.expandModule;
 
     const { depth } = alluvialObject;
 
@@ -34,9 +35,18 @@ export default class Diagram {
     }
 
     if (depth === Depth.STREAMLINE_NODE) {
-      const { rightNetworkId, leftNetworkId, rightModuleId, leftModuleId } = alluvialObject;
-      const leftSuccess = action.call(this.alluvialRoot, leftModuleId, leftNetworkId);
-      const rightSuccess = action.call(this.alluvialRoot, rightModuleId, rightNetworkId);
+      const { rightNetworkId, leftNetworkId, rightModuleId, leftModuleId } =
+        alluvialObject;
+      const leftSuccess = action.call(
+        this.alluvialRoot,
+        leftModuleId,
+        leftNetworkId
+      );
+      const rightSuccess = action.call(
+        this.alluvialRoot,
+        rightModuleId,
+        rightNetworkId
+      );
       return leftSuccess || rightSuccess;
     }
 
@@ -61,9 +71,11 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setModuleColor(alluvialObject: Object,
-                 paintNodesInAllNetworks: boolean = false,
-                 paintModuleIdsInAllNetworks: boolean = false) {
+  setModuleColor(
+    alluvialObject: Object,
+    paintNodesInAllNetworks: boolean = false,
+    paintModuleIdsInAllNetworks: boolean = false
+  ) {
     const { highlightIndex, networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
@@ -71,15 +83,15 @@ export default class Diagram {
     if (!module) return;
     const leafNodes = Array.from(module.leafNodes());
 
-    leafNodes.forEach(node => {
+    leafNodes.forEach((node) => {
       node.highlightIndex = highlightIndex;
       node.update();
     });
 
     if (paintNodesInAllNetworks) {
       this.alluvialRoot.children
-        .filter(root => root.networkId !== networkId)
-        .forEach(networkRoot =>
+        .filter((root) => root.networkId !== networkId)
+        .forEach((networkRoot) =>
           leafNodes
             .reduce((nodes, node) => {
               const oppositeNode = networkRoot.getLeafNode(node.identifier);
@@ -89,14 +101,18 @@ export default class Diagram {
               }
               return nodes;
             }, [])
-            .forEach(node => node.update()));
+            .forEach((node) => node.update())
+        );
     } else if (paintModuleIdsInAllNetworks) {
       this.alluvialRoot.children
-        .filter(root => root.networkId !== networkId)
-        .forEach(networkRoot => {
+        .filter((root) => root.networkId !== networkId)
+        .forEach((networkRoot) => {
           const oppositeModule = networkRoot.getModule(moduleId);
           if (oppositeModule) {
-            this.setModuleColor({ ...oppositeModule.asObject(), highlightIndex });
+            this.setModuleColor({
+              ...oppositeModule.asObject(),
+              highlightIndex,
+            });
           }
         });
     }
@@ -108,18 +124,22 @@ export default class Diagram {
     alluvialObject: ?Object = null,
     highlightColors: string[],
     paintNodesInAllNetworks: boolean = true,
-    paintModuleIdsInAllNetworks: boolean = false,
+    paintModuleIdsInAllNetworks: boolean = false
   ) {
     const highlightIndices = Array.from(highlightColors.keys());
 
     if (paintNodesInAllNetworks && paintModuleIdsInAllNetworks) {
-      console.warn("Cannot use paintNodesInAllNetworks and paintModuleIdsInAllNetworks together");
+      console.warn(
+        "Cannot use paintNodesInAllNetworks and paintModuleIdsInAllNetworks together"
+      );
       return;
     }
 
     this.removeColors();
 
-    const networkId = alluvialObject ? alluvialObject.networkId : this.alluvialRoot.children[0].networkId;
+    const networkId = alluvialObject
+      ? alluvialObject.networkId
+      : this.alluvialRoot.children[0].networkId;
 
     if (!networkId) {
       console.warn("Tried to auto paint but could not find a network id!");
@@ -140,17 +160,22 @@ export default class Diagram {
 
     if (paintNodesInAllNetworks) {
       networkRoot.children
-        .filter(module => module.flow > 0)
+        .filter((module) => module.flow > 0)
         .forEach((module, i) =>
-          this.setModuleColor({
-            ...module.asObject(),
-            highlightIndex: highlightIndices[i % highlightIndices.length],
-          }, true, false));
+          this.setModuleColor(
+            {
+              ...module.asObject(),
+              highlightIndex: highlightIndices[i % highlightIndices.length],
+            },
+            true,
+            false
+          )
+        );
     } else if (paintModuleIdsInAllNetworks) {
       const moduleIds = new Set();
 
-      this.alluvialRoot.children.forEach(network => {
-        network.children.forEach(module => {
+      this.alluvialRoot.children.forEach((network) => {
+        network.children.forEach((module) => {
           moduleIds.add(module.moduleId);
         });
       });
@@ -165,32 +190,40 @@ export default class Diagram {
         return 0;
       };
 
-      Array.from(moduleIds).sort((a, b) => {
-        if (a === b) return 0;
+      Array.from(moduleIds)
+        .sort((a, b) => {
+          if (a === b) return 0;
 
-        let aPath = a.split(":");
-        let bPath = b.split(":");
+          let aPath = a.split(":");
+          let bPath = b.split(":");
 
-        if (aPath.length === bPath.length) {
-          const i = differenceIndex(aPath, bPath);
+          if (aPath.length === bPath.length) {
+            const i = differenceIndex(aPath, bPath);
 
-          return +aPath[i] < +bPath[i] ? -1 : 1;
-        }
+            return +aPath[i] < +bPath[i] ? -1 : 1;
+          }
 
-        // different lengths
-        return aPath.length < bPath.length ? -1 : 1;
-      }).forEach((moduleId, i) => {
-        moduleHighlightindexMap[moduleId] = highlightIndices[i % highlightIndices.length];
-      });
+          // different lengths
+          return aPath.length < bPath.length ? -1 : 1;
+        })
+        .forEach((moduleId, i) => {
+          moduleHighlightindexMap[moduleId] =
+            highlightIndices[i % highlightIndices.length];
+        });
 
-      this.alluvialRoot.children.forEach(network => {
+      this.alluvialRoot.children.forEach((network) => {
         network.children
-          .filter(module => module.flow > 0)
+          .filter((module) => module.flow > 0)
           .forEach((module, i) =>
-            this.setModuleColor({
-              ...module.asObject(),
-              highlightIndex: moduleHighlightindexMap[module.moduleId],
-            }, false, false));
+            this.setModuleColor(
+              {
+                ...module.asObject(),
+                highlightIndex: moduleHighlightindexMap[module.moduleId],
+              },
+              false,
+              false
+            )
+          );
       });
     }
   }
@@ -206,10 +239,12 @@ export default class Diagram {
           }
         }
       }
-      modules.forEach(module => this.setModuleColor({
-        ...module.asObject(),
-        highlightIndex: NOT_HIGHLIGHTED,
-      }));
+      modules.forEach((module) =>
+        this.setModuleColor({
+          ...module.asObject(),
+          highlightIndex: NOT_HIGHLIGHTED,
+        })
+      );
     }
 
     this.dirty = true;
@@ -238,18 +273,23 @@ export default class Diagram {
 
     const visibleModules = {};
 
-    networkRoots.forEach(({ networkId, children }) =>
-      visibleModules[networkId] = children.map(module => module.moduleId));
+    networkRoots.forEach(
+      ({ networkId, children }) =>
+        (visibleModules[networkId] = children.map((module) => module.moduleId))
+    );
 
     return visibleModules;
   }
 
   clearFilters() {
-    this.alluvialRoot.children.forEach(networkRoot => networkRoot.clearFilter());
+    this.alluvialRoot.children.forEach((networkRoot) =>
+      networkRoot.clearFilter()
+    );
   }
 
   setVisibleModules(visibleModules: { [key: string]: Array<string> }) {
-    for (let [networkId, moduleIds] of Object.entries(visibleModules)) { // $FlowFixMe
+    for (let [networkId, moduleIds] of Object.entries(visibleModules)) {
+      // $FlowFixMe
       const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
 
       if (!networkRoot) {

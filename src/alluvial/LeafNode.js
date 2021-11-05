@@ -10,7 +10,6 @@ import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
-
 const streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
 export default class LeafNode extends AlluvialNodeBase {
@@ -31,7 +30,7 @@ export default class LeafNode extends AlluvialNodeBase {
 
   oppositeNodes: {
     LEFT: ?LeafNode,
-    RIGHT: ?LeafNode
+    RIGHT: ?LeafNode,
   } = {};
 
   networkRoot: NetworkRoot;
@@ -43,12 +42,14 @@ export default class LeafNode extends AlluvialNodeBase {
     this.identifier = node.identifier;
     this.nodeId = node.id || node.stateId || 0;
     this.treePath = new TreePath(node.path);
-    this.highlightIndex = node.highlightIndex && Number.isInteger(node.highlightIndex)
-      ? node.highlightIndex
-      : NOT_HIGHLIGHTED;
-    this.moduleLevel = node.moduleLevel && Number.isInteger(node.moduleLevel)
-      ? node.moduleLevel
-      : 1;
+    this.highlightIndex =
+      node.highlightIndex && Number.isInteger(node.highlightIndex)
+        ? node.highlightIndex
+        : NOT_HIGHLIGHTED;
+    this.moduleLevel =
+      node.moduleLevel && Number.isInteger(node.moduleLevel)
+        ? node.moduleLevel
+        : 1;
     this.networkRoot = networkRoot;
   }
 
@@ -65,7 +66,7 @@ export default class LeafNode extends AlluvialNodeBase {
       identifier: this.identifier,
       insignificant: this.insignificant,
       highlightIndex: this.highlightIndex,
-      moduleLevel: this.moduleLevel
+      moduleLevel: this.moduleLevel,
     };
   }
 
@@ -102,9 +103,11 @@ export default class LeafNode extends AlluvialNodeBase {
   }
 
   add() {
-    const module = this.networkRoot.getModule(this.moduleId) ||
+    const module =
+      this.networkRoot.getModule(this.moduleId) ||
       new Module(this.networkRoot, this.moduleId, this.moduleLevel);
-    const group = module.getGroup(this.highlightIndex, this.insignificant) ||
+    const group =
+      module.getGroup(this.highlightIndex, this.insignificant) ||
       new HighlightGroup(module, this.highlightIndex, this.insignificant);
 
     for (let branch of group) {
@@ -114,7 +117,9 @@ export default class LeafNode extends AlluvialNodeBase {
       if (!oppositeNode) {
         const neighborNetwork = this.networkRoot.getNeighbor(side);
         if (neighborNetwork) {
-          oppositeNode = this.oppositeNodes[side] = neighborNetwork.getLeafNode(this.identifier);
+          oppositeNode = this.oppositeNodes[side] = neighborNetwork.getLeafNode(
+            this.identifier
+          );
         }
       }
 
@@ -140,7 +145,10 @@ export default class LeafNode extends AlluvialNodeBase {
 
           const branch = oldStreamlineNode.parent;
           oppositeStreamlineNode = new StreamlineNode(branch, oppositeId);
-          streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
+          streamlineNodesById.set(
+            oppositeStreamlineNode.id,
+            oppositeStreamlineNode
+          );
           streamlineNode.linkTo(oppositeStreamlineNode);
         }
 
@@ -212,7 +220,9 @@ export default class LeafNode extends AlluvialNodeBase {
         oppositeStreamlineNode.makeDangling();
         oppositeStreamlineNode.removeLink();
 
-        const alreadyDanglingStreamlineNode = streamlineNodesById.get(oppositeStreamlineNode.id);
+        const alreadyDanglingStreamlineNode = streamlineNodesById.get(
+          oppositeStreamlineNode.id
+        );
         // Does the (new) dangling id already exist? Move nodes from it.
         if (alreadyDanglingStreamlineNode) {
           const oppositeSide = opposite(side);
@@ -227,7 +237,10 @@ export default class LeafNode extends AlluvialNodeBase {
           }
         } else {
           // Update with the new dangling id
-          streamlineNodesById.set(oppositeStreamlineNode.id, oppositeStreamlineNode);
+          streamlineNodesById.set(
+            oppositeStreamlineNode.id,
+            oppositeStreamlineNode
+          );
         }
       }
 
@@ -248,11 +261,11 @@ export default class LeafNode extends AlluvialNodeBase {
     return {
       ...super.asObject(),
       name: this.name,
-      highlightIndex: this.highlightIndex
+      highlightIndex: this.highlightIndex,
     };
   }
 
-  * leafNodes(): Iterable<AlluvialNode> {
+  *leafNodes(): Iterable<AlluvialNode> {
     yield this;
   }
 }

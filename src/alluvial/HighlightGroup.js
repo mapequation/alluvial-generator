@@ -6,15 +6,11 @@ import { HIGHLIGHT_GROUP } from "./Depth";
 import Module from "./Module";
 import { LEFT, RIGHT } from "./Side";
 
-
 export const NOT_HIGHLIGHTED = -1;
 
 export default class HighlightGroup extends AlluvialNodeBase {
   parent: ?Module;
-  children: Branch[] = [
-    new Branch(this, LEFT),
-    new Branch(this, RIGHT)
-  ];
+  children: Branch[] = [new Branch(this, LEFT), new Branch(this, RIGHT)];
   depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
   insignificant: boolean;
@@ -24,7 +20,11 @@ export default class HighlightGroup extends AlluvialNodeBase {
     highlightIndex: number = NOT_HIGHLIGHTED,
     insignificant: boolean = false
   ) {
-    super(parent, parent.networkId, `${parent.id}_group${insignificant ? "i" : ""}${highlightIndex}`);
+    super(
+      parent,
+      parent.networkId,
+      `${parent.id}_group${insignificant ? "i" : ""}${highlightIndex}`
+    );
     parent.addChild(this);
     this.highlightIndex = highlightIndex;
     this.insignificant = insignificant;
@@ -42,7 +42,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
       flow: this.flow,
       depth: this.depth,
       highlightIndex: this.highlightIndex,
-      insignificant: this.insignificant
+      insignificant: this.insignificant,
     };
   }
 
@@ -62,7 +62,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     return this.left.numLeafNodes;
   }
 
-  * leafNodes(): Iterable<AlluvialNode> {
+  *leafNodes(): Iterable<AlluvialNode> {
     yield* this.left.leafNodes();
   }
 }

@@ -17,12 +17,7 @@ const setNodeIdentifiers = (object, identifier) => {
   return object;
 };
 
-const parse = (
-  object,
-  name,
-  nodeIdentifier = "name",
-  isMultilayer = false
-) => {
+const parse = (object, name, nodeIdentifier = "name", isMultilayer = false) => {
   if (isMultilayer) {
     // TODO remove support for 0.x
     object.nodes.forEach((node) => (node.stateId = null));

@@ -8,7 +8,6 @@ import type { Side } from "./Side";
 import StreamlineLink from "./StreamlineLink";
 import StreamlineNode from "./StreamlineNode";
 
-
 export default class NetworkRoot extends AlluvialNodeBase {
   parent: ?AlluvialRoot;
   children: Module[] = [];
@@ -32,9 +31,11 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   addNodes(nodes: Node[]) {
-    const leafNodes = nodes.map(node => new LeafNode(node, this));
-    this.nodesByIdentifier = new Map(Array.from(leafNodes, node => [node.identifier, node]));
-    leafNodes.forEach(node => node.add());
+    const leafNodes = nodes.map((node) => new LeafNode(node, this));
+    this.nodesByIdentifier = new Map(
+      Array.from(leafNodes, (node) => [node.identifier, node])
+    );
+    leafNodes.forEach((node) => node.add());
   }
 
   addChild(module: Module) {
@@ -56,9 +57,15 @@ export default class NetworkRoot extends AlluvialNodeBase {
   getNeighbor(side: Side): ?NetworkRoot {
     const alluvialRoot = this.parent;
     if (alluvialRoot) {
-      const networkIndex = alluvialRoot.children.findIndex(networkRoot => networkRoot.networkId === this.networkId);
+      const networkIndex = alluvialRoot.children.findIndex(
+        (networkRoot) => networkRoot.networkId === this.networkId
+      );
       const neighborNetworkIndex = networkIndex + side;
-      if (networkIndex > -1 && neighborNetworkIndex > -1 && neighborNetworkIndex < alluvialRoot.children.length) {
+      if (
+        networkIndex > -1 &&
+        neighborNetworkIndex > -1 &&
+        neighborNetworkIndex < alluvialRoot.children.length
+      ) {
         return alluvialRoot.children[neighborNetworkIndex];
       }
     }
@@ -69,21 +76,24 @@ export default class NetworkRoot extends AlluvialNodeBase {
   }
 
   getModuleNames(): Array<any> {
-    return Array.from(Module.customNames.entries())
-      .filter(([key, val]) => key.startsWith(this.id));
+    return Array.from(Module.customNames.entries()).filter(([key, val]) =>
+      key.startsWith(this.id)
+    );
   }
 
   setVisibleModules(moduleIds: string[]) {
-    const filterActive = this.children.some(module => moduleIds.includes(module.moduleId));
+    const filterActive = this.children.some((module) =>
+      moduleIds.includes(module.moduleId)
+    );
 
-    this.children.forEach(module => {
+    this.children.forEach((module) => {
       module.filterActive = filterActive;
       module.visibleInFilter = moduleIds.includes(module.moduleId);
     });
   }
 
   clearFilter() {
-    this.children.forEach(module => {
+    this.children.forEach((module) => {
       module.filterActive = false;
       module.visibleInFilter = false;
     });
@@ -104,20 +114,20 @@ export default class NetworkRoot extends AlluvialNodeBase {
         width: this.width,
         height: 15,
         textX: this.x + this.width / 2,
-        textY: this.height + 15 + 5
+        textY: this.height + 15 + 5,
       },
-      links: Array.from(this.rightStreamlines(), link => link.asObject())
-        .sort((a, b) => b.avgHeight - a.avgHeight),
-      children: this.children
-        .reduce((modules, module) => {
-          if (module.isVisible && module.flow >= this.flowThreshold)
-            modules.push(module.asObject());
-          return modules;
-        }, [])
+      links: Array.from(this.rightStreamlines(), (link) =>
+        link.asObject()
+      ).sort((a, b) => b.avgHeight - a.avgHeight),
+      children: this.children.reduce((modules, module) => {
+        if (module.isVisible && module.flow >= this.flowThreshold)
+          modules.push(module.asObject());
+        return modules;
+      }, []),
     };
   }
 
-  * rightStreamlines(): Iterable<StreamlineLink> {
+  *rightStreamlines(): Iterable<StreamlineLink> {
     for (let module of this) {
       // Skip if left module if below threshold
       if (module.flow < this.flowThreshold || !module.isVisible) {
@@ -126,13 +136,18 @@ export default class NetworkRoot extends AlluvialNodeBase {
 
       for (let group of module) {
         for (let streamlineNode of group.right) {
-          const oppositeStreamlineNode: ?StreamlineNode = streamlineNode.getOpposite();
+          const oppositeStreamlineNode: ?StreamlineNode =
+            streamlineNode.getOpposite();
           if (!oppositeStreamlineNode) continue;
-          const oppositeModule: ?Module = oppositeStreamlineNode.getAncestor(MODULE);
+          const oppositeModule: ?Module =
+            oppositeStreamlineNode.getAncestor(MODULE);
 
           if (oppositeModule) {
             // Skip if right module is below threshold
-            if (oppositeModule.flow < this.flowThreshold || !oppositeModule.isVisible)
+            if (
+              oppositeModule.flow < this.flowThreshold ||
+              !oppositeModule.isVisible
+            )
               continue;
           }
 

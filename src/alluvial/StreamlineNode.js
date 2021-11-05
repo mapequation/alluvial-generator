@@ -7,7 +7,6 @@ import type { Side } from "./Side";
 import { LEFT, opposite, sideToString } from "./Side";
 import StreamlineLink from "./StreamlineLink";
 
-
 export default class StreamlineNode extends AlluvialNodeBase {
   parent: ?Branch;
   children: LeafNode[] = [];
@@ -54,23 +53,27 @@ export default class StreamlineNode extends AlluvialNodeBase {
     this.targetId = null;
   }
 
-  static createId(source: LeafNode, side: Side, target: ?LeafNode = null): string {
+  static createId(
+    source: LeafNode,
+    side: Side,
+    target: ?LeafNode = null
+  ): string {
     if (!target) {
-      return `${
-        source.networkId}_module${source.moduleId}_group${
-        source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)
-      }`;
+      return `${source.networkId}_module${source.moduleId}_group${
+        source.insignificant ? "i" : ""
+      }${source.highlightIndex}_${sideToString(side)}`;
     }
-    return `${
-      source.networkId}_module${source.moduleId}_group${
-      source.insignificant ? "i" : ""}${source.highlightIndex}_${sideToString(side)}--${
-      target.networkId}_module${target.moduleId}_group${
-      target.insignificant ? "i" : ""}${target.highlightIndex}_${sideToString(opposite(side))
-    }`;
+    return `${source.networkId}_module${source.moduleId}_group${
+      source.insignificant ? "i" : ""
+    }${source.highlightIndex}_${sideToString(side)}--${
+      target.networkId
+    }_module${target.moduleId}_group${target.insignificant ? "i" : ""}${
+      target.highlightIndex
+    }_${sideToString(opposite(side))}`;
   }
 
   get oppositeId(): string {
-    return `${this.targetId || "NULL"}--${this.sourceId}`
+    return `${this.targetId || "NULL"}--${this.sourceId}`;
   }
 
   getOpposite(): ?StreamlineNode {

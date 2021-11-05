@@ -1,15 +1,14 @@
 // @flow
 import type { Depth } from "./Depth";
 
-
 type Position = {
   x: number,
-  y: number
+  y: number,
 };
 
 type Size = {
   width: number,
-  height: number
+  height: number,
 };
 
 type Layout = Position & Size;
@@ -82,10 +81,13 @@ export default class AlluvialNodeBase {
   }
 
   get numLeafNodes(): number {
-    return this.children.reduce((num, children) => num + children.numLeafNodes, 0);
+    return this.children.reduce(
+      (num, children) => num + children.numLeafNodes,
+      0
+    );
   }
 
-  * leafNodes(): Iterable<AlluvialNode> {
+  *leafNodes(): Iterable<AlluvialNode> {
     for (let child of this) {
       yield* child.leafNodes();
     }
@@ -105,12 +107,14 @@ export default class AlluvialNodeBase {
       networkId: this.networkId,
       flow: this.flow,
       depth: this.depth,
-      children: this.children.map(child => child.asObject())
+      children: this.children.map((child) => child.asObject()),
     };
   }
 
   forEachDepthFirst(callback: IteratorCallback, preOrder: boolean = true) {
-    return preOrder ? this.forEachDepthFirstPreOrder(callback) : this.forEachDepthFirstPostOrder(callback);
+    return preOrder
+      ? this.forEachDepthFirstPreOrder(callback)
+      : this.forEachDepthFirstPostOrder(callback);
   }
 
   forEachDepthFirstPreOrder(callback: IteratorCallback) {

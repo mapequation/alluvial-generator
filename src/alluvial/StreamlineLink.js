@@ -2,7 +2,6 @@
 import HighlightGroup from "./HighlightGroup";
 import StreamlineNode from "./StreamlineNode";
 
-
 export default class StreamlineLink {
   left: StreamlineNode;
   right: StreamlineNode;
@@ -23,8 +22,20 @@ export default class StreamlineLink {
 
   asObject() {
     const {
-      left: { layout: leftLayout, parent: leftBranch, networkId: leftNetworkId, id, sourceId, targetId, depth },
-      right: { layout: rightLayout, parent: rightBranch, networkId: rightNetworkId }
+      left: {
+        layout: leftLayout,
+        parent: leftBranch,
+        networkId: leftNetworkId,
+        id,
+        sourceId,
+        targetId,
+        depth,
+      },
+      right: {
+        layout: rightLayout,
+        parent: rightBranch,
+        networkId: rightNetworkId,
+      },
     } = this;
 
     const x0 = leftLayout.x + leftLayout.width;
@@ -42,8 +53,10 @@ export default class StreamlineLink {
     const rightHighlightIndex = rightGroup ? rightGroup.highlightIndex : -1;
     const leftInsignificant = leftGroup ? leftGroup.insignificant : false;
     const rightInsignificant = rightGroup ? rightGroup.insignificant : false;
-    const leftModuleId = leftGroup && leftGroup.parent ? leftGroup.parent.moduleId : 0;
-    const rightModuleId = rightGroup && rightGroup.parent ? rightGroup.parent.moduleId : 0;
+    const leftModuleId =
+      leftGroup && leftGroup.parent ? leftGroup.parent.moduleId : 0;
+    const rightModuleId =
+      rightGroup && rightGroup.parent ? rightGroup.parent.moduleId : 0;
 
     return {
       id,
@@ -61,7 +74,7 @@ export default class StreamlineLink {
         y0,
         y1,
         h0,
-        h1
+        h1,
       },
       transitionPath: {
         x0: xAvg,
@@ -69,13 +82,13 @@ export default class StreamlineLink {
         y0: yAvg + h0 / 4,
         y1: yAvg + h1 / 4,
         h0: h0 / 2,
-        h1: h1 / 2
+        h1: h1 / 2,
       },
       leftHighlightIndex,
       rightHighlightIndex,
       highlightIndex: Math.max(leftHighlightIndex, rightHighlightIndex),
       leftInsignificant,
-      rightInsignificant
+      rightInsignificant,
     };
   }
 }

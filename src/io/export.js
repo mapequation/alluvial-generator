@@ -1,6 +1,5 @@
 import FileSaver from "file-saver";
 
-
 export const saveSvg = (elementId, filename) => {
   const svg = document.getElementById(elementId);
   const string = new XMLSerializer().serializeToString(svg);
@@ -26,7 +25,7 @@ export const savePng = (elementId, filename) => {
   const image = new Image(width, height);
   image.onload = () => {
     context.drawImage(image, 0, 0);
-    canvas.toBlob(blob => FileSaver.saveAs(blob, filename));
+    canvas.toBlob((blob) => FileSaver.saveAs(blob, filename));
   };
 
   image.onerror = (err) => {
@@ -37,9 +36,9 @@ export const savePng = (elementId, filename) => {
 };
 
 export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
-  const filename = networks.map(network => network.name).join(",") + ".json";
+  const filename = networks.map((network) => network.name).join(",") + ".json";
 
-  const networkRoot = id => {
+  const networkRoot = (id) => {
     const networkRoot = alluvialRoot.getNetworkRoot(id);
     if (!networkRoot) {
       console.error(`No network found with id ${id}`);
@@ -48,33 +47,39 @@ export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
     return networkRoot;
   };
 
-  const nodes = id => {
+  const nodes = (id) => {
     const root = networkRoot(id);
-    return root ? Array.from(root.leafNodes()).map(node => node.toNode()) : null;
+    return root
+      ? Array.from(root.leafNodes()).map((node) => node.toNode())
+      : null;
   };
 
-  const name = id => {
+  const name = (id) => {
     const root = networkRoot(id);
     return root ? root.name : null;
   };
 
-  const moduleNames = id => {
+  const moduleNames = (id) => {
     const root = networkRoot(id);
     return root ? root.getModuleNames() : [];
   };
 
-  const json = JSON.stringify({
-    version,
-    timestamp: +new Date(),
-    state,
-    networks: networks.map(network => ({
-      id: network.id,
-      name: name(network.id) || network.name,
-      codelength: network.codelength,
-      moduleNames: moduleNames(network.id),
-      nodes: nodes(network.id) || []
-    }))
-  }, null, 2);
+  const json = JSON.stringify(
+    {
+      version,
+      timestamp: +new Date(),
+      state,
+      networks: networks.map((network) => ({
+        id: network.id,
+        name: name(network.id) || network.name,
+        codelength: network.codelength,
+        moduleNames: moduleNames(network.id),
+        nodes: nodes(network.id) || [],
+      })),
+    },
+    null,
+    2
+  );
 
   const blob = new Blob([json], { type: "application/json;charset=utf-8" });
   FileSaver.saveAs(blob, filename);

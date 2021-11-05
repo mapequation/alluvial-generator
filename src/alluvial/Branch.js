@@ -6,7 +6,6 @@ import type { Side } from "./Side";
 import { LEFT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
-
 export default class Branch extends AlluvialNodeBase {
   parent: ?HighlightGroup;
   children: StreamlineNode[] = [];

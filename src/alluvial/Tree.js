@@ -12,11 +12,11 @@ export default class Tree {
   root = new TreeNode();
 
   constructor(children, getSize) {
-    children.forEach(child => {
+    children.forEach((child) => {
       let parent = this.root;
 
       for (let path of child.path) {
-        let node = parent.nodes.find(node => node.path === path);
+        let node = parent.nodes.find((node) => node.path === path);
 
         if (!node) {
           node = new TreeNode(path);
@@ -33,7 +33,7 @@ export default class Tree {
 
   sort(tree = this.root) {
     tree.nodes.sort((a, b) => b.size - a.size);
-    tree.nodes.forEach(node => {
+    tree.nodes.forEach((node) => {
       if (node.nodes) this.sort(node);
     });
 
@@ -41,8 +41,12 @@ export default class Tree {
   }
 
   flatten(tree = this.root) {
-    return tree.nodes.reduce((flattened, toFlatten) =>
-        flattened.concat(Array.isArray(toFlatten.nodes) ? this.flatten(toFlatten) : toFlatten),
-      []);
+    return tree.nodes.reduce(
+      (flattened, toFlatten) =>
+        flattened.concat(
+          Array.isArray(toFlatten.nodes) ? this.flatten(toFlatten) : toFlatten
+        ),
+      []
+    );
   }
 }

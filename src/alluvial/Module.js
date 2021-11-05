@@ -7,7 +7,6 @@ import { MODULE } from "./Depth";
 import HighlightGroup from "./HighlightGroup";
 import NetworkRoot from "./NetworkRoot";
 
-
 type CustomName = {
   name: string,
   flow: number,
@@ -29,11 +28,7 @@ export default class Module extends AlluvialNodeBase {
 
   static customNames: Map<string, CustomName> = new Map();
 
-  constructor(
-    parent: NetworkRoot,
-    moduleId: string,
-    moduleLevel: number = 1
-  ) {
+  constructor(parent: NetworkRoot, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
@@ -77,11 +72,15 @@ export default class Module extends AlluvialNodeBase {
     if (moduleLevel < 1) return modules;
 
     const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
-    return modules.filter(module => parentPath.isAncestor(module.moduleId));
+    return modules.filter((module) => parentPath.isAncestor(module.moduleId));
   }
 
   getGroup(highlightIndex: number, insignificant: boolean): ?HighlightGroup {
-    return this.children.find(group => group.highlightIndex === highlightIndex && group.insignificant === insignificant);
+    return this.children.find(
+      (group) =>
+        group.highlightIndex === highlightIndex &&
+        group.insignificant === insignificant
+    );
   }
 
   getLargestLeafNodeNames() {
@@ -90,7 +89,7 @@ export default class Module extends AlluvialNodeBase {
       queue.push(node);
       this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
-    return queue.map(node => node.name);
+    return queue.map((node) => node.name);
   }
 
   asObject(): Object {
@@ -111,15 +110,15 @@ export default class Module extends AlluvialNodeBase {
       maxModuleLevel: this.maxModuleLevel,
       moduleNamePosition: {
         x: [x1 - textOffset, x2 + textOffset],
-        y: y + height / 2
+        y: y + height / 2,
       },
       moduleIdPosition: {
         x: (x1 + x2) / 2,
-        y: y + height / 2
+        y: y + height / 2,
       },
       networkName: parent ? parent.name : "",
       networkCodelength: parent && parent.codelength ? parent.codelength : 0,
-      leafNodes: Array.from(this.leafNodes(), node => node.toNode())
+      leafNodes: Array.from(this.leafNodes(), (node) => node.toNode()),
     };
   }
 }
