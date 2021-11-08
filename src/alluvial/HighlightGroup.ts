@@ -1,14 +1,12 @@
-import type { AlluvialNode } from "./AlluvialNodeBase";
-import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialNodeBase from "./AlluvialNode";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP } from "./Depth";
-import Module from "./Module";
+import type Module from "./Module";
 import { LEFT, RIGHT } from "./Side";
 
 export const NOT_HIGHLIGHTED = -1;
 
-export default class HighlightGroup extends AlluvialNodeBase {
-  parent: ?Module;
+export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
   children: Branch[] = [new Branch(this, LEFT), new Branch(this, RIGHT)];
   depth = HIGHLIGHT_GROUP;
   highlightIndex: number;
@@ -61,7 +59,7 @@ export default class HighlightGroup extends AlluvialNodeBase {
     return this.left.numLeafNodes;
   }
 
-  *leafNodes(): Iterable<AlluvialNode> {
+  *leafNodes() {
     yield* this.left.leafNodes();
   }
 }

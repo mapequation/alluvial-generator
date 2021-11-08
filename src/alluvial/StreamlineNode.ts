@@ -1,19 +1,18 @@
-import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialNodeBase from "./AlluvialNode";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP, STREAMLINE_NODE } from "./Depth";
-import LeafNode from "./LeafNode";
 import type { Side } from "./Side";
 import { LEFT, opposite, sideToString } from "./Side";
 import StreamlineLink from "./StreamlineLink";
+import type LeafNode from "./LeafNode";
+import type HighlightGroup from "./HighlightGroup";
 
-export default class StreamlineNode extends AlluvialNodeBase {
-  parent: ?Branch;
-  children: LeafNode[] = [];
-  link: ?StreamlineLink = null;
+export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
+  depth = STREAMLINE_NODE;
+  link: StreamlineLink | null = null;
   side: Side;
   sourceId: string;
-  targetId: ?string;
-  depth = STREAMLINE_NODE;
+  targetId: string | null;
 
   constructor(parent: Branch, id: string) {
     super(parent, parent.networkId, id);
@@ -55,13 +54,14 @@ export default class StreamlineNode extends AlluvialNodeBase {
   static createId(
     source: LeafNode,
     side: Side,
-    target: ?LeafNode = null
-  ): string {
+    target: LeafNode | null = null
+  ) {
     if (!target) {
       return `${source.networkId}_module${source.moduleId}_group${
         source.insignificant ? "i" : ""
       }${source.highlightIndex}_${sideToString(side)}`;
     }
+
     return `${source.networkId}_module${source.moduleId}_group${
       source.insignificant ? "i" : ""
     }${source.highlightIndex}_${sideToString(side)}--${
@@ -71,20 +71,23 @@ export default class StreamlineNode extends AlluvialNodeBase {
     }_${sideToString(opposite(side))}`;
   }
 
-  get oppositeId(): string {
+  get oppositeId() {
     return `${this.targetId || "NULL"}--${this.sourceId}`;
   }
 
-  getOpposite(): ?StreamlineNode {
+  getOpposite(): StreamlineNode | null {
     if (this.link) {
       return this.link.left === this ? this.link.right : this.link.left;
     }
+    return null;
   }
 
   oppositeStreamlinePosition(flowThreshold: number) {
     const oppositeStreamlineNode = this.getOpposite();
     if (oppositeStreamlineNode) {
-      const group = oppositeStreamlineNode.getAncestor(HIGHLIGHT_GROUP);
+      const group = oppositeStreamlineNode.getAncestor(
+        HIGHLIGHT_GROUP
+      ) as HighlightGroup | null;
       if (group) {
         const module = group.parent;
         if (module && module.flow >= flowThreshold) {

@@ -1,17 +1,16 @@
 import TreePath from "../utils/TreePath";
-import type { AlluvialNode } from "./AlluvialNodeBase";
-import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialNodeBase from "./AlluvialNode";
 import { HIGHLIGHT_GROUP, LEAF_NODE } from "./Depth";
 import HighlightGroup, { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import Module from "./Module";
-import NetworkRoot from "./NetworkRoot";
+import Network from "./Network";
 import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
 const streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
-export default class LeafNode extends AlluvialNodeBase {
+export default class LeafNode extends AlluvialNodeBase<never> {
   name: string;
   flow: number;
   nodeId: number;
@@ -24,17 +23,20 @@ export default class LeafNode extends AlluvialNodeBase {
   leftIndex: number = -1;
   rightIndex: number = -1;
 
-  leftParent: ?StreamlineNode;
-  rightParent: ?StreamlineNode;
+  leftParent: StreamlineNode | null = null;
+  rightParent: StreamlineNode | null = null;
 
   oppositeNodes: {
-    LEFT: ?LeafNode,
-    RIGHT: ?LeafNode,
-  } = {};
+    [side: number]: LeafNode | null;
+  } = {
+    [LEFT]: null,
+    [RIGHT]: null,
+  };
 
-  networkRoot: NetworkRoot;
+  networkRoot: Network;
 
-  constructor(node: Node, networkRoot: NetworkRoot) {
+  constructor(node: any, networkRoot: Network) {
+    // FIXME
     super(null, networkRoot.networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
@@ -56,16 +58,28 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.treePath.insignificant[this.moduleLevel - 1] || false;
   }
 
-  toNode(): Node {
+  toNode(): any {
+    // FIXME
+    const {
+      id,
+      flow,
+      name,
+      nodeId,
+      identifier,
+      insignificant,
+      highlightIndex,
+      moduleLevel,
+    } = this;
+
     return {
-      path: this.id,
-      flow: this.flow,
-      name: this.name,
-      id: this.nodeId,
-      identifier: this.identifier,
-      insignificant: this.insignificant,
-      highlightIndex: this.highlightIndex,
-      moduleLevel: this.moduleLevel,
+      path: id,
+      flow,
+      name,
+      id: nodeId,
+      identifier,
+      insignificant,
+      highlightIndex,
+      moduleLevel,
     };
   }
 
@@ -77,7 +91,7 @@ export default class LeafNode extends AlluvialNodeBase {
     return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
-  getParent(side: Side): ?StreamlineNode {
+  getParent(side: Side) {
     return side === LEFT ? this.leftParent : this.rightParent;
   }
 
@@ -89,7 +103,7 @@ export default class LeafNode extends AlluvialNodeBase {
     }
   }
 
-  getIndex(side: Side): number {
+  getIndex(side: Side) {
     return side === LEFT ? this.leftIndex : this.rightIndex;
   }
 
@@ -161,7 +175,7 @@ export default class LeafNode extends AlluvialNodeBase {
   }
 
   remove(removeNetworkRoot: boolean = false) {
-    const group = this.getAncestor(HIGHLIGHT_GROUP);
+    const group = this.getAncestor(HIGHLIGHT_GROUP) as HighlightGroup | null;
 
     this.removeFromSide(LEFT);
     this.removeFromSide(RIGHT);
@@ -185,9 +199,11 @@ export default class LeafNode extends AlluvialNodeBase {
               alluvialRoot.removeChild(networkRoot);
 
               if (this.oppositeNodes[LEFT]) {
+                // @ts-ignore
                 this.oppositeNodes[LEFT].oppositeNodes[RIGHT] = null;
               }
               if (this.oppositeNodes[RIGHT]) {
+                // @ts-ignore
                 this.oppositeNodes[RIGHT].oppositeNodes[LEFT] = null;
               }
             }
@@ -256,7 +272,7 @@ export default class LeafNode extends AlluvialNodeBase {
     this.add();
   }
 
-  asObject(): Object {
+  asObject() {
     return {
       ...super.asObject(),
       name: this.name,
@@ -264,7 +280,7 @@ export default class LeafNode extends AlluvialNodeBase {
     };
   }
 
-  *leafNodes(): Iterable<AlluvialNode> {
+  *leafNodes() {
     yield this;
   }
 }

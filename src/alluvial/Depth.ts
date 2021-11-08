@@ -1,7 +1,7 @@
 export type Depth = number;
 
-export const ALLUVIAL_ROOT: Depth = 0;
-export const NETWORK_ROOT: Depth = 1;
+export const ROOT: Depth = 0;
+export const NETWORK: Depth = 1;
 export const MODULE: Depth = 2;
 export const HIGHLIGHT_GROUP: Depth = 3;
 export const BRANCH: Depth = 4;
@@ -9,8 +9,8 @@ export const STREAMLINE_NODE: Depth = 5;
 export const LEAF_NODE: Depth = 6;
 
 const depths = {
-  ALLUVIAL_ROOT,
-  NETWORK_ROOT,
+  ROOT,
+  NETWORK,
   MODULE,
   HIGHLIGHT_GROUP,
   BRANCH,

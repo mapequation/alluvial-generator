@@ -1,23 +1,19 @@
-import AlluvialRoot from "./AlluvialRoot";
+import Root from "./Root";
 import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 
-type Event = {
-  shiftKey: boolean,
-};
-
 export default class Diagram {
-  alluvialRoot = new AlluvialRoot();
+  alluvialRoot = new Root();
 
-  dirty: boolean = true;
-  _asObject: Object = {};
+  dirty = true;
+  _asObject = {};
 
-  constructor(networks: Network[]) {
+  constructor(networks) {
     networks.forEach((network) => this.alluvialRoot.addNetwork(network));
   }
 
-  doubleClick(alluvialObject: Object, event: ?Event): boolean {
-    const noKeyModifiers: Event = {
+  doubleClick(alluvialObject, event) {
+    const noKeyModifiers = {
       shiftKey: false,
     };
 
@@ -52,7 +48,7 @@ export default class Diagram {
     return false;
   }
 
-  setModuleName(alluvialObject: Object) {
+  setModuleName(alluvialObject) {
     const { name, networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
@@ -62,7 +58,7 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setNetworkName(alluvialObject: Object) {
+  setNetworkName(alluvialObject) {
     const { networkId, networkName } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
@@ -71,9 +67,9 @@ export default class Diagram {
   }
 
   setModuleColor(
-    alluvialObject: Object,
-    paintNodesInAllNetworks: boolean = false,
-    paintModuleIdsInAllNetworks: boolean = false
+    alluvialObject,
+    paintNodesInAllNetworks = false,
+    paintModuleIdsInAllNetworks = false
   ) {
     const { highlightIndex, networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
@@ -120,10 +116,10 @@ export default class Diagram {
   }
 
   autoPaint(
-    alluvialObject: ?Object = null,
-    highlightColors: string[],
-    paintNodesInAllNetworks: boolean = true,
-    paintModuleIdsInAllNetworks: boolean = false
+    alluvialObject = null,
+    highlightColors,
+    paintNodesInAllNetworks = true,
+    paintModuleIdsInAllNetworks = false
   ) {
     const highlightIndices = Array.from(highlightColors.keys());
 
@@ -249,7 +245,7 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setNodesColors(highlightedNodes: Array<any>) {
+  setNodesColors(highlightedNodes) {
     for (let file of highlightedNodes) {
       const nodes = new Set();
 
@@ -267,7 +263,7 @@ export default class Diagram {
     }
   }
 
-  getVisibleModules(): { [key: string]: Array<string> } {
+  getVisibleModules() {
     const networkRoots = this.alluvialRoot.children;
 
     const visibleModules = {};
@@ -286,7 +282,7 @@ export default class Diagram {
     );
   }
 
-  setVisibleModules(visibleModules: { [key: string]: Array<string> }) {
+  setVisibleModules(visibleModules) {
     for (let [networkId, moduleIds] of Object.entries(visibleModules)) {
       // $FlowFixMe
       const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
@@ -307,7 +303,7 @@ export default class Diagram {
     this.alluvialRoot.updateLayout(...arguments);
   }
 
-  asObject(): Object {
+  asObject() {
     if (this.dirty) {
       this._asObject = this.alluvialRoot.asObject();
       this.dirty = false;

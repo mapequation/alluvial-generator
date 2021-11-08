@@ -1,13 +1,14 @@
-import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialNodeBase from "./AlluvialNode";
 import { BRANCH } from "./Depth";
-import HighlightGroup from "./HighlightGroup";
+import type HighlightGroup from "./HighlightGroup";
 import type { Side } from "./Side";
 import { LEFT, sideToString } from "./Side";
-import StreamlineNode from "./StreamlineNode";
+import type StreamlineNode from "./StreamlineNode";
 
-export default class Branch extends AlluvialNodeBase {
-  parent: ?HighlightGroup;
-  children: StreamlineNode[] = [];
+export default class Branch extends AlluvialNodeBase<
+  StreamlineNode,
+  HighlightGroup
+> {
   side: Side;
   depth = BRANCH;
 

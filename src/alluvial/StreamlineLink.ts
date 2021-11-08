@@ -21,7 +21,7 @@ export default class StreamlineLink {
   asObject() {
     const {
       left: {
-        layout: leftLayout, // FIXME
+        layout: leftLayout,
         parent: leftBranch,
         networkId: leftNetworkId,
         id,
@@ -30,7 +30,7 @@ export default class StreamlineLink {
         depth,
       },
       right: {
-        layout: rightLayout, // FIXME
+        layout: rightLayout,
         parent: rightBranch,
         networkId: rightNetworkId,
       },

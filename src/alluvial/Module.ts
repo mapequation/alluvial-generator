@@ -1,25 +1,23 @@
 import PriorityQueue from "../utils/PriorityQueue";
 import TreePath from "../utils/TreePath";
-
-import AlluvialNodeBase from "./AlluvialNodeBase";
+import AlluvialNodeBase from "./AlluvialNode";
 import { MODULE } from "./Depth";
-import HighlightGroup from "./HighlightGroup";
-import NetworkRoot from "./NetworkRoot";
+import type HighlightGroup from "./HighlightGroup";
+import type LeafNode from "./LeafNode";
+import type Network from "./Network";
 
 type CustomName = {
-  name: string,
-  flow: number,
+  name: string;
+  flow: number;
 };
 
-export default class Module extends AlluvialNodeBase {
-  parent: ?NetworkRoot;
-  children: HighlightGroup[] = [];
+export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   moduleLevel: number = 1;
   maxModuleLevel: number = 1;
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
-  _name: ?Array<string> = null;
+  _name: string[] | null = null;
   visibleInFilter: boolean = false;
   filterActive: boolean = false;
   depth = MODULE;
@@ -27,7 +25,7 @@ export default class Module extends AlluvialNodeBase {
 
   static customNames: Map<string, CustomName> = new Map();
 
-  constructor(parent: NetworkRoot, moduleId: string, moduleLevel: number = 1) {
+  constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
@@ -37,15 +35,15 @@ export default class Module extends AlluvialNodeBase {
     this.index = parent.addChild(this) - 1;
   }
 
-  subModuleNames(): ?Array<string> {
+  subModuleNames() {
     const names = Array.from(Module.customNames.entries())
-      .filter(([id, ...rest]) => id.startsWith(this.id))
+      .filter(([id, ..._]) => id.startsWith(this.id))
       .sort((a, b) => a[1].flow - b[1].flow)
-      .map(([id, { name }]) => name);
+      .map(([_, { name }]) => name);
     return names.length ? names : null;
   }
 
-  set name(name: ?string) {
+  set name(name: string | null) {
     if (!name || name === "") {
       Module.customNames.delete(this.id);
       this._name = this.subModuleNames();
@@ -55,7 +53,8 @@ export default class Module extends AlluvialNodeBase {
     }
   }
 
-  get name(): ?Array<string> {
+  get name() {
+    // @ts-ignore
     return this._name;
   }
 
@@ -74,7 +73,7 @@ export default class Module extends AlluvialNodeBase {
     return modules.filter((module) => parentPath.isAncestor(module.moduleId));
   }
 
-  getGroup(highlightIndex: number, insignificant: boolean): ?HighlightGroup {
+  getGroup(highlightIndex: number, insignificant: boolean) {
     return this.children.find(
       (group) =>
         group.highlightIndex === highlightIndex &&
@@ -88,10 +87,10 @@ export default class Module extends AlluvialNodeBase {
       queue.push(node);
       this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
-    return queue.map((node) => node.name);
+    return queue.map((node: LeafNode) => node.name);
   }
 
-  asObject(): Object {
+  asObject() {
     const { name, x: x1, y, height, parent } = this;
 
     const x2 = x1 + this.width;
