@@ -25,7 +25,7 @@ import {
 } from "../../io/object-parser";
 //import Background from "../../images/background.svg";
 import { getParserForExtension } from "../../io/text-parser";
-import humanFileSize from "../../utils/humanFileSize";
+import humanFileSize from "../../utils/human-file-size";
 import makeDraggable from "./Draggable";
 
 const DraggableTableRow = makeDraggable(Table.Row);
