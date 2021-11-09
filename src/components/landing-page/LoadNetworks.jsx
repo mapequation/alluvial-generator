@@ -1,4 +1,3 @@
-import { getParserForExtension } from "@mapequation/infoparse";
 //import * as Sentry from "@sentry/browser";
 import PropTypes from "prop-types";
 import { Component } from "react";
@@ -15,17 +14,19 @@ import {
   Table,
   Transition,
 } from "semantic-ui-react";
-//import Background from "../../images/background.svg";
-
 import {
   acceptedFormats,
   getParser,
   isValidExtension,
+  validExtensions,
 } from "../../io/object-parser";
-import readAsText from "../../io/read-as-text";
-import streeParser from "../../io/stree-parser";
+//import Background from "../../images/background.svg";
+import { getParserForExtension } from "../../io/text-parser";
+import {
+  extension as fileExtension,
+  readFile,
+} from "@mapequation/infomap/parser";
 import humanFileSize from "../../utils/humanFileSize";
-import fileExtension from "../../utils/extension";
 import makeDraggable from "./Draggable";
 
 const DraggableTableRow = makeDraggable(Table.Row);
@@ -35,7 +36,6 @@ export default class LoadNetworks extends Component {
     files: [],
     loading: false,
     nodeIdentifier: "name",
-    animateUseNodeIds: true,
   };
 
   static propTypes = {
@@ -46,27 +46,22 @@ export default class LoadNetworks extends Component {
     onSubmit: (values) => console.log(values),
   };
 
-  onNodeIdentifierChange = (e, { value }) =>
+  onNodeIdentifierChange = (_, { value }) =>
     this.setState({ nodeIdentifier: value });
 
-  animateUseNodeIds = () =>
-    this.setState((prevState) => ({
-      animateUseNodeIds: !prevState.animateUseNodeIds,
-    }));
+  // toggleMultilayer = (i) =>
+  //   this.setState((prevState) => {
+  //     const file = prevState.files[i];
+  //     if (!file) return;
+  //     file.multilayer = !file.multilayer;
 
-  toggleMultilayer = (i) =>
-    this.setState((prevState) => {
-      const file = prevState.files[i];
-      if (!file) return;
-      file.multilayer = !file.multilayer;
+  //     // Switch to using id as node identifier if only one file set to multilayer
+  //     if (i === 0 && prevState.files.length === 1 && file.multilayer) {
+  //       return { files: prevState.files, nodeIdentifier: "id" };
+  //     }
 
-      // Switch to using id as node identifier if only one file set to multilayer
-      if (i === 0 && prevState.files.length === 1 && file.multilayer) {
-        return { files: prevState.files, nodeIdentifier: "id" };
-      }
-
-      return { files: prevState.files };
-    });
+  //     return { files: prevState.files };
+  //   });
 
   withLoadingState = (callback) => () =>
     this.setState({ loading: true }, () => setTimeout(callback, 50));
@@ -76,7 +71,7 @@ export default class LoadNetworks extends Component {
 
     for (let file of this.input.files) {
       const extension = fileExtension(file.name);
-      if (isValidExtension(extension) || extension === "json") {
+      if (isValidExtension(extension)) {
         file.format = extension;
         validFiles.push(file);
       } else {
@@ -87,14 +82,14 @@ export default class LoadNetworks extends Component {
 
     this.input.value = "";
 
-    Promise.all(validFiles.map(readAsText))
+    Promise.all(validFiles.map(readFile))
       .then((files) => {
         const newFiles = files.map((file, i) => ({
           contents: file,
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
-          multilayer: false,
+          //multilayer: false,
           error: false,
           errorMessage: null,
         }));
@@ -108,22 +103,6 @@ export default class LoadNetworks extends Component {
         console.log(err);
         //Sentry.captureException(err);
       });
-  };
-
-  setIdentifiersInJsonFormat = (json) => {
-    if (json.version) {
-      const version = json.version.split(".").map(Number);
-      const [major, minor] = version;
-      if (major === 0 && minor < 3) {
-        for (let network of json.networks) {
-          for (let node of network.nodes) {
-            // "node.name" was the only supported identifier before version 0.3.0
-            node.identifier = node.name;
-          }
-        }
-      }
-    }
-    return json;
   };
 
   createDiagram = () => {
@@ -148,33 +127,18 @@ export default class LoadNetworks extends Component {
       }
 
       const json = JSON.parse(files[0].contents);
-      this.setIdentifiersInJsonFormat(json);
+      setIdentifiersInJsonFormat(json);
       onSubmit(json);
       return;
     }
 
-    const checkNameConflicts = (nodes, file) => {
-      const uniqueNames = new Set();
-      nodes.forEach((node) => {
-        if (uniqueNames.has(node.name)) {
-          const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
-          file.errorMessage = message;
-          throw new Error(message);
-        }
-        uniqueNames.add(node.name);
-      });
-    };
-
     const networks = [];
 
     files.forEach((file, i) => {
-      const parseLinks = false;
       const lines = file.contents.split("\n").filter(Boolean);
-      const parser =
-        file.format === "stree"
-          ? streeParser
-          : getParserForExtension(file.format);
-      const object = parser(lines, parseLinks);
+      const parser = getParserForExtension(file.format);
+      const object = parser(lines);
+      console.log(lines, object);
 
       // If we found an error before, and switched to using node ids now, we need to reset any errors
       file.error = false;
@@ -182,31 +146,32 @@ export default class LoadNetworks extends Component {
 
       try {
         // If we only load one file that is set to multilayer, visualize each layer as a network
-        if (
-          files.length === 1 &&
-          file.multilayer &&
-          (file.format === "tree" || file.format === "ftree")
-        ) {
-          const objectParser = getParser("multilevelTree");
-          const parsed = objectParser(object, file.name, nodeIdentifier);
+        // if (
+        //   files.length === 1 &&
+        //   file.multilayer &&
+        //   (file.format === "tree" || file.format === "ftree")
+        // ) {
+        //   const objectParser = getParser("multilevelTree");
+        //   const parsed = objectParser(object, file.name, nodeIdentifier);
 
-          if (nodeIdentifier === "name") {
-            for (let network of parsed) {
-              checkNameConflicts(network.nodes, file);
-            }
-          }
+        //   if (nodeIdentifier === "name") {
+        //     for (let network of parsed) {
+        //       checkNameConflicts(network.nodes, file);
+        //     }
+        //   }
 
-          networks.push(...parsed);
-          return;
-        }
+        //   networks.push(...parsed);
+        //   return;
+        // }
 
         const objectParser = getParser(file.format);
         const parsed = objectParser(
           object,
           file.name,
-          nodeIdentifier,
-          file.multilayer
+          nodeIdentifier
+          //file.multilayer
         );
+        console.log(parsed);
 
         // If we use node name as identifier, all names must be unique
         if (nodeIdentifier === "name") {
@@ -221,7 +186,6 @@ export default class LoadNetworks extends Component {
     });
 
     if (files.some((file) => file.error)) {
-      this.animateUseNodeIds();
       this.setState({ loading: false });
       return;
     }
@@ -236,7 +200,7 @@ export default class LoadNetworks extends Component {
 
     fetch(`/alluvial/data/${filename}`)
       .then((res) => res.json())
-      .then(this.setIdentifiersInJsonFormat)
+      .then(setIdentifiersInJsonFormat)
       .then(onSubmit)
       .catch((err) => {
         console.log(err);
@@ -250,6 +214,7 @@ export default class LoadNetworks extends Component {
       files.splice(index, 1);
       const hasJson = files.some((file) => file.format === "json");
       if (!hasJson) {
+        // If we removed the json file, reset the error
         files.forEach((file) => (file.error = false));
       }
       return { files };
@@ -265,7 +230,7 @@ export default class LoadNetworks extends Component {
     });
 
   render() {
-    const { files, loading, nodeIdentifier, animateUseNodeIds } = this.state;
+    const { files, loading, nodeIdentifier } = this.state;
 
     const background = {
       padding: "100px 0 100px 0",
@@ -310,7 +275,9 @@ export default class LoadNetworks extends Component {
             >
               <Step.Content>
                 <Step.Title>Add networks</Step.Title>
-                <Step.Description>clu, map, tree, ftree, json</Step.Description>
+                <Step.Description>
+                  {validExtensions.join(", ")}
+                </Step.Description>
               </Step.Content>
               <input
                 style={{ display: "none" }}
@@ -318,7 +285,7 @@ export default class LoadNetworks extends Component {
                 multiple
                 id="upload"
                 onChange={this.withLoadingState(this.loadSelectedFiles)}
-                accept={acceptedFormats + ",.json"}
+                accept={acceptedFormats}
                 ref={(input) => (this.input = input)}
               />
             </Step>
@@ -334,49 +301,43 @@ export default class LoadNetworks extends Component {
             </Step>
           </Step.Group>
 
-          <Transition
-            animation="glow"
-            duration={5000}
-            visible={animateUseNodeIds}
-          >
-            <Form>
-              <Form.Field>
-                Node identifier
-                <Popup trigger={<Icon name="question" />} inverted>
-                  <p>
-                    Two nodes in different networks are considered equal if
-                    their names are the same. For this to work, all nodes in a
-                    network must have unique names.
-                  </p>
-                  <p>
-                    If a network does not have unique names, you can try to use
-                    node ids as identifiers, which uses the node ids to
-                    determine if two nodes are equal.
-                  </p>
-                </Popup>
-              </Form.Field>
-              <Form.Field>
-                <Checkbox
-                  radio
-                  label="Node name"
-                  name="nodeIdentifier"
-                  value="name"
-                  checked={nodeIdentifier === "name"}
-                  onChange={this.onNodeIdentifierChange}
-                />
-              </Form.Field>
-              <Form.Field>
-                <Checkbox
-                  radio
-                  label="Node id"
-                  name="nodeIdentifier"
-                  value="id"
-                  checked={nodeIdentifier === "id"}
-                  onChange={this.onNodeIdentifierChange}
-                />
-              </Form.Field>
-            </Form>
-          </Transition>
+          <Form>
+            <Form.Field>
+              Node identifier
+              <Popup trigger={<Icon name="question" />} inverted>
+                <p>
+                  Two nodes in different networks are considered equal if their
+                  names are the same. For this to work, all nodes in a network
+                  must have unique names.
+                </p>
+                <p>
+                  If a network does not have unique names, you can try to use
+                  node ids as identifiers, which uses the node ids to determine
+                  if two nodes are equal.
+                </p>
+              </Popup>
+            </Form.Field>
+            <Form.Field>
+              <Checkbox
+                radio
+                label="Node name"
+                name="nodeIdentifier"
+                value="name"
+                checked={nodeIdentifier === "name"}
+                onChange={this.onNodeIdentifierChange}
+              />
+            </Form.Field>
+            <Form.Field>
+              <Checkbox
+                radio
+                label="Node id"
+                name="nodeIdentifier"
+                value="id"
+                checked={nodeIdentifier === "id"}
+                onChange={this.onNodeIdentifierChange}
+              />
+            </Form.Field>
+          </Form>
 
           {files.length > 0 && (
             <Table celled unstackable striped size="small">
@@ -385,7 +346,7 @@ export default class LoadNetworks extends Component {
                   <Table.HeaderCell>Name</Table.HeaderCell>
                   <Table.HeaderCell>Size</Table.HeaderCell>
                   <Table.HeaderCell>Format</Table.HeaderCell>
-                  <Table.HeaderCell>Multilayer</Table.HeaderCell>
+                  {/* <Table.HeaderCell>Multilayer</Table.HeaderCell> */}
                   <Table.HeaderCell />
                 </Table.Row>
               </Table.Header>
@@ -421,12 +382,12 @@ export default class LoadNetworks extends Component {
                       </Table.Cell>
                       <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
                       <Table.Cell>{file.format}</Table.Cell>
-                      <Table.Cell>
+                      {/* <Table.Cell>
                         <Checkbox
                           checked={file.multilayer}
                           onChange={() => this.toggleMultilayer(i)}
                         />
-                      </Table.Cell>
+                      </Table.Cell> */}
                       <Table.Cell
                         selectable
                         textAlign="center"
@@ -445,4 +406,33 @@ export default class LoadNetworks extends Component {
       </div>
     );
   }
+}
+
+function checkNameConflicts(nodes, file) {
+  const uniqueNames = new Set();
+  nodes.forEach((node) => {
+    if (uniqueNames.has(node.name)) {
+      const message = `Nodes with duplicate names found: "${node.name}". Try using node ids as identifiers.`;
+      file.errorMessage = message;
+      throw new Error(message);
+    }
+    uniqueNames.add(node.name);
+  });
+}
+
+function setIdentifiersInJsonFormat(json) {
+  if (json.version) {
+    const version = json.version.split(".").map(Number);
+    const [major, minor] = version;
+    if (major === 0 && minor < 3) {
+      for (let network of json.networks) {
+        for (let node of network.nodes) {
+          // "node.name" was the only supported identifier before version 0.3.0
+          node.identifier = node.name;
+        }
+      }
+    }
+  }
+
+  return json;
 }

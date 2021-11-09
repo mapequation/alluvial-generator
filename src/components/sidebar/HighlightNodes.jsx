@@ -1,7 +1,7 @@
 import { useContext, useState, useRef } from "react";
 import { Button, Table } from "semantic-ui-react";
 import Dispatch from "../../context/Dispatch";
-import readAsText from "../../io/read-as-text";
+import { readFile } from "@mapequation/infomap/parser";
 
 export default function HighlightNodes({ highlightColors }) {
   const [files, setFiles] = useState([]);
@@ -12,7 +12,7 @@ export default function HighlightNodes({ highlightColors }) {
     const numFiles = files.length;
     const fileInputs = Array.from(input.current.files);
 
-    Promise.all(fileInputs.map(readAsText)).then((files) => {
+    Promise.all(fileInputs.map(readFile)).then((files) => {
       const newFiles = files.map((file, i) => ({
         name: fileInputs[i].name,
         content: file.split("\n").map((line) => line.trim()),

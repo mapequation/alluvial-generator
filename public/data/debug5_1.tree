@@ -1,5 +1,11 @@
-# Codelength = 8.07337 bits.
-# path flow name physicalId
+# v1.7.3
+# ./Infomap debug5_1.tree .
+# started at 2021-11-02 18:12:38
+# completed in 0.005364 s
+# partitioned into 2 levels with 2 top modules
+# codelength 1.47841 bits
+# relative codelength savings 6.22946%
+# path flow name node_id
 1:1:1 0.2 "node 1" 1
 1:2:1 0.2 "node 2" 82
 2:1:1 0.2 "node 3" 144

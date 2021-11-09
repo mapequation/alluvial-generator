@@ -1,8 +1,9 @@
 import id from "../utils/id";
 
+const stateOrNodeId = (node) => (node.stateId != null ? node.stateId : node.id);
+
 const setNodeIdentifiers = (object, identifier) => {
-  const id = (node) =>
-    (node.stateId !== null ? node.stateId : node.id).toString();
+  const id = (node) => stateOrNodeId(node).toString();
   const name = (node) => node.name;
 
   let nodeId = null;
@@ -14,74 +15,78 @@ const setNodeIdentifiers = (object, identifier) => {
   for (let node of object.nodes) {
     node.identifier = nodeId(node);
   }
+
   return object;
 };
 
-const parse = (object, name, nodeIdentifier = "name", isMultilayer = false) => {
-  if (isMultilayer) {
-    // TODO remove support for 0.x
-    object.nodes.forEach((node) => (node.stateId = null));
-  }
-
+const parse = (
+  object,
+  name,
+  nodeIdentifier = "name"
+  /*, isMultilayer = false */
+) => {
+  // if (isMultilayer) {
+  //   // TODO remove support for 0.x
+  //   object.nodes.forEach((node) => (node.stateId = null));
+  // }
   setNodeIdentifiers(object, nodeIdentifier);
 
   return {
     id: id(),
     name,
     ...object,
+    nodes: object.nodes.map((node) => ({
+      ...node,
+      path: node.path.join(":"), // TODO remove,
+    })),
   };
 };
 
 const parseClu = (object, name, nodeIdentifier = "name") => {
   setNodeIdentifiers(object, nodeIdentifier);
 
-  const numNodes = object.nodes.length;
-  const normalizedWeight = 1 / (numNodes || 1);
-
   return {
     id: id(),
     name,
+    ...object,
     nodes: object.nodes.map((node) => ({
-      path: node.module.toString(),
-      id: node.id,
-      name: node.stateId ? node.stateId.toString() : node.id.toString(),
       ...node,
-      flow: node.flow || normalizedWeight,
+      path: node.moduleId.toString(),
+      name: stateOrNodeId(node).toString(),
     })),
-    codelength: object.codelength,
-    moduleNames: null,
+    //moduleNames: null,
   };
 };
 
-const parseMultilevelTree = (object, name, nodeIdentifier = "name") => {
-  const nodesPerLayer = {};
+// const parseMultilevelTree = (object, name, nodeIdentifier = "name") => {
+//   const nodesPerLayer = {};
 
-  object.nodes.forEach((node) => {
-    node.stateId = null;
+//   object.nodes.forEach((node) => {
+//     node.stateId = null;
 
-    if (nodesPerLayer[node.layerId] == null) {
-      nodesPerLayer[node.layerId] = [];
-    }
+//     if (nodesPerLayer[node.layerId] == null) {
+//       nodesPerLayer[node.layerId] = [];
+//     }
 
-    nodesPerLayer[node.layerId].push(node);
-  });
+//     nodesPerLayer[node.layerId].push(node);
+//   });
 
-  return Object.entries(nodesPerLayer).map(([layerId, nodes]) =>
-    parse(
-      { codelength: object.codelength, nodes },
-      `${name} layer ${layerId}`,
-      nodeIdentifier
-    )
-  );
-};
+//   return Object.entries(nodesPerLayer).map(([layerId, nodes]) =>
+//     parse(
+//       { codelength: object.codelength, nodes },
+//       `${name} layer ${layerId}`,
+//       nodeIdentifier
+//     )
+//   );
+// };
 
 const objectParsers = {
   clu: parseClu,
-  map: parse,
   tree: parse,
   ftree: parse,
-  stree: parse,
-  multilevelTree: parseMultilevelTree, // FIXME: this is not a valid file extension
+  //stree: parse,
+  //multilevelTree: parseMultilevelTree,
+  json: (json) => json,
 };
 
 export const validExtensions = Object.keys(objectParsers);
