@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import { Component } from "react";
-
 import Diagram from "../alluvial/Diagram";
 import Dispatch from "../context/Dispatch";
 import { saveDiagram } from "../io/export";
@@ -10,68 +9,6 @@ import { streamlineHorizontal } from "../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 import ZoomableSvg from "./ZoomableSvg";
-
-function highlightConnectedModules(
-  modules,
-  streamline,
-  strokeOpacity = null,
-  stroke = null
-) {
-  modules
-    .filter(
-      (group) =>
-        group.id === streamline.sourceId || group.id === streamline.targetId
-    )
-    .select("rect")
-    .attr("stroke-opacity", strokeOpacity)
-    .attr("stroke", stroke);
-}
-
-function highlightStreamline(d) {
-  d3.select(this).attr("stroke", "#f00");
-
-  d3.selectAll(".group").call(highlightConnectedModules, d, 0.5, "#f00");
-}
-
-function clearStreamlineHighlight(d) {
-  d3.select(this).call(LinearGradients.stroke);
-
-  d3.selectAll(".group").call(highlightConnectedModules, d);
-}
-
-function restoreMouseOver(selection) {
-  selection
-    .on("mouseover", function () {
-      d3.select(this).attr("stroke-opacity", 0.5);
-    })
-    .on("mouseout", function () {
-      d3.select(this).attr("stroke-opacity", 0);
-    });
-}
-
-function wiggle() {
-  const duration = 80;
-  const dx = 8;
-
-  d3.select(this)
-    .attr("transform", null)
-    .transition()
-    .ease(d3.easeSin)
-    .duration(duration)
-    .attr("transform", `translate(${1.5 * dx} 0)`)
-    .transition()
-    .ease(d3.easeSin)
-    .duration(2 * duration)
-    .attr("transform", `translate(-${dx} 0)`)
-    .transition()
-    .ease(d3.easeSin)
-    .duration(2 * duration)
-    .attr("transform", `translate(${dx / 2} 0)`)
-    .transition()
-    .ease(d3.easeSin)
-    .duration(duration)
-    .attr("transform", "translate(0 0)");
-}
 
 export default class AlluvialDiagram extends Component {
   svg = d3.select(null);
@@ -837,4 +774,66 @@ export default class AlluvialDiagram extends Component {
       </svg>
     );
   }
+}
+
+function highlightConnectedModules(
+  modules,
+  streamline,
+  strokeOpacity = null,
+  stroke = null
+) {
+  modules
+    .filter(
+      (group) =>
+        group.id === streamline.sourceId || group.id === streamline.targetId
+    )
+    .select("rect")
+    .attr("stroke-opacity", strokeOpacity)
+    .attr("stroke", stroke);
+}
+
+function highlightStreamline(d) {
+  d3.select(this).attr("stroke", "#f00");
+
+  d3.selectAll(".group").call(highlightConnectedModules, d, 0.5, "#f00");
+}
+
+function clearStreamlineHighlight(d) {
+  d3.select(this).call(LinearGradients.stroke);
+
+  d3.selectAll(".group").call(highlightConnectedModules, d);
+}
+
+function restoreMouseOver(selection) {
+  selection
+    .on("mouseover", function () {
+      d3.select(this).attr("stroke-opacity", 0.5);
+    })
+    .on("mouseout", function () {
+      d3.select(this).attr("stroke-opacity", 0);
+    });
+}
+
+function wiggle() {
+  const duration = 80;
+  const dx = 8;
+
+  d3.select(this)
+    .attr("transform", null)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(duration)
+    .attr("transform", `translate(${1.5 * dx} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2 * duration)
+    .attr("transform", `translate(-${dx} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2 * duration)
+    .attr("transform", `translate(${dx / 2} 0)`)
+    .transition()
+    .ease(d3.easeSin)
+    .duration(duration)
+    .attr("transform", "translate(0 0)");
 }
