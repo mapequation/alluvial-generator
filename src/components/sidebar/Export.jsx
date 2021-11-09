@@ -4,7 +4,6 @@ export default function Export({
   onSaveClick,
   onDownloadSvgClick,
   onDownloadPngClick,
-  onConvertToPdfClick,
 }) {
   return (
     <>
@@ -28,13 +27,6 @@ export default function Export({
           icon="image"
           onClick={onDownloadPngClick}
           content="Download PNG"
-        />
-      </Menu.Menu>
-      <Menu.Menu>
-        <Menu.Item
-          icon="help"
-          onClick={onConvertToPdfClick}
-          content="Converting to PDF"
         />
       </Menu.Menu>
     </>
