@@ -1,12 +1,11 @@
 import {
-  schemeTableau10,
   schemeDark2,
   schemePastel1,
   schemePastel2,
   schemeSet2,
+  schemeTableau10,
 } from "d3";
 import { StrictMode, useReducer } from "react";
-import { Menu, Rail, Sidebar as SemanticSidebar } from "semantic-ui-react";
 import Dispatch from "../context/Dispatch";
 import AlluvialDiagram from "./AlluvialDiagram";
 import Sidebar from "./sidebar/Sidebar";
