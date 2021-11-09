@@ -46,7 +46,6 @@ export default class Sidebar extends PureComponent {
       networks,
       defaultHighlightColor,
       highlightColors,
-      sidebarVisible,
       selectedModule,
       visibleModules,
     } = this.props;
@@ -97,20 +96,14 @@ export default class Sidebar extends PureComponent {
     return (
       <SemanticSidebar
         as={Menu}
-        animation="overlay"
         width="wide"
         direction="right"
-        visible={sidebarVisible}
+        visible={true}
         vertical
       >
         <Menu.Item header href="//www.mapequation.org/alluvial">
           <MenuHeader />
         </Menu.Item>
-        <Menu.Item
-          icon="close"
-          content="Hide sidebar"
-          onClick={() => dispatch({ type: "sidebarVisible", value: false })}
-        />
         <Menu.Item>
           <Header as="h4" content="Module explorer" />
           {!!selectedModule ? (

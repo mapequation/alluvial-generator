@@ -79,8 +79,6 @@ function reducer(state, action) {
       return { ...state, regroupBit: flip(state.regroupBit) };
     case "saveDiagram":
       return { ...state, saveDiagramBit: flip(state.saveDiagramBit) };
-    case "sidebarVisible":
-      return { ...state, sidebarVisible: action.value };
     case "moduleSize":
       return { ...state, moduleSize: action.value };
     case "sortModulesBy":
@@ -137,7 +135,6 @@ export default function Layout(props) {
     expandBit: 0,
     regroupBit: 0,
     saveDiagramBit: 0,
-    sidebarVisible: true,
     moduleSize: "flow",
     sortModulesBy: "flow",
     visibleModules: {},
@@ -172,10 +169,6 @@ export default function Layout(props) {
     modulesVisibleInFilter: state.modulesVisibleInFilter,
   };
 
-  const sidebarProps = {
-    sidebarVisible: state.sidebarVisible,
-  };
-
   const alluvialProps = {
     clearFiltersBit: state.clearFiltersBit,
     nameChangeBit: state.nameChangeBit,
@@ -194,29 +187,10 @@ export default function Layout(props) {
 
   return (
     <Dispatch.Provider value={{ dispatch }}>
-      <SemanticSidebar.Pushable style={{ height: "100vh", overflow: "hidden" }}>
-        <Sidebar {...sidebarProps} {...sharedProps} {...props} />
-        <SemanticSidebar.Pusher>
-          <Rail
-            internal
-            position="right"
-            style={{ padding: 0, margin: 0, height: 0, width: "182px" }}
-          >
-            <Menu vertical size="small">
-              <Menu.Item
-                icon="sidebar"
-                content="Show sidebar"
-                onClick={() =>
-                  dispatch({ type: "sidebarVisible", value: true })
-                }
-              />
-            </Menu>
-          </Rail>
-          <StrictMode>
-            <AlluvialDiagram {...alluvialProps} {...sharedProps} {...props} />
-          </StrictMode>
-        </SemanticSidebar.Pusher>
-      </SemanticSidebar.Pushable>
+      <Sidebar {...sharedProps} {...props} />
+      <StrictMode>
+        <AlluvialDiagram {...alluvialProps} {...sharedProps} {...props} />
+      </StrictMode>
     </Dispatch.Provider>
   );
 }
