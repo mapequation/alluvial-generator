@@ -1,9 +1,16 @@
 import * as d3 from "d3";
 import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
 
-const highlightColor =
-  (defaultHighlightColor, highlightColors) =>
-  ({ highlightIndex, insignificant }) => {
+type Color = {
+  highlightIndex: number;
+  insignificant: boolean;
+};
+
+function highlightColor(
+  defaultHighlightColor: string,
+  highlightColors: string[]
+) {
+  return ({ highlightIndex, insignificant }: Color) => {
     const color =
       highlightIndex === NOT_HIGHLIGHTED
         ? defaultHighlightColor
@@ -15,5 +22,6 @@ const highlightColor =
 
     return color;
   };
+}
 
 export default highlightColor;
