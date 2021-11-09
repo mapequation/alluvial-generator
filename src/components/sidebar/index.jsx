@@ -88,29 +88,17 @@ export default observer(function Sidebar() {
         <Header as="h4" content="Module explorer" />
         {!!store.selectedModule ? (
           <>
-            <ModuleExplorer
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-              module={store.selectedModule}
-              highlightColors={store.highlightColors}
-            />
-            <SelectedModule
-              module={store.selectedModule}
-              highlightColors={store.highlightColors}
-              defaultHighlightColor={store.defaultHighlightColor}
-              // selectedNetworkId={selectedNetworkId}
-              // setSelectedNetworkId={setSelectedNetworkId}
-              // moduleIds={moduleIdsForNetwork(store.selectedModule.networkId)}
-              // setModuleIds={setModuleIdsForNetwork(
-              //   store.selectedModule.networkId
-              // )}
-            />
+            <SelectedModule />
             <Button
               icon="info"
               {...buttonProps}
               style={{ margin: "4px 0 0 0" }}
               content={modalOpen ? "Close info" : "Open info"}
               onClick={() => setModalOpen(!modalOpen)}
+            />
+            <ModuleExplorer
+              open={modalOpen}
+              onClose={() => setModalOpen(false)}
             />
           </>
         ) : (

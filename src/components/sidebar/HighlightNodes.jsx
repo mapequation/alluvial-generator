@@ -4,10 +4,11 @@ import { useContext, useRef, useState } from "react";
 import { Button, Table } from "semantic-ui-react";
 import { StoreContext } from "../../store";
 
-export default observer(function HighlightNodes({ highlightColors }) {
-  const [files, setFiles] = useState([]);
+export default observer(function HighlightNodes() {
   const store = useContext(StoreContext);
+  const [files, setFiles] = useState([]);
   const input = useRef();
+  const { highlightColors } = store;
 
   const onInputChange = () => {
     const numFiles = files.length;

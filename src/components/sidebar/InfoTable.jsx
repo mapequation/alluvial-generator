@@ -8,8 +8,9 @@ const toPrecision = (flow, precision = 3) =>
 
 const selectable = { selectable: true, style: { padding: "0 8px" } };
 
-export default observer(function InfoTable({ module }) {
+export default observer(function InfoTable() {
   const store = useContext(StoreContext);
+  const module = store.selectedModule; // FIXME
   const [name, setName] = useState(module?.name ?? "");
   const [networkName, setNetworkName] = useState(module?.networkName ?? "");
 

@@ -3,12 +3,7 @@ import { Button, Header, Portal, Segment, Tab } from "semantic-ui-react";
 import HighlightNodes from "./HighlightNodes";
 import InfoTable from "./InfoTable";
 
-export default function ModuleExplorer({
-  open,
-  onClose,
-  module,
-  highlightColors,
-}) {
+export default function ModuleExplorer({ open, onClose }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
@@ -33,7 +28,7 @@ export default function ModuleExplorer({
               menuItem: "Info",
               render: () => (
                 <Tab.Pane>
-                  <InfoTable module={module} />
+                  <InfoTable />
                 </Tab.Pane>
               ),
             },
@@ -41,7 +36,7 @@ export default function ModuleExplorer({
               menuItem: "Highlight Nodes",
               render: () => (
                 <Tab.Pane>
-                  <HighlightNodes highlightColors={highlightColors} />
+                  <HighlightNodes />
                 </Tab.Pane>
               ),
             },

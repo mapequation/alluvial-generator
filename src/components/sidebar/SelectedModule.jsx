@@ -30,19 +30,22 @@ function Swatch({ background }) {
 
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
-export default observer(function SelectedModule({
-  module,
-  highlightColors,
-  defaultHighlightColor,
-  // selectedNetworkId,
-  // setSelectedNetworkId,
-  // moduleIds,
-  // setModuleIds,
-}) {
+export default observer(function SelectedModule() {
+  // {
+  //   module,
+  //   highlightColors,
+  //   defaultHighlightColor,
+  //   selectedNetworkId,
+  //   setSelectedNetworkId,
+  //   moduleIds,
+  //   setModuleIds,
+  // }
   const store = useContext(StoreContext);
-  const [color, setColor] = useState(defaultHighlightColor);
+  const [color, setColor] = useState(store.defaultHighlightColor);
   const [buttonsEnabled, setButtonsEnabled] = useState(true);
   useLayoutEffect(() => setButtonsEnabled(true), [module]);
+  const module = store.selectedModule; // FIXME;
+  const { highlightColors, defaultHighlightColor } = store;
 
   const highlightIndex = highlightColors.indexOf(color);
 
