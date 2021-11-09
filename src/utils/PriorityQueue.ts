@@ -1,24 +1,21 @@
-export default class PriorityQueue {
-  heap = [];
-  numValues;
+export default class PriorityQueue<T extends { flow: number }> {
+  heap: T[] = [];
 
-  constructor(numValues) {
-    this.numValues = numValues;
-  }
+  constructor(public numValues: number) {}
 
   get length() {
     return this.heap.length;
   }
 
-  get minValue() {
+  private get minValue() {
     return this.heap[this.heap.length - 1];
   }
 
-  sort() {
+  private sort() {
     this.heap.sort((a, b) => b.flow - a.flow);
   }
 
-  push(value) {
+  push(value: T) {
     if (this.length < this.numValues) {
       this.heap.push(value);
       this.sort();
@@ -31,7 +28,7 @@ export default class PriorityQueue {
     }
   }
 
-  map(callbackFn) {
+  map(callbackFn: Parameters<T[]["map"]>[0]) {
     return this.heap.map(callbackFn);
   }
 }

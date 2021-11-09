@@ -81,13 +81,13 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     );
   }
 
-  getLargestLeafNodeNames() {
-    const queue = new PriorityQueue(6);
+  getLargestLeafNodeNames(numNodes: number = 6) {
+    const queue = new PriorityQueue<LeafNode>(numNodes);
     for (let node of this.leafNodes()) {
       queue.push(node);
       this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
-    return queue.map((node: LeafNode) => node.name);
+    return queue.map((node) => node.name);
   }
 
   asObject() {
