@@ -7,8 +7,6 @@ export default function ModuleExplorer({
   open,
   onClose,
   module,
-  // activeIndex,
-  // setActiveIndex,
   highlightColors,
 }) {
   const [activeIndex, setActiveIndex] = useState(0);

@@ -1,33 +1,29 @@
+import { observer } from "mobx-react";
 import { useContext, useState } from "react";
 import { Icon, Input, Table } from "semantic-ui-react";
-import Dispatch from "../../context/Dispatch";
+import { StoreContext } from "../../store";
 
 const toPrecision = (flow, precision = 3) =>
   Number.parseFloat(flow).toPrecision(precision);
 
 const selectable = { selectable: true, style: { padding: "0 8px" } };
 
-export default function InfoTable({ module }) {
-  const { dispatch } = useContext(Dispatch);
+export default observer(function InfoTable({ module }) {
+  const store = useContext(StoreContext);
   const [name, setName] = useState(module?.name ?? "");
   const [networkName, setNetworkName] = useState(module?.networkName ?? "");
 
-  const handleNameChange = (e, { value }) => {
+  const handleNameChange = (name = "") => {
     if (!module) return;
-    module.name = value;
-    setName(value);
-    dispatch({ type: "changeName" });
+    setName(name);
+    store.setModuleName(module, name);
   };
 
-  const handleNetworkNameChange = (e, { value }) => {
+  const handleNetworkNameChange = (name = "") => {
     if (!module) return;
-    module.networkName = value;
-    setNetworkName(value);
-    dispatch({ type: "changeName" });
+    setNetworkName(name);
+    store.setNetworkName(module, name);
   };
-
-  const clearName = () => handleNameChange(null, { value: "" });
-  const clearNetworkName = () => handleNetworkNameChange(null, { value: "" });
 
   const {
     networkCodelength,
@@ -49,9 +45,11 @@ export default function InfoTable({ module }) {
               transparent
               value={networkName || ""}
               placeholder="Set network name..."
-              onChange={handleNetworkNameChange}
+              onChange={(_, { value }) => handleNetworkNameChange(value)}
               icon={
-                networkName && <Icon link name="x" onClick={clearNetworkName} />
+                networkName && (
+                  <Icon link name="x" onClick={handleNetworkNameChange} />
+                )
               }
             />
           </Table.Cell>
@@ -89,8 +87,8 @@ export default function InfoTable({ module }) {
               transparent
               value={name || ""}
               placeholder="Set module name..."
-              onChange={handleNameChange}
-              icon={name && <Icon link name="x" onClick={clearName} />}
+              onChange={(_, { value }) => handleNameChange(value)}
+              icon={name && <Icon link name="x" onClick={handleNameChange} />}
             />
           </Table.Cell>
         </Table.Row>
@@ -101,4 +99,4 @@ export default function InfoTable({ module }) {
       </Table.Body>
     </Table>
   );
-}
+});

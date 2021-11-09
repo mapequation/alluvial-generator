@@ -1,11 +1,12 @@
-import { useContext, useState, useRef } from "react";
-import { Button, Table } from "semantic-ui-react";
-import Dispatch from "../../context/Dispatch";
 import { readFile } from "@mapequation/infomap/parser";
+import { observer } from "mobx-react";
+import { useContext, useRef, useState } from "react";
+import { Button, Table } from "semantic-ui-react";
+import { StoreContext } from "../../store";
 
-export default function HighlightNodes({ highlightColors }) {
+export default observer(function HighlightNodes({ highlightColors }) {
   const [files, setFiles] = useState([]);
-  const { dispatch } = useContext(Dispatch);
+  const store = useContext(StoreContext);
   const input = useRef();
 
   const onInputChange = () => {
@@ -19,9 +20,8 @@ export default function HighlightNodes({ highlightColors }) {
         highlightIndex: (numFiles + i) % highlightColors.length,
       }));
 
-      setFiles([...files, ...newFiles], () =>
-        dispatch({ type: "highlightNodes", value: files })
-      );
+      setFiles([...files, ...newFiles]);
+      store.setHighlightedNodes(files);
     });
 
     input.value = "";
@@ -80,4 +80,4 @@ export default function HighlightNodes({ highlightColors }) {
       </Table.Footer>
     </Table>
   );
-}
+});

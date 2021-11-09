@@ -1,21 +1,33 @@
-import { useState } from "react";
+import { observer } from "mobx-react";
+import { StrictMode, useContext } from "react";
+import { StoreContext } from "../store";
+import Diagram from "./Diagram";
 import Documentation from "./landing-page/Documentation";
 import Header from "./landing-page/Header";
 import LoadNetworks from "./landing-page/LoadNetworks";
-import Layout from "./Layout";
+import Sidebar from "./Sidebar";
 
-export default function App() {
-  const [state, setState] = useState({ networks: [] });
+export default observer(function App() {
+  const store = useContext(StoreContext);
 
-  if (state.networks.length === 0) {
+  if (store.networks.length === 0) {
     return (
       <>
         <Header />
-        <LoadNetworks onSubmit={setState} />
+        <LoadNetworks
+          onSubmit={({ networks }) => store.setNetworks(networks)}
+        />
         <Documentation />
       </>
     );
   }
 
-  return <Layout {...state} />;
-}
+  return (
+    <>
+      <Sidebar />
+      <StrictMode>
+        <Diagram />
+      </StrictMode>
+    </>
+  );
+});

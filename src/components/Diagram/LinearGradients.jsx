@@ -1,7 +1,7 @@
-import { Fragment } from "react";
 import { cross, hsl as d3_hsl } from "d3";
-import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
-import highlightColor from "../utils/highlight-color";
+import { Fragment } from "react";
+import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
+import highlightColor from "../../utils/highlight-color";
 
 const id = (left, right, leftInsignificant, rightInsignificant) =>
   `gradient_${left}${leftInsignificant ? "i" : ""}_${right}${

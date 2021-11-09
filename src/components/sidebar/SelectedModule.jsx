@@ -1,9 +1,10 @@
+import { observer } from "mobx-react";
 import { useContext, useLayoutEffect, useState } from "react";
 import { GithubPicker } from "react-color";
 import { Button } from "semantic-ui-react";
-import Dispatch from "../../context/Dispatch";
+import { StoreContext } from "../../store";
 
-function Swatch(props) {
+function Swatch({ background }) {
   return (
     <div
       style={{
@@ -20,7 +21,7 @@ function Swatch(props) {
         style={{
           width: "25px",
           height: "25px",
-          background: props.background,
+          background,
         }}
       />
     </div>
@@ -29,46 +30,44 @@ function Swatch(props) {
 
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
-export default function SelectedModule({
+export default observer(function SelectedModule({
   module,
   highlightColors,
   defaultHighlightColor,
-  selectedNetworkId,
-  setSelectedNetworkId,
-  moduleIds,
-  setModuleIds,
+  // selectedNetworkId,
+  // setSelectedNetworkId,
+  // moduleIds,
+  // setModuleIds,
 }) {
-  const { dispatch } = useContext(Dispatch);
+  const store = useContext(StoreContext);
   const [color, setColor] = useState(defaultHighlightColor);
+  const [buttonsEnabled, setButtonsEnabled] = useState(true);
+  useLayoutEffect(() => setButtonsEnabled(true), [module]);
 
   const highlightIndex = highlightColors.indexOf(color);
 
   const paintModule = () => {
     module.highlightIndex = highlightIndex;
-    dispatch({ type: "changeColor" });
+    //dispatch({ type: "changeColor" });
   };
 
   const paintNodes = () => {
     module.highlightIndex = highlightIndex;
-    dispatch({ type: "changeNodesColor" });
+    //dispatch({ type: "changeNodesColor" });
   };
 
   const paintModuleIds = () => {
     module.highlightIndex = highlightIndex;
-    dispatch({ type: "changeModuleIdsColor" });
+    //dispatch({ type: "changeModuleIdsColor" });
   };
 
-  const [buttonsEnabled, setButtonsEnabled] = useState(true);
-
-  useLayoutEffect(() => setButtonsEnabled(true), [module]);
-
   const expandModule = () => {
-    dispatch({ type: "expand" });
+    //dispatch({ type: "expand" });
     setButtonsEnabled(false);
   };
 
   const contractModule = () => {
-    dispatch({ type: "regroup" });
+    //dispatch({ type: "regroup" });
     setButtonsEnabled(false);
   };
 
@@ -76,14 +75,14 @@ export default function SelectedModule({
     return;
   }
 
-  const addToFilter = () => {
-    const ids = selectedNetworkId === module.networkId ? moduleIds : [];
-    setSelectedNetworkId(module.networkId);
-    setModuleIds([...ids, module.moduleId]);
-  };
+  // const addToFilter = () => {
+  //   const ids = selectedNetworkId === module.networkId ? moduleIds : [];
+  //   setSelectedNetworkId(module.networkId);
+  //   setModuleIds([...ids, module.moduleId]);
+  // };
 
-  const removeFromFilter = () =>
-    setModuleIds(moduleIds.filter((moduleId) => moduleId !== module.moduleId));
+  // const removeFromFilter = () =>
+  //   setModuleIds(moduleIds.filter((moduleId) => moduleId !== module.moduleId));
 
   return (
     <>
@@ -103,7 +102,7 @@ export default function SelectedModule({
           disabled={!buttonsEnabled || module.moduleLevel === 1}
         />
       </Button.Group>
-      <Button.Group {...buttonProps} style={{ margin: "4px 0 4px 0 " }}>
+      {/* <Button.Group {...buttonProps} style={{ margin: "4px 0 4px 0 " }}>
         <Button
           content="Add to module filter"
           onClick={addToFilter}
@@ -114,7 +113,7 @@ export default function SelectedModule({
           onClick={removeFromFilter}
           disabled={!moduleIds.includes(module.moduleId)}
         />
-      </Button.Group>
+      </Button.Group> */}
       <Swatch background={color} />
       <GithubPicker
         colors={[defaultHighlightColor, ...highlightColors]}
@@ -132,4 +131,4 @@ export default function SelectedModule({
       </Button.Group>
     </>
   );
-}
+});

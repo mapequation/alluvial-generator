@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import { Component } from "react";
-import Diagram from "../alluvial/Diagram";
-import Dispatch from "../context/Dispatch";
-import { saveDiagram } from "../io/export";
-import highlightColor from "../utils/highlight-color";
-import { streamlineHorizontal } from "../utils/streamline";
+import Diagram from "../../alluvial/Diagram";
+import Dispatch from "../../context/Dispatch";
+import { saveDiagram } from "../../io/export";
+import highlightColor from "../../utils/highlight-color";
+import { streamlineHorizontal } from "../../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 import ZoomableSvg from "./ZoomableSvg";
@@ -61,6 +61,7 @@ export default class AlluvialDiagram extends Component {
   };
 
   componentDidMount() {
+    console.time("AlluvialDiagram.componentDidMount");
     this.svg = d3.select(this.node);
     this.diagram = new Diagram(this.props.networks);
 
@@ -74,6 +75,7 @@ export default class AlluvialDiagram extends Component {
       type: "setVisibleModules",
       value: this.diagram.getVisibleModules(),
     });
+    console.timeEnd("AlluvialDiagram.componentDidMount");
   }
 
   componentDidUpdate(prev) {

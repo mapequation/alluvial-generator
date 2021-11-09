@@ -9,7 +9,12 @@ export default class Diagram {
   _asObject = {};
 
   constructor(networks) {
-    networks.forEach((network) => this.alluvialRoot.addNetwork(network));
+    networks?.forEach((network) => this.alluvialRoot.addNetwork(network));
+  }
+
+  addNetwork(network) {
+    this.alluvialRoot.addNetwork(network);
+    this.dirty = true;
   }
 
   doubleClick(alluvialObject, event) {
@@ -48,8 +53,7 @@ export default class Diagram {
     return false;
   }
 
-  setModuleName(alluvialObject) {
-    const { name, networkId, moduleId } = alluvialObject;
+  setModuleName({ networkId, moduleId }, name) {
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     const module = networkRoot.getModule(moduleId);
@@ -58,8 +62,7 @@ export default class Diagram {
     this.dirty = true;
   }
 
-  setNetworkName(alluvialObject) {
-    const { networkId, networkName } = alluvialObject;
+  setNetworkName({ networkId }, networkName) {
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     networkRoot.name = networkName;
@@ -67,11 +70,10 @@ export default class Diagram {
   }
 
   setModuleColor(
-    alluvialObject,
+    { highlightIndex, networkId, moduleId },
     paintNodesInAllNetworks = false,
     paintModuleIdsInAllNetworks = false
   ) {
-    const { highlightIndex, networkId, moduleId } = alluvialObject;
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     const module = networkRoot.getModule(moduleId);
@@ -132,9 +134,8 @@ export default class Diagram {
 
     this.removeColors();
 
-    const networkId = alluvialObject
-      ? alluvialObject.networkId
-      : this.alluvialRoot.children[0].networkId;
+    const networkId =
+      alluvialObject?.networkId ?? this.alluvialRoot.children[0].networkId;
 
     if (!networkId) {
       console.warn("Tried to auto paint but could not find a network id!");
@@ -209,7 +210,7 @@ export default class Diagram {
       this.alluvialRoot.children.forEach((network) => {
         network.children
           .filter((module) => module.flow > 0)
-          .forEach((module, i) =>
+          .forEach((module) =>
             this.setModuleColor(
               {
                 ...module.asObject(),
@@ -284,7 +285,6 @@ export default class Diagram {
 
   setVisibleModules(visibleModules) {
     for (let [networkId, moduleIds] of Object.entries(visibleModules)) {
-      // $FlowFixMe
       const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
 
       if (!networkRoot) {
@@ -292,7 +292,6 @@ export default class Diagram {
         return;
       }
 
-      // $FlowFixMe
       networkRoot.setVisibleModules(moduleIds);
     }
   }

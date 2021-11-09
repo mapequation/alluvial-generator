@@ -1,8 +1,9 @@
+import { observer } from "mobx-react";
 import { useContext } from "react";
 import { Button, Dropdown, Form, Header, Icon } from "semantic-ui-react";
-import Dispatch from "../../context/Dispatch";
+import { StoreContext } from "../../store";
 
-export default function ModuleFilter({
+export default observer(function ModuleFilter({
   selectedNetworkId,
   setSelectedNetworkId,
   networkIdOptions,
@@ -12,7 +13,7 @@ export default function ModuleFilter({
   moduleIds,
   clearFilter,
 }) {
-  const { dispatch } = useContext(Dispatch);
+  const store = useContext(StoreContext);
 
   const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
@@ -39,16 +40,14 @@ export default function ModuleFilter({
             selection
             options={moduleIdOptions}
             value={moduleIdsForNetwork(selectedNetworkId)}
-            onChange={(e, { value }) =>
+            onChange={(_, { value }) =>
               setModuleIdsForNetwork(selectedNetworkId)(value)
             }
           />
           <Button.Group style={{ margin: "4px 0 0 0 " }} {...buttonProps}>
             <Button
               type="submit"
-              onClick={() =>
-                dispatch({ type: "changeVisibleModules", value: moduleIds })
-              }
+              onClick={() => store.setModulesVisibleInFilter(moduleIds)}
               content="Apply filter"
             />
           </Button.Group>
@@ -62,4 +61,4 @@ export default function ModuleFilter({
       </Button.Group>
     </>
   );
-}
+});
