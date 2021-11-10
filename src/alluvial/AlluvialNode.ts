@@ -1,6 +1,5 @@
 import { Depth } from "./Depth";
 import LeafNode from "./LeafNode";
-import { makeObservable, observable } from "mobx";
 
 class Layout {
   x: number = 0;
@@ -90,12 +89,6 @@ export default abstract class AlluvialNode<
     public readonly id: string = ""
   ) {
     super();
-    makeObservable(this, {
-      x: observable,
-      y: observable,
-      width: observable,
-      height: observable,
-    });
   }
 
   getAncestor(depth: Depth): Ancestors<this> | null {

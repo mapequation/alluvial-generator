@@ -12,6 +12,9 @@ import Diagram from "../alluvial/Diagram";
 export class Store {
   diagram = new Diagram();
 
+  // hack to force updates when we call updateLayout
+  updateFlag = true;
+
   numNetworks = 0;
 
   height: number = 600;
@@ -53,6 +56,7 @@ export class Store {
   constructor() {
     makeObservable(this, {
       diagram: observable,
+      updateFlag: observable,
       numNetworks: observable,
       setNetworks: action,
       height: observable,
@@ -220,6 +224,7 @@ export class Store {
       this.moduleSize,
       this.sortModulesBy
     );
+    this.updateFlag = !this.updateFlag;
   }
 }
 

@@ -22,6 +22,7 @@ export default observer(function Diagram() {
     dropShadow,
     fontSize,
     showNetworkNames,
+    updateFlag,
   } = store;
   const maxModuleLevel = 3;
 
@@ -35,6 +36,7 @@ export default observer(function Diagram() {
       xmlns={d3.namespaces.svg}
       xmlnsXlink={d3.namespaces.xlink}
       id="alluvialSvg"
+      className={`updateFlag-${updateFlag}`}
     >
       <defs>
         <DropShadows maxLevel={maxModuleLevel} />
