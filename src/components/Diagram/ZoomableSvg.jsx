@@ -14,7 +14,6 @@ export default function ZoomableSvg({
   const svgRef = useRef();
 
   useEffect(() => {
-    console.log("useEffect");
     const svg = d3
       .select(svgRef.current)
       .call(zoom)

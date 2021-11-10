@@ -1,7 +1,6 @@
 import * as d3 from "d3";
-import { motion, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useRef } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import { streamlineHorizontal } from "../../utils/streamline";
@@ -44,45 +43,69 @@ export default observer(function Diagram() {
       <ZoomableSvg>
         <g className="alluvialDiagram" transform="translate(200, 10)">
           {diagram.alluvialRoot.children.map((network) => (
-            <g className="networkRoot" key={network.id}>
-              {showNetworkNames && (
-                <NetworkName
-                  x={network.networkName.textX}
-                  y={network.networkName.textY}
-                  fontSize={fontSize}
-                  name={network.networkName.name}
-                />
-              )}
-
-              {network.links
-                .filter((link) => link.avgHeight > streamlineThreshold)
-                .sort((a, b) =>
-                  a.highlightIndex !== b.highlightIndex
-                    ? a.highlightIndex - b.highlightIndex
-                    : b.avgHeight - a.avgHeight
-                )
-                .map((link) => (
-                  <Streamline key={link.id} link={link} />
-                ))}
-
-              {network.visibleChildren.map((module, i) => (
-                <Module
-                  key={module.id}
-                  module={module}
-                  dropShadow={dropShadowFilter}
-                  fillColor={groupFillColor}
-                  setPosition={(i, pos) => console.log("setPosition", i, pos)}
-                  moveItem={(i, pos) => console.log("moveItem", i, pos)}
-                  i={i}
-                />
-              ))}
-            </g>
+            <Network
+              key={network.id}
+              network={network}
+              name={network.networkName}
+              showName={showNetworkNames}
+              fontSize={fontSize}
+              streamlineOpacity={streamlineOpacity}
+              streamlineThreshold={streamlineThreshold}
+              dropShadow={dropShadowFilter}
+              groupFillColor={groupFillColor}
+            />
           ))}
         </g>
       </ZoomableSvg>
     </svg>
   );
 });
+
+function Network({
+  network,
+  name,
+  fontSize,
+  showName,
+  streamlineOpacity,
+  streamlineThreshold,
+  dropShadow,
+  groupFillColor,
+}) {
+  const children = network.visibleChildren;
+
+  return (
+    <g className="networkRoot">
+      {showName && (
+        <NetworkName
+          x={name.textX}
+          y={name.textY}
+          fontSize={fontSize}
+          name={name.name}
+        />
+      )}
+
+      {network.links
+        .filter((link) => link.avgHeight > streamlineThreshold)
+        .sort((a, b) =>
+          a.highlightIndex !== b.highlightIndex
+            ? a.highlightIndex - b.highlightIndex
+            : b.avgHeight - a.avgHeight
+        )
+        .map((link) => (
+          <Streamline key={link.id} link={link} opacity={streamlineOpacity} />
+        ))}
+
+      {children.map((module, i) => (
+        <Module
+          key={module.id}
+          module={module}
+          dropShadow={dropShadow}
+          fillColor={groupFillColor}
+        />
+      ))}
+    </g>
+  );
+}
 
 function NetworkName({ x, y, fontSize, name }) {
   return (
@@ -116,22 +139,9 @@ function Streamline({ link, opacity }) {
   );
 }
 
-function Module({ module, dropShadow, fillColor, setPosition, moveItem, i }) {
-  const ref = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragOriginY = useMotionValue(0);
-
-  useEffect(() => {
-    // console.log(ref.current);
-    // setPosition(i, {
-    //   height: ref.current.offsetHeight,
-    //   top: ref.current.offsetTop,
-    // });
-  });
-
+function Module({ module, dropShadow, fillColor }) {
   return (
-    <motion.g
-      ref={ref}
+    <g
       className="module"
       style={{
         cursor: "pointer",
@@ -139,37 +149,11 @@ function Module({ module, dropShadow, fillColor, setPosition, moveItem, i }) {
       }}
       stroke="#f00"
       strokeOpacity={0}
-      // motion
-      initial={false}
-      animate={
-        isDragging ? { zIndex: 1 } : { zIndex: 0, transition: { delay: 0.3 } }
-      }
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 1.1 }}
-      drag="y"
-      //dragOriginY={dragOriginY}
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={1}
-      onDragStart={(e) => {
-        return setIsDragging(true);
-      }}
-      onDragEnd={() => setIsDragging(false)}
-      onDrag={(e, { point }) => {
-        console.log(e);
-        return moveItem(i, point.y);
-      }}
-      positionTransition={({ delta }) => {
-        if (isDragging) {
-          dragOriginY.set(dragOriginY.get() + delta.y);
-        }
-
-        return !isDragging;
-      }}
     >
       {module.children.map((group) => (
         <Group key={group.id} fill={fillColor(group)} {...group} />
       ))}
-    </motion.g>
+    </g>
   );
 }
 
