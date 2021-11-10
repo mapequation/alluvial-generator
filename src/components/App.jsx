@@ -11,7 +11,7 @@ import Sidebar from "./Sidebar";
 export default observer(function App() {
   const store = useContext(StoreContext);
 
-  if (store.networks.length === 0) {
+  if (store.numNetworks === 0) {
     return (
       <>
         <Header />

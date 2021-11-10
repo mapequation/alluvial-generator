@@ -12,7 +12,7 @@ import Diagram from "../alluvial/Diagram";
 export class Store {
   diagram = new Diagram();
 
-  networks: any[] = [];
+  numNetworks = 0;
 
   height: number = 600;
   duration: number = 400;
@@ -53,7 +53,7 @@ export class Store {
   constructor() {
     makeObservable(this, {
       diagram: observable,
-      networks: observable,
+      numNetworks: observable,
       setNetworks: action,
       height: observable,
       setHeight: action,
@@ -105,9 +105,11 @@ export class Store {
   }
 
   setNetworks(networks: any[]) {
-    this.networks = networks;
+    console.time("Store.setNetworks");
     networks.forEach((network) => this.diagram.addNetwork(network));
+    this.numNetworks = networks.length;
     this.updateLayout();
+    console.timeEnd("Store.setNetworks");
   }
 
   setHeight(height: number) {

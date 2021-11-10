@@ -6,72 +6,20 @@ import {
   Menu,
   Sidebar as SemanticSidebar,
 } from "semantic-ui-react";
-import { savePng, saveSvg } from "../../io/export";
+//import { savePng, saveSvg } from "../../io/export";
 import { StoreContext } from "../../store";
-import Export from "./Export";
+//import Export from "./Export";
 import LayoutSettings from "./LayoutSettings";
 import MenuHeader from "./MenuHeader";
 import ModuleExplorer from "./ModuleExplorer";
-//import ModuleFilter from "./ModuleFilter";
 import PaintNetworks from "./PaintNetworks";
 import SelectedModule from "./SelectedModule";
 
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
-// const createEmptyFilter = (networks) => {
-//   const emptyFilter = {};
-//   networks.forEach(({ id }) => (emptyFilter[id] = []));
-//   return emptyFilter;
-// };
-
 export default observer(function Sidebar() {
-  const store = useContext(StoreContext);
-  const { networks } = store;
-
-  //const [selectedNetworkId, setSelectedNetworkId] = useState("");
-  // const [moduleIds, setModuleIds] = useState({
-  //   ...createEmptyFilter(networks),
-  //   ...store.modulesVisibleInFilter,
-  // });
+  const { selectedModule } = useContext(StoreContext);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // const networkIdOptions = networks.map(({ name, id }, key) => ({
-  //   key,
-  //   text: name,
-  //   value: id,
-  // }));
-
-  // const moduleIdOptions = (() => {
-  //   const visibleModuleIds = store.visibleModules[selectedNetworkId] || [];
-  //   return visibleModuleIds.map((moduleId, key) => ({
-  //     key,
-  //     text: moduleId,
-  //     value: moduleId,
-  //   }));
-  // })();
-
-  // const moduleIdsForNetwork = (networkId) => moduleIds[networkId] || [];
-
-  // const setModuleIdsForNetwork = (networkId) => (newModuleIds) => {
-  //   if (!moduleIds[networkId]) return;
-  //   const updated = Object.assign({}, moduleIds);
-  //   updated[networkId] = newModuleIds;
-  //   setModuleIds(updated);
-  // };
-
-  // const clearFilter = () => {
-  //   setModuleIds(createEmptyFilter(networks));
-  //   //dispatch({ type: "clearFilters" });
-  // };
-
-  // Object.entries(moduleIds).forEach(([networkId, moduleIds]) => {
-  //   const visible = store.visibleModules[networkId] || [];
-  //   if (moduleIds.some((moduleId) => !visible.includes(moduleId))) {
-  //     clearFilter();
-  //   }
-  // });
-
-  const basename = networks.map((network) => network.name);
 
   return (
     <SemanticSidebar
@@ -86,7 +34,7 @@ export default observer(function Sidebar() {
       </Menu.Item>
       <Menu.Item>
         <Header as="h4" content="Module explorer" />
-        {!!store.selectedModule ? (
+        {selectedModule != null ? (
           <>
             <SelectedModule />
             <Button
@@ -124,22 +72,10 @@ export default observer(function Sidebar() {
           }
         />
       </Menu.Item>
-      {/* <Menu.Item>
-        <ModuleFilter
-          selectedNetworkId={selectedNetworkId}
-          setSelectedNetworkId={setSelectedNetworkId}
-          networkIdOptions={networkIdOptions}
-          moduleIdsForNetwork={moduleIdsForNetwork}
-          setModuleIdsForNetwork={setModuleIdsForNetwork}
-          moduleIdOptions={moduleIdOptions}
-          moduleIds={moduleIds}
-          clearFilter={clearFilter}
-        />
-      </Menu.Item> */}
       <Menu.Item>
         <LayoutSettings />
       </Menu.Item>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Export
           onSaveClick={
             () => null
@@ -148,7 +84,7 @@ export default observer(function Sidebar() {
           onDownloadSvgClick={() => saveSvg("alluvialSvg", basename + ".svg")}
           onDownloadPngClick={() => savePng("alluvialSvg", basename + ".png")}
         />
-      </Menu.Item>
+      </Menu.Item> */}
     </SemanticSidebar>
   );
 });

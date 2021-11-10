@@ -1,6 +1,7 @@
 import * as d3 from "d3";
+import { motion, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import { streamlineHorizontal } from "../../utils/streamline";
@@ -40,22 +41,17 @@ export default observer(function Diagram() {
         <DropShadows maxLevel={maxModuleLevel} />
         <LinearGradients />
       </defs>
-      <ZoomableSvg onClick={() => {}}>
+      <ZoomableSvg>
         <g className="alluvialDiagram" transform="translate(200, 10)">
           {diagram.alluvialRoot.children.map((network) => (
             <g className="networkRoot" key={network.id}>
               {showNetworkNames && (
-                <text
-                  className="name"
-                  style={{ cursor: "default" }}
+                <NetworkName
                   x={network.networkName.textX}
                   y={network.networkName.textY}
-                  dy={3}
-                  textAnchor="middle"
                   fontSize={fontSize}
-                >
-                  {network.networkName.name}
-                </text>
+                  name={network.networkName.name}
+                />
               )}
 
               {network.links
@@ -66,43 +62,19 @@ export default observer(function Diagram() {
                     : b.avgHeight - a.avgHeight
                 )
                 .map((link) => (
-                  <path
-                    className="streamline"
-                    key={link.id}
-                    // style={{ cursor: "pointer" }}
-                    fill={LinearGradients.fill(link)}
-                    //stroke={LinearGradients.stroke(link)}
-                    strokeWidth={1}
-                    vectorEffect="non-scaling-stroke"
-                    paintOrder="stroke"
-                    opacity={streamlineOpacity}
-                    d={streamlineGenerator(link.path)}
-                  />
+                  <Streamline key={link.id} link={link} />
                 ))}
 
-              {network.visibleChildren.map((module) => (
-                <g
-                  className="module"
+              {network.visibleChildren.map((module, i) => (
+                <Module
                   key={module.id}
-                  style={{
-                    cursor: "pointer",
-                    filter: dropShadowFilter(module),
-                  }}
-                  stroke="#f00"
-                  strokeOpacity={0}
-                >
-                  {module.children.map((group) => (
-                    <g className="group" key={group.id}>
-                      <rect
-                        x={group.x}
-                        y={group.y}
-                        width={group.width}
-                        height={group.height}
-                        fill={groupFillColor(group)}
-                      ></rect>
-                    </g>
-                  ))}
-                </g>
+                  module={module}
+                  dropShadow={dropShadowFilter}
+                  fillColor={groupFillColor}
+                  setPosition={(i, pos) => console.log("setPosition", i, pos)}
+                  moveItem={(i, pos) => console.log("moveItem", i, pos)}
+                  i={i}
+                />
               ))}
             </g>
           ))}
@@ -111,3 +83,105 @@ export default observer(function Diagram() {
     </svg>
   );
 });
+
+function NetworkName({ x, y, fontSize, name }) {
+  return (
+    <text
+      className="name"
+      style={{ cursor: "default" }}
+      x={x}
+      y={y}
+      dy={3}
+      textAnchor="middle"
+      fontSize={fontSize}
+    >
+      {name}
+    </text>
+  );
+}
+
+function Streamline({ link, opacity }) {
+  return (
+    <path
+      className="streamline"
+      // style={{ cursor: "pointer" }}
+      fill={LinearGradients.fill(link)}
+      //stroke={LinearGradients.stroke(link)}
+      strokeWidth={1}
+      vectorEffect="non-scaling-stroke"
+      paintOrder="stroke"
+      opacity={opacity}
+      d={streamlineGenerator(link.path)}
+    />
+  );
+}
+
+function Module({ module, dropShadow, fillColor, setPosition, moveItem, i }) {
+  const ref = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragOriginY = useMotionValue(0);
+
+  useEffect(() => {
+    // console.log(ref.current);
+    // setPosition(i, {
+    //   height: ref.current.offsetHeight,
+    //   top: ref.current.offsetTop,
+    // });
+  });
+
+  return (
+    <motion.g
+      ref={ref}
+      className="module"
+      style={{
+        cursor: "pointer",
+        filter: dropShadow(module),
+      }}
+      stroke="#f00"
+      strokeOpacity={0}
+      // motion
+      initial={false}
+      animate={
+        isDragging ? { zIndex: 1 } : { zIndex: 0, transition: { delay: 0.3 } }
+      }
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 1.1 }}
+      drag="y"
+      //dragOriginY={dragOriginY}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={1}
+      onDragStart={(e) => {
+        return setIsDragging(true);
+      }}
+      onDragEnd={() => setIsDragging(false)}
+      onDrag={(e, { point }) => {
+        console.log(e);
+        return moveItem(i, point.y);
+      }}
+      positionTransition={({ delta }) => {
+        if (isDragging) {
+          dragOriginY.set(dragOriginY.get() + delta.y);
+        }
+
+        return !isDragging;
+      }}
+    >
+      {module.children.map((group) => (
+        <Group key={group.id} fill={fillColor(group)} {...group} />
+      ))}
+    </motion.g>
+  );
+}
+
+function Group({ x, y, width, height, fill }) {
+  return (
+    <rect
+      className="group"
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={fill}
+    />
+  );
+}

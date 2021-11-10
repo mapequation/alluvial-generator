@@ -1,13 +1,11 @@
 import Root from "./Root";
 import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
-import { makeAutoObservable } from "mobx";
 
 export default class Diagram {
   alluvialRoot = new Root();
 
   constructor(networks) {
-    makeAutoObservable(this);
     networks?.forEach((network) => this.alluvialRoot.addNetwork(network));
   }
 
