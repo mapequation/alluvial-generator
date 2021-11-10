@@ -1,13 +1,23 @@
+import {
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
+} from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { useContext } from "react";
-import { Slider } from "react-semantic-ui-range";
 import { Checkbox, Header, Popup } from "semantic-ui-react";
 import { StoreContext } from "../../store";
 import DefaultHighlightColor from "./DefaultHighlightColor";
 import LabelForSlider from "./LabelForSlider";
 
-const GreySlider = ({ start, ...props }) => (
-  <Slider color="grey" value={start} settings={props} />
+const GreySlider = ({ start, onChange, ...props }) => (
+  <Slider defaultValue={start} onChangeEnd={onChange} {...props}>
+    <SliderTrack bg="gray.200">
+      <SliderFilledTrack bg="gray.500" />
+    </SliderTrack>
+    <SliderThumb />
+  </Slider>
 );
 
 const MyCheckbox = ({ popup, ...rest }) => {
@@ -66,7 +76,9 @@ export default observer(function LayoutSettings() {
           min={0}
           max={10}
           step={0.1}
-          onChange={(value) => store.setStreamlineFraction(value)}
+          onChange={(value) => {
+            return store.setStreamlineFraction(value);
+          }}
         />
       </LabelForSlider>
       <LabelForSlider

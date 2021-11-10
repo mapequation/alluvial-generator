@@ -1,6 +1,8 @@
 import { cross, hsl as d3_hsl } from "d3";
-import { Fragment } from "react";
+import { observer } from "mobx-react";
+import { Fragment, useContext } from "react";
 import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
+import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 
 const id = (left, right, leftInsignificant, rightInsignificant) =>
@@ -21,10 +23,10 @@ const stroke = (color, highlightIndex) => {
   return hsl.toString();
 };
 
-export default function LinearGradients({
-  defaultColor = "white",
-  highlightColors = [],
-}) {
+function LinearGradients() {
+  const { defaultHighlightColor: defaultColor, highlightColors } =
+    useContext(StoreContext);
+
   const highlightIndices = [NOT_HIGHLIGHTED, ...highlightColors.keys()];
   const pairs = cross(highlightIndices, highlightIndices);
   const color = highlightColor(defaultColor, highlightColors);
@@ -36,77 +38,73 @@ export default function LinearGradients({
 
   return (
     <>
-      {insignificant.map(([leftInsignificant, rightInsignificant], i) =>
-        pairs.map(([leftHighlightIndex, rightHighlightIndex], j) => (
-          <Fragment key={`${i}_${j}}`}>
-            <linearGradient
-              id={id(
-                leftHighlightIndex,
-                rightHighlightIndex,
-                leftInsignificant,
-                rightInsignificant
-              )}
-            >
-              <stop
-                offset={leftOffset}
-                stopColor={color({
-                  highlightIndex: leftHighlightIndex,
-                  insignificant: leftInsignificant,
-                })}
-              />
-              <stop
-                offset={rightOffset}
-                stopColor={color({
-                  highlightIndex: rightHighlightIndex,
-                  insignificant: rightInsignificant,
-                })}
-              />
-            </linearGradient>
-            <linearGradient
-              id={strokeId(leftHighlightIndex, rightHighlightIndex)}
-            >
-              <stop
-                offset={leftOffset}
-                stopColor={stroke(
-                  color({
+      {insignificant.map(([leftInsignificant, rightInsignificant]) =>
+        pairs.map(([leftHighlightIndex, rightHighlightIndex]) => {
+          const _id = id(
+            leftHighlightIndex,
+            rightHighlightIndex,
+            leftInsignificant,
+            rightInsignificant
+          );
+          return (
+            <Fragment key={_id}>
+              <linearGradient id={_id}>
+                <stop
+                  offset={leftOffset}
+                  stopColor={color({
                     highlightIndex: leftHighlightIndex,
                     insignificant: leftInsignificant,
-                  }),
-                  leftHighlightIndex
-                )}
-              />
-              <stop
-                offset={rightOffset}
-                stopColor={stroke(
-                  color({
+                  })}
+                />
+                <stop
+                  offset={rightOffset}
+                  stopColor={color({
                     highlightIndex: rightHighlightIndex,
                     insignificant: rightInsignificant,
-                  }),
-                  rightHighlightIndex
-                )}
-              />
-            </linearGradient>
-          </Fragment>
-        ))
+                  })}
+                />
+              </linearGradient>
+              <linearGradient
+                id={strokeId(leftHighlightIndex, rightHighlightIndex)}
+              >
+                <stop
+                  offset={leftOffset}
+                  stopColor={stroke(
+                    color({
+                      highlightIndex: leftHighlightIndex,
+                      insignificant: leftInsignificant,
+                    }),
+                    leftHighlightIndex
+                  )}
+                />
+                <stop
+                  offset={rightOffset}
+                  stopColor={stroke(
+                    color({
+                      highlightIndex: rightHighlightIndex,
+                      insignificant: rightInsignificant,
+                    }),
+                    rightHighlightIndex
+                  )}
+                />
+              </linearGradient>
+            </Fragment>
+          );
+        })
       )}
     </>
   );
 }
 
 LinearGradients.fill = (d) =>
-  d.attr(
-    "fill",
-    (d) =>
-      `url(#${id(
-        d.leftHighlightIndex,
-        d.rightHighlightIndex,
-        d.leftInsignificant,
-        d.rightInsignificant
-      )})`
-  );
+  `url(#${id(
+    d.leftHighlightIndex,
+    d.rightHighlightIndex,
+    d.leftInsignificant,
+    d.rightInsignificant
+  )})`;
 
 LinearGradients.stroke = (d) =>
-  d.attr(
-    "stroke",
-    (d) => `url(#${strokeId(d.leftHighlightIndex, d.rightHighlightIndex)})`
-  );
+  `url(#${strokeId(d.leftHighlightIndex, d.rightHighlightIndex)})`;
+
+export default observer(LinearGradients);

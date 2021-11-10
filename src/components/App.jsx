@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { StrictMode, useContext } from "react";
 import { StoreContext } from "../store";
 import Diagram from "./Diagram";
@@ -23,11 +24,11 @@ export default observer(function App() {
   }
 
   return (
-    <>
+    <ChakraProvider>
       <Sidebar />
       <StrictMode>
         <Diagram />
       </StrictMode>
-    </>
+    </ChakraProvider>
   );
 });

@@ -100,42 +100,30 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     });
   }
 
-  asObject() {
-    const { id, networkId, codelength, flow, depth, name, x, width, height } =
-      this;
-
-    const links = Array.from(this.rightStreamlines(), (link) =>
-      link.asObject()
-    ).sort((a, b) => b.avgHeight - a.avgHeight);
-
-    const children = this.children.reduce(
-      (modules: ReturnType<Module["asObject"]>[], module) => {
-        if (module.isVisible && module.flow >= this.flowThreshold)
-          modules.push(module.asObject());
-        return modules;
-      },
-      []
-    );
+  get networkName() {
+    const { x, width, height } = this;
 
     return {
-      ...this.layout,
-      id,
-      networkId,
-      codelength,
-      flow,
-      depth,
-      networkName: {
-        name,
-        x,
-        y: height + 5,
-        width,
-        height: 15,
-        textX: x + width / 2,
-        textY: height + 15 + 5,
-      },
-      links,
-      children,
+      name: this.name,
+      x,
+      y: height + 5,
+      width,
+      height: 15,
+      textX: x + width / 2,
+      textY: height + 15 + 5,
     };
+  }
+
+  get links() {
+    return Array.from(this.rightStreamlines()).sort(
+      (a, b) => b.avgHeight - a.avgHeight
+    );
+  }
+
+  get visibleChildren() {
+    return this.children.filter(
+      (module) => module.isVisible && module.flow >= this.flowThreshold
+    );
   }
 
   *rightStreamlines() {

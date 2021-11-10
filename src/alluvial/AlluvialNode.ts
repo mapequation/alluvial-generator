@@ -1,5 +1,6 @@
 import { Depth } from "./Depth";
 import LeafNode from "./LeafNode";
+import { makeObservable, observable } from "mobx";
 
 class Layout {
   x: number = 0;
@@ -28,11 +29,6 @@ class Layout {
     return this;
   }
 }
-
-export type AlluvialObject<
-  T extends AlluvialNode<any, any>,
-  Props extends keyof T = "id" | "networkId" | "depth" | "flow"
-> = Pick<T, Props> & { [key: string]: any };
 
 type ToArray<T> = T extends any ? T[] : never;
 
@@ -94,6 +90,12 @@ export default abstract class AlluvialNode<
     public readonly id: string = ""
   ) {
     super();
+    makeObservable(this, {
+      x: observable,
+      y: observable,
+      width: observable,
+      height: observable,
+    });
   }
 
   getAncestor(depth: Depth): Ancestors<this> | null {
@@ -136,17 +138,6 @@ export default abstract class AlluvialNode<
 
   [Symbol.iterator](): Iterator<ChildType> {
     return this.children.values();
-  }
-
-  asObject(): AlluvialObject<this> {
-    return {
-      ...this.layout,
-      id: this.id,
-      networkId: this.networkId,
-      flow: this.flow,
-      depth: this.depth,
-      children: this.children.map((child) => child.asObject()),
-    };
   }
 
   forEachDepthFirst(

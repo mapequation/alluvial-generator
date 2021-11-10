@@ -272,14 +272,6 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     this.add();
   }
 
-  asObject() {
-    return {
-      ...super.asObject(),
-      name: this.name,
-      highlightIndex: this.highlightIndex,
-    };
-  }
-
   *leafNodes() {
     yield this;
   }

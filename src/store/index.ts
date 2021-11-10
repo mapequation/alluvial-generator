@@ -1,4 +1,4 @@
-import { makeObservable, observable, action, computed } from "mobx";
+import { makeObservable, observable, action } from "mobx";
 import { createContext } from "react";
 import {
   schemeDark2,
@@ -11,6 +11,7 @@ import Diagram from "../alluvial/Diagram";
 
 export class Store {
   diagram = new Diagram();
+
   networks: any[] = [];
 
   height: number = 600;
@@ -51,6 +52,7 @@ export class Store {
 
   constructor() {
     makeObservable(this, {
+      diagram: observable,
       networks: observable,
       setNetworks: action,
       height: observable,
@@ -98,16 +100,14 @@ export class Store {
       modulesVisibleInFilter: observable,
       setModulesVisibleInFilter: action,
       // methods
-      alluvialRoot: computed,
       updateLayout: action,
-      setModuleName: action,
-      setNetworkName: action,
     });
   }
 
   setNetworks(networks: any[]) {
     this.networks = networks;
     networks.forEach((network) => this.diagram.addNetwork(network));
+    this.updateLayout();
   }
 
   setHeight(height: number) {
@@ -218,22 +218,6 @@ export class Store {
       this.moduleSize,
       this.sortModulesBy
     );
-  }
-
-  setModuleName({ networkId, moduleId }: any, name: string) {
-    this.diagram.setModuleName({ networkId, moduleId }, name);
-  }
-
-  setNetworkName({ networkId }: any, name: string) {
-    this.diagram.setNetworkName({ networkId }, name);
-  }
-
-  setModuleColor(module: any) {
-    this.diagram.setModuleColor(module);
-  }
-
-  get alluvialRoot() {
-    return this.diagram.asObject();
   }
 }
 

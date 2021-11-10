@@ -31,18 +31,6 @@ export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
     return this.highlightIndex !== NOT_HIGHLIGHTED;
   }
 
-  asObject() {
-    return {
-      ...this.layout,
-      id: this.id,
-      networkId: this.networkId,
-      flow: this.flow,
-      depth: this.depth,
-      highlightIndex: this.highlightIndex,
-      insignificant: this.insignificant,
-    };
-  }
-
   get left() {
     return this.children[0];
   }

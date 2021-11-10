@@ -114,6 +114,7 @@ export default class Root extends AlluvialNodeBase<Network> {
   }
 
   calcFlow() {
+    console.time("Root.calcFlow");
     this.forEachDepthFirstPostOrder((node) => {
       if (node instanceof HighlightGroup) {
         node.flow = node.left.flow;
@@ -124,6 +125,7 @@ export default class Root extends AlluvialNodeBase<Network> {
         );
       }
     });
+    console.timeEnd("Root.calcFlow");
   }
 
   expandModule(moduleId: string, networkId: string) {
@@ -223,6 +225,7 @@ export default class Root extends AlluvialNodeBase<Network> {
     moduleSize: ModuleSize = "flow",
     sortModulesBy: ModuleSize = "flow"
   ) {
+    console.time("Root.updateLayout");
     const numNetworks = this.children.length;
 
     if (!numNetworks) return;
@@ -431,5 +434,7 @@ export default class Root extends AlluvialNodeBase<Network> {
         }
       }
     );
+
+    console.timeEnd("Root.updateLayout");
   }
 }

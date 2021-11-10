@@ -90,33 +90,48 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return queue.map((node) => node.name);
   }
 
-  asObject() {
-    const { name, x: x1, y, height, parent } = this;
+  get largestLeafNodes() {
+    // TODO inline
+    return this.getLargestLeafNodeNames();
+  }
 
-    const x2 = x1 + this.width;
+  get x1() {
+    return this.x;
+  }
+
+  get x2() {
+    return this.x + this.width;
+  }
+
+  get moduleNamePosition() {
+    const { x1, x2, y, height } = this;
     const padding = 5;
     const width = 15;
     const textOffset = width + padding;
 
     return {
-      ...super.asObject(),
-      moduleLevel: this.moduleLevel,
-      moduleId: this.moduleId,
-      name,
-      largestLeafNodes: this.getLargestLeafNodeNames(),
-      numLeafNodes: this.numLeafNodes,
-      maxModuleLevel: this.maxModuleLevel,
-      moduleNamePosition: {
-        x: [x1 - textOffset, x2 + textOffset],
-        y: y + height / 2,
-      },
-      moduleIdPosition: {
-        x: (x1 + x2) / 2,
-        y: y + height / 2,
-      },
-      networkName: parent ? parent.name : "",
-      networkCodelength: parent && parent.codelength ? parent.codelength : 0,
-      leafNodes: Array.from(this.leafNodes(), (node) => node.toNode()),
+      x: [x1 - textOffset, x2 + textOffset],
+      y: y + height / 2,
     };
+  }
+
+  get moduleIdPosition() {
+    const { x1, x2, y, height } = this;
+    return {
+      x: (x1 + x2) / 2,
+      y: y + height / 2,
+    };
+  }
+
+  get networkName() {
+    return this.parent?.name ?? "";
+  }
+
+  get networkCodelength() {
+    return this.parent?.codelength ?? 0;
+  }
+
+  get getLeafNodes() {
+    return Array.from(this.leafNodes(), (node) => node.toNode());
   }
 }

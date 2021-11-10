@@ -1,20 +1,18 @@
 import Root from "./Root";
 import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
+import { makeAutoObservable } from "mobx";
 
 export default class Diagram {
   alluvialRoot = new Root();
 
-  dirty = true;
-  _asObject = {};
-
   constructor(networks) {
+    makeAutoObservable(this);
     networks?.forEach((network) => this.alluvialRoot.addNetwork(network));
   }
 
   addNetwork(network) {
     this.alluvialRoot.addNetwork(network);
-    this.dirty = true;
   }
 
   doubleClick(alluvialObject, event) {
@@ -59,14 +57,12 @@ export default class Diagram {
     const module = networkRoot.getModule(moduleId);
     if (!module) return;
     module.name = name;
-    this.dirty = true;
   }
 
   setNetworkName({ networkId }, networkName) {
     const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
     if (!networkRoot) return;
     networkRoot.name = networkName;
-    this.dirty = true;
   }
 
   setModuleColor(
@@ -107,14 +103,12 @@ export default class Diagram {
           const oppositeModule = networkRoot.getModule(moduleId);
           if (oppositeModule) {
             this.setModuleColor({
-              ...oppositeModule.asObject(),
+              ...oppositeModule,
               highlightIndex,
             });
           }
         });
     }
-
-    this.dirty = true;
   }
 
   autoPaint(
@@ -160,7 +154,7 @@ export default class Diagram {
         .forEach((module, i) =>
           this.setModuleColor(
             {
-              ...module.asObject(),
+              ...module,
               highlightIndex: highlightIndices[i % highlightIndices.length],
             },
             true,
@@ -213,7 +207,7 @@ export default class Diagram {
           .forEach((module) =>
             this.setModuleColor(
               {
-                ...module.asObject(),
+                ...module,
                 highlightIndex: moduleHighlightindexMap[module.moduleId],
               },
               false,
@@ -237,13 +231,11 @@ export default class Diagram {
       }
       modules.forEach((module) =>
         this.setModuleColor({
-          ...module.asObject(),
+          ...module,
           highlightIndex: NOT_HIGHLIGHTED,
         })
       );
     }
-
-    this.dirty = true;
   }
 
   setNodesColors(highlightedNodes) {
@@ -297,16 +289,7 @@ export default class Diagram {
   }
 
   updateLayout() {
-    this.dirty = true;
     this.alluvialRoot.calcFlow();
     this.alluvialRoot.updateLayout(...arguments);
-  }
-
-  asObject() {
-    if (this.dirty) {
-      this._asObject = this.alluvialRoot.asObject();
-      this.dirty = false;
-    }
-    return this._asObject;
   }
 }

@@ -34,9 +34,5 @@ DropShadows.getUrl = function (level) {
 };
 
 DropShadows.filter = function (enabled = true) {
-  return (d) =>
-    d.style(
-      "filter",
-      enabled ? (d) => DropShadows.getUrl(d.moduleLevel) : null
-    );
+  return enabled ? (d) => DropShadows.getUrl(d.moduleLevel) : () => "none";
 };
