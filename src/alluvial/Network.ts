@@ -114,10 +114,14 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     };
   }
 
-  get links() {
-    return Array.from(this.rightStreamlines()).sort(
-      (a, b) => b.avgHeight - a.avgHeight
-    );
+  getLinks(streamlineThreshold: number = 0) {
+    return Array.from(this.rightStreamlines())
+      .filter((link) => link.avgHeight > streamlineThreshold)
+      .sort((a, b) =>
+        a.highlightIndex !== b.highlightIndex
+          ? a.highlightIndex - b.highlightIndex
+          : b.avgHeight - a.avgHeight
+      );
   }
 
   get visibleChildren() {

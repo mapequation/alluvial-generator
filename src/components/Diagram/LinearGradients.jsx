@@ -1,7 +1,7 @@
-import { cross, hsl as d3_hsl } from "d3";
+//import { cross, hsl as d3_hsl } from "d3";
 import { observer } from "mobx-react";
 import { Fragment, useContext } from "react";
-import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
+//import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 
@@ -12,34 +12,35 @@ const id = (left, right, leftInsignificant, rightInsignificant) =>
 
 const strokeId = (left, right) => `gradient-stroke_${left}_${right}`;
 
-const stroke = (color, highlightIndex) => {
-  if (highlightIndex === NOT_HIGHLIGHTED) {
-    return "#fff";
-  }
+// const stroke = (color, highlightIndex) => {
+//   if (highlightIndex === NOT_HIGHLIGHTED) {
+//     return "#fff";
+//   }
 
-  const hsl = d3_hsl(color);
-  hsl.s += 0.2;
-  hsl.l -= 0.2;
-  return hsl.toString();
-};
+//   const hsl = d3_hsl(color);
+//   hsl.s += 0.2;
+//   hsl.l -= 0.2;
+//   return hsl.toString();
+// };
 
-function LinearGradients() {
+function LinearGradients({ activeIndices }) {
   const { defaultHighlightColor: defaultColor, highlightColors } =
     useContext(StoreContext);
 
-  const highlightIndices = [NOT_HIGHLIGHTED, ...highlightColors.keys()];
-  const pairs = cross(highlightIndices, highlightIndices);
+  // const highlightIndices = [NOT_HIGHLIGHTED, ...highlightColors.keys()];
+  // const pairs = cross(highlightIndices, highlightIndices);
   const color = highlightColor(defaultColor, highlightColors);
 
   const leftOffset = "15%";
   const rightOffset = "85%";
 
-  const insignificant = cross([true, false], [true, false]);
+  //const insignificant = cross([true, false], [true, false]);
+  const insignificant = [[false, false]];
 
   return (
     <>
       {insignificant.map(([leftInsignificant, rightInsignificant]) =>
-        pairs.map(([leftHighlightIndex, rightHighlightIndex]) => {
+        activeIndices.map(([leftHighlightIndex, rightHighlightIndex]) => {
           const _id = id(
             leftHighlightIndex,
             rightHighlightIndex,
@@ -64,7 +65,7 @@ function LinearGradients() {
                   })}
                 />
               </linearGradient>
-              <linearGradient
+              {/* <linearGradient
                 id={strokeId(leftHighlightIndex, rightHighlightIndex)}
               >
                 <stop
@@ -87,7 +88,7 @@ function LinearGradients() {
                     rightHighlightIndex
                   )}
                 />
-              </linearGradient>
+              </linearGradient> */}
             </Fragment>
           );
         })

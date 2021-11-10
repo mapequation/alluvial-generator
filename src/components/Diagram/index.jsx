@@ -38,7 +38,6 @@ export default observer(function Diagram() {
     >
       <defs>
         <DropShadows maxLevel={maxModuleLevel} />
-        <LinearGradients />
       </defs>
       <ZoomableSvg>
         <g className="alluvialDiagram" transform="translate(200, 10)">
@@ -72,9 +71,23 @@ function Network({
   groupFillColor,
 }) {
   const children = network.visibleChildren;
+  const links = network.getLinks(streamlineThreshold);
+
+  const uniqueIndices = new Set();
+
+  for (const { leftHighlightIndex, rightHighlightIndex } of links) {
+    uniqueIndices.add(`${leftHighlightIndex}_${rightHighlightIndex}`);
+  }
+
+  const activeIndices = Array.from(uniqueIndices, (i) =>
+    i.split("_").map(Number)
+  );
 
   return (
     <g className="networkRoot">
+      <defs>
+        <LinearGradients activeIndices={activeIndices} />
+      </defs>
       {showName && (
         <NetworkName
           x={name.textX}
@@ -84,16 +97,9 @@ function Network({
         />
       )}
 
-      {network.links
-        .filter((link) => link.avgHeight > streamlineThreshold)
-        .sort((a, b) =>
-          a.highlightIndex !== b.highlightIndex
-            ? a.highlightIndex - b.highlightIndex
-            : b.avgHeight - a.avgHeight
-        )
-        .map((link) => (
-          <Streamline key={link.id} link={link} opacity={streamlineOpacity} />
-        ))}
+      {links.map((link) => (
+        <Streamline key={link.id} link={link} opacity={streamlineOpacity} />
+      ))}
 
       {children.map((module, i) => (
         <Module
