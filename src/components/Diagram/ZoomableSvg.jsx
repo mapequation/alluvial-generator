@@ -22,7 +22,7 @@ export default function ZoomableSvg({
 
     const zoomable = d3.select("#zoomable").attr("transform", initialTransform);
 
-    zoom.on("zoom", () => zoomable.attr("transform", d3.event.transform));
+    zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
 
     svg.select(".background").on("click", onClick);
   }, [svgRef, onClick]);
