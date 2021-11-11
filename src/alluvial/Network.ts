@@ -100,18 +100,12 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     });
   }
 
-  get networkName() {
-    const { x, width, height } = this;
+  get nameX() {
+    return this.x + this.width / 2;
+  }
 
-    return {
-      name: this.name,
-      x,
-      y: height + 5,
-      width,
-      height: 15,
-      textX: x + width / 2,
-      textY: height + 15 + 5,
-    };
+  get nameY() {
+    return this.height + 15 + 5;
   }
 
   getLinks(streamlineThreshold: number = 0) {

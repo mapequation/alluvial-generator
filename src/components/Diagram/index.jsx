@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { observer } from "mobx-react";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import { streamlineHorizontal } from "../../utils/streamline";
@@ -12,7 +12,6 @@ const streamlineGenerator = streamlineHorizontal();
 
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
-  const svgRef = useRef(null);
   const {
     diagram,
     defaultHighlightColor,
@@ -32,7 +31,6 @@ export default observer(function Diagram() {
   return (
     <svg
       style={{ width: "100vw", height: "100vh" }}
-      ref={svgRef}
       xmlns={d3.namespaces.svg}
       xmlnsXlink={d3.namespaces.xlink}
       id="alluvialSvg"
@@ -81,8 +79,8 @@ function Network({
     uniqueIndices.add(`${leftHighlightIndex}_${rightHighlightIndex}`);
   }
 
-  const activeIndices = Array.from(uniqueIndices, (i) =>
-    i.split("_").map(Number)
+  const activeIndices = Array.from(uniqueIndices, (indices) =>
+    indices.split("_").map(Number)
   );
 
   return (
@@ -91,19 +89,24 @@ function Network({
         <LinearGradients activeIndices={activeIndices} />
       </defs>
       {showName && (
-        <NetworkName
-          x={name.textX}
-          y={name.textY}
+        <text
+          className="name"
+          style={{ cursor: "default" }}
+          x={network.nameX}
+          y={network.nameY}
           fontSize={fontSize}
-          name={name.name}
-        />
+          dy={3}
+          textAnchor="middle"
+        >
+          {network.name}
+        </text>
       )}
 
       {links.map((link) => (
         <Streamline key={link.id} link={link} opacity={streamlineOpacity} />
       ))}
 
-      {children.map((module, i) => (
+      {children.map((module) => (
         <Module
           key={module.id}
           module={module}
@@ -112,22 +115,6 @@ function Network({
         />
       ))}
     </g>
-  );
-}
-
-function NetworkName({ x, y, fontSize, name }) {
-  return (
-    <text
-      className="name"
-      style={{ cursor: "default" }}
-      x={x}
-      y={y}
-      dy={3}
-      textAnchor="middle"
-      fontSize={fontSize}
-    >
-      {name}
-    </text>
   );
 }
 
@@ -159,21 +146,16 @@ function Module({ module, dropShadow, fillColor }) {
       strokeOpacity={0}
     >
       {module.children.map((group) => (
-        <Group key={group.id} fill={fillColor(group)} {...group} />
+        <rect
+          key={group.id}
+          className="group"
+          x={group.x}
+          y={group.y}
+          width={group.width}
+          height={group.height}
+          fill={fillColor(group)}
+        />
       ))}
     </g>
-  );
-}
-
-function Group({ x, y, width, height, fill }) {
-  return (
-    <rect
-      className="group"
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={fill}
-    />
   );
 }
