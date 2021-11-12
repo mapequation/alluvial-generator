@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { useContext, useLayoutEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { GithubPicker } from "react-color";
 import { Button } from "semantic-ui-react";
 import { StoreContext } from "../../store";
@@ -31,61 +31,36 @@ function Swatch({ background }) {
 const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
 
 export default observer(function SelectedModule() {
-  // {
-  //   module,
-  //   highlightColors,
-  //   defaultHighlightColor,
-  //   selectedNetworkId,
-  //   setSelectedNetworkId,
-  //   moduleIds,
-  //   setModuleIds,
-  // }
   const store = useContext(StoreContext);
   const [color, setColor] = useState(store.defaultHighlightColor);
-  const [buttonsEnabled, setButtonsEnabled] = useState(true);
-  useLayoutEffect(() => setButtonsEnabled(true), [module]);
-  const module = store.selectedModule; // FIXME;
   const { highlightColors, defaultHighlightColor } = store;
+
+  if (!store.selectedModule) return null;
+  const module = store.selectedModule; // FIXME;
 
   const highlightIndex = highlightColors.indexOf(color);
 
   const paintModule = () => {
     module.highlightIndex = highlightIndex;
-    //dispatch({ type: "changeColor" });
   };
 
   const paintNodes = () => {
     module.highlightIndex = highlightIndex;
-    //dispatch({ type: "changeNodesColor" });
   };
 
   const paintModuleIds = () => {
     module.highlightIndex = highlightIndex;
-    //dispatch({ type: "changeModuleIdsColor" });
   };
 
   const expandModule = () => {
-    //dispatch({ type: "expand" });
-    setButtonsEnabled(false);
+    module.expand();
+    store.updateLayout();
   };
 
   const contractModule = () => {
-    //dispatch({ type: "regroup" });
-    setButtonsEnabled(false);
+    module.regroup();
+    store.updateLayout();
   };
-
-  if (!module) {
-    return;
-  }
-
-  // const addToFilter = () => {
-  //   const ids = selectedNetworkId === module.networkId ? moduleIds : [];
-  //   setSelectedNetworkId(module.networkId);
-  //   setModuleIds([...ids, module.moduleId]);
-  // };
-
-  // const removeFromFilter = () =>
-  //   setModuleIds(moduleIds.filter((moduleId) => moduleId !== module.moduleId));
 
   return (
     <>
@@ -94,29 +69,15 @@ export default observer(function SelectedModule() {
           icon="plus"
           content="Expand module"
           onClick={expandModule}
-          disabled={
-            !buttonsEnabled || module.moduleLevel === module.maxModuleLevel
-          }
+          disabled={module.moduleLevel === module.maxModuleLevel}
         />
         <Button
           icon="minus"
           content="Contract module"
           onClick={contractModule}
-          disabled={!buttonsEnabled || module.moduleLevel === 1}
+          disabled={module.moduleLevel === 1}
         />
       </Button.Group>
-      {/* <Button.Group {...buttonProps} style={{ margin: "4px 0 4px 0 " }}>
-        <Button
-          content="Add to module filter"
-          onClick={addToFilter}
-          disabled={moduleIds.includes(module.moduleId)}
-        />
-        <Button
-          content="Remove from module filter"
-          onClick={removeFromFilter}
-          disabled={!moduleIds.includes(module.moduleId)}
-        />
-      </Button.Group> */}
       <Swatch background={color} />
       <GithubPicker
         colors={[defaultHighlightColor, ...highlightColors]}

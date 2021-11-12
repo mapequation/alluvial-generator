@@ -24,7 +24,6 @@ export default observer(function Diagram() {
     updateFlag,
   } = store;
   const maxModuleLevel = 3;
-
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
   const dropShadowFilter = DropShadows.filter(dropShadow);
 
@@ -45,7 +44,6 @@ export default observer(function Diagram() {
             <Network
               key={network.id}
               network={network}
-              name={network.networkName}
               showName={showNetworkNames}
               fontSize={fontSize}
               streamlineOpacity={streamlineOpacity}
@@ -62,7 +60,6 @@ export default observer(function Diagram() {
 
 function Network({
   network,
-  name,
   fontSize,
   showName,
   streamlineOpacity,
@@ -134,7 +131,33 @@ function Streamline({ link, opacity }) {
   );
 }
 
+let clickTimer;
+
 function Module({ module, dropShadow, fillColor }) {
+  const store = useContext(StoreContext);
+
+  const onClick = () => store.setSelectedModule(module);
+
+  const onDoubleClick = (event) => {
+    if (event.shiftKey) {
+      module.regroup();
+    } else {
+      module.expand();
+    }
+    store.updateLayout();
+  };
+
+  const nodes = module.largestLeafNodes; // eslint-disable-line no-unused-vars
+
+  const onClickHandler = (e) => {
+    clearTimeout(clickTimer);
+    if (e.detail === 1) {
+      clickTimer = setTimeout(onClick(e), 250);
+    } else if (e.detail === 2) {
+      onDoubleClick(e);
+    }
+  };
+
   return (
     <g
       className="module"
@@ -144,6 +167,7 @@ function Module({ module, dropShadow, fillColor }) {
       }}
       stroke="#f00"
       strokeOpacity={0}
+      onClick={onClickHandler}
     >
       {module.children.map((group) => (
         <rect

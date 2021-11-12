@@ -1,66 +1,15 @@
 import Root from "./Root";
-import Depth from "./Depth";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 
 export default class Diagram {
   alluvialRoot = new Root();
 
   constructor(networks) {
-    networks?.forEach((network) => this.alluvialRoot.addNetwork(network));
+    networks?.forEach((network) => this.addNetwork(network));
   }
 
   addNetwork(network) {
     this.alluvialRoot.addNetwork(network);
-  }
-
-  doubleClick(alluvialObject, event) {
-    const noKeyModifiers = {
-      shiftKey: false,
-    };
-
-    const { shiftKey } = event || noKeyModifiers;
-    const action = shiftKey
-      ? this.alluvialRoot.regroupModule
-      : this.alluvialRoot.expandModule;
-
-    const { depth } = alluvialObject;
-
-    if (depth === Depth.MODULE) {
-      const { moduleId, networkId } = alluvialObject;
-      return action.call(this.alluvialRoot, moduleId, networkId);
-    }
-
-    if (depth === Depth.STREAMLINE_NODE) {
-      const { rightNetworkId, leftNetworkId, rightModuleId, leftModuleId } =
-        alluvialObject;
-      const leftSuccess = action.call(
-        this.alluvialRoot,
-        leftModuleId,
-        leftNetworkId
-      );
-      const rightSuccess = action.call(
-        this.alluvialRoot,
-        rightModuleId,
-        rightNetworkId
-      );
-      return leftSuccess || rightSuccess;
-    }
-
-    return false;
-  }
-
-  setModuleName({ networkId, moduleId }, name) {
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!networkRoot) return;
-    const module = networkRoot.getModule(moduleId);
-    if (!module) return;
-    module.name = name;
-  }
-
-  setNetworkName({ networkId }, networkName) {
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!networkRoot) return;
-    networkRoot.name = networkName;
   }
 
   setModuleColor(
@@ -251,38 +200,6 @@ export default class Diagram {
           }
         }
       }
-    }
-  }
-
-  getVisibleModules() {
-    const networkRoots = this.alluvialRoot.children;
-
-    const visibleModules = {};
-
-    networkRoots.forEach(
-      ({ networkId, children }) =>
-        (visibleModules[networkId] = children.map((module) => module.moduleId))
-    );
-
-    return visibleModules;
-  }
-
-  clearFilters() {
-    this.alluvialRoot.children.forEach((networkRoot) =>
-      networkRoot.clearFilter()
-    );
-  }
-
-  setVisibleModules(visibleModules) {
-    for (let [networkId, moduleIds] of Object.entries(visibleModules)) {
-      const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-
-      if (!networkRoot) {
-        console.warn(`Invalid network id ${networkId}`);
-        return;
-      }
-
-      networkRoot.setVisibleModules(moduleIds);
     }
   }
 

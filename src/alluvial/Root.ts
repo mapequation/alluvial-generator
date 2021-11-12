@@ -3,7 +3,6 @@ import AlluvialNodeBase from "./AlluvialNode";
 import Branch from "./Branch";
 import Depth, { NETWORK, ROOT } from "./Depth";
 import HighlightGroup from "./HighlightGroup";
-import type LeafNode from "./LeafNode";
 import Module from "./Module";
 import Network from "./Network";
 import StreamlineNode from "./StreamlineNode";
@@ -126,93 +125,6 @@ export default class Root extends AlluvialNodeBase<Network> {
       }
     });
     console.timeEnd("Root.calcFlow");
-  }
-
-  expandModule(moduleId: string, networkId: string) {
-    const networkRoot = this.getNetworkRoot(networkId);
-    if (!networkRoot) {
-      console.warn(`No network id ${networkId}`);
-      return false;
-    }
-
-    const module = networkRoot.getModule(moduleId);
-    if (!module) {
-      console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`
-      );
-      return false;
-    }
-
-    const leafNodes: LeafNode[] = Array.from(module.leafNodes());
-    if (!leafNodes.length) {
-      console.warn(`No leaf nodes found`);
-      return false;
-    }
-
-    const newModuleLevel = module.moduleLevel + 1;
-
-    const alreadyExpanded = leafNodes.some(
-      (node) => node.level <= newModuleLevel
-    );
-    if (alreadyExpanded) {
-      console.warn(
-        `Module can't be expanded to level ${newModuleLevel} ` +
-          `because some nodes are at level ${newModuleLevel - 1}`
-      );
-      return false;
-    }
-
-    leafNodes.forEach((node) => {
-      node.moduleLevel = newModuleLevel;
-      node.update();
-    });
-
-    return true;
-  }
-
-  regroupModule(moduleId: string, networkId: string) {
-    const networkRoot = this.getNetworkRoot(networkId);
-    if (!networkRoot) {
-      console.warn(`No network id ${networkId}`);
-      return false;
-    }
-
-    const module = networkRoot.getModule(moduleId);
-    if (!module) {
-      console.warn(
-        `No module found with id ${moduleId} in network ${networkId}`
-      );
-      return false;
-    }
-
-    if (module.moduleLevel <= 1) {
-      console.warn(
-        `Module with id ${moduleId} is already at module level ${module.moduleLevel}`
-      );
-      return false;
-    }
-
-    const modules = module.getSiblings();
-
-    const leafNodes: LeafNode[] = [].concat.apply(
-      [],
-      // @ts-ignore FIXME
-      modules.map((module) => [...module.leafNodes()])
-    );
-
-    if (!leafNodes.length) {
-      console.warn(`No leaf nodes found`);
-      return false;
-    }
-
-    const newModuleLevel = module.moduleLevel - 1;
-
-    leafNodes.forEach((node) => {
-      node.moduleLevel = newModuleLevel;
-      node.update();
-    });
-
-    return true;
   }
 
   updateLayout(

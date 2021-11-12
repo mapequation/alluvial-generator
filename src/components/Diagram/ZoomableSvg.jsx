@@ -1,22 +1,18 @@
 import * as d3 from "d3";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
+import { StoreContext } from "../../store";
 
 const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 const initialTransform = d3.zoomIdentity.translate(0, 50);
-const nop = () => null;
 
-export default function ZoomableSvg({
-  width,
-  height,
-  children,
-  onClick = nop,
-}) {
+export default function ZoomableSvg({ width, height, children }) {
   const svgRef = useRef();
+  const store = useContext(StoreContext);
 
   useEffect(() => {
     const svg = d3
       .select(svgRef.current)
-      .call(zoom)
+      .call(zoom, { capture: true })
       .on("dblclick.zoom", null)
       .call(zoom.transform, initialTransform);
 
@@ -24,8 +20,8 @@ export default function ZoomableSvg({
 
     zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
 
-    svg.select(".background").on("click", onClick);
-  }, [svgRef, onClick]);
+    svg.select(".background").on("click", () => store.setSelectedModule(null));
+  }, [svgRef, store]);
 
   return (
     <svg

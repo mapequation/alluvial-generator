@@ -81,10 +81,65 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     );
   }
 
+  expand() {
+    const leafNodes: LeafNode[] = Array.from(this.leafNodes());
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return;
+    }
+
+    const newModuleLevel = this.moduleLevel + 1;
+
+    const alreadyExpanded = leafNodes.some(
+      (node) => node.level <= newModuleLevel
+    );
+    if (alreadyExpanded) {
+      console.warn(
+        `Module can't be expanded to level ${newModuleLevel} ` +
+          `because some nodes are at level ${newModuleLevel - 1}`
+      );
+      return;
+    }
+
+    leafNodes.forEach((node) => {
+      node.moduleLevel = newModuleLevel;
+      node.update();
+    });
+  }
+
+  regroup() {
+    if (this.moduleLevel <= 1) {
+      console.warn(
+        `Module with id ${this.moduleId} is already at module level ${this.moduleLevel}`
+      );
+    }
+
+    const modules = this.getSiblings();
+
+    const leafNodes: LeafNode[] = [].concat.apply(
+      [],
+      // @ts-ignore FIXME
+      modules.map((module) => [...module.leafNodes()])
+    );
+
+    if (!leafNodes.length) {
+      console.warn(`No leaf nodes found`);
+      return false;
+    }
+
+    const newModuleLevel = this.moduleLevel - 1;
+
+    leafNodes.forEach((node) => {
+      node.moduleLevel = newModuleLevel;
+      node.update();
+    });
+  }
+
   getLargestLeafNodeNames(numNodes: number = 6) {
     const queue = new PriorityQueue<LeafNode>(numNodes);
     for (let node of this.leafNodes()) {
       queue.push(node);
+      // FIXME, move this to LeafNode?
       this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
     return queue.map((node) => node.name);

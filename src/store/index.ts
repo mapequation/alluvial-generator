@@ -8,6 +8,7 @@ import {
   schemeTableau10,
 } from "d3";
 import Diagram from "../alluvial/Diagram";
+import type Module from "../alluvial/Module";
 
 export class Store {
   diagram = new Diagram();
@@ -47,11 +48,7 @@ export class Store {
   dropShadow: boolean = false;
   fontSize: number = 10;
 
-  // FIXME
-  selectedModule: any = null;
-  highlightedNodes: any[] = [];
-  visibleModules: any = {};
-  modulesVisibleInFilter: any = {};
+  selectedModule: Module | null = null;
 
   constructor() {
     makeObservable(this, {
@@ -97,12 +94,6 @@ export class Store {
       setFontSize: action,
       selectedModule: observable,
       setSelectedModule: action,
-      highlightedNodes: observable,
-      setHighlightedNodes: action,
-      visibleModules: observable,
-      setVisibleModules: action,
-      modulesVisibleInFilter: observable,
-      setModulesVisibleInFilter: action,
       // methods
       updateLayout: action,
     });
@@ -197,20 +188,8 @@ export class Store {
     this.fontSize = fontSize;
   }
 
-  setSelectedModule(selectedModule: any) {
+  setSelectedModule(selectedModule: Module | null) {
     this.selectedModule = selectedModule;
-  }
-
-  setHighlightedNodes(highlightedNodes: any[]) {
-    this.highlightedNodes = highlightedNodes;
-  }
-
-  setVisibleModules(visibleModules: any) {
-    this.visibleModules = visibleModules;
-  }
-
-  setModulesVisibleInFilter(modulesVisibleInFilter: any) {
-    this.modulesVisibleInFilter = modulesVisibleInFilter;
   }
 
   updateLayout() {
