@@ -1,3 +1,4 @@
+import differenceIndex from "../utils/difference-index";
 import Tree from "../utils/Tree";
 import AlluvialNodeBase from "./AlluvialNode";
 import Branch from "./Branch";
@@ -11,19 +12,13 @@ export type VerticalAlign = "bottom" | "justify" | "top";
 
 export type ModuleSize = "flow" | "nodes";
 
-const differenceIndex = (array1: number[], array2: number[]) => {
-  const minLength = Math.min(array1.length, array2.length);
-  for (let i = 0; i < minLength; i++) {
-    if (array1[i] !== array2[i]) return i;
-  }
-  return 0;
-};
-
 type GetNodeSize = (node: { flow: number; numLeafNodes: number }) => number;
 
-const getNodeSizeByPropForNetwork =
-  ({ numLeafNodes }: Network, maxFlow: number) =>
-  (property: string): GetNodeSize => {
+function getNodeSizeByPropForNetwork(
+  { numLeafNodes }: Network,
+  maxFlow: number
+) {
+  return (property: string): GetNodeSize => {
     if (property === "flow") {
       return (node: any) => node.flow / maxFlow;
     } else if (property === "nodes") {
@@ -31,6 +26,7 @@ const getNodeSizeByPropForNetwork =
     }
     return () => 0;
   };
+}
 
 /*
                        Root

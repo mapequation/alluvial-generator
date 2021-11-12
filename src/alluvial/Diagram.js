@@ -1,5 +1,6 @@
-import Root from "./Root";
+import differenceIndex from "../utils/difference-index";
 import { NOT_HIGHLIGHTED } from "./HighlightGroup";
+import Root from "./Root";
 
 export default class Diagram {
   alluvialRoot = new Root();
@@ -118,14 +119,6 @@ export default class Diagram {
       });
 
       const moduleHighlightindexMap = {};
-
-      const differenceIndex = (array1, array2) => {
-        const minLength = Math.min(array1.length, array2.length);
-        for (let i = 0; i < minLength; i++) {
-          if (array1[i] !== array2[i]) return i;
-        }
-        return 0;
-      };
 
       Array.from(moduleIds)
         .sort((a, b) => {
