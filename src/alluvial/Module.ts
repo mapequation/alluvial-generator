@@ -58,10 +58,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this._name;
   }
 
-  get isVisible(): boolean {
-    return this.filterActive ? this.visibleInFilter : true;
-  }
-
   getSiblings(): Module[] {
     if (!this.parent) return [];
     const modules = this.parent.children;

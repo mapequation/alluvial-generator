@@ -105,7 +105,15 @@ export default class Root extends AlluvialNodeBase<Network> {
       Module.customNames = new Map([...Module.customNames, ...moduleNames]);
     }
 
-    new Network(this, id, name, codelength).addNodes(nodes);
+    Network.create(this, id, name, codelength).addNodes(nodes);
+  }
+
+  removeNetwork(network: Network) {
+    if (!this.children.includes(network)) {
+      throw new Error(`Network with id ${network.networkId} does not exist`);
+    }
+
+    this.children = this.children.filter((child) => child !== network);
   }
 
   calcFlow() {
@@ -158,15 +166,12 @@ export default class Root extends AlluvialNodeBase<Network> {
     let moduleHeight = 0;
     let moduleMargin = 0;
 
-    const moduleIsVisible = (module: Module) =>
-      module.flow >= flowThreshold && module.isVisible;
-
     // Use first pass to get order of modules to sort streamlines in second pass
     // Y position of modules will be tuned in second pass depending on max margins
     this.forEachDepthFirstPreOrderWhile(
       (node: any) =>
         node.depth < Depth.MODULE ||
-        (node instanceof Module && moduleIsVisible(node)) ||
+        (node instanceof Module && node.flow >= flowThreshold) ||
         node instanceof HighlightGroup,
       (node: any, i: number, nodes: any[]) => {
         if (node instanceof Network) {
@@ -255,7 +260,7 @@ export default class Root extends AlluvialNodeBase<Network> {
       this.forEachDepthFirstWhile(
         (node: any) =>
           node.depth < Depth.MODULE ||
-          (node instanceof Module && moduleIsVisible(node)),
+          (node instanceof Module && node.flow >= flowThreshold),
         (node: any, i: number) => {
           if (node instanceof Network) {
             totalMargin = totalMargins[i];
@@ -271,7 +276,7 @@ export default class Root extends AlluvialNodeBase<Network> {
           }
         }
       );
-    }
+    } // "justify"
 
     this.forEachDepthFirstWhile(
       (node: any) => node.depth <= Depth.BRANCH,
@@ -294,7 +299,7 @@ export default class Root extends AlluvialNodeBase<Network> {
     this.forEachDepthFirstPostOrderWhile(
       (node: any) =>
         node.depth !== Depth.MODULE ||
-        (node instanceof Module && moduleIsVisible(node)),
+        (node instanceof Module && node.flow >= flowThreshold),
       (node: any) => {
         if (node instanceof StreamlineNode) {
           if (!getNodeSize) {

@@ -25,6 +25,15 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     this.codelength = codelength;
   }
 
+  static create(
+    parent: Root,
+    networkId: string,
+    name: string,
+    codelength: number
+  ) {
+    return new Network(parent, networkId, name, codelength);
+  }
+
   addNodes(nodes: Node[]) {
     const leafNodes = nodes.map((node) => new LeafNode(node, this));
     this.nodesByIdentifier = new Map(
@@ -119,15 +128,13 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   get visibleChildren() {
-    return this.children.filter(
-      (module) => module.isVisible && module.flow >= this.flowThreshold
-    );
+    return this.children.filter((module) => module.flow >= this.flowThreshold);
   }
 
   *rightStreamlines() {
     for (let module of this) {
       // Skip if left module if below threshold
-      if (module.flow < this.flowThreshold || !module.isVisible) {
+      if (module.flow < this.flowThreshold) {
         continue;
       }
 
@@ -141,11 +148,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
 
           if (oppositeModule) {
             // Skip if right module is below threshold
-            if (
-              oppositeModule.flow < this.flowThreshold ||
-              !oppositeModule.isVisible
-            )
-              continue;
+            if (oppositeModule.flow < this.flowThreshold) continue;
           }
 
           if (streamlineNode.link) yield streamlineNode.link;
