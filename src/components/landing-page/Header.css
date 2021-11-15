@@ -22,7 +22,7 @@ header {
 }
 
 .brand {
-    font-family: Philosopher;
+    font-family: Philosopher, serif;
     font-weight: 700;
     /*font-size: 24px;*/
 }

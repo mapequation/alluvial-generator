@@ -91,24 +91,6 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     );
   }
 
-  setVisibleModules(moduleIds: string[]) {
-    const filterActive = this.children.some((module) =>
-      moduleIds.includes(module.moduleId)
-    );
-
-    this.children.forEach((module) => {
-      module.filterActive = filterActive;
-      module.visibleInFilter = moduleIds.includes(module.moduleId);
-    });
-  }
-
-  clearFilter() {
-    this.children.forEach((module) => {
-      module.filterActive = false;
-      module.visibleInFilter = false;
-    });
-  }
-
   get nameX() {
     return this.x + this.width / 2;
   }

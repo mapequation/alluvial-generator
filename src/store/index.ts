@@ -52,7 +52,7 @@ export class Store {
 
   constructor() {
     makeObservable(this, {
-      diagram: observable,
+      diagram: observable.ref,
       updateFlag: observable,
       numNetworks: observable,
       setNetworks: action,
@@ -101,10 +101,17 @@ export class Store {
 
   setNetworks(networks: any[]) {
     console.time("Store.setNetworks");
+    this.diagram = new Diagram();
     networks.forEach((network) => this.diagram.addNetwork(network));
     this.numNetworks = networks.length;
     this.updateLayout();
     console.timeEnd("Store.setNetworks");
+  }
+
+  addNetwork(network: any) {
+    this.diagram.addNetwork(network);
+    this.numNetworks++;
+    this.updateLayout();
   }
 
   setHeight(height: number) {

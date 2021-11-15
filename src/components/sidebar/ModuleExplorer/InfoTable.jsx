@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
 import { Icon, Input, Table } from "semantic-ui-react";
-import { StoreContext } from "../../store";
+import { StoreContext } from "../../../store";
 
 const toPrecision = (flow, precision = 3) =>
   Number.parseFloat(flow).toPrecision(precision);

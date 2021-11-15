@@ -1,90 +1,377 @@
+//import ModuleExplorer from "./ModuleExplorer";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import UploadIcon from "@mui/icons-material/Upload";
+import {
+  Chip,
+  Collapse,
+  FormControlLabel,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Radio,
+  RadioGroup as MuiRadioGroup,
+  Slider as MuiSlider,
+  Stack,
+  Switch as MuiSwitch,
+} from "@mui/material";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
-import {
-  Button,
-  Header,
-  Menu,
-  Sidebar as SemanticSidebar,
-} from "semantic-ui-react";
-//import { savePng, saveSvg } from "../../io/export";
+import { TransitionGroup } from "react-transition-group";
 import { StoreContext } from "../../store";
-//import Export from "./Export";
-import LayoutSettings from "./LayoutSettings";
-import MenuHeader from "./MenuHeader";
-import ModuleExplorer from "./ModuleExplorer";
-import PaintNetworks from "./PaintNetworks";
-import SelectedModule from "./SelectedModule";
 
-const buttonProps = { compact: true, size: "tiny", basic: true, fluid: true };
-
-export default observer(function Sidebar() {
-  const { selectedModule } = useContext(StoreContext);
-  const [modalOpen, setModalOpen] = useState(false);
+export default observer(function Sidebar({ onClick }) {
+  const store = useContext(StoreContext);
+  const { selectedModule, highlightColors, defaultHighlightColor } = store;
+  const [color, setColor] = useState(defaultHighlightColor);
+  console.log(selectedModule);
 
   return (
-    <SemanticSidebar
-      as={Menu}
-      width="wide"
-      direction="right"
-      visible={true}
-      vertical
-    >
-      <Menu.Item header href="//www.mapequation.org/alluvial">
-        <MenuHeader />
-      </Menu.Item>
-      <Menu.Item>
-        <Header as="h4" content="Module explorer" />
-        {selectedModule != null ? (
-          <>
-            <SelectedModule />
-            <Button
-              icon="info"
-              {...buttonProps}
-              style={{ margin: "4px 0 0 0" }}
-              content={modalOpen ? "Close info" : "Open info"}
-              onClick={() => setModalOpen(!modalOpen)}
+    <>
+      <List dense>
+        <ListItem>
+          <Logo />
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={onClick}>
+            <ListItemIcon>
+              <UploadIcon />
+            </ListItemIcon>
+            <ListItemText>Load networks</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton>
+            <ListItemIcon>
+              <InfoOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText>About</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListSubheader color="primary">Module</ListSubheader>
+
+        <TransitionGroup>
+          <Collapse key={selectedModule != null ? "module" : "no-module"}>
+            {selectedModule != null ? (
+              <>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Network</Label>
+                    {selectedModule.networkName}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Codelength</Label>
+                    {selectedModule.networkCodelength.toPrecision(3) + " bits"}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Module id</Label>
+                    {selectedModule.moduleId}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Name</Label>
+                    {selectedModule.name?.toString()}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Current level</Label>
+                    {selectedModule.moduleLevel}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Flow</Label>
+                    {selectedModule.flow.toPrecision(3)}
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <Label>Nodes</Label>
+                    {Array.from(selectedModule.leafNodes()).length}
+                  </ListItemText>
+                </ListItem>
+
+                {/* swatch
+            <div
+              style={{
+                margin: "0 1px 2px",
+                padding: "4px",
+                background: "#fff",
+                borderRadius: "4px",
+                boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+                display: "inline-block",
+                cursor: "pointer",
+              }}
+            >
+              <div
+                style={{
+                  width: "25px",
+                  height: "25px",
+                  background: color,
+                }}
+              />
+            </div>
+            <GithubPicker
+              colors={[defaultHighlightColor, ...highlightColors]}
+              onChangeComplete={(color) => setColor(color.hex)}
             />
-            <ModuleExplorer
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-            />
-          </>
-        ) : (
-          <div style={{ color: "#777" }}>
-            No module selected. <br />
-            Click on any module.
-          </div>
-        )}
-      </Menu.Item>
-      <Menu.Item>
-        <PaintNetworks
-          onAutoPaintNodesClick={
-            () => null
-            //dispatch({ type: "autoPaintNodes" })
-          }
-          onAutoPaintModuleIdsClick={
-            () => null
-            //dispatch({ type: "autoPaintModuleIds" })
-          }
-          onRemoveColorsClick={
-            () => null
-            //dispatch({ type: "removeColors" })
+            */}
+              </>
+            ) : (
+              <ListItem>
+                <ListItemText
+                  secondary={
+                    <>
+                      No module selected.
+                      <br />
+                      Click on any module.
+                    </>
+                  }
+                />
+              </ListItem>
+            )}
+          </Collapse>
+        </TransitionGroup>
+
+        <ListSubheader color="primary">Layout</ListSubheader>
+
+        <Slider
+          label="Height"
+          value={store.height}
+          min={400}
+          max={2000}
+          step={10}
+          onChange={(value) => store.setHeight(value)}
+        />
+        <Slider
+          label="Module width"
+          value={store.moduleWidth}
+          min={10}
+          max={200}
+          step={10}
+          onChange={(value) => store.setModuleWidth(value)}
+        />
+        <Slider
+          label="Module spacing"
+          value={store.streamlineFraction}
+          min={0}
+          max={10}
+          step={0.1}
+          valueLabelFormat={(value) => Math.round(value * 100) + "%"}
+          onChange={(value) => {
+            return store.setStreamlineFraction(value);
+          }}
+        />
+        <Slider
+          label="Margin"
+          value={store.marginExponent}
+          min={1}
+          max={6}
+          valueLabelFormat={(value) => 2 ** (value - 1)}
+          onChange={(value) => store.setMarginExponent(value)}
+        />
+        <Slider
+          label="Visible flow"
+          value={(1 - store.moduleFlowThreshold) * 100}
+          min={95}
+          max={100}
+          step={0.1}
+          valueLabelFormat={(value) => value + "%"}
+          onChange={(value) => store.setModuleFlowThreshold(1 - value / 100)}
+        />
+        <Slider
+          label="Streamline filter"
+          value={store.streamlineThreshold}
+          min={0}
+          max={5}
+          step={0.01}
+          onChange={(value) => store.setStreamlineThreshold(value)}
+        />
+        <Slider
+          label="Transparency"
+          value={1 - store.streamlineOpacity}
+          min={0}
+          max={1}
+          step={0.01}
+          valueLabelFormat={(value) => Math.round((1 - value) * 100) + "%"}
+          onChange={(value) => store.setStreamlineOpacity(1 - value)}
+        />
+        <Slider
+          label="Font size"
+          value={store.fontSize}
+          min={5}
+          max={40}
+          onChange={(value) => store.setFontSize(value)}
+        />
+
+        <RadioGroup
+          legend="Module size"
+          value={store.moduleSize}
+          onChange={(value) => store.setModuleSize(value)}
+          options={[
+            { value: "flow", label: "Flow" },
+            { value: "nodes", label: "Nodes" },
+          ]}
+        />
+
+        <RadioGroup
+          legend="Module order"
+          value={store.sortModulesBy}
+          onChange={(value) => store.setSortModulesBy(value)}
+          options={[
+            { value: "flow", label: "Flow" },
+            { value: "nodes", label: "Nodes" },
+          ]}
+        />
+
+        <Switch
+          label="Bottom align"
+          defaultChecked
+          value={store.verticalAlign === "bottom"}
+          onChange={(value) =>
+            store.setVerticalAlign(value ? "bottom" : "justify")
           }
         />
-      </Menu.Item>
-      <Menu.Item>
-        <LayoutSettings />
-      </Menu.Item>
-      {/* <Menu.Item>
-        <Export
-          onSaveClick={
-            () => null
-            //dispatch({ type: "saveDiagram" })
-          }
-          onDownloadSvgClick={() => saveSvg("alluvialSvg", basename + ".svg")}
-          onDownloadPngClick={() => savePng("alluvialSvg", basename + ".png")}
+        <Switch
+          label="Module ids"
+          value={store.showModuleId}
+          onChange={(_, value) => store.setShowModuleId(value)}
         />
-      </Menu.Item> */}
-    </SemanticSidebar>
+        <Switch
+          label="Module names"
+          defaultChecked
+          value={store.showModuleNames}
+          onChange={(value) => store.setShowModuleNames(value)}
+        />
+        <Switch
+          label="Network names"
+          defaultChecked
+          value={store.showNetworkNames}
+          onChange={(value) => store.setShowNetworkNames(value)}
+        />
+        <Switch
+          label="Drop shadow"
+          value={store.dropShadow}
+          onChange={(value) => store.setDropShadow(value)}
+        />
+      </List>
+    </>
   );
 });
+
+function Label({ children }) {
+  return (
+    <span style={{ display: "inline-block", width: "50%" }}>{children}</span>
+  );
+}
+
+function Slider({ label, value, onChange, ...props }) {
+  return (
+    <ListItem>
+      <ListItemText>{label}</ListItemText>
+      <MuiSlider
+        sx={{
+          width: "50%",
+        }}
+        size="small"
+        defaultValue={value}
+        onChangeCommitted={(_, value) => onChange(value)}
+        valueLabelDisplay="auto"
+        {...props}
+      />
+    </ListItem>
+  );
+}
+
+function RadioGroup({ legend, value, onChange, options }) {
+  return (
+    <ListItem>
+      <ListItemText>{legend}</ListItemText>
+      <MuiRadioGroup row value={value} onChange={(_, value) => onChange(value)}>
+        {options.map(({ value, label }) => (
+          <FormControlLabel
+            key={value}
+            value={value}
+            control={<Radio size="small" />}
+            label={label}
+          />
+        ))}
+      </MuiRadioGroup>
+    </ListItem>
+  );
+}
+
+function Switch({ value, onChange, label, ...props }) {
+  return (
+    <ListItem>
+      <ListItemText>{label}</ListItemText>
+      <MuiSwitch
+        value={value}
+        size="small"
+        onChange={(_, value) => onChange(value)}
+        {...props}
+      />
+    </ListItem>
+  );
+}
+
+function Logo() {
+  const brand = {
+    base: {
+      fontFamily: "Philosopher, serif",
+      fontWeight: 700,
+      fontSize: "1.4em",
+    },
+    infomap: {
+      color: "#555",
+    },
+    alluvial: {
+      color: "#B22222",
+    },
+  };
+
+  return (
+    <Stack
+      sx={{ width: "100%" }}
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      <Stack
+        direction="row"
+        justifyContent="flex-start"
+        alignItems="center"
+        spacing={3}
+      >
+        <img
+          alt="MapEquation"
+          width="32px"
+          height="32px"
+          src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
+        />
+        <div>
+          <span style={brand.base}>
+            <span style={brand.infomap}>Infomap</span>{" "}
+            <span style={brand.alluvial}>Alluvial</span>
+          </span>
+        </div>
+      </Stack>
+      <Chip
+        size="small"
+        variant="outlined"
+        label={"v" + process.env.REACT_APP_VERSION}
+      />
+    </Stack>
+  );
+}

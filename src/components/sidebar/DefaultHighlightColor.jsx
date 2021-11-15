@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { SketchPicker } from "react-color";
-import { Popup } from "semantic-ui-react";
 
 export default function DefaultHighlightColor({
   defaultHighlightColor,
@@ -51,16 +50,11 @@ export default function DefaultHighlightColor({
   };
 
   return (
-    <div className="ui checkbox">
+    <div>
       <div style={styles.swatch} onClick={() => setVisible(!visible)}>
         <div style={styles.color} />
       </div>
-      <Popup
-        inverted
-        size="small"
-        trigger={<span style={styles.label}>Default color</span>}
-        content="Choose the default color."
-      />
+      <span style={styles.label}>Default color</span>
       {visible && (
         <div style={styles.popover}>
           <div style={styles.cover} onClick={() => setVisible(false)} />

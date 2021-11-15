@@ -133,8 +133,9 @@ function Streamline({ link, opacity }) {
 
 let clickTimer;
 
-function Module({ module, dropShadow, fillColor }) {
+const Module = observer(function Module({ module, dropShadow, fillColor }) {
   const store = useContext(StoreContext);
+  const isSelected = store.selectedModule === module;
 
   const onClick = () => store.setSelectedModule(module);
 
@@ -144,6 +145,9 @@ function Module({ module, dropShadow, fillColor }) {
     } else {
       module.expand();
     }
+    if (isSelected) {
+      store.setSelectedModule(null);
+    }
     store.updateLayout();
   };
 
@@ -152,7 +156,7 @@ function Module({ module, dropShadow, fillColor }) {
   const onClickHandler = (e) => {
     clearTimeout(clickTimer);
     if (e.detail === 1) {
-      clickTimer = setTimeout(onClick(e), 250);
+      clickTimer = setTimeout(() => onClick(e), 250);
     } else if (e.detail === 2) {
       onDoubleClick(e);
     }
@@ -166,7 +170,7 @@ function Module({ module, dropShadow, fillColor }) {
         filter: dropShadow(module),
       }}
       stroke="#f00"
-      strokeOpacity={0}
+      strokeOpacity={isSelected ? 1 : 0}
       onClick={onClickHandler}
     >
       {module.children.map((group) => (
@@ -182,4 +186,4 @@ function Module({ module, dropShadow, fillColor }) {
       ))}
     </g>
   );
-}
+});

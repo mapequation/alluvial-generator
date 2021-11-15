@@ -2,7 +2,7 @@ import { readFile } from "@mapequation/infomap/parser";
 import { observer } from "mobx-react";
 import { useContext, useRef, useState } from "react";
 import { Button, Table } from "semantic-ui-react";
-import { StoreContext } from "../../store";
+import { StoreContext } from "../../../store";
 
 export default observer(function HighlightNodes() {
   const store = useContext(StoreContext);

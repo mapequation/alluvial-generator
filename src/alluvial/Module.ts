@@ -18,8 +18,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   moduleId: string;
   margin: number = 0;
   _name: string[] | null = null;
-  visibleInFilter: boolean = false;
-  filterActive: boolean = false;
   depth = MODULE;
   index: number;
 

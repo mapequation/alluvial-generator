@@ -1,4 +1,3 @@
-//import * as Sentry from "@sentry/browser";
 import {
   extension as fileExtension,
   readFile,
@@ -6,13 +5,9 @@ import {
 import { useRef, useState } from "react";
 import {
   Checkbox,
-  Container,
-  Divider,
   Form,
   Icon,
-  Label,
   Popup,
-  Segment,
   Step,
   Table,
   Transition,
@@ -23,34 +18,17 @@ import {
   isValidExtension,
   validExtensions,
 } from "../../io/object-parser";
-//import Background from "../../images/background.svg";
 import { getParserForExtension } from "../../io/text-parser";
 import humanFileSize from "../../utils/human-file-size";
 import makeDraggable from "./Draggable";
 
 const DraggableTableRow = makeDraggable(Table.Row);
 
-export default function LoadNetworks({
-  onSubmit = (values) => console.log(values),
-}) {
+export default function LoadNetworks({ onSubmit }) {
   const [files, setFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [nodeIdentifier, setNodeIdentifier] = useState("name");
   const input = useRef(null);
-
-  // toggleMultilayer = (i) =>
-  //   setState((prevState) => {
-  //     const file = prevState.files[i];
-  //     if (!file) return;
-  //     file.multilayer = !file.multilayer;
-
-  //     // Switch to using id as node identifier if only one file set to multilayer
-  //     if (i === 0 && prevState.files.length === 1 && file.multilayer) {
-  //       return { files: prevState.files, nodeIdentifier: "id" };
-  //     }
-
-  //     return { files: prevState.files };
-  //   });
 
   const loadSelectedFiles = () => {
     setIsLoading(true);
@@ -76,17 +54,13 @@ export default function LoadNetworks({
           name: validFiles[i].name,
           size: validFiles[i].size,
           format: validFiles[i].format,
-          //multilayer: false,
           error: false,
           errorMessage: null,
         }));
 
         setFiles([...files, ...newFiles]);
       })
-      .catch((err) => {
-        console.log(err);
-        //Sentry.captureException(err);
-      });
+      .catch((err) => console.error(err));
 
     setIsLoading(false);
   };
@@ -130,25 +104,6 @@ export default function LoadNetworks({
       file.errorMessage = null;
 
       try {
-        // If we only load one file that is set to multilayer, visualize each layer as a network
-        // if (
-        //   files.length === 1 &&
-        //   file.multilayer &&
-        //   (file.format === "tree" || file.format === "ftree")
-        // ) {
-        //   const objectParser = getParser("multilevelTree");
-        //   const parsed = objectParser(object, file.name, nodeIdentifier);
-
-        //   if (nodeIdentifier === "name") {
-        //     for (let network of parsed) {
-        //       checkNameConflicts(network.nodes, file);
-        //     }
-        //   }
-
-        //   networks.push(...parsed);
-        //   return;
-        // }
-
         const objectParser = getParser(file.format);
         const parsed = objectParser(
           object,
@@ -211,176 +166,133 @@ export default function LoadNetworks({
     setFiles(files);
   };
 
-  const background = {
-    padding: "100px 0 100px 0",
-    background: `linear-gradient(hsla(0, 0%, 100%, 0.8), hsla(0, 0%, 100%, 0.7))`,
-    backgroundSize: "115% auto",
-    backgroundPosition: "20% 20%",
-  };
-
   return (
-    <div style={background}>
-      <Segment
-        as={Container}
-        loading={isLoading}
-        text
-        textAlign="center"
-        style={{ padding: "50px 50px" }}
-      >
-        <Label attached="top right">v {process.env.REACT_APP_VERSION}</Label>
-        <Step.Group>
-          <Step link onClick={loadExample}>
-            <Icon name="book" />
-            <Step.Content>
-              <Step.Title>Load example</Step.Title>
-              <Step.Description>Citation networks</Step.Description>
-            </Step.Content>
-          </Step>
-        </Step.Group>
+    <>
+      <Step.Group>
+        <Step link onClick={loadExample}>
+          <Icon name="book" />
+          <Step.Content>
+            <Step.Title>Load example</Step.Title>
+            <Step.Description>Citation networks</Step.Description>
+          </Step.Content>
+        </Step>
+      </Step.Group>
 
-        <Divider
-          horizontal
-          style={{ margin: "20px 0px 30px 0px" }}
-          content="Or"
-        />
+      <Step.Group ordered>
+        <Step
+          as="label"
+          link
+          completed={files.length > 0}
+          active={files.length === 0}
+          htmlFor="upload"
+        >
+          <Step.Content>
+            <Step.Title>Add networks</Step.Title>
+            <Step.Description>{validExtensions.join(", ")}</Step.Description>
+          </Step.Content>
+          <input
+            style={{ display: "none" }}
+            type="file"
+            multiple
+            id="upload"
+            onChange={loadSelectedFiles}
+            accept={acceptedFormats}
+            ref={input}
+          />
+        </Step>
+        <Step
+          link
+          active={files.length > 0}
+          disabled={files.length === 0}
+          onClick={createDiagram}
+        >
+          <Step.Content>
+            <Step.Title>Create diagram</Step.Title>
+          </Step.Content>
+        </Step>
+      </Step.Group>
 
-        <Step.Group ordered>
-          <Step
-            as="label"
-            link
-            completed={files.length > 0}
-            active={files.length === 0}
-            htmlFor="upload"
-          >
-            <Step.Content>
-              <Step.Title>Add networks</Step.Title>
-              <Step.Description>{validExtensions.join(", ")}</Step.Description>
-            </Step.Content>
-            <input
-              style={{ display: "none" }}
-              type="file"
-              multiple
-              id="upload"
-              onChange={loadSelectedFiles}
-              accept={acceptedFormats}
-              ref={input}
-            />
-          </Step>
-          <Step
-            link
-            active={files.length > 0}
-            disabled={files.length === 0}
-            onClick={createDiagram}
-          >
-            <Step.Content>
-              <Step.Title>Create diagram</Step.Title>
-            </Step.Content>
-          </Step>
-        </Step.Group>
+      <Form>
+        <Form.Field>Node identifier</Form.Field>
+        <Form.Field>
+          <Checkbox
+            radio
+            label="Node name"
+            name="nodeIdentifier"
+            value="name"
+            checked={nodeIdentifier === "name"}
+            onChange={(_, { value }) => setNodeIdentifier(value)}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Checkbox
+            radio
+            label="Node id"
+            name="nodeIdentifier"
+            value="id"
+            checked={nodeIdentifier === "id"}
+            onChange={(_, { value }) => setNodeIdentifier(value)}
+          />
+        </Form.Field>
+      </Form>
 
-        <Form>
-          <Form.Field>
-            Node identifier
-            <Popup trigger={<Icon name="question" />} inverted>
-              <p>
-                Two nodes in different networks are considered equal if their
-                names are the same. For this to work, all nodes in a network
-                must have unique names.
-              </p>
-              <p>
-                If a network does not have unique names, you can try to use node
-                ids as identifiers, which uses the node ids to determine if two
-                nodes are equal.
-              </p>
-            </Popup>
-          </Form.Field>
-          <Form.Field>
-            <Checkbox
-              radio
-              label="Node name"
-              name="nodeIdentifier"
-              value="name"
-              checked={nodeIdentifier === "name"}
-              onChange={(_, { value }) => setNodeIdentifier(value)}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Checkbox
-              radio
-              label="Node id"
-              name="nodeIdentifier"
-              value="id"
-              checked={nodeIdentifier === "id"}
-              onChange={(_, { value }) => setNodeIdentifier(value)}
-            />
-          </Form.Field>
-        </Form>
+      {files.length > 0 && (
+        <Table celled unstackable striped size="small">
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Size</Table.HeaderCell>
+              <Table.HeaderCell>Format</Table.HeaderCell>
+              <Table.HeaderCell />
+            </Table.Row>
+          </Table.Header>
 
-        {files.length > 0 && (
-          <Table celled unstackable striped size="small">
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Name</Table.HeaderCell>
-                <Table.HeaderCell>Size</Table.HeaderCell>
-                <Table.HeaderCell>Format</Table.HeaderCell>
-                {/* <Table.HeaderCell>Multilayer</Table.HeaderCell> */}
-                <Table.HeaderCell />
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              {files.map((file, i) => (
-                <Transition
-                  key={i}
-                  animation="shake"
-                  duration={700}
-                  visible={!file.error}
+          <Table.Body>
+            {files.map((file, i) => (
+              <Transition
+                key={i}
+                animation="shake"
+                duration={700}
+                visible={!file.error}
+              >
+                <DraggableTableRow
+                  draggable
+                  className="draggable"
+                  index={i}
+                  action={moveRow}
                 >
-                  <DraggableTableRow
-                    draggable
-                    className="draggable"
-                    index={i}
-                    action={moveRow}
+                  <Table.Cell style={{ cursor: "grab" }} error={file.error}>
+                    {file.name}
+                    {file.error && (
+                      <Popup
+                        inverted
+                        content={file.errorMessage}
+                        trigger={
+                          <Icon
+                            name="warning sign"
+                            style={{ float: "right", cursor: "pointer" }}
+                          />
+                        }
+                      />
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
+                  <Table.Cell>{file.format}</Table.Cell>
+                  <Table.Cell
+                    selectable
+                    textAlign="center"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => removeFile(i)}
                   >
-                    <Table.Cell style={{ cursor: "grab" }} error={file.error}>
-                      {file.name}
-                      {file.error && (
-                        <Popup
-                          inverted
-                          content={file.errorMessage}
-                          trigger={
-                            <Icon
-                              name="warning sign"
-                              style={{ float: "right", cursor: "pointer" }}
-                            />
-                          }
-                        />
-                      )}
-                    </Table.Cell>
-                    <Table.Cell>{humanFileSize(file.size)}</Table.Cell>
-                    <Table.Cell>{file.format}</Table.Cell>
-                    {/* <Table.Cell>
-                        <Checkbox
-                          checked={file.multilayer}
-                          onChange={() => toggleMultilayer(i)}
-                        />
-                      </Table.Cell> */}
-                    <Table.Cell
-                      selectable
-                      textAlign="center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => removeFile(i)}
-                    >
-                      <Icon name="x" />
-                    </Table.Cell>
-                  </DraggableTableRow>
-                </Transition>
-              ))}
-            </Table.Body>
-          </Table>
-        )}
-      </Segment>
-    </div>
+                    <Icon name="x" />
+                  </Table.Cell>
+                </DraggableTableRow>
+              </Transition>
+            ))}
+          </Table.Body>
+        </Table>
+      )}
+    </>
   );
 }
 
