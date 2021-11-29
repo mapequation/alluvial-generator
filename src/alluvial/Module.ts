@@ -97,6 +97,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     leafNodes.forEach((node) => {
       node.moduleLevel = newModuleLevel;
+      this.updateMaxModuleLevel(node.level - 1);
       node.update();
     });
   }
@@ -125,16 +126,20 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     leafNodes.forEach((node) => {
       node.moduleLevel = newModuleLevel;
+      this.updateMaxModuleLevel(node.level - 1);
       node.update();
     });
+  }
+
+  private updateMaxModuleLevel(level: number) {
+    // FIXME what is this?
+    this.maxModuleLevel = Math.max(this.maxModuleLevel, level);
   }
 
   getLargestLeafNodeNames(numNodes: number = 6) {
     const queue = new PriorityQueue<LeafNode>(numNodes);
     for (let node of this.leafNodes()) {
       queue.push(node);
-      // FIXME, move this to LeafNode?
-      this.maxModuleLevel = Math.max(node.level - 1, this.maxModuleLevel);
     }
     return queue.map((node) => node.name);
   }

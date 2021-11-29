@@ -96,6 +96,7 @@ export class Store {
       setSelectedModule: action,
       // methods
       updateLayout: action,
+      toggleUpdate: action,
     });
   }
 
@@ -120,6 +121,7 @@ export class Store {
   }
 
   setDuration(duration: number) {
+    // TODO remove
     this.duration = duration;
   }
 
@@ -210,6 +212,10 @@ export class Store {
       this.moduleSize,
       this.sortModulesBy
     );
+    this.toggleUpdate();
+  }
+
+  toggleUpdate() {
     this.updateFlag = !this.updateFlag;
   }
 }

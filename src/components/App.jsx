@@ -20,7 +20,6 @@ export default observer(function App() {
 
   return (
     <>
-      <CssBaseline />
       <Dialog
         open={isOpen}
         onClose={() => setIsOpen(false)}

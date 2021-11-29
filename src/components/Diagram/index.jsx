@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
+import useOnClick from "../../utils/onClick";
 import { streamlineHorizontal } from "../../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
@@ -131,36 +132,24 @@ function Streamline({ link, opacity }) {
   );
 }
 
-let clickTimer;
-
 const Module = observer(function Module({ module, dropShadow, fillColor }) {
   const store = useContext(StoreContext);
   const isSelected = store.selectedModule === module;
-
-  const onClick = () => store.setSelectedModule(module);
-
-  const onDoubleClick = (event) => {
-    if (event.shiftKey) {
-      module.regroup();
-    } else {
-      module.expand();
-    }
-    if (isSelected) {
-      store.setSelectedModule(null);
-    }
-    store.updateLayout();
-  };
-
-  const nodes = module.largestLeafNodes; // eslint-disable-line no-unused-vars
-
-  const onClickHandler = (e) => {
-    clearTimeout(clickTimer);
-    if (e.detail === 1) {
-      clickTimer = setTimeout(() => onClick(e), 250);
-    } else if (e.detail === 2) {
-      onDoubleClick(e);
-    }
-  };
+  const handler = useOnClick({
+    onClick: () => store.setSelectedModule(module),
+    onDoubleClick: (event) => {
+      if (event.shiftKey) {
+        module.regroup();
+      } else {
+        module.expand();
+      }
+      if (isSelected) {
+        store.setSelectedModule(null);
+      }
+      store.updateLayout();
+    },
+    delay: 100,
+  });
 
   return (
     <g
@@ -171,7 +160,7 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
       }}
       stroke="#f00"
       strokeOpacity={isSelected ? 1 : 0}
-      onClick={onClickHandler}
+      onClick={handler}
     >
       {module.children.map((group) => (
         <rect

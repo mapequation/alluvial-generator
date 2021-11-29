@@ -1,4 +1,3 @@
-//import ModuleExplorer from "./ModuleExplorer";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import UploadIcon from "@mui/icons-material/Upload";
 import {
@@ -26,7 +25,9 @@ export default observer(function Sidebar({ onClick }) {
   const store = useContext(StoreContext);
   const { selectedModule, highlightColors, defaultHighlightColor } = store;
   const [color, setColor] = useState(defaultHighlightColor);
-  console.log(selectedModule);
+  console.log("selectedModule", selectedModule);
+
+  const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
 
   return (
     <>
@@ -35,7 +36,7 @@ export default observer(function Sidebar({ onClick }) {
           <Logo />
         </ListItem>
 
-        <ListItem disablePadding>
+        <ListItem>
           <ListItemButton onClick={onClick}>
             <ListItemIcon>
               <UploadIcon />
@@ -44,7 +45,7 @@ export default observer(function Sidebar({ onClick }) {
           </ListItemButton>
         </ListItem>
 
-        <ListItem disablePadding>
+        <ListItem>
           <ListItemButton>
             <ListItemIcon>
               <InfoOutlinedIcon />
@@ -62,43 +63,43 @@ export default observer(function Sidebar({ onClick }) {
                 <ListItem>
                   <ListItemText>
                     <Label>Network</Label>
-                    {selectedModule.networkName}
+                    {selectedModule?.networkName}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Codelength</Label>
-                    {selectedModule.networkCodelength.toPrecision(3) + " bits"}
+                    {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Module id</Label>
-                    {selectedModule.moduleId}
+                    {selectedModule?.moduleId}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Name</Label>
-                    {selectedModule.name?.toString()}
+                    {selectedModule?.name?.toString()}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Current level</Label>
-                    {selectedModule.moduleLevel}
+                    {selectedModule?.moduleLevel}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Flow</Label>
-                    {selectedModule.flow.toPrecision(3)}
+                    {selectedModule?.flow.toPrecision(3)}
                   </ListItemText>
                 </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Nodes</Label>
-                    {Array.from(selectedModule.leafNodes()).length}
+                    {leafNodes.length}
                   </ListItemText>
                 </ListItem>
 
@@ -237,32 +238,29 @@ export default observer(function Sidebar({ onClick }) {
 
         <Switch
           label="Bottom align"
-          defaultChecked
-          value={store.verticalAlign === "bottom"}
+          checked={store.verticalAlign === "bottom"}
           onChange={(value) =>
             store.setVerticalAlign(value ? "bottom" : "justify")
           }
         />
         <Switch
           label="Module ids"
-          value={store.showModuleId}
+          checked={store.showModuleId}
           onChange={(_, value) => store.setShowModuleId(value)}
         />
         <Switch
           label="Module names"
-          defaultChecked
-          value={store.showModuleNames}
+          checked={store.showModuleNames}
           onChange={(value) => store.setShowModuleNames(value)}
         />
         <Switch
           label="Network names"
-          defaultChecked
-          value={store.showNetworkNames}
+          checked={store.showNetworkNames}
           onChange={(value) => store.setShowNetworkNames(value)}
         />
         <Switch
           label="Drop shadow"
-          value={store.dropShadow}
+          checked={store.dropShadow}
           onChange={(value) => store.setDropShadow(value)}
         />
       </List>
@@ -312,12 +310,11 @@ function RadioGroup({ legend, value, onChange, options }) {
   );
 }
 
-function Switch({ value, onChange, label, ...props }) {
+function Switch({ onChange, label, ...props }) {
   return (
     <ListItem>
       <ListItemText>{label}</ListItemText>
       <MuiSwitch
-        value={value}
         size="small"
         onChange={(_, value) => onChange(value)}
         {...props}
@@ -362,8 +359,8 @@ function Logo() {
         />
         <div>
           <span style={brand.base}>
-            <span style={brand.infomap}>Infomap</span>{" "}
-            <span style={brand.alluvial}>Alluvial</span>
+            <span style={brand.infomap}>Alluvial</span>{" "}
+            <span style={brand.alluvial}>Generator</span>
           </span>
         </div>
       </Stack>
