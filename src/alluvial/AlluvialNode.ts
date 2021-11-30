@@ -25,7 +25,12 @@ class Layout {
   }
 
   get layout() {
-    return this;
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    };
   }
 }
 
@@ -110,6 +115,18 @@ export default abstract class AlluvialNode<
     }
 
     return found;
+  }
+
+  get isFirstChild() {
+    return this.parent?.children.findIndex((child) => child === this) === 0;
+  }
+
+  get isLastChild() {
+    const numChildren = this.parent?.children.length ?? -1;
+    return (
+      this.parent?.children.findIndex((child) => child === this) ===
+      numChildren - 1
+    );
   }
 
   get isEmpty() {

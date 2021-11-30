@@ -91,12 +91,11 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     );
   }
 
-  get nameX() {
-    return this.x + this.width / 2;
-  }
-
-  get nameY() {
-    return this.height + 15 + 5;
+  get namePosition() {
+    return {
+      x: this.x + this.width / 2,
+      y: this.height + 15 + 5,
+    };
   }
 
   getLinks(streamlineThreshold: number = 0) {

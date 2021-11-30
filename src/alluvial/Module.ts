@@ -157,19 +157,33 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.x + this.width;
   }
 
-  get moduleNamePosition() {
+  get namePosition() {
     const { x1, x2, y, height } = this;
     const padding = 5;
     const width = 15;
     const textOffset = width + padding;
 
+    const x = this.parent.isFirstChild
+      ? x1 - textOffset
+      : this.parent.isLastChild
+      ? x2 + textOffset
+      : (x1 + x2) / 2;
+
     return {
-      x: [x1 - textOffset, x2 + textOffset],
+      x,
       y: y + height / 2,
     };
   }
 
-  get moduleIdPosition() {
+  get textAnchor() {
+    return this.parent.isFirstChild
+      ? "end"
+      : this.parent.isLastChild
+      ? "start"
+      : null;
+  }
+
+  get idPosition() {
     const { x1, x2, y, height } = this;
     return {
       x: (x1 + x2) / 2,

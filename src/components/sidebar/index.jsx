@@ -246,7 +246,7 @@ export default observer(function Sidebar({ onClick }) {
         <Switch
           label="Module ids"
           checked={store.showModuleId}
-          onChange={(_, value) => store.setShowModuleId(value)}
+          onChange={(value) => store.setShowModuleId(value)}
         />
         <Switch
           label="Module names"

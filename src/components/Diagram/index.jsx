@@ -90,11 +90,10 @@ function Network({
         <text
           className="name"
           style={{ cursor: "default" }}
-          x={network.nameX}
-          y={network.nameY}
           fontSize={fontSize}
           dy={3}
           textAnchor="middle"
+          {...network.namePosition}
         >
           {network.name}
         </text>
@@ -134,7 +133,9 @@ function Streamline({ link, opacity }) {
 
 const Module = observer(function Module({ module, dropShadow, fillColor }) {
   const store = useContext(StoreContext);
+
   const isSelected = store.selectedModule === module;
+
   const handler = useOnClick({
     onClick: () => store.setSelectedModule(module),
     onDoubleClick: (event) => {
@@ -159,20 +160,45 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
         filter: dropShadow(module),
       }}
       stroke="#f00"
-      strokeOpacity={isSelected ? 1 : 0}
+      strokeWidth={isSelected ? 1 : 0}
       onClick={handler}
     >
       {module.children.map((group) => (
         <rect
           key={group.id}
           className="group"
-          x={group.x}
-          y={group.y}
-          width={group.width}
-          height={group.height}
+          {...group.layout}
           fill={fillColor(group)}
         />
       ))}
+
+      {store.showModuleId && (
+        <text
+          fontSize={store.fontSize}
+          textAnchor="middle"
+          dy={3}
+          stroke="#fff"
+          strokeWidth={3}
+          paintOrder="stroke"
+          strokeLinecap="round"
+          {...module.idPosition}
+        >
+          {module.moduleId}
+        </text>
+      )}
+
+      {store.showModuleNames && module.textAnchor != null && (
+        <text
+          fontSize={store.fontSize}
+          textAnchor={module.textAnchor}
+          dy={3}
+          strokeWidth={0}
+          fill={isSelected ? "#f00" : "#000"}
+          {...module.namePosition}
+        >
+          {module.largestLeafNodes.join(", ")}
+        </text>
+      )}
     </g>
   );
 });

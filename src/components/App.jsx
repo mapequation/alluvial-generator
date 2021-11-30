@@ -1,10 +1,4 @@
-import {
-  CssBaseline,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Drawer,
-} from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, Drawer } from "@mui/material";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
 import { StoreContext } from "../store";
