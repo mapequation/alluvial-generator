@@ -36,7 +36,7 @@ export default observer(function Sidebar({ onClick }) {
           <Logo />
         </ListItem>
 
-        <ListItem>
+        <ListItem disablePadding>
           <ListItemButton onClick={onClick}>
             <ListItemIcon>
               <UploadIcon />
@@ -45,7 +45,7 @@ export default observer(function Sidebar({ onClick }) {
           </ListItemButton>
         </ListItem>
 
-        <ListItem>
+        <ListItem disablePadding>
           <ListItemButton>
             <ListItemIcon>
               <InfoOutlinedIcon />
@@ -132,13 +132,8 @@ export default observer(function Sidebar({ onClick }) {
             ) : (
               <ListItem>
                 <ListItemText
-                  secondary={
-                    <>
-                      No module selected.
-                      <br />
-                      Click on any module.
-                    </>
-                  }
+                  primary="No module selected."
+                  secondary="Click on any module."
                 />
               </ListItem>
             )}

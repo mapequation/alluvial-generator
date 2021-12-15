@@ -19,10 +19,12 @@
     "@types/react-dom": "^17.0.11",
     "d3": "^7.1.1",
     "file-saver": "^2.0.5",
+    "framer-motion": "^5.4.1",
     "mobx-react": "^7.2.1",
     "react": "^17.0.2",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.2",
+    "react-dropzone": "^11.4.2",
     "react-scripts": "4.0.3",
     "react-transition-group": "^4.4.2",
     "semantic-ui-react": "^2.0.4",
@@ -30,8 +32,8 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-scripts test",
     "release": "standard-version",
     "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial"
@@ -56,7 +58,9 @@
   },
   "devDependencies": {
     "@types/d3": "^5.16.4",
+    "customize-cra": "^1.0.0",
     "prettier": "^2.4.1",
+    "react-app-rewired": "^2.1.8",
     "standard-version": "^9.3.2"
   }
 }

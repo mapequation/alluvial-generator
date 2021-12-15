@@ -1,13 +1,10 @@
-import { Dialog, DialogContent, DialogTitle, Drawer } from "@mui/material";
-import { observer } from "mobx-react";
-import { useContext, useState } from "react";
-import { StoreContext } from "../store";
+import { Dialog, Drawer } from "@mui/material";
+import { useState } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./landing-page/LoadNetworks";
 import Sidebar from "./Sidebar";
 
-export default observer(function App() {
-  const store = useContext(StoreContext);
+export default function App() {
   const [isOpen, setIsOpen] = useState(true);
 
   const drawerWidth = 350;
@@ -17,18 +14,10 @@ export default observer(function App() {
       <Dialog
         open={isOpen}
         onClose={() => setIsOpen(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
       >
-        <DialogTitle>Load networks</DialogTitle>
-        <DialogContent>
-          <LoadNetworks
-            onSubmit={({ networks }) => {
-              store.setNetworks(networks);
-              setIsOpen(false);
-            }}
-          />
-        </DialogContent>
+        <LoadNetworks onClose={() => setIsOpen(false)} />
       </Dialog>
 
       <Drawer
@@ -48,4 +37,4 @@ export default observer(function App() {
       <Diagram />
     </>
   );
-});
+}

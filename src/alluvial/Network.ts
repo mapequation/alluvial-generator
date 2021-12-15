@@ -35,10 +35,18 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   addNodes(nodes: Node[]) {
-    const leafNodes = nodes.map((node) => new LeafNode(node, this));
-    this.nodesByIdentifier = new Map(
-      Array.from(leafNodes, (node) => [node.identifier, node])
-    );
+    this.nodesByIdentifier = new Map();
+
+    const leafNodes = nodes.map((node) => {
+      const leafNode = new LeafNode(node, this);
+      this.nodesByIdentifier.set(leafNode.identifier, leafNode);
+      return leafNode;
+    });
+
+    // const leafNodes = nodes.map((node) => new LeafNode(node, this));
+    // this.nodesByIdentifier = new Map(
+    //   Array.from(leafNodes, (node) => [node.identifier, node])
+    // );
     leafNodes.forEach((node) => node.add());
   }
 

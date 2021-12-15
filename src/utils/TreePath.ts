@@ -1,4 +1,4 @@
-type Path = TreePath | string;
+type Path = TreePath | string | number[];
 
 const insignificantPathRexeg = /(\d+)([:;])+/g;
 
@@ -15,7 +15,7 @@ export default class TreePath {
    * Construct a new TreePath
    */
   constructor(path: Path) {
-    this.path = path.toString();
+    this.path = Array.isArray(path) ? path.join(":") : path.toString();
 
     const lastChar = this.path.slice(-1);
 

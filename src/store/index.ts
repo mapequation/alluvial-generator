@@ -13,6 +13,8 @@ import type Module from "../alluvial/Module";
 export class Store {
   diagram = new Diagram();
 
+  files: any[] = [];
+
   // hack to force updates when we call updateLayout
   updateFlag = true;
 
@@ -53,6 +55,8 @@ export class Store {
   constructor() {
     makeObservable(this, {
       diagram: observable.ref,
+      files: observable.ref,
+      setFiles: action,
       updateFlag: observable,
       numNetworks: observable,
       setNetworks: action,
@@ -102,8 +106,8 @@ export class Store {
 
   setNetworks(networks: any[]) {
     console.time("Store.setNetworks");
-    this.diagram = new Diagram();
-    networks.forEach((network) => this.diagram.addNetwork(network));
+    this.setSelectedModule(null);
+    this.diagram = new Diagram(networks);
     this.numNetworks = networks.length;
     this.updateLayout();
     console.timeEnd("Store.setNetworks");
@@ -113,6 +117,10 @@ export class Store {
     this.diagram.addNetwork(network);
     this.numNetworks++;
     this.updateLayout();
+  }
+
+  setFiles(files: any[]) {
+    this.files = files;
   }
 
   setHeight(height: number) {
