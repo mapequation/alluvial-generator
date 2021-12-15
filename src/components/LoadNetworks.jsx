@@ -22,6 +22,7 @@ import {
   Stepper,
   Tooltip,
   Typography,
+  Stack,
 } from "@mui/material";
 import { animate, Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
@@ -37,14 +38,29 @@ const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
   const [files, setFiles] = useState(store.files);
+  const [errors, setErrors] = useState([]);
+  const [rejected, setRejected] = useState([]);
+  const [errorsOpen, setErrorsOpen] = useState(false);
+
+  const showErrors = (callback) => {
+    if (callback) callback();
+    if (errorsOpen) return;
+    setErrorsOpen(true);
+    window.setTimeout(() => setErrorsOpen(false), 5000);
+  };
 
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
+    onDropRejected: (rejectedFiles) =>
+      showErrors(() => setRejected(rejectedFiles)),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
+      setErrors([]);
+
       const readFiles = await Promise.all(acceptedFiles.map(readFile));
       const newFiles = [];
+      const newErrors = [];
 
       for (let i = 0; i < acceptedFiles.length; ++i) {
         const file = acceptedFiles[i];
@@ -63,8 +79,16 @@ export default observer(function LoadNetworks({ onClose }) {
               continue;
             }
           } catch (e) {
-            // TODO show error
             console.error(e);
+            newErrors.push({
+              file,
+              errors: [
+                {
+                  code: "invalid-json",
+                  message: e.message,
+                },
+              ],
+            });
             continue;
           }
         } else {
@@ -72,18 +96,31 @@ export default observer(function LoadNetworks({ onClose }) {
         }
 
         if (!contents) {
-          // TODO show error
           console.error(`Could not parse ${file.name}`);
+          newErrors.push({
+            file,
+            errors: [
+              {
+                code: "invalid-format",
+                message: "Could not parse file",
+              },
+            ],
+          });
           continue;
         }
 
-        file.contents = contents;
-        file.id = id();
-        file.format = format;
-        newFiles.push(file);
+        newFiles.push(
+          Object.assign(file, {
+            contents,
+            id: id(),
+            format,
+          })
+        );
       }
 
       setFiles([...files, ...newFiles]);
+      setErrors(newErrors);
+      showErrors();
       console.timeEnd("onDrop");
     },
   });
@@ -156,6 +193,8 @@ export default observer(function LoadNetworks({ onClose }) {
     setFiles(newFiles);
   };
 
+  const fileErrors = [...errors, ...rejected];
+
   return (
     <>
       <DialogTitle>Load network partitions</DialogTitle>
@@ -198,7 +237,6 @@ export default observer(function LoadNetworks({ onClose }) {
             </StepLabel>
           </Step>
         </Stepper>
-
         <div className="dropzone" {...getRootProps()}>
           <Reorder.Group
             className="parent"
@@ -218,6 +256,16 @@ export default observer(function LoadNetworks({ onClose }) {
           </Reorder.Group>
           <input {...getInputProps()} />
         </div>
+        <Collapse in={errorsOpen}>
+          <Stack spacing={2} my={2}>
+            {fileErrors.map(({ file, errors }, i) => (
+              <Alert key={i} severity="error">
+                <AlertTitle>{file.name}</AlertTitle>
+                {errors[0].message}
+              </Alert>
+            ))}
+          </Stack>
+        </Collapse>
       </DialogContent>
       <DialogActions>
         <Button variant="outlined" onClick={loadExample}>
@@ -226,7 +274,12 @@ export default observer(function LoadNetworks({ onClose }) {
         <Button
           variant="outlined"
           disabled={files.length === 0}
-          onClick={() => setFiles([])}
+          onClick={() => {
+            setFiles([]);
+            setErrors([]);
+            setRejected([]);
+            setErrorsOpen(false);
+          }}
           startIcon={<DeleteIcon />}
           sx={{ marginRight: "auto" }}
         >
@@ -348,6 +401,8 @@ function createFilesFromDiagramObject(json, file) {
     json.networks
       .map((network) => network.nodes.length)
       .reduce((tot, b) => tot + b, 0) || 1;
+
+  // TODO extract state
 
   return json.networks.map((network) => ({
     ...file,
