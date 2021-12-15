@@ -8,8 +8,6 @@ import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
-const streamlineNodesById: Map<string, StreamlineNode> = new Map();
-
 export default class LeafNode extends AlluvialNodeBase<never> {
   name: string;
   flow: number;
@@ -116,6 +114,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   add() {
+    const { streamlineNodesById } = this.networkRoot.parent;
     const module =
       this.networkRoot.getModule(this.moduleId) ||
       new Module(this.networkRoot, this.moduleId, this.moduleLevel);
@@ -214,6 +213,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   removeFromSide(side: Side) {
+    const { streamlineNodesById } = this.networkRoot.parent;
     const streamlineNode = this.getParent(side);
 
     if (!streamlineNode) {
