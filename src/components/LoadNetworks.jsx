@@ -42,8 +42,7 @@ export default observer(function LoadNetworks({ onClose }) {
   const [rejected, setRejected] = useState([]);
   const [errorsOpen, setErrorsOpen] = useState(false);
 
-  const showErrors = (callback) => {
-    if (callback) callback();
+  const showErrors = () => {
     if (errorsOpen) return;
     setErrorsOpen(true);
     window.setTimeout(() => setErrorsOpen(false), 5000);
@@ -52,8 +51,10 @@ export default observer(function LoadNetworks({ onClose }) {
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
-    onDropRejected: (rejectedFiles) =>
-      showErrors(() => setRejected(rejectedFiles)),
+    onDropRejected: (rejectedFiles) => {
+      setRejected(rejectedFiles);
+      if (rejectedFiles.length > 0) showErrors();
+    },
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
       setErrors([]);
@@ -120,7 +121,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
       setFiles([...files, ...newFiles]);
       setErrors(newErrors);
-      showErrors();
+      if (newErrors.length > 0) showErrors();
       console.timeEnd("onDrop");
     },
   });
