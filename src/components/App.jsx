@@ -1,7 +1,7 @@
 import { Dialog, Drawer } from "@mui/material";
 import { useState } from "react";
 import Diagram from "./Diagram";
-import LoadNetworks from "./landing-page/LoadNetworks";
+import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 
 export default function App() {

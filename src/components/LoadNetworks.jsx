@@ -7,6 +7,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UploadIcon from "@mui/icons-material/Upload";
 import {
+  Alert,
+  AlertTitle,
+  Collapse,
   Button,
   Card,
   CardContent,
@@ -24,9 +27,9 @@ import { animate, Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { StoreContext } from "../../store";
-import humanFileSize from "../../utils/human-file-size";
-import id from "../../utils/id";
+import { StoreContext } from "../store";
+import humanFileSize from "../utils/human-file-size";
+import id from "../utils/id";
 import "./LoadNetworks.css";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
@@ -53,13 +56,14 @@ export default observer(function LoadNetworks({ onClose }) {
           try {
             contents = JSON.parse(readFiles[i]);
 
-            if (contents.networks != undefined) {
+            if (contents.networks !== undefined) {
               // a diagram contains several networks
               // duplicate file for each network
               newFiles.push(...createFilesFromDiagramObject(contents, file));
               continue;
             }
           } catch (e) {
+            // TODO show error
             console.error(e);
             continue;
           }
@@ -68,6 +72,7 @@ export default observer(function LoadNetworks({ onClose }) {
         }
 
         if (!contents) {
+          // TODO show error
           console.error(`Could not parse ${file.name}`);
           continue;
         }
@@ -78,7 +83,6 @@ export default observer(function LoadNetworks({ onClose }) {
         newFiles.push(file);
       }
 
-      console.log(newFiles);
       setFiles([...files, ...newFiles]);
       console.timeEnd("onDrop");
     },
@@ -91,15 +95,19 @@ export default observer(function LoadNetworks({ onClose }) {
     const stateOrNodeId = (node) =>
       node.stateId != null ? node.stateId : node.id;
 
+    // TODO already loaded?
+
     files.forEach((file) => {
       if (file.format === "json") {
-        file.contents.nodes.forEach((node) => {
-          node.identifier = node.identifier ?? stateOrNodeId(node).toString();
-        });
+        file.contents.nodes.forEach(
+          (node) =>
+            (node.identifier =
+              node.identifier ?? stateOrNodeId(node).toString())
+        );
       } else if (file.format === "tree" || file.format === "ftree") {
-        file.contents.nodes.forEach((node) => {
-          node.identifier = stateOrNodeId(node).toString();
-        });
+        file.contents.nodes.forEach(
+          (node) => (node.identifier = stateOrNodeId(node).toString())
+        );
       } else if (file.format === "clu") {
         file.contents.nodes.forEach((node) => {
           const id = stateOrNodeId(node);
@@ -115,6 +123,8 @@ export default observer(function LoadNetworks({ onClose }) {
         ...file.contents,
       });
     });
+
+    // TODO set state from json
 
     store.setFiles(files);
     store.setNetworks(networks);
@@ -188,6 +198,7 @@ export default observer(function LoadNetworks({ onClose }) {
             </StepLabel>
           </Step>
         </Stepper>
+
         <div className="dropzone" {...getRootProps()}>
           <Reorder.Group
             className="parent"
