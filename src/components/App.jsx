@@ -1,11 +1,12 @@
 import { Dialog, Drawer } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 
 export default function App() {
   const [isOpen, setIsOpen] = useState(true);
+  const onClose = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   useEffect(() => {
     const onKeyPress = (e) => {
@@ -23,13 +24,8 @@ export default function App() {
 
   return (
     <>
-      <Dialog
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        maxWidth="lg"
-        fullWidth
-      >
-        <LoadNetworks onClose={() => setIsOpen(false)} />
+      <Dialog open={isOpen} onClose={onClose} maxWidth="lg" fullWidth>
+        <LoadNetworks onClose={onClose} />
       </Dialog>
 
       <Drawer

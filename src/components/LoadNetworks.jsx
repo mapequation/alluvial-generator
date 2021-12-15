@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import { animate, Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { StoreContext } from "../store";
 import humanFileSize from "../utils/human-file-size";
@@ -41,11 +41,19 @@ export default observer(function LoadNetworks({ onClose }) {
   const [errors, setErrors] = useState([]);
   const [rejected, setRejected] = useState([]);
   const [errorsOpen, setErrorsOpen] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(-1);
+
+  const reset = useCallback(() => {
+    setFiles([]);
+    setErrors([]);
+    setRejected([]);
+    setErrorsOpen(false);
+  }, [setFiles, setErrors, setRejected, setErrorsOpen]);
 
   const showErrors = () => {
     if (errorsOpen) return;
     setErrorsOpen(true);
-    window.setTimeout(() => setErrorsOpen(false), 5000);
+    setTimeoutId(window.setTimeout(() => setErrorsOpen(false), 5000));
   };
 
   const { open, getRootProps, getInputProps } = useDropzone({
@@ -126,7 +134,7 @@ export default observer(function LoadNetworks({ onClose }) {
     },
   });
 
-  const createDiagram = () => {
+  const createDiagram = useCallback(() => {
     console.time("createDiagram");
     const networks = [];
 
@@ -168,9 +176,9 @@ export default observer(function LoadNetworks({ onClose }) {
     store.setNetworks(networks);
     onClose();
     console.timeEnd("createDiagram");
-  };
+  }, [onClose, files, store]);
 
-  const loadExample = async () => {
+  const loadExample = useCallback(async () => {
     console.time("loadExample");
     const filename = "science-1998-2001-2007.json";
 
@@ -187,12 +195,32 @@ export default observer(function LoadNetworks({ onClose }) {
       console.error(e);
     }
     console.timeEnd("loadExample");
-  };
+  }, [onClose, store]);
 
   const removeFileId = (id) => {
     const newFiles = files.filter((file) => file.id !== id);
     setFiles(newFiles);
   };
+
+  useEffect(() => {
+    const onKeyPress = (e) => {
+      e.preventDefault();
+      if (e.key === "c" && files.length > 0) {
+        createDiagram();
+      } else if (e.key === "Backspace") {
+        reset();
+      } else if (e.key === "e") {
+        loadExample();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyPress);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      document.removeEventListener("keydown", onKeyPress);
+    };
+  }, [files, timeoutId, createDiagram, reset, loadExample]);
 
   const fileErrors = [...errors, ...rejected];
 
@@ -275,12 +303,7 @@ export default observer(function LoadNetworks({ onClose }) {
         <Button
           variant="outlined"
           disabled={files.length === 0}
-          onClick={() => {
-            setFiles([]);
-            setErrors([]);
-            setRejected([]);
-            setErrorsOpen(false);
-          }}
+          onClick={reset}
           startIcon={<DeleteIcon />}
           sx={{ marginRight: "auto" }}
         >
