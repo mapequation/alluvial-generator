@@ -35,6 +35,12 @@ import "./LoadNetworks.css";
 import useRaisedShadow from "../hooks/useRaisedShadow";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
+const exampleDataFilename = "science-1998-2001-2007.json";
+
+async function fetchExampleData(filename = exampleDataFilename) {
+  const res = await fetch(`/alluvial/data/${filename}`);
+  return await res.json();
+}
 
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
@@ -146,13 +152,9 @@ export default observer(function LoadNetworks({ onClose }) {
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");
-    const filename = "science-1998-2001-2007.json";
-
     try {
-      const res = await fetch(`/alluvial/data/${filename}`);
-      const json = await res.json();
-
-      const emptyFile = new File([], filename);
+      const json = await fetchExampleData();
+      const emptyFile = new File([], exampleDataFilename);
       const files = createFilesFromDiagramObject(json, emptyFile);
       store.setFiles(files);
       onClose();
