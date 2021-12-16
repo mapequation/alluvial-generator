@@ -334,7 +334,7 @@ function Item({ number, file, onClick }) {
             </Typography>
           </Tooltip>
 
-          <Text>{humanFileSize(file.size)}</Text>
+          {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
           {file.nodes && <Text>{file.nodes.length} nodes</Text>}
           {file.numTopModules && <Text>{file.numTopModules} top modules</Text>}
           {file.numLevels && <Text>{file.numLevels} levels</Text>}
