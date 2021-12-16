@@ -154,7 +154,6 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
       }
       store.updateLayout();
     },
-    delay: 100,
   });
 
   return (

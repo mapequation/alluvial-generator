@@ -1,12 +1,12 @@
-type Handler = (e: MouseEvent) => void;
+import { MouseEvent, MouseEventHandler } from "react";
 
 export default function useOnClick({
   onClick,
   onDoubleClick,
-  delay = 250,
+  delay = 100,
 }: {
-  onClick: Handler;
-  onDoubleClick: Handler;
+  onClick: MouseEventHandler;
+  onDoubleClick: MouseEventHandler;
   delay?: number;
 }) {
   let clickTimer: number;
