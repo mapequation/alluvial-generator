@@ -33,7 +33,9 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   get visibleChildren() {
-    return this.children.filter((module) => module.flow >= this.flowThreshold);
+    return this.children.filter(
+      (module) => module.flow >= this.flowThreshold && module.flow > 0
+    );
   }
 
   static create(
