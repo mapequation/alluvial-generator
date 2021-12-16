@@ -8,6 +8,7 @@ import { streamlineHorizontal } from "../../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 import ZoomableSvg from "./ZoomableSvg";
+import { drawerWidth } from "../App";
 
 const streamlineGenerator = streamlineHorizontal();
 
@@ -28,6 +29,10 @@ export default observer(function Diagram() {
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
   const dropShadowFilter = DropShadows.filter(dropShadow);
 
+  const { width, height } = diagram.alluvialRoot;
+  const dx = Math.max((window.innerWidth - drawerWidth - width) / 2, 100);
+  const dy = (window.innerHeight - height) / 3;
+
   return (
     <svg
       style={{ width: "100vw", height: "100vh" }}
@@ -40,7 +45,7 @@ export default observer(function Diagram() {
         <DropShadows maxLevel={maxModuleLevel} />
       </defs>
       <ZoomableSvg>
-        <g className="alluvialDiagram" transform="translate(200, 10)">
+        <g className="alluvialDiagram" transform={`translate(${dx}, ${dy})`}>
           {diagram.alluvialRoot.children.map((network) => (
             <Network
               key={network.id}

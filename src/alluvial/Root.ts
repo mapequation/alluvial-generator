@@ -151,6 +151,9 @@ export default class Root extends AlluvialNodeBase<Network> {
     const networkWidth = moduleWidth + streamlineWidth;
     const totalWidth = networkWidth * numNetworks - streamlineWidth;
 
+    this.width = totalWidth;
+    this.height = height;
+
     let x = 0;
     let y = height;
 

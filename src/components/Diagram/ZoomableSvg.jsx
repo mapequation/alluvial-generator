@@ -3,7 +3,6 @@ import { useContext, useEffect, useRef } from "react";
 import { StoreContext } from "../../store";
 
 const zoom = d3.zoom().scaleExtent([0.1, 1000]);
-const initialTransform = d3.zoomIdentity.translate(0, 50);
 
 export default function ZoomableSvg({ width, height, children }) {
   const svgRef = useRef();
@@ -14,9 +13,9 @@ export default function ZoomableSvg({ width, height, children }) {
       .select(svgRef.current)
       .call(zoom, { capture: true })
       .on("dblclick.zoom", null)
-      .call(zoom.transform, initialTransform);
+      .call(zoom.transform, d3.zoomIdentity);
 
-    const zoomable = d3.select("#zoomable").attr("transform", initialTransform);
+    const zoomable = d3.select("#zoomable").attr("transform", d3.zoomIdentity);
 
     zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
 

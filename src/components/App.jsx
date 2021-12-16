@@ -5,6 +5,8 @@ import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
 
+export const drawerWidth = 350;
+
 export default function App() {
   const [isLoadOpen, setIsLoadOpen] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -35,8 +37,6 @@ export default function App() {
 
     return () => document.removeEventListener("keydown", onKeyPress);
   }, [setIsLoadOpen]);
-
-  const drawerWidth = 350;
 
   return (
     <>
