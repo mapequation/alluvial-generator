@@ -3,29 +3,48 @@ import { useCallback, useEffect, useState } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
+import Documentation from "./Documentation";
 
 export default function App() {
-  const [isOpen, setIsOpen] = useState(true);
-  const onClose = useCallback(() => setIsOpen(false), [setIsOpen]);
+  const [isLoadOpen, setIsLoadOpen] = useState(true);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const onLoadClose = useCallback(() => setIsLoadOpen(false), [setIsLoadOpen]);
+  const onAboutClose = useCallback(
+    () => setIsAboutOpen(false),
+    [setIsAboutOpen]
+  );
+
+  const openLoad = () => {
+    setIsLoadOpen(true);
+    setIsAboutOpen(false);
+  };
+
+  const openAbout = () => {
+    setIsAboutOpen(true);
+    setIsLoadOpen(false);
+  };
 
   useEffect(() => {
     const onKeyPress = (e) => {
       if (e.key === "l") {
-        setIsOpen(true);
+        openLoad();
       }
     };
 
     document.addEventListener("keydown", onKeyPress);
 
     return () => document.removeEventListener("keydown", onKeyPress);
-  }, [setIsOpen]);
+  }, [setIsLoadOpen]);
 
   const drawerWidth = 350;
 
   return (
     <>
-      <Dialog open={isOpen} onClose={onClose} maxWidth="lg" fullWidth>
-        <LoadNetworks onClose={onClose} />
+      <Dialog open={isLoadOpen} onClose={onLoadClose} maxWidth="lg" fullWidth>
+        <LoadNetworks onClose={onLoadClose} />
+      </Dialog>
+      <Dialog open={isAboutOpen} onClose={onAboutClose} maxWidth="md" fullWidth>
+        <Documentation onClose={onAboutClose} />
       </Dialog>
 
       <Drawer
@@ -40,7 +59,7 @@ export default function App() {
         variant="permanent"
         anchor="right"
       >
-        <Sidebar onClick={() => setIsOpen(true)} />
+        <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
       </Drawer>
       <Diagram />
     </>

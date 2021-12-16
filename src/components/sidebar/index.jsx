@@ -21,7 +21,7 @@ import { useContext, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
 import { StoreContext } from "../../store";
 
-export default observer(function Sidebar({ onClick }) {
+export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
   const { selectedModule, highlightColors, defaultHighlightColor } = store;
   const [color, setColor] = useState(defaultHighlightColor);
@@ -37,7 +37,7 @@ export default observer(function Sidebar({ onClick }) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton onClick={onClick}>
+          <ListItemButton onClick={onLoadClick}>
             <ListItemIcon>
               <UploadIcon />
             </ListItemIcon>
@@ -46,7 +46,7 @@ export default observer(function Sidebar({ onClick }) {
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton>
+          <ListItemButton onClick={onAboutClick}>
             <ListItemIcon>
               <InfoOutlinedIcon />
             </ListItemIcon>
