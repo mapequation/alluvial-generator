@@ -119,11 +119,13 @@ export default observer(function LoadNetworks({ onClose }) {
           continue;
         }
 
+        setIdentifiers(contents.nodes, format);
+
         newFiles.push(
           Object.assign(file, {
-            contents,
             id: id(),
             format,
+            ...contents,
           })
         );
       }
@@ -136,47 +138,10 @@ export default observer(function LoadNetworks({ onClose }) {
   });
 
   const createDiagram = useCallback(() => {
-    console.time("createDiagram");
-    const networks = [];
-
-    const stateOrNodeId = (node) =>
-      node.stateId != null ? node.stateId : node.id;
-
     // TODO already loaded?
-
-    files.forEach((file) => {
-      if (file.format === "json") {
-        file.contents.nodes.forEach(
-          (node) =>
-            (node.identifier =
-              node.identifier ?? stateOrNodeId(node).toString())
-        );
-      } else if (file.format === "tree" || file.format === "ftree") {
-        file.contents.nodes.forEach(
-          (node) => (node.identifier = stateOrNodeId(node).toString())
-        );
-      } else if (file.format === "clu") {
-        file.contents.nodes.forEach((node) => {
-          const id = stateOrNodeId(node);
-          node.path = node.moduleId.toString();
-          node.identifier = id.toString();
-          node.name = id.toString();
-        });
-      }
-
-      networks.push({
-        id: file.id,
-        name: file.name,
-        ...file.contents,
-      });
-    });
-
     // TODO set state from json
-
     store.setFiles(files);
-    store.setNetworks(networks);
     onClose();
-    console.timeEnd("createDiagram");
   }, [onClose, files, store]);
 
   const loadExample = useCallback(async () => {
@@ -190,7 +155,6 @@ export default observer(function LoadNetworks({ onClose }) {
       const emptyFile = new File([], filename);
       const files = createFilesFromDiagramObject(json, emptyFile);
       store.setFiles(files);
-      store.setNetworks(json.networks);
       onClose();
     } catch (e) {
       console.error(e);
@@ -369,18 +333,10 @@ function Item({ number, file, onClick }) {
           </Tooltip>
 
           <Text>{humanFileSize(file.size)}</Text>
-          {file.contents?.nodes && (
-            <Text>{file.contents.nodes.length} nodes</Text>
-          )}
-          {file.contents?.numTopModules && (
-            <Text>{file.contents.numTopModules} top modules</Text>
-          )}
-          {file.contents?.numLevels && (
-            <Text>{file.contents.numLevels} levels</Text>
-          )}
-          {file.contents?.codelength && (
-            <Text>{file.contents.codelength.toFixed(3)} bits</Text>
-          )}
+          {file.nodes && <Text>{file.nodes.length} nodes</Text>}
+          {file.numTopModules && <Text>{file.numTopModules} top modules</Text>}
+          {file.numLevels && <Text>{file.numLevels} levels</Text>}
+          {file.codelength && <Text>{file.codelength.toFixed(3)} bits</Text>}
           <IconButton
             size="small"
             onClick={() => onClick(file.id)}
@@ -403,13 +359,37 @@ function createFilesFromDiagramObject(json, file) {
 
   // TODO extract state
 
-  return json.networks.map((network) => ({
-    ...file,
-    lastModified: file.lastModified,
-    size: (file.size * network.nodes.length) / totNodes,
-    name: network.name,
-    id: network.id,
-    contents: network,
-    format: "json",
-  }));
+  return json.networks.map((network) => {
+    setIdentifiers(network.nodes, "json");
+    return {
+      ...file,
+      lastModified: file.lastModified,
+      size: (file.size * network.nodes.length) / totNodes,
+      name: network.name,
+      id: network.id,
+      format: "json",
+      ...network,
+    };
+  });
+}
+
+function setIdentifiers(nodes, format) {
+  const stateOrNodeId = (node) =>
+    node.stateId != null ? node.stateId : node.id;
+
+  if (format === "json") {
+    nodes.forEach(
+      (node) =>
+        (node.identifier = node.identifier ?? stateOrNodeId(node).toString())
+    );
+  } else if (format === "tree" || format === "ftree") {
+    nodes.forEach((node) => (node.identifier = stateOrNodeId(node).toString()));
+  } else if (format === "clu") {
+    nodes.forEach((node) => {
+      const id = stateOrNodeId(node);
+      node.path = node.moduleId.toString();
+      node.identifier = id.toString();
+      node.name = id.toString();
+    });
+  }
 }

@@ -121,6 +121,7 @@ export class Store {
 
   setFiles(files: any[]) {
     this.files = files;
+    this.setNetworks(files);
   }
 
   setHeight(height: number) {
