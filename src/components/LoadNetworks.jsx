@@ -24,7 +24,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { animate, Reorder, useMotionValue } from "framer-motion";
+import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -32,6 +32,7 @@ import { StoreContext } from "../store";
 import humanFileSize from "../utils/human-file-size";
 import id from "../utils/id";
 import "./LoadNetworks.css";
+import useRaisedShadow from "../hooks/useRaisedShadow";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 
@@ -391,32 +392,6 @@ function Item({ number, file, onClick }) {
       </Card>
     </Reorder.Item>
   );
-}
-
-const inactiveShadow = "0px 1px 4px rgba(0, 0, 0, 0.16)";
-
-function useRaisedShadow(value) {
-  const boxShadow = useMotionValue(inactiveShadow);
-
-  useEffect(() => {
-    let isActive = false;
-    value.onChange((latest) => {
-      const wasActive = isActive;
-      if (latest !== 0) {
-        isActive = true;
-        if (isActive !== wasActive) {
-          animate(boxShadow, "5px 5px 10px rgba(0,0,0,0.3)");
-        }
-      } else {
-        isActive = false;
-        if (isActive !== wasActive) {
-          animate(boxShadow, inactiveShadow);
-        }
-      }
-    });
-  }, [value, boxShadow]);
-
-  return boxShadow;
 }
 
 function createFilesFromDiagramObject(json, file) {

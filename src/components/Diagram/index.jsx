@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
-import useOnClick from "../../utils/onClick";
+import useOnClick from "../../hooks/useOnClick";
 import { streamlineHorizontal } from "../../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
