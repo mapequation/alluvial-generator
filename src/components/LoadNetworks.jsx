@@ -195,44 +195,8 @@ export default observer(function LoadNetworks({ onClose }) {
     <>
       <DialogTitle>Load network partitions</DialogTitle>
       <DialogContent>
-        <Stepper
-          activeStep={files.length > 0 ? 2 : 1}
-          sx={{ margin: "1em auto 2em", width: "90%" }}
-        >
-          <Step>
-            <StepLabel
-              optional={
-                <Typography variant="caption">
-                  Infomap Online or standalone
-                </Typography>
-              }
-            >
-              <a href="//mapequation.org/infomap">Run Infomap</a>
-            </StepLabel>
-          </Step>
-          <Step>
-            <StepLabel
-              optional={
-                <Typography variant="caption">
-                  Infomap output formats: {acceptedFormats}
-                </Typography>
-              }
-            >
-              Load network partitions
-            </StepLabel>
-          </Step>
-          <Step>
-            <StepLabel
-              optional={
-                <Typography variant="caption">
-                  Highlight partition differences
-                </Typography>
-              }
-            >
-              Create alluvial diagram
-            </StepLabel>
-          </Step>
-        </Stepper>
+        <MyStepper activeStep={files.length > 0 ? 2 : 1} />
+
         <div className="dropzone" {...getRootProps()}>
           <Reorder.Group
             className="parent"
@@ -252,6 +216,7 @@ export default observer(function LoadNetworks({ onClose }) {
           </Reorder.Group>
           <input {...getInputProps()} />
         </div>
+
         <Collapse in={errorsOpen}>
           <Stack spacing={2} my={2}>
             {fileErrors.map(({ file, errors }, i) => (
@@ -263,6 +228,7 @@ export default observer(function LoadNetworks({ onClose }) {
           </Stack>
         </Collapse>
       </DialogContent>
+
       <DialogActions>
         <Button variant="outlined" onClick={loadExample}>
           Load Example
@@ -349,6 +315,49 @@ function Item({ number, file, onClick }) {
         </CardContent>
       </Card>
     </Reorder.Item>
+  );
+}
+
+function MyStepper({ activeStep }) {
+  return (
+    <Stepper
+      activeStep={activeStep}
+      sx={{ margin: "1em auto 2em", width: "90%" }}
+    >
+      <Step>
+        <StepLabel
+          optional={
+            <Typography variant="caption">
+              Infomap Online or standalone
+            </Typography>
+          }
+        >
+          <a href="//mapequation.org/infomap">Run Infomap</a>
+        </StepLabel>
+      </Step>
+      <Step>
+        <StepLabel
+          optional={
+            <Typography variant="caption">
+              Infomap output formats: {acceptedFormats}
+            </Typography>
+          }
+        >
+          Load network partitions
+        </StepLabel>
+      </Step>
+      <Step>
+        <StepLabel
+          optional={
+            <Typography variant="caption">
+              Highlight partition differences
+            </Typography>
+          }
+        >
+          Create alluvial diagram
+        </StepLabel>
+      </Step>
+    </Stepper>
   );
 }
 
