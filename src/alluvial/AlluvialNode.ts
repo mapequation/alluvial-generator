@@ -7,6 +7,15 @@ class Layout {
   width: number = 0;
   height: number = 0;
 
+  get layout() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    };
+  }
+
   set layout({
     x,
     y,
@@ -22,15 +31,6 @@ class Layout {
     this.y = y;
     this.width = width;
     this.height = height;
-  }
-
-  get layout() {
-    return {
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-    };
   }
 }
 
@@ -96,27 +96,6 @@ export default abstract class AlluvialNode<
     super();
   }
 
-  getAncestor(depth: Depth): Ancestors<this> | null {
-    if (this.depth === depth) return this;
-    if (!this.parent || this.depth < depth) return null;
-    return this.parent.getAncestor(depth);
-  }
-
-  addChild(node: ChildType) {
-    return this.children.push(node);
-  }
-
-  removeChild(node: ChildType) {
-    const index = this.children.indexOf(node);
-    const found = index > -1;
-    if (found) {
-      this.children[index] = this.children[this.children.length - 1];
-      this.children.pop();
-    }
-
-    return found;
-  }
-
   get isFirstChild() {
     return this.parent?.children.findIndex((child) => child === this) === 0;
   }
@@ -138,6 +117,27 @@ export default abstract class AlluvialNode<
       (num, children) => num + children.numLeafNodes,
       0
     );
+  }
+
+  getAncestor(depth: Depth): Ancestors<this> | null {
+    if (this.depth === depth) return this;
+    if (!this.parent || this.depth < depth) return null;
+    return this.parent.getAncestor(depth);
+  }
+
+  addChild(node: ChildType) {
+    return this.children.push(node);
+  }
+
+  removeChild(node: ChildType) {
+    const index = this.children.indexOf(node);
+    const found = index > -1;
+    if (found) {
+      this.children[index] = this.children[this.children.length - 1];
+      this.children.pop();
+    }
+
+    return found;
   }
 
   *leafNodes(): Iterable<LeafNode> {

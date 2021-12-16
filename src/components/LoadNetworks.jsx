@@ -9,24 +9,24 @@ import UploadIcon from "@mui/icons-material/Upload";
 import {
   Alert,
   AlertTitle,
-  Collapse,
   Button,
   Card,
   CardContent,
+  Collapse,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
+  Stack,
   Step,
   StepLabel,
   Stepper,
   Tooltip,
   Typography,
-  Stack,
 } from "@mui/material";
 import { animate, Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { StoreContext } from "../store";
 import humanFileSize from "../utils/human-file-size";

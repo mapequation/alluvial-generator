@@ -12,16 +12,15 @@ type CustomName = {
 };
 
 export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
+  // FIXME should this be static?
+  static customNames: Map<string, CustomName> = new Map();
   moduleLevel: number = 1;
   maxModuleLevel: number = 1;
   path: number[] = [];
   moduleId: string;
   margin: number = 0;
-  _name: string[] | null = null;
   depth = MODULE;
   index: number;
-
-  static customNames: Map<string, CustomName> = new Map();
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
@@ -33,12 +32,11 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.index = parent.addChild(this) - 1;
   }
 
-  subModuleNames() {
-    const names = Array.from(Module.customNames.entries())
-      .filter(([id, ..._]) => id.startsWith(this.id))
-      .sort((a, b) => a[1].flow - b[1].flow)
-      .map(([_, { name }]) => name);
-    return names.length ? names : null;
+  _name: string[] | null = null;
+
+  get name() {
+    // @ts-ignore
+    return this._name;
   }
 
   set name(name: string | null) {
@@ -51,9 +49,71 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     }
   }
 
-  get name() {
-    // @ts-ignore
-    return this._name;
+  get largestLeafNodes() {
+    // TODO inline
+    return this.getLargestLeafNodeNames();
+  }
+
+  get x1() {
+    return this.x;
+  }
+
+  get x2() {
+    return this.x + this.width;
+  }
+
+  get namePosition() {
+    const { x1, x2, y, height } = this;
+    const padding = 5;
+    const width = 15;
+    const textOffset = width + padding;
+
+    const x = this.parent.isFirstChild
+      ? x1 - textOffset
+      : this.parent.isLastChild
+      ? x2 + textOffset
+      : (x1 + x2) / 2;
+
+    return {
+      x,
+      y: y + height / 2,
+    };
+  }
+
+  get textAnchor() {
+    return this.parent.isFirstChild
+      ? "end"
+      : this.parent.isLastChild
+      ? "start"
+      : null;
+  }
+
+  get idPosition() {
+    const { x1, x2, y, height } = this;
+    return {
+      x: (x1 + x2) / 2,
+      y: y + height / 2,
+    };
+  }
+
+  get networkName() {
+    return this.parent?.name ?? "";
+  }
+
+  get networkCodelength() {
+    return this.parent?.codelength ?? 0;
+  }
+
+  get getLeafNodes() {
+    return Array.from(this.leafNodes(), (node) => node.toNode());
+  }
+
+  subModuleNames() {
+    const names = Array.from(Module.customNames.entries())
+      .filter(([id, ..._]) => id.startsWith(this.id))
+      .sort((a, b) => a[1].flow - b[1].flow)
+      .map(([_, { name }]) => name);
+    return names.length ? names : null;
   }
 
   getSiblings(): Module[] {
@@ -131,11 +191,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     });
   }
 
-  private updateMaxModuleLevel(level: number) {
-    // FIXME what is this?
-    this.maxModuleLevel = Math.max(this.maxModuleLevel, level);
-  }
-
   getLargestLeafNodeNames(numNodes: number = 6) {
     const queue = new PriorityQueue<LeafNode>(numNodes);
     for (let node of this.leafNodes()) {
@@ -144,62 +199,8 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return queue.map((node) => node.name);
   }
 
-  get largestLeafNodes() {
-    // TODO inline
-    return this.getLargestLeafNodeNames();
-  }
-
-  get x1() {
-    return this.x;
-  }
-
-  get x2() {
-    return this.x + this.width;
-  }
-
-  get namePosition() {
-    const { x1, x2, y, height } = this;
-    const padding = 5;
-    const width = 15;
-    const textOffset = width + padding;
-
-    const x = this.parent.isFirstChild
-      ? x1 - textOffset
-      : this.parent.isLastChild
-      ? x2 + textOffset
-      : (x1 + x2) / 2;
-
-    return {
-      x,
-      y: y + height / 2,
-    };
-  }
-
-  get textAnchor() {
-    return this.parent.isFirstChild
-      ? "end"
-      : this.parent.isLastChild
-      ? "start"
-      : null;
-  }
-
-  get idPosition() {
-    const { x1, x2, y, height } = this;
-    return {
-      x: (x1 + x2) / 2,
-      y: y + height / 2,
-    };
-  }
-
-  get networkName() {
-    return this.parent?.name ?? "";
-  }
-
-  get networkCodelength() {
-    return this.parent?.codelength ?? 0;
-  }
-
-  get getLeafNodes() {
-    return Array.from(this.leafNodes(), (node) => node.toNode());
+  private updateMaxModuleLevel(level: number) {
+    // FIXME what is this?
+    this.maxModuleLevel = Math.max(this.maxModuleLevel, level);
   }
 }

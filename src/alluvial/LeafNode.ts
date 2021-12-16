@@ -56,6 +56,14 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     return this.treePath.insignificant[this.moduleLevel - 1] || false;
   }
 
+  get level(): number {
+    return this.treePath.level;
+  }
+
+  get moduleId(): string {
+    return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
+  }
+
   toNode(): any {
     // FIXME
     const {
@@ -79,14 +87,6 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       highlightIndex,
       moduleLevel,
     };
-  }
-
-  get level(): number {
-    return this.treePath.level;
-  }
-
-  get moduleId(): string {
-    return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
   getParent(side: Side) {

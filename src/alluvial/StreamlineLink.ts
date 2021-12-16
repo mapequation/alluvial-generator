@@ -13,11 +13,6 @@ export default class StreamlineLink {
     this.right = reverse ? left : right;
   }
 
-  remove() {
-    this.left.link = null;
-    this.right.link = null;
-  }
-
   get id() {
     return this.left?.id ?? "";
   }
@@ -69,24 +64,31 @@ export default class StreamlineLink {
   get x0() {
     return this.left?.x + this.left?.width ?? 0;
   }
+
   get x1() {
     return this.right?.x ?? 0;
   }
+
   get y0() {
     return this.left?.y ?? 0;
   }
+
   get y1() {
     return this.right?.y ?? 0;
   }
+
   get h0() {
     return this.left?.height;
   }
+
   get h1() {
     return this.right?.height;
   }
+
   get xMid() {
     return (this.x0 + this.x1) / 2;
   }
+
   get yMid() {
     return (this.y0 + this.y1) / 2;
   }
@@ -106,5 +108,10 @@ export default class StreamlineLink {
       h0,
       h1,
     };
+  }
+
+  remove() {
+    this.left.link = null;
+    this.right.link = null;
   }
 }

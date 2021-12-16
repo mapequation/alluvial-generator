@@ -23,32 +23,12 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     this.targetId = target;
   }
 
-  addChild(node: LeafNode): number {
-    const length = super.addChild(node);
-    node.setIndex(length - 1, this.side);
-    return length;
-  }
-
-  removeChild(node: LeafNode) {
-    const index = node.getIndex(this.side);
-    const found = index > -1 && index < this.children.length;
-
-    if (found) {
-      this.children[index] = this.children[this.children.length - 1];
-      this.children[index].setIndex(index, this.side);
-      node.setIndex(-1, this.side);
-      this.children.pop();
-    }
-
-    return found;
-  }
-
   get numLeafNodes(): number {
     return this.children.length;
   }
 
-  makeDangling() {
-    this.targetId = null;
+  get oppositeId() {
+    return `${this.targetId || "NULL"}--${this.sourceId}`;
   }
 
   static createId(
@@ -71,8 +51,28 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     }_${sideToString(opposite(side))}`;
   }
 
-  get oppositeId() {
-    return `${this.targetId || "NULL"}--${this.sourceId}`;
+  addChild(node: LeafNode): number {
+    const length = super.addChild(node);
+    node.setIndex(length - 1, this.side);
+    return length;
+  }
+
+  removeChild(node: LeafNode) {
+    const index = node.getIndex(this.side);
+    const found = index > -1 && index < this.children.length;
+
+    if (found) {
+      this.children[index] = this.children[this.children.length - 1];
+      this.children[index].setIndex(index, this.side);
+      node.setIndex(-1, this.side);
+      this.children.pop();
+    }
+
+    return found;
+  }
+
+  makeDangling() {
+    this.targetId = null;
   }
 
   getOpposite(): StreamlineNode | null {

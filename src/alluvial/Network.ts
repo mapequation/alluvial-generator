@@ -25,6 +25,17 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     this.codelength = codelength;
   }
 
+  get namePosition() {
+    return {
+      x: this.x + this.width / 2,
+      y: this.height + 15 + 5,
+    };
+  }
+
+  get visibleChildren() {
+    return this.children.filter((module) => module.flow >= this.flowThreshold);
+  }
+
   static create(
     parent: Root,
     networkId: string,
@@ -43,10 +54,6 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
       return leafNode;
     });
 
-    // const leafNodes = nodes.map((node) => new LeafNode(node, this));
-    // this.nodesByIdentifier = new Map(
-    //   Array.from(leafNodes, (node) => [node.identifier, node])
-    // );
     leafNodes.forEach((node) => node.add());
   }
 
@@ -99,13 +106,6 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
     );
   }
 
-  get namePosition() {
-    return {
-      x: this.x + this.width / 2,
-      y: this.height + 15 + 5,
-    };
-  }
-
   getLinks(streamlineThreshold: number = 0) {
     return Array.from(this.rightStreamlines())
       .filter((link) => link.avgHeight > streamlineThreshold)
@@ -114,10 +114,6 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
           ? a.highlightIndex - b.highlightIndex
           : b.avgHeight - a.avgHeight
       );
-  }
-
-  get visibleChildren() {
-    return this.children.filter((module) => module.flow >= this.flowThreshold);
   }
 
   *rightStreamlines() {
