@@ -1,5 +1,5 @@
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import UploadIcon from "@mui/icons-material/Upload";
+import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import {
   Chip,
   Collapse,
@@ -17,14 +17,14 @@ import {
   Switch as MuiSwitch,
 } from "@mui/material";
 import { observer } from "mobx-react";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { TransitionGroup } from "react-transition-group";
 import { StoreContext } from "../../store";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
-  const { selectedModule, highlightColors, defaultHighlightColor } = store;
-  const [color, setColor] = useState(defaultHighlightColor);
+  const { selectedModule /*highlightColors, defaultHighlightColor*/ } = store;
+  //const [color, setColor] = useState(defaultHighlightColor);
   console.log("selectedModule", selectedModule);
 
   const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
@@ -41,16 +41,16 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
             <ListItemIcon>
               <UploadIcon />
             </ListItemIcon>
-            <ListItemText>Load networks</ListItemText>
+            <ListItemText>Load or arrange</ListItemText>
           </ListItemButton>
         </ListItem>
 
         <ListItem disablePadding>
           <ListItemButton onClick={onAboutClick}>
             <ListItemIcon>
-              <InfoOutlinedIcon />
+              <HelpCenterIcon />
             </ListItemIcon>
-            <ListItemText>About</ListItemText>
+            <ListItemText>Help and shortcuts</ListItemText>
           </ListItemButton>
         </ListItem>
 
