@@ -1,8 +1,8 @@
 import type StreamlineNode from "./StreamlineNode";
 
 export default class StreamlineLink {
-  left: StreamlineNode;
-  right: StreamlineNode;
+  readonly left: StreamlineNode;
+  readonly right: StreamlineNode;
 
   constructor(
     left: StreamlineNode,

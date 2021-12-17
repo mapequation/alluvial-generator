@@ -6,12 +6,12 @@ import Module from "./Module";
 import type { Side } from "./Side";
 
 export default class Network extends AlluvialNodeBase<Module, Root> {
+  readonly depth = NETWORK;
   flowThreshold: number = 0;
   name: string;
-  depth = NETWORK;
-  codelength: number;
-  nodesByIdentifier: Map<string, LeafNode> = new Map();
-  modulesById: Map<string, Module> = new Map();
+  readonly codelength: number;
+  private nodesByIdentifier: Map<string, LeafNode> = new Map();
+  private readonly modulesById: Map<string, Module> = new Map();
 
   constructor(
     parent: Root,

@@ -7,10 +7,13 @@ import { LEFT, RIGHT } from "./Side";
 export const NOT_HIGHLIGHTED = -1;
 
 export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
-  children: Branch[] = [new Branch(this, LEFT), new Branch(this, RIGHT)];
-  depth = HIGHLIGHT_GROUP;
-  highlightIndex: number;
-  insignificant: boolean;
+  readonly depth = HIGHLIGHT_GROUP;
+  readonly children: Branch[] = [
+    new Branch(this, LEFT),
+    new Branch(this, RIGHT),
+  ];
+  readonly highlightIndex: number;
+  readonly insignificant: boolean;
 
   constructor(
     parent: Module,

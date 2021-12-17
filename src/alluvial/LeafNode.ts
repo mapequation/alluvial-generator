@@ -9,29 +9,29 @@ import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
 export default class LeafNode extends AlluvialNodeBase<never> {
-  name: string;
-  flow: number;
-  nodeId: number;
-  identifier: string;
+  readonly depth = LEAF_NODE;
+  readonly name: string;
+  readonly flow: number;
+  readonly nodeId: number;
+  readonly identifier: string;
+  readonly treePath: TreePath;
   highlightIndex: number;
-  treePath: TreePath;
-  depth = LEAF_NODE;
   moduleLevel: number;
 
-  leftIndex: number = -1;
-  rightIndex: number = -1;
+  private leftIndex: number = -1;
+  private rightIndex: number = -1;
 
-  leftParent: StreamlineNode | null = null;
-  rightParent: StreamlineNode | null = null;
+  private leftParent: StreamlineNode | null = null;
+  private rightParent: StreamlineNode | null = null;
 
-  oppositeNodes: {
+  private oppositeNodes: {
     [side: number]: LeafNode | null;
   } = {
     [LEFT]: null,
     [RIGHT]: null,
   };
 
-  networkRoot: Network;
+  private readonly networkRoot: Network;
 
   constructor(node: any, networkRoot: Network) {
     // FIXME remove any
@@ -102,6 +102,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   getIndex(side: Side) {
+    // index in the parent's children array
     return side === LEFT ? this.leftIndex : this.rightIndex;
   }
 

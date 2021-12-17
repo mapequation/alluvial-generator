@@ -9,8 +9,8 @@ export default class Branch extends AlluvialNodeBase<
   StreamlineNode,
   HighlightGroup
 > {
-  side: Side;
-  depth = BRANCH;
+  readonly depth = BRANCH;
+  readonly side: Side;
 
   constructor(parent: HighlightGroup, side: Side) {
     super(parent, parent.networkId, sideToString(side));

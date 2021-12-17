@@ -83,7 +83,7 @@ function getNodeSizeByPropForNetwork(
 +--------------------------------------------------------------------------------------------------------------------------+
  */
 export default class Root extends AlluvialNodeBase<Network> {
-  depth = ROOT;
+  readonly depth = ROOT;
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
   constructor() {

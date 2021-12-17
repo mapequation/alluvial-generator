@@ -82,7 +82,7 @@ export default abstract class AlluvialNode<
   ChildType extends AlluvialNode<any, any>,
   ParentType extends AlluvialNode<any, any> | null = null
 > extends Layout {
-  abstract depth: Depth;
+  abstract readonly depth: Depth;
 
   flow: number = 0;
 

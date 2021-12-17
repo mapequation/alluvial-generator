@@ -12,15 +12,14 @@ type CustomName = {
 };
 
 export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
-  // FIXME should this be static?
-  static customNames: Map<string, CustomName> = new Map();
-  moduleLevel: number = 1;
-  maxModuleLevel: number = 1;
-  path: number[] = [];
-  moduleId: string;
+  static customNames: Map<string, CustomName> = new Map(); // FIXME should this really be static?
+  readonly depth = MODULE;
+  readonly path: number[] = [];
+  readonly moduleId: string;
   margin: number = 0;
-  depth = MODULE;
   index: number;
+  private readonly moduleLevel: number = 1;
+  private maxModuleLevel: number = 1;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
@@ -32,7 +31,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.index = parent.addChild(this) - 1;
   }
 
-  _name: string[] | null = null;
+  private _name: string[] | null = null;
 
   get name() {
     // @ts-ignore
