@@ -88,7 +88,7 @@ export default abstract class AlluvialNode<
 
   children: ChildType[] = [];
 
-  constructor(
+  protected constructor(
     public parent: ParentType,
     public readonly networkId: string,
     public readonly id: string = ""

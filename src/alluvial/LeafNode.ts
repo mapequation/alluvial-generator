@@ -34,7 +34,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   networkRoot: Network;
 
   constructor(node: any, networkRoot: Network) {
-    // FIXME
+    // FIXME remove any
     super(null, networkRoot.networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
@@ -65,7 +65,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   toNode(): any {
-    // FIXME
+    // FIXME remove any
     const {
       id,
       flow,
@@ -155,8 +155,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
             return;
           }
 
-          const branch = oldStreamlineNode.parent;
-          oppositeStreamlineNode = new StreamlineNode(branch, oppositeId);
+          oppositeStreamlineNode = new StreamlineNode(
+            oldStreamlineNode.parent,
+            oppositeId
+          );
           streamlineNodesById.set(
             oppositeStreamlineNode.id,
             oppositeStreamlineNode
@@ -173,7 +175,16 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     }
   }
 
-  remove(removeNetworkRoot: boolean = false) {
+  update() {
+    this.remove();
+    this.add();
+  }
+
+  *leafNodes() {
+    yield this;
+  }
+
+  private remove(removeNetworkRoot: boolean = false) {
     const group = this.getAncestor(HIGHLIGHT_GROUP) as HighlightGroup | null;
 
     this.removeFromSide(LEFT);
@@ -212,7 +223,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     }
   }
 
-  removeFromSide(side: Side) {
+  private removeFromSide(side: Side) {
     const { streamlineNodesById } = this.networkRoot.parent;
     const streamlineNode = this.getParent(side);
 
@@ -265,14 +276,5 @@ export default class LeafNode extends AlluvialNodeBase<never> {
         branch.removeChild(streamlineNode);
       }
     }
-  }
-
-  update() {
-    this.remove();
-    this.add();
-  }
-
-  *leafNodes() {
-    yield this;
   }
 }

@@ -95,7 +95,7 @@ export default class Root extends AlluvialNodeBase<Network> {
   }
 
   addNetwork(network: any) {
-    // FIXME
+    // FIXME remove any
     const { nodes, id, codelength, name, moduleNames } = network;
 
     if (this.children.some((network) => network.networkId === id)) {

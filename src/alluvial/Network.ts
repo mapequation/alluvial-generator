@@ -118,7 +118,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
       );
   }
 
-  *rightStreamlines() {
+  private *rightStreamlines() {
     for (let module of this) {
       // Skip if left module if below threshold
       if (module.flow < this.flowThreshold) {

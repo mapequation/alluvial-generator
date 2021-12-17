@@ -108,25 +108,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return Array.from(this.leafNodes(), (node) => node.toNode());
   }
 
-  subModuleNames() {
-    const names = Array.from(Module.customNames.entries())
-      .filter(([id, ..._]) => id.startsWith(this.id))
-      .sort((a, b) => a[1].flow - b[1].flow)
-      .map(([_, { name }]) => name);
-    return names.length ? names : null;
-  }
-
-  getSiblings(): Module[] {
-    if (!this.parent) return [];
-    const modules = this.parent.children;
-
-    const moduleLevel = this.moduleLevel - 1;
-    if (moduleLevel < 1) return modules;
-
-    const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
-    return modules.filter((module) => parentPath.isAncestor(module.moduleId));
-  }
-
   getGroup(highlightIndex: number, insignificant: boolean) {
     return this.children.find(
       (group) =>
@@ -197,6 +178,25 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       queue.push(node);
     }
     return queue.map((node) => node.name);
+  }
+
+  private subModuleNames() {
+    const names = Array.from(Module.customNames.entries())
+      .filter(([id, ..._]) => id.startsWith(this.id))
+      .sort((a, b) => a[1].flow - b[1].flow)
+      .map(([_, { name }]) => name);
+    return names.length ? names : null;
+  }
+
+  private getSiblings(): Module[] {
+    if (!this.parent) return [];
+    const modules = this.parent.children;
+
+    const moduleLevel = this.moduleLevel - 1;
+    if (moduleLevel < 1) return modules;
+
+    const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
+    return modules.filter((module) => parentPath.isAncestor(module.moduleId));
   }
 
   private updateMaxModuleLevel(level: number) {
