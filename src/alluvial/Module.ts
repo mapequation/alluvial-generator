@@ -19,7 +19,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   margin: number = 0;
   index: number;
   private readonly moduleLevel: number = 1;
-  private maxModuleLevel: number = 1;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
@@ -137,7 +136,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     leafNodes.forEach((node) => {
       node.moduleLevel = newModuleLevel;
-      this.updateMaxModuleLevel(node.level - 1);
       node.update();
     });
   }
@@ -166,7 +164,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     leafNodes.forEach((node) => {
       node.moduleLevel = newModuleLevel;
-      this.updateMaxModuleLevel(node.level - 1);
       node.update();
     });
   }
@@ -196,10 +193,5 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
     return modules.filter((module) => parentPath.isAncestor(module.moduleId));
-  }
-
-  private updateMaxModuleLevel(level: number) {
-    // FIXME what is this?
-    this.maxModuleLevel = Math.max(this.maxModuleLevel, level);
   }
 }
