@@ -33,6 +33,7 @@ import humanFileSize from "../utils/human-file-size";
 import id from "../utils/id";
 import "./LoadNetworks.css";
 import useRaisedShadow from "../hooks/useRaisedShadow";
+import TreePath from "../utils/TreePath";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
@@ -389,10 +390,12 @@ function setIdentifiers(nodes, format) {
     node.stateId != null ? node.stateId : node.id;
 
   if (format === "json") {
-    nodes.forEach(
-      (node) =>
-        (node.identifier = node.identifier ?? stateOrNodeId(node).toString())
-    );
+    nodes.forEach((node) => {
+      node.identifier = node.identifier ?? stateOrNodeId(node).toString();
+      if (!Array.isArray(node.path)) {
+        node.path = TreePath.toArray(node.path);
+      }
+    });
   } else if (format === "tree" || format === "ftree") {
     nodes.forEach((node) => (node.identifier = stateOrNodeId(node).toString()));
   } else if (format === "clu") {

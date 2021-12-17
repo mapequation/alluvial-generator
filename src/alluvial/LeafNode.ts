@@ -53,7 +53,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   get insignificant(): boolean {
-    return this.treePath.insignificant[this.moduleLevel - 1] || false;
+    return !this.treePath.isSignificant(this.moduleLevel - 1);
   }
 
   get level(): number {

@@ -6,16 +6,22 @@ const insignificantPathRexeg = /(\d+)([:;])+/g;
  * Class that represents a path in a tree
  */
 export default class TreePath {
-  path: string;
-  pathArr: string[];
-  insignificant: boolean[] = [];
-  ancestorPaths: Map<number, string> = new Map();
+  private readonly path: string;
+  private readonly pathArr: number[];
+  private readonly insignificant: boolean[] = [];
+  private readonly ancestorPaths: Map<number, string> = new Map();
 
   /**
    * Construct a new TreePath
    */
   constructor(path: Path) {
-    this.path = Array.isArray(path) ? path.join(":") : path.toString();
+    if (Array.isArray(path)) {
+      this.path = path.join(":");
+      this.pathArr = path;
+    } else {
+      this.path = path.toString();
+      this.pathArr = TreePath.toArray(path);
+    }
 
     const lastChar = this.path.slice(-1);
 
@@ -25,7 +31,7 @@ export default class TreePath {
       const matches = this.path.matchAll(insignificantPathRexeg);
 
       for (let match of matches) {
-        this.pathArr.push(match[1]);
+        this.pathArr.push(Number(match[1]));
         this.insignificant.push(match[2] === ";");
       }
     } else {
@@ -34,7 +40,6 @@ export default class TreePath {
         this.path = this.path.slice(0, -1);
       }
 
-      this.pathArr = this.path.split(":");
       this.insignificant = this.pathArr.map(() => false);
     }
 
@@ -194,6 +199,14 @@ export default class TreePath {
 
   isParentOf(child: Path) {
     return TreePath.isParentOf(this, child);
+  }
+
+  isSignificant(level: number) {
+    if (level < 0 || level >= this.insignificant.length) {
+      return false;
+    }
+
+    return !this.insignificant[level];
   }
 
   /**
