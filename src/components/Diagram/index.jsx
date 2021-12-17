@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { observer } from "mobx-react";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import useOnClick from "../../hooks/useOnClick";
@@ -8,6 +8,7 @@ import { streamlineHorizontal } from "../../utils/streamline";
 import DropShadows from "./DropShadows";
 import LinearGradients from "./LinearGradients";
 import ZoomableSvg from "./ZoomableSvg";
+import raise from "../../utils/raise";
 import { drawerWidth } from "../App";
 
 const streamlineGenerator = streamlineHorizontal();
@@ -24,24 +25,9 @@ function translate({ width, height }) {
 
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
-  const {
-    diagram,
-    defaultHighlightColor,
-    highlightColors,
-    streamlineThreshold,
-    streamlineOpacity,
-    dropShadow,
-    fontSize,
-    showNetworkNames,
-    updateFlag,
-  } = store;
+  const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
   const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
-  const dropShadowFilter = DropShadows.filter(dropShadow);
-
-  const { width, height } = diagram.alluvialRoot;
-  const dx = Math.max((window.innerWidth - drawerWidth - width) / 2, 100);
-  const dy = (window.innerHeight - height) / 3;
 
   return (
     <svg
@@ -60,11 +46,6 @@ export default observer(function Diagram() {
             <Network
               key={network.id}
               network={network}
-              showName={showNetworkNames}
-              fontSize={fontSize}
-              streamlineOpacity={streamlineOpacity}
-              streamlineThreshold={streamlineThreshold}
-              dropShadow={dropShadowFilter}
               groupFillColor={groupFillColor}
             />
           ))}
@@ -74,15 +55,11 @@ export default observer(function Diagram() {
   );
 });
 
-function Network({
-  network,
-  fontSize,
-  showName,
-  streamlineOpacity,
-  streamlineThreshold,
-  dropShadow,
-  groupFillColor,
-}) {
+const Network = observer(function Network({ network, groupFillColor }) {
+  const store = useContext(StoreContext);
+  const { streamlineThreshold, streamlineOpacity, fontSize, showNetworkNames } =
+    store;
+
   const children = network.visibleChildren;
   const links = network.getLinks(streamlineThreshold);
 
@@ -101,7 +78,7 @@ function Network({
       <defs>
         <LinearGradients activeIndices={activeIndices} />
       </defs>
-      {showName && (
+      {showNetworkNames && (
         <text
           className="name"
           style={{ cursor: "default" }}
@@ -119,16 +96,11 @@ function Network({
       ))}
 
       {children.map((module) => (
-        <Module
-          key={module.id}
-          module={module}
-          dropShadow={dropShadow}
-          fillColor={groupFillColor}
-        />
+        <Module key={module.id} module={module} fillColor={groupFillColor} />
       ))}
     </g>
   );
-}
+});
 
 function Streamline({ link, opacity }) {
   return (
@@ -146,13 +118,20 @@ function Streamline({ link, opacity }) {
   );
 }
 
-const Module = observer(function Module({ module, dropShadow, fillColor }) {
+const Module = observer(function Module({ module, fillColor }) {
   const store = useContext(StoreContext);
+  const ref = useRef();
+
+  const { fontSize, showModuleId, showModuleNames } = store;
+  const dropShadow = DropShadows.filter(store.dropShadow);
 
   const isSelected = store.selectedModule === module;
 
   const handler = useOnClick({
-    onClick: () => store.setSelectedModule(module),
+    onClick: () => {
+      raise(ref?.current);
+      store.setSelectedModule(module);
+    },
     onDoubleClick: (event) => {
       if (event.shiftKey) {
         module.regroup();
@@ -168,6 +147,7 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
 
   return (
     <g
+      ref={ref}
       className="module"
       style={{
         cursor: "pointer",
@@ -186,9 +166,9 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
         />
       ))}
 
-      {store.showModuleId && (
+      {showModuleId && (
         <text
-          fontSize={store.fontSize}
+          fontSize={fontSize}
           textAnchor="middle"
           dy={3}
           stroke="#fff"
@@ -201,9 +181,9 @@ const Module = observer(function Module({ module, dropShadow, fillColor }) {
         </text>
       )}
 
-      {store.showModuleNames && module.textAnchor != null && (
+      {showModuleNames && module.textAnchor != null && (
         <text
-          fontSize={store.fontSize}
+          fontSize={fontSize}
           textAnchor={module.textAnchor}
           dy={3}
           strokeWidth={0}
