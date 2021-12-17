@@ -76,11 +76,11 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   getNeighbor(side: Side): Network | null {
-    const alluvialRoot = this.parent;
+    const root = this.parent;
 
-    if (alluvialRoot) {
-      const networkIndex = alluvialRoot.children.findIndex(
-        (networkRoot) => networkRoot.networkId === this.networkId
+    if (root) {
+      const networkIndex = root.children.findIndex(
+        (network) => network.networkId === this.networkId
       );
 
       const neighborNetworkIndex = networkIndex + side;
@@ -88,9 +88,9 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
       if (
         networkIndex > -1 &&
         neighborNetworkIndex > -1 &&
-        neighborNetworkIndex < alluvialRoot.children.length
+        neighborNetworkIndex < root.children.length
       ) {
-        return alluvialRoot.children[neighborNetworkIndex];
+        return root.children[neighborNetworkIndex];
       }
     }
 
@@ -120,7 +120,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
 
   private *rightStreamlines() {
     for (let module of this) {
-      // Skip if left module if below threshold
+      // Skip if left module is below threshold
       if (module.flow < this.flowThreshold) {
         continue;
       }

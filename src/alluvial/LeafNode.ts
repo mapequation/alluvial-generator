@@ -31,11 +31,11 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     [RIGHT]: null,
   };
 
-  private readonly networkRoot: Network;
+  private readonly network: Network;
 
-  constructor(node: any, networkRoot: Network) {
+  constructor(node: any, network: Network) {
     // FIXME remove any
-    super(null, networkRoot.networkId, node.path);
+    super(null, network.networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
     this.identifier = node.identifier;
@@ -49,7 +49,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       node.moduleLevel && Number.isInteger(node.moduleLevel)
         ? node.moduleLevel
         : 1;
-    this.networkRoot = networkRoot;
+    this.network = network;
   }
 
   get insignificant(): boolean {
@@ -115,10 +115,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   add() {
-    const root = this.networkRoot.parent;
+    const root = this.network.parent;
     const module =
-      this.networkRoot.getModule(this.moduleId) ||
-      new Module(this.networkRoot, this.moduleId, this.moduleLevel);
+      this.network.getModule(this.moduleId) ||
+      new Module(this.network, this.moduleId, this.moduleLevel);
     const group =
       module.getGroup(this.highlightIndex, this.insignificant) ||
       new HighlightGroup(module, this.highlightIndex, this.insignificant);
@@ -128,7 +128,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       let oppositeNode = this.oppositeNodes[side];
 
       if (!oppositeNode) {
-        const neighborNetwork = this.networkRoot.getNeighbor(side);
+        const neighborNetwork = this.network.getNeighbor(side);
         if (neighborNetwork) {
           oppositeNode = this.oppositeNodes[side] = neighborNetwork.getLeafNode(
             this.identifier
@@ -185,7 +185,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     yield this;
   }
 
-  private remove(removeNetworkRoot: boolean = false) {
+  private remove(removeNetwork: boolean = false) {
     const group = this.getAncestor(HIGHLIGHT_GROUP) as HighlightGroup | null;
 
     this.removeFromSide(LEFT);
@@ -198,16 +198,16 @@ export default class LeafNode extends AlluvialNodeBase<never> {
           module.removeChild(group);
         }
 
-        const networkRoot = module.parent;
-        if (networkRoot) {
+        const network = module.parent;
+        if (network) {
           if (module.isEmpty) {
-            networkRoot.removeChild(module);
+            network.removeChild(module);
           }
 
-          const alluvialRoot = networkRoot.parent;
-          if (alluvialRoot) {
-            if (removeNetworkRoot && networkRoot.isEmpty) {
-              alluvialRoot.removeChild(networkRoot);
+          const root = network.parent;
+          if (root) {
+            if (removeNetwork && network.isEmpty) {
+              root.removeChild(network);
 
               if (this.oppositeNodes[LEFT]) {
                 // @ts-ignore
@@ -225,7 +225,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   private removeFromSide(side: Side) {
-    const root = this.networkRoot.parent;
+    const root = this.network.parent;
     const streamlineNode = this.getParent(side);
 
     if (!streamlineNode) {

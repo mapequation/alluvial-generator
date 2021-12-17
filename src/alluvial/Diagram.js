@@ -3,14 +3,14 @@ import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import Root from "./Root";
 
 export default class Diagram {
-  alluvialRoot = new Root();
+  root = new Root();
 
   constructor(networks) {
     networks?.forEach((network) => this.addNetwork(network));
   }
 
   addNetwork(network) {
-    this.alluvialRoot.addNetwork(network);
+    this.root.addNetwork(network);
   }
 
   setModuleColor(
@@ -18,9 +18,9 @@ export default class Diagram {
     paintNodesInAllNetworks = false,
     paintModuleIdsInAllNetworks = false
   ) {
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
-    if (!networkRoot) return;
-    const module = networkRoot.getModule(moduleId);
+    const network = this.root.getNetwork(networkId);
+    if (!network) return;
+    const module = network.getModule(moduleId);
     if (!module) return;
     const leafNodes = Array.from(module.leafNodes());
 
@@ -30,12 +30,12 @@ export default class Diagram {
     });
 
     if (paintNodesInAllNetworks) {
-      this.alluvialRoot.children
-        .filter((root) => root.networkId !== networkId)
-        .forEach((networkRoot) =>
+      this.root.children
+        .filter((network) => network.networkId !== networkId)
+        .forEach((network) =>
           leafNodes
             .reduce((nodes, node) => {
-              const oppositeNode = networkRoot.getLeafNode(node.identifier);
+              const oppositeNode = network.getLeafNode(node.identifier);
               if (oppositeNode) {
                 oppositeNode.highlightIndex = highlightIndex;
                 nodes.push(oppositeNode);
@@ -45,10 +45,10 @@ export default class Diagram {
             .forEach((node) => node.update())
         );
     } else if (paintModuleIdsInAllNetworks) {
-      this.alluvialRoot.children
-        .filter((root) => root.networkId !== networkId)
-        .forEach((networkRoot) => {
-          const oppositeModule = networkRoot.getModule(moduleId);
+      this.root.children
+        .filter((network) => network.networkId !== networkId)
+        .forEach((network) => {
+          const oppositeModule = network.getModule(moduleId);
           if (oppositeModule) {
             this.setModuleColor({
               ...oppositeModule,
@@ -77,16 +77,16 @@ export default class Diagram {
     this.removeColors();
 
     const networkId =
-      alluvialObject?.networkId ?? this.alluvialRoot.children[0].networkId;
+      alluvialObject?.networkId ?? this.root.children[0].networkId;
 
     if (!networkId) {
       console.warn("Tried to auto paint but could not find a network id!");
       return;
     }
 
-    const networkRoot = this.alluvialRoot.getNetworkRoot(networkId);
+    const network = this.root.getNetwork(networkId);
 
-    if (!networkRoot) {
+    if (!network) {
       console.warn(`No network root found with id ${networkId}`);
       return;
     }
@@ -97,7 +97,7 @@ export default class Diagram {
     }
 
     if (paintNodesInAllNetworks) {
-      networkRoot.children
+      network.children
         .filter((module) => module.flow > 0)
         .forEach((module, i) =>
           this.setModuleColor(
@@ -112,7 +112,7 @@ export default class Diagram {
     } else if (paintModuleIdsInAllNetworks) {
       const moduleIds = new Set();
 
-      this.alluvialRoot.children.forEach((network) => {
+      this.root.children.forEach((network) => {
         network.children.forEach((module) => {
           moduleIds.add(module.moduleId);
         });
@@ -141,7 +141,7 @@ export default class Diagram {
             highlightIndices[i % highlightIndices.length];
         });
 
-      this.alluvialRoot.children.forEach((network) => {
+      this.root.children.forEach((network) => {
         network.children
           .filter((module) => module.flow > 0)
           .forEach((module) =>
@@ -159,9 +159,9 @@ export default class Diagram {
   }
 
   removeColors() {
-    for (let networkRoot of this.alluvialRoot) {
+    for (let network of this.root) {
       const modules = [];
-      for (let module of networkRoot) {
+      for (let module of network) {
         for (let highlightGroup of module) {
           if (highlightGroup.isHighlighted) {
             modules.push(module);
@@ -182,9 +182,9 @@ export default class Diagram {
     for (let file of highlightedNodes) {
       const nodes = new Set();
 
-      for (let networkRoot of this.alluvialRoot) {
+      for (let network of this.root) {
         for (let id of file.content) {
-          const leafNode = networkRoot.getLeafNode(id);
+          const leafNode = network.getLeafNode(id);
 
           if (leafNode && !nodes.has(leafNode)) {
             leafNode.highlightIndex = file.highlightIndex;
@@ -197,7 +197,7 @@ export default class Diagram {
   }
 
   updateLayout() {
-    this.alluvialRoot.calcFlow();
-    this.alluvialRoot.updateLayout(...arguments);
+    this.root.calcFlow();
+    this.root.updateLayout(...arguments);
   }
 }

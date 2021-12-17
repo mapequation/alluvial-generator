@@ -12,6 +12,16 @@ import { drawerWidth } from "../App";
 
 const streamlineGenerator = streamlineHorizontal();
 
+function translate({ width, height }) {
+  let { innerWidth, innerHeight } = window;
+  innerWidth -= drawerWidth;
+
+  const dx = Math.max((innerWidth - width) / 2, 100);
+  const dy = Math.max((innerHeight - height) / 3, 100);
+
+  return `translate(${dx}, ${dy})`;
+}
+
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
   const {
@@ -25,7 +35,7 @@ export default observer(function Diagram() {
     showNetworkNames,
     updateFlag,
   } = store;
-  const maxModuleLevel = 3;
+  const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
   const dropShadowFilter = DropShadows.filter(dropShadow);
 
@@ -42,11 +52,11 @@ export default observer(function Diagram() {
       className={`updateFlag-${updateFlag}`}
     >
       <defs>
-        <DropShadows maxLevel={maxModuleLevel} />
+        <DropShadows maxLevel={maxDropShadowModuleLevel} />
       </defs>
       <ZoomableSvg>
-        <g className="alluvialDiagram" transform={`translate(${dx}, ${dy})`}>
-          {diagram.alluvialRoot.children.map((network) => (
+        <g className="alluvialDiagram" transform={translate(diagram.root)}>
+          {diagram.root.children.map((network) => (
             <Network
               key={network.id}
               network={network}
@@ -87,7 +97,7 @@ function Network({
   );
 
   return (
-    <g className="networkRoot">
+    <g className="network">
       <defs>
         <LinearGradients activeIndices={activeIndices} />
       </defs>

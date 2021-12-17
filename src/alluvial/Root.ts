@@ -102,8 +102,10 @@ export default class Root extends AlluvialNodeBase<Network> {
     this.streamlineNodesById.delete(id);
   }
 
-  getNetworkRoot(networkId: string): Network | null {
-    return this.children.find((root) => root.networkId === networkId) ?? null;
+  getNetwork(networkId: string): Network | null {
+    return (
+      this.children.find((network) => network.networkId === networkId) ?? null
+    );
   }
 
   addNetwork(network: any) {
@@ -321,7 +323,7 @@ export default class Root extends AlluvialNodeBase<Network> {
           if (!getNodeSize) {
             const network = node.getAncestor(NETWORK) as Network | null;
             if (!network) {
-              console.error("Streamline node has no NetworkRoot parent");
+              console.error("Streamline node has no Network parent");
               return;
             }
             getNodeSize = getNodeSizeByPropForNetwork(

@@ -35,33 +35,33 @@ export const savePng = (elementId, filename) => {
   image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(string);
 };
 
-export const saveDiagram = (version, networks, alluvialRoot, state = {}) => {
+export const saveDiagram = (version, networks, root, state = {}) => {
   const filename = networks.map((network) => network.name).join(",") + ".json";
 
-  const networkRoot = (id) => {
-    const networkRoot = alluvialRoot.getNetworkRoot(id);
-    if (!networkRoot) {
+  const getNetwork = (id) => {
+    const network = root.getNetwork(id);
+    if (!network) {
       console.error(`No network found with id ${id}`);
       return;
     }
-    return networkRoot;
+    return network;
   };
 
   const nodes = (id) => {
-    const root = networkRoot(id);
-    return root
-      ? Array.from(root.leafNodes()).map((node) => node.toNode())
+    const network = getNetwork(id);
+    return network
+      ? Array.from(network.leafNodes()).map((node) => node.toNode())
       : null;
   };
 
   const name = (id) => {
-    const root = networkRoot(id);
-    return root ? root.name : null;
+    const network = getNetwork(id);
+    return network ? network.name : null;
   };
 
   const moduleNames = (id) => {
-    const root = networkRoot(id);
-    return root ? root.getModuleNames() : [];
+    const network = getNetwork(id);
+    return network ? network.getModuleNames() : [];
   };
 
   const json = JSON.stringify(
