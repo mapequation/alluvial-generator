@@ -9,6 +9,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 import {
   Alert,
   AlertTitle,
+  Avatar,
   Button,
   Card,
   CardContent,
@@ -17,6 +18,9 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  List,
+  ListItem,
+  ListItemText,
   Stack,
   Step,
   StepLabel,
@@ -28,12 +32,14 @@ import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import * as d3 from "d3";
 import { StoreContext } from "../store";
-import humanFileSize from "../utils/human-file-size";
 import id from "../utils/id";
 import "./LoadNetworks.css";
 import useRaisedShadow from "../hooks/useRaisedShadow";
 import TreePath from "../utils/TreePath";
+import { normalize } from "../utils/math";
+import humanFileSize from "../utils/human-file-size";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
@@ -139,6 +145,7 @@ export default observer(function LoadNetworks({ onClose }) {
           Object.assign(file, {
             id: id(),
             format,
+            flowDistribution: calculateFlowDistribution(contents),
             ...contents,
           })
         );
@@ -179,7 +186,6 @@ export default observer(function LoadNetworks({ onClose }) {
 
   useEffect(() => {
     const onKeyPress = (e) => {
-      e.preventDefault();
       if (e.key === "c" && files.length > 0) {
         createDiagram();
       } else if (e.key === "Backspace") {
@@ -265,11 +271,41 @@ export default observer(function LoadNetworks({ onClose }) {
   );
 });
 
-function Text({ children }) {
+function FileBackground({ file, ...props }) {
+  const colors = d3.interpolateSinebow;
+  const minFlow = 1e-4;
+
+  const values = normalize(
+    Array.from(Object.values(file.flowDistribution))
+      .filter((flow) => flow > minFlow)
+      .sort()
+  );
+
+  const height = 300;
+  const margin = 10;
+  const usableHeight =
+    values.length > 2 ? height - margin * (values.length - 1) : height;
+
+  let prevY = 0;
+
   return (
-    <Typography variant="body2" color="text.secondary" gutterBottom>
-      {children}
-    </Typography>
+    <svg width="100%" height="100%" {...props} opacity={0.2}>
+      {values.map((k, i) => {
+        const y = prevY;
+        const rectHeight = k * usableHeight;
+        prevY += rectHeight + margin;
+        return (
+          <rect
+            key={i}
+            x={0}
+            y={y}
+            width="100%"
+            height={rectHeight}
+            fill={colors(1 - i / values.length)}
+          />
+        );
+      })}
+    </svg>
   );
 }
 
@@ -278,7 +314,7 @@ function Item({ number, file, onClick }) {
   const boxShadow = useRaisedShadow(x);
 
   const truncatedName = ((name) => {
-    const maxLength = 10;
+    const maxLength = 5;
     const nameParts = name.split(".");
     if (nameParts[0].length < maxLength) {
       return name;
@@ -293,26 +329,74 @@ function Item({ number, file, onClick }) {
       className="child"
       style={{ boxShadow, x }}
     >
-      <Card sx={{ maxWidth: "100%", height: "100%" }} variant="outlined">
-        <CardContent>
-          <Typography variant="h6" color="text.secondary">
+      <FileBackground file={file} style={{ position: "absolute" }} />
+      <Card
+        sx={{
+          maxWidth: "100%",
+          height: "100%",
+          position: "relative",
+          background: "transparent",
+        }}
+        variant="outlined"
+      >
+        <CardContent sx={{ p: "10px" }}>
+          <Avatar
+            sx={{
+              bgcolor: "background.paper",
+              boxShadow: 1,
+              color: "text.primary",
+              marginLeft: "-2px",
+            }}
+          >
             {number}
-          </Typography>
-          <Tooltip title={file.name}>
-            <Typography
-              fontSize={14}
-              sx={{ overflowWrap: "anywhere" }}
-              gutterBottom
-            >
-              {truncatedName}
-            </Typography>
-          </Tooltip>
+          </Avatar>
 
-          {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
-          {file.nodes && <Text>{file.nodes.length} nodes</Text>}
-          {file.numTopModules && <Text>{file.numTopModules} top modules</Text>}
-          {file.numLevels && <Text>{file.numLevels} levels</Text>}
-          {file.codelength && <Text>{file.codelength.toFixed(3)} bits</Text>}
+          <List
+            dense
+            sx={{
+              bgcolor: "white",
+              boxShadow: 1,
+              borderRadius: "5px",
+              mt: "10px",
+            }}
+          >
+            <ListItem sx={{ overflowWrap: "anywhere" }}>
+              {truncatedName.length === file.name.length ? (
+                <ListItemText primary={file.name} />
+              ) : (
+                <Tooltip title={file.name}>
+                  <ListItemText primary={truncatedName} />
+                </Tooltip>
+              )}
+            </ListItem>
+
+            {file.nodes && (
+              <ListItem>
+                <ListItemText primary={file.nodes.length + " nodes"} />
+              </ListItem>
+            )}
+            {file.numTopModules && (
+              <ListItem>
+                <ListItemText primary={file.numTopModules + " top modules"} />
+              </ListItem>
+            )}
+            {file.numLevels && (
+              <ListItem>
+                <ListItemText primary={file.numLevels + " levels"} />
+              </ListItem>
+            )}
+            {file.codelength && (
+              <ListItem>
+                <ListItemText primary={file.codelength.toFixed(3) + " bits"} />
+              </ListItem>
+            )}
+            {file.size > 0 && (
+              <ListItem>
+                <ListItemText primary={humanFileSize(file.size)} />
+              </ListItem>
+            )}
+          </List>
+
           <IconButton
             size="small"
             onClick={() => onClick(file.id)}
@@ -380,7 +464,8 @@ function createFilesFromDiagramObject(json, file) {
 
   return json.networks.map((network) => {
     setIdentifiers(network.nodes, "json");
-    return {
+
+    const part = {
       ...file,
       lastModified: file.lastModified,
       size: (file.size * network.nodes.length) / totNodes,
@@ -389,7 +474,27 @@ function createFilesFromDiagramObject(json, file) {
       format: "json",
       ...network,
     };
+
+    if (!part.flowDistribution) {
+      part.flowDistribution = calculateFlowDistribution(network);
+    }
+
+    return part;
   });
+}
+
+function calculateFlowDistribution(file) {
+  const flowDistribution = {};
+
+  file.nodes.forEach(({ flow, path }) => {
+    const topModule = path[0];
+    if (!flowDistribution[topModule]) {
+      flowDistribution[topModule] = 0;
+    }
+    flowDistribution[topModule] += flow;
+  });
+
+  return flowDistribution;
 }
 
 function setIdentifiers(nodes, format) {
