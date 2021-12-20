@@ -10,6 +10,7 @@ import LinearGradients from "./LinearGradients";
 import ZoomableSvg from "./ZoomableSvg";
 import raise from "../../utils/raise";
 import { drawerWidth } from "../App";
+import "./Diagram.css";
 
 const streamlineGenerator = streamlineHorizontal();
 
@@ -149,10 +150,7 @@ const Module = observer(function Module({ module, fillColor }) {
     <g
       ref={ref}
       className="module"
-      style={{
-        cursor: "pointer",
-        filter: dropShadow(module),
-      }}
+      style={{ filter: dropShadow(module) }}
       stroke="#f00"
       strokeWidth={isSelected ? 1 : 0}
       onClick={handler}

@@ -27,15 +27,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    const onKeyPress = (e) => {
+    const onKeyDown = (e) => {
       if (e.key === "l") {
         openLoad();
       }
     };
 
-    document.addEventListener("keydown", onKeyPress);
+    document.addEventListener("keydown", onKeyDown);
 
-    return () => document.removeEventListener("keydown", onKeyPress);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [setIsLoadOpen]);
 
   return (

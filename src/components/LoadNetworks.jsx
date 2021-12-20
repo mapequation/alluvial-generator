@@ -185,7 +185,7 @@ export default observer(function LoadNetworks({ onClose }) {
   };
 
   useEffect(() => {
-    const onKeyPress = (e) => {
+    const onKeyDown = (e) => {
       if (e.key === "c" && files.length > 0) {
         createDiagram();
       } else if (e.key === "Backspace") {
@@ -195,11 +195,11 @@ export default observer(function LoadNetworks({ onClose }) {
       }
     };
 
-    document.addEventListener("keydown", onKeyPress);
+    document.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.clearTimeout(timeoutId);
-      document.removeEventListener("keydown", onKeyPress);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [files, timeoutId, createDiagram, reset, loadExample]);
 

@@ -1,0 +1,7 @@
+g.module {
+    cursor: pointer;
+}
+
+.drag-mode g.module {
+    cursor: move;
+}
