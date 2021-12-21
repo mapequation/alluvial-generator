@@ -1,7 +1,11 @@
 export default class PriorityQueue<T extends { flow: number }> {
   heap: T[] = [];
 
-  constructor(public numValues: number) {}
+  constructor(public numValues: number, values: Iterable<T> = []) {
+    for (const value of values) {
+      this.push(value);
+    }
+  }
 
   get length() {
     return this.heap.length;

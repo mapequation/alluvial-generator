@@ -64,31 +64,6 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
-  toNode(): any {
-    // FIXME remove any
-    const {
-      id,
-      flow,
-      name,
-      nodeId,
-      identifier,
-      insignificant,
-      highlightIndex,
-      moduleLevel,
-    } = this;
-
-    return {
-      path: id,
-      flow,
-      name,
-      id: nodeId,
-      identifier,
-      insignificant,
-      highlightIndex,
-      moduleLevel,
-    };
-  }
-
   getParent(side: Side) {
     return side === LEFT ? this.leftParent : this.rightParent;
   }

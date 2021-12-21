@@ -50,7 +50,27 @@ export const saveDiagram = (version, networks, root, state = {}) => {
   const nodes = (id) => {
     const network = getNetwork(id);
     return network
-      ? Array.from(network.leafNodes()).map((node) => node.toNode())
+      ? Array.from(network.leafNodes()).map(
+          ({
+            id,
+            flow,
+            name,
+            nodeId,
+            identifier,
+            insignificant,
+            highlightIndex,
+            moduleLevel,
+          }) => ({
+            path: id,
+            flow,
+            name,
+            id: nodeId,
+            identifier,
+            insignificant,
+            highlightIndex,
+            moduleLevel,
+          })
+        )
       : null;
   };
 

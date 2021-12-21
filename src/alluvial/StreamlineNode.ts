@@ -46,6 +46,13 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     return -Infinity;
   }
 
+  get opposite(): StreamlineNode | null {
+    if (this.link) {
+      return this.link.left === this ? this.link.right : this.link.left;
+    }
+    return null;
+  }
+
   static createId(
     source: LeafNode,
     side: Side,
@@ -88,13 +95,6 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
 
   makeDangling() {
     this.targetId = null;
-  }
-
-  get opposite(): StreamlineNode | null {
-    if (this.link) {
-      return this.link.left === this ? this.link.right : this.link.left;
-    }
-    return null;
   }
 
   linkTo(opposite: StreamlineNode) {

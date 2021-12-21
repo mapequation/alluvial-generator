@@ -48,8 +48,9 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   }
 
   get largestLeafNodes() {
-    // TODO inline
-    return this.getLargestLeafNodeNames();
+    return new PriorityQueue<LeafNode>(5, this.leafNodes()).map(
+      (node) => node.name
+    );
   }
 
   get x1() {
@@ -102,17 +103,23 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.parent?.codelength ?? 0;
   }
 
-  get getLeafNodes() {
-    // TODO remove
-    return Array.from(this.leafNodes(), (node) => node.toNode());
-  }
-
   get isVisible() {
     return this.flow >= this.flowThreshold && this.flow > 0;
   }
 
   private get flowThreshold() {
     return this.parent?.flowThreshold ?? 0;
+  }
+
+  private get siblings(): Module[] {
+    if (!this.parent) return [];
+    const modules = this.parent.children;
+
+    const moduleLevel = this.moduleLevel - 1;
+    if (moduleLevel < 1) return modules;
+
+    const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
+    return modules.filter((module) => parentPath.isAncestor(module.moduleId));
   }
 
   getGroup(highlightIndex: number, insignificant: boolean) {
@@ -156,7 +163,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       );
     }
 
-    const modules = this.getSiblings();
+    const modules = this.siblings;
 
     const leafNodes: LeafNode[] = [].concat.apply(
       [],
@@ -177,13 +184,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     });
   }
 
-  getLargestLeafNodeNames(numNodes: number = 6) {
-    const queue = new PriorityQueue<LeafNode>(numNodes);
-    for (let node of this.leafNodes()) {
-      queue.push(node);
-    }
-    return queue.map((node) => node.name);
-  }
 
   *rightStreamlines() {
     for (let group of this) {
@@ -207,16 +207,5 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       .sort((a, b) => a[1].flow - b[1].flow)
       .map(([_, { name }]) => name);
     return names.length ? names : null;
-  }
-
-  private getSiblings(): Module[] {
-    if (!this.parent) return [];
-    const modules = this.parent.children;
-
-    const moduleLevel = this.moduleLevel - 1;
-    if (moduleLevel < 1) return modules;
-
-    const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
-    return modules.filter((module) => parentPath.isAncestor(module.moduleId));
   }
 }
