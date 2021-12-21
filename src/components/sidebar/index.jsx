@@ -1,5 +1,7 @@
 import UploadIcon from "@mui/icons-material/Upload";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
+import ExpandIcon from "@mui/icons-material/Expand";
+import CompressIcon from "@mui/icons-material/Compress";
 import {
   Chip,
   Collapse,
@@ -60,6 +62,28 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           <Collapse key={selectedModule != null ? "module" : "no-module"}>
             {selectedModule != null ? (
               <>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={onAboutClick}
+                    disabled={!selectedModule.hasSubmodules}
+                  >
+                    <ListItemIcon>
+                      <ExpandIcon />
+                    </ListItemIcon>
+                    <ListItemText>Expand module</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={onAboutClick}
+                    disabled={selectedModule?.moduleLevel === 1}
+                  >
+                    <ListItemIcon>
+                      <CompressIcon />
+                    </ListItemIcon>
+                    <ListItemText>Contract module</ListItemText>
+                  </ListItemButton>
+                </ListItem>
                 <ListItem>
                   <ListItemText>
                     <Label>Network</Label>
@@ -86,7 +110,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 </ListItem>
                 <ListItem>
                   <ListItemText>
-                    <Label>Current level</Label>
+                    <Label>Level</Label>
                     {selectedModule?.moduleLevel}
                   </ListItemText>
                 </ListItem>

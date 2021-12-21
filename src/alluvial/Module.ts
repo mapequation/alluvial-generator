@@ -18,7 +18,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   readonly moduleId: string;
   margin: number = 0;
   index: number;
-  private readonly moduleLevel: number = 1;
+  readonly moduleLevel: number = 1;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
@@ -105,6 +105,19 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
   get isVisible() {
     return this.flow >= this.flowThreshold && this.flow > 0;
+  }
+
+  get hasSubmodules() {
+    return this.moduleLevel < this.maxModuleLevel;
+  }
+
+  private get maxModuleLevel() {
+    // FIXME optimize
+    let maxModuleLevel = this.moduleLevel;
+    for (const node of this.leafNodes()) {
+      maxModuleLevel = Math.max(maxModuleLevel, node.level - 1);
+    }
+    return maxModuleLevel;
   }
 
   private get flowThreshold() {
