@@ -188,17 +188,12 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   *rightStreamlines() {
     for (let group of this) {
       for (let streamlineNode of group.right) {
-        const oppositeStreamlineNode = streamlineNode.getOpposite();
-
-        if (!oppositeStreamlineNode) continue;
-
-        const oppositeModule = oppositeStreamlineNode.getAncestor(
+        const module = streamlineNode.opposite?.getAncestor(
           MODULE
         ) as Module | null;
 
-        if (oppositeModule) {
-          // Skip if right module is below threshold
-          if (!oppositeModule.isVisible) continue;
+        if (!module?.isVisible) {
+          continue;
         }
 
         if (streamlineNode.link) yield streamlineNode.link;

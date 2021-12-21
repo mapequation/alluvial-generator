@@ -239,7 +239,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     if (streamlineNode.isEmpty) {
       // We are deleting streamlineNode,
       // so opposite streamline node must be made dangling.
-      const oppositeStreamlineNode = streamlineNode.getOpposite();
+      const oppositeStreamlineNode = streamlineNode.opposite;
 
       if (oppositeStreamlineNode) {
         // Delete the old id
