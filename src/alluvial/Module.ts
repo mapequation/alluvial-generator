@@ -176,6 +176,27 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return queue.map((node) => node.name);
   }
 
+  *rightStreamlines(flowThreshold: number) {
+    for (let group of this) {
+      for (let streamlineNode of group.right) {
+        const oppositeStreamlineNode = streamlineNode.getOpposite();
+
+        if (!oppositeStreamlineNode) continue;
+
+        const oppositeModule = oppositeStreamlineNode.getAncestor(
+          MODULE
+        ) as Module | null;
+
+        if (oppositeModule) {
+          // Skip if right module is below threshold
+          if (oppositeModule.flow < flowThreshold) continue;
+        }
+
+        if (streamlineNode.link) yield streamlineNode.link;
+      }
+    }
+  }
+
   private subModuleNames() {
     const names = Array.from(Module.customNames.entries())
       .filter(([id, ..._]) => id.startsWith(this.id))

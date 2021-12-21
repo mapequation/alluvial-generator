@@ -1,6 +1,6 @@
 import AlluvialNodeBase from "./AlluvialNode";
 import Root from "./Root";
-import { MODULE, NETWORK } from "./Depth";
+import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
@@ -125,22 +125,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
         continue;
       }
 
-      for (let group of module) {
-        for (let streamlineNode of group.right) {
-          const oppositeStreamlineNode = streamlineNode.getOpposite();
-          if (!oppositeStreamlineNode) continue;
-          const oppositeModule = oppositeStreamlineNode.getAncestor(
-            MODULE
-          ) as Module | null;
-
-          if (oppositeModule) {
-            // Skip if right module is below threshold
-            if (oppositeModule.flow < this.flowThreshold) continue;
-          }
-
-          if (streamlineNode.link) yield streamlineNode.link;
-        }
-      }
+      yield* module.rightStreamlines(this.flowThreshold);
     }
   }
 }
