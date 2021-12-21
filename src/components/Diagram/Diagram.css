@@ -8,6 +8,17 @@ g.network > text {
 
 g.module {
     cursor: pointer;
+    stroke-width: 0;
+}
+
+g.module:hover {
+    stroke: #128bc2;
+    stroke-width: 1;
+}
+
+g.module.selected {
+    stroke: #f00;
+    stroke-width: 1;
 }
 
 .drag-mode g.module {

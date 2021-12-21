@@ -44,10 +44,8 @@ const Module = observer(function Module({ module, fillColor }) {
   return (
     <g
       ref={ref}
-      className="module"
+      className={`${isSelected ? "module selected" : "module"}`}
       style={{ filter: dropShadow(module) }}
-      stroke="#f00"
-      strokeWidth={isSelected ? 1 : 0}
       onClick={handler}
     >
       {module.children.map((group) => (
