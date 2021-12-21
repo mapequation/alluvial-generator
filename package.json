@@ -23,14 +23,12 @@
     "react-dropzone": "^11.4.2",
     "react-scripts": "5.0.0",
     "react-transition-group": "^4.4.2",
-    "semantic-ui-react": "^2.0.4",
     "typescript": "^4.4.4",
     "web-vitals": "^2.1.2"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-scripts test",
     "release": "standard-version",
     "deploy": "npm run build && scp -r build/* mapequation:/var/www/alluvial"
   },
