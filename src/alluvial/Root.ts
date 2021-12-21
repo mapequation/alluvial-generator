@@ -189,7 +189,7 @@ export default class Root extends AlluvialNodeBase<Network> {
     this.forEachDepthFirstPreOrderWhile(
       (node: any) =>
         node.depth < Depth.MODULE ||
-        (node instanceof Module && node.flow >= flowThreshold) ||
+        (node instanceof Module && node.isVisible) ||
         node instanceof HighlightGroup,
       (node: any, i: number, nodes: any[]) => {
         if (node instanceof Network) {
@@ -278,7 +278,7 @@ export default class Root extends AlluvialNodeBase<Network> {
       this.forEachDepthFirstWhile(
         (node: any) =>
           node.depth < Depth.MODULE ||
-          (node instanceof Module && node.flow >= flowThreshold),
+          (node instanceof Module && node.isVisible),
         (node: any, i: number) => {
           if (node instanceof Network) {
             totalMargin = totalMargins[i];
@@ -302,8 +302,7 @@ export default class Root extends AlluvialNodeBase<Network> {
         if (node instanceof Branch) {
           node.children.sort(
             (a, b) =>
-              a.oppositeStreamlinePosition(flowThreshold) -
-              b.oppositeStreamlinePosition(flowThreshold)
+              a.oppositeStreamlinePosition - b.oppositeStreamlinePosition
           );
         }
       }
@@ -317,7 +316,7 @@ export default class Root extends AlluvialNodeBase<Network> {
     this.forEachDepthFirstPostOrderWhile(
       (node: any) =>
         node.depth !== Depth.MODULE ||
-        (node instanceof Module && node.flow >= flowThreshold),
+        (node instanceof Module && node.isVisible),
       (node: any) => {
         if (node instanceof StreamlineNode) {
           if (!getNodeSize) {

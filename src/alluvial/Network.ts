@@ -33,9 +33,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   get visibleChildren() {
-    return this.children.filter(
-      (module) => module.flow >= this.flowThreshold && module.flow > 0
-    );
+    return this.children.filter((module) => module.isVisible);
   }
 
   static create(
@@ -121,11 +119,11 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   private *rightStreamlines() {
     for (let module of this) {
       // Skip if left module is below threshold
-      if (module.flow < this.flowThreshold) {
+      if (!module.isVisible) {
         continue;
       }
 
-      yield* module.rightStreamlines(this.flowThreshold);
+      yield* module.rightStreamlines();
     }
   }
 }

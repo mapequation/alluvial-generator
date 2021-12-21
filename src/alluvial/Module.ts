@@ -103,7 +103,16 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   }
 
   get getLeafNodes() {
+    // TODO remove
     return Array.from(this.leafNodes(), (node) => node.toNode());
+  }
+
+  get isVisible() {
+    return this.flow >= this.flowThreshold && this.flow > 0;
+  }
+
+  private get flowThreshold() {
+    return this.parent?.flowThreshold ?? 0;
   }
 
   getGroup(highlightIndex: number, insignificant: boolean) {
@@ -176,7 +185,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return queue.map((node) => node.name);
   }
 
-  *rightStreamlines(flowThreshold: number) {
+  *rightStreamlines() {
     for (let group of this) {
       for (let streamlineNode of group.right) {
         const oppositeStreamlineNode = streamlineNode.getOpposite();
@@ -189,7 +198,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
         if (oppositeModule) {
           // Skip if right module is below threshold
-          if (oppositeModule.flow < flowThreshold) continue;
+          if (!oppositeModule.isVisible) continue;
         }
 
         if (streamlineNode.link) yield streamlineNode.link;

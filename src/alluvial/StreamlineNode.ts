@@ -31,6 +31,22 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     return `${this.targetId || "NULL"}--${this.sourceId}`;
   }
 
+  get oppositeStreamlinePosition() {
+    const oppositeStreamlineNode = this.getOpposite();
+    if (oppositeStreamlineNode) {
+      const group = oppositeStreamlineNode.getAncestor(
+        HIGHLIGHT_GROUP
+      ) as HighlightGroup | null;
+      if (group) {
+        const module = group.parent;
+        if (module && module.isVisible) {
+          return -group.y;
+        }
+      }
+    }
+    return -Infinity;
+  }
+
   static createId(
     source: LeafNode,
     side: Side,
@@ -80,22 +96,6 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
       return this.link.left === this ? this.link.right : this.link.left;
     }
     return null;
-  }
-
-  oppositeStreamlinePosition(flowThreshold: number) {
-    const oppositeStreamlineNode = this.getOpposite();
-    if (oppositeStreamlineNode) {
-      const group = oppositeStreamlineNode.getAncestor(
-        HIGHLIGHT_GROUP
-      ) as HighlightGroup | null;
-      if (group) {
-        const module = group.parent;
-        if (module && module.flow >= flowThreshold) {
-          return -group.y;
-        }
-      }
-    }
-    return -Infinity;
   }
 
   linkTo(opposite: StreamlineNode) {
