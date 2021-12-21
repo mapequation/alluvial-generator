@@ -1,7 +1,15 @@
+rect.background {
+    cursor: move;
+}
+
 g.module {
     cursor: pointer;
 }
 
 .drag-mode g.module {
-    cursor: move;
+    cursor: grab;
+}
+
+.drag-mode g.module:active {
+    cursor: grabbing;
 }
