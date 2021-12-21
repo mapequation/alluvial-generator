@@ -178,6 +178,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       console.warn(
         `Module with id ${this.moduleId} is already at module level ${this.moduleLevel}`
       );
+      return;
     }
 
     const modules = this.siblings;
