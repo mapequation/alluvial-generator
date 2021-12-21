@@ -95,16 +95,22 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
 
   makeDangling() {
     this.targetId = null;
+
+    return this;
   }
 
   linkTo(opposite: StreamlineNode) {
     const reverse = this.side === LEFT;
     this.link = opposite.link = new StreamlineLink(this, opposite, reverse);
+
+    return this;
   }
 
   removeLink() {
     if (this.link) {
       this.link.remove();
     }
+
+    return this;
   }
 }

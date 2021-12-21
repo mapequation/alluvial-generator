@@ -13,6 +13,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly name: string;
   readonly flow: number;
   readonly nodeId: number;
+  readonly stateId: number | null = null;
   readonly identifier: string;
   readonly treePath: TreePath;
   highlightIndex: number;
@@ -38,8 +39,9 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     super(null, network.networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;
+    this.nodeId = node.id;
+    this.stateId = node.stateId != null ? node.stateId : null;
     this.identifier = node.identifier;
-    this.nodeId = node.id || node.stateId || 0;
     this.treePath = new TreePath(node.path);
     this.highlightIndex =
       node.highlightIndex && Number.isInteger(node.highlightIndex)
@@ -92,10 +94,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   add() {
     const root = this.network.parent;
     const module =
-      this.network.getModule(this.moduleId) ||
+      this.network.getModule(this.moduleId) ??
       new Module(this.network, this.moduleId, this.moduleLevel);
     const group =
-      module.getGroup(this.highlightIndex, this.insignificant) ||
+      module.getGroup(this.highlightIndex, this.insignificant) ??
       new HighlightGroup(module, this.highlightIndex, this.insignificant);
 
     for (let branch of group) {
@@ -103,12 +105,8 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       let oppositeNode = this.oppositeNodes[side];
 
       if (!oppositeNode) {
-        const neighborNetwork = this.network.getNeighbor(side);
-        if (neighborNetwork) {
-          oppositeNode = this.oppositeNodes[side] = neighborNetwork.getLeafNode(
-            this.identifier
-          );
-        }
+        oppositeNode = this.oppositeNodes[side] =
+          this.network.getNeighbor(side)?.getLeafNode(this.identifier) ?? null;
       }
 
       const streamlineId = StreamlineNode.createId(this, side, oppositeNode);
@@ -219,8 +217,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       if (oppositeStreamlineNode) {
         // Delete the old id
         root.removeStreamlineNode(oppositeStreamlineNode.id);
-        oppositeStreamlineNode.makeDangling();
-        oppositeStreamlineNode.removeLink();
+        oppositeStreamlineNode.makeDangling().removeLink();
 
         const alreadyDanglingStreamlineNode = root.getStreamlineNode(
           oppositeStreamlineNode.id
@@ -233,10 +230,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
             node.setParent(alreadyDanglingStreamlineNode, oppositeSide);
           }
 
-          const branch = oppositeStreamlineNode.parent;
-          if (branch) {
-            branch.removeChild(oppositeStreamlineNode);
-          }
+          oppositeStreamlineNode.parent?.removeChild(oppositeStreamlineNode);
         } else {
           // Update with the new dangling id
           root.setStreamlineNode(
@@ -247,10 +241,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       }
 
       root.removeStreamlineNode(streamlineNode.id);
-      const branch = streamlineNode.parent;
-      if (branch) {
-        branch.removeChild(streamlineNode);
-      }
+      streamlineNode.parent.removeChild(streamlineNode);
     }
   }
 }
