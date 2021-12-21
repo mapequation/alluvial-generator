@@ -2,6 +2,10 @@ rect.background {
     cursor: move;
 }
 
+g.network > text {
+    cursor: default;
+}
+
 g.module {
     cursor: pointer;
 }

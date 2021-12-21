@@ -6,7 +6,7 @@ type Color = {
   insignificant: boolean;
 };
 
-function highlightColor(
+export default function highlightColor(
   defaultHighlightColor: string,
   highlightColors: string[]
 ) {
@@ -23,5 +23,3 @@ function highlightColor(
     return color;
   };
 }
-
-export default highlightColor;
