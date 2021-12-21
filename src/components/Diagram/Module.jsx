@@ -24,14 +24,10 @@ const Module = observer(function Module({ module, fillColor }) {
     },
     onDoubleClick: (event) => {
       if (event.shiftKey) {
-        module.regroup();
+        store.regroup(module);
       } else {
-        module.expand();
+        store.expand(module);
       }
-      if (isSelected) {
-        store.setSelectedModule(null);
-      }
-      store.updateLayout();
     },
   });
 

@@ -9,6 +9,7 @@ import {
 } from "d3";
 import Diagram from "../alluvial/Diagram";
 import type Module from "../alluvial/Module";
+import TreePath from "../utils/TreePath";
 
 export class Store {
   diagram = new Diagram();
@@ -208,6 +209,35 @@ export class Store {
 
   setSelectedModule(selectedModule: Module | null) {
     this.selectedModule = selectedModule;
+  }
+
+  expand(module: Module) {
+    const { parent, moduleId } = module;
+    module.expand();
+    this.updateLayout();
+
+    const visibleSubModules = parent.children.filter(
+      (module) => module.isVisible && module.moduleId.startsWith(moduleId)
+    );
+
+    if (visibleSubModules.length > 0) {
+      const largestSubModule = visibleSubModules.reduce((max, module) =>
+        module.flow > max.flow ? module : max
+      );
+      this.setSelectedModule(largestSubModule);
+    }
+  }
+
+  regroup(module: Module) {
+    const { parent, moduleId } = module;
+    module.regroup();
+    this.updateLayout();
+
+    const parentModuleId = TreePath.parentPath(moduleId)?.toString() ?? null;
+    if (parentModuleId) {
+      const superModule = parent.getModule(parentModuleId) ?? null;
+      this.setSelectedModule(superModule);
+    }
   }
 
   updateLayout() {

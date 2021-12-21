@@ -64,7 +64,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
               <>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={onAboutClick}
+                    onClick={() => store.expand(selectedModule)}
                     disabled={!selectedModule.hasSubmodules}
                   >
                     <ListItemIcon>
@@ -75,8 +75,8 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={onAboutClick}
-                    disabled={selectedModule?.moduleLevel === 1}
+                    onClick={() => store.regroup(selectedModule)}
+                    disabled={selectedModule.isTopModule}
                   >
                     <ListItemIcon>
                       <CompressIcon />
