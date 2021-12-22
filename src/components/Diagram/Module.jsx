@@ -41,9 +41,7 @@ const Module = observer(function Module({ module, fillColor }) {
       dragListener={false}
       dragControls={dragControls}
       dragSnapToOrigin
-      onDragStart={(event) => {
-        raise(ref.current);
-      }}
+      onDragStart={() => raise(ref.current)}
       onDrag={(event, info) => {
         console.log(event, info);
       }}
@@ -58,13 +56,13 @@ const Module = observer(function Module({ module, fillColor }) {
           key={group.id}
           className="group"
           initial={false}
-          animate={{ ...group.layout }}
+          animate={group.layout}
           fill={fillColor(group)}
         />
       ))}
 
       {showModuleId && (
-        <text
+        <motion.text
           fontSize={fontSize}
           textAnchor="middle"
           dy={3}
@@ -72,23 +70,25 @@ const Module = observer(function Module({ module, fillColor }) {
           strokeWidth={3}
           paintOrder="stroke"
           strokeLinecap="round"
-          {...module.idPosition}
+          initial={false}
+          animate={module.idPosition}
         >
           {module.moduleId}
-        </text>
+        </motion.text>
       )}
 
       {showModuleNames && module.textAnchor != null && (
-        <text
+        <motion.text
           fontSize={fontSize}
           textAnchor={module.textAnchor}
           dy={3}
           strokeWidth={0}
           fill={isSelected ? "#f00" : "#000"}
-          {...module.namePosition}
+          initial={false}
+          animate={module.namePosition}
         >
           {module.largestLeafNodes.join(", ")}
-        </text>
+        </motion.text>
       )}
     </motion.g>
   );

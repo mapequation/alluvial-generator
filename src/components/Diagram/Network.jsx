@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { useContext } from "react";
+import { motion } from "framer-motion";
 import { StoreContext } from "../../store";
 import LinearGradients from "./LinearGradients";
 import Streamline from "./Streamline";
@@ -27,15 +28,16 @@ const Network = observer(function Network({ network, groupFillColor }) {
         <LinearGradients activeIndices={activeIndices} />
       </defs>
       {showNetworkNames && (
-        <text
+        <motion.text
           className="name"
           fontSize={fontSize}
           dy={3}
           textAnchor="middle"
-          {...network.namePosition}
+          initial={false}
+          animate={network.namePosition}
         >
           {network.name}
-        </text>
+        </motion.text>
       )}
 
       {links.map((link) => (

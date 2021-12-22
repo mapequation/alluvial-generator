@@ -255,6 +255,13 @@ export class Store {
     this.toggleUpdate();
   }
 
+  resetLayout() {
+    this.diagram.root.children.forEach(
+      (network) => (network.isCustomSorted = false)
+    );
+    this.updateLayout();
+  }
+
   toggleUpdate() {
     this.updateFlag = !this.updateFlag;
   }

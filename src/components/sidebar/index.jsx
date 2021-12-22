@@ -4,6 +4,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ExpandIcon from "@mui/icons-material/Expand";
 import CompressIcon from "@mui/icons-material/Compress";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   Chip,
   Collapse,
@@ -89,7 +90,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => store.expand(selectedModule)}
-                    disabled={!selectedModule.hasSubmodules}
+                    disabled={selectedModule.isLeafModule}
                   >
                     <ListItemIcon>
                       <ExpandIcon />
@@ -189,6 +190,15 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
         </TransitionGroup>
 
         <ListSubheader color="primary">Layout</ListSubheader>
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => store.resetLayout()}>
+            <ListItemIcon>
+              <RestartAltIcon />
+            </ListItemIcon>
+            <ListItemText>Sort modules</ListItemText>
+          </ListItemButton>
+        </ListItem>
 
         <Slider
           label="Height"
