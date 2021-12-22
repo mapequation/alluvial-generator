@@ -35,6 +35,7 @@ const Network = observer(function Network({ network, groupFillColor }) {
           textAnchor="middle"
           initial={false}
           animate={network.namePosition}
+          transition={{ bounce: 0, duration: 0.2 }}
         >
           {network.name}
         </motion.text>

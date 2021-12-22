@@ -27,6 +27,8 @@ const Module = observer(function Module({ module, fillColor }) {
     },
   });
 
+  const transition = { bounce: 0, duration: 0.2 };
+
   return (
     <motion.g
       ref={ref}
@@ -57,6 +59,7 @@ const Module = observer(function Module({ module, fillColor }) {
           className="group"
           initial={false}
           animate={group.layout}
+          transition={transition}
           fill={fillColor(group)}
         />
       ))}
@@ -72,6 +75,7 @@ const Module = observer(function Module({ module, fillColor }) {
           strokeLinecap="round"
           initial={false}
           animate={module.idPosition}
+          transition={transition}
         >
           {module.moduleId}
         </motion.text>
@@ -86,6 +90,7 @@ const Module = observer(function Module({ module, fillColor }) {
           fill={isSelected ? "#f00" : "#000"}
           initial={false}
           animate={module.namePosition}
+          transition={transition}
         >
           {module.largestLeafNodes.join(", ")}
         </motion.text>

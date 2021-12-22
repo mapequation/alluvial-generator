@@ -12,6 +12,7 @@ export default function Streamline({ link, opacity }) {
       fill={LinearGradients.fill(link)}
       initial={{ opacity: 0 }}
       animate={{ opacity, d }}
+      transition={{ bounce: 0, duration: 0.2 }}
       exit={{ opacity: 0 }}
     />
   );
