@@ -4,11 +4,13 @@ import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
+import { moveItem } from "../utils/array";
 
 export default class Network extends AlluvialNodeBase<Module, Root> {
   readonly depth = NETWORK;
   flowThreshold: number = 0;
   name: string;
+  isCustomSorted = false;
   readonly codelength: number;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
@@ -97,6 +99,10 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
 
   getLeafNode(identifier: string): LeafNode | null {
     return this.nodesByIdentifier.get(identifier) ?? null;
+  }
+
+  moveToIndex(fromIndex: number, toIndex: number) {
+    moveItem(this.children, fromIndex, toIndex);
   }
 
   getModuleNames(): any[] {

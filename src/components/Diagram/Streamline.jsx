@@ -1,18 +1,18 @@
+import { motion } from "framer-motion";
 import LinearGradients from "./LinearGradients";
 import { streamlineHorizontal } from "../../utils/streamline";
 
 const streamlineGenerator = streamlineHorizontal();
 
 export default function Streamline({ link, opacity }) {
+  const d = streamlineGenerator(link.path);
   return (
-    <path
+    <motion.path
       className="streamline"
       fill={LinearGradients.fill(link)}
-      strokeWidth={1}
-      vectorEffect="non-scaling-stroke"
-      paintOrder="stroke"
-      opacity={opacity}
-      d={streamlineGenerator(link.path)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity, d }}
+      exit={{ opacity: 0 }}
     />
   );
 }

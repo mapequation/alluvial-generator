@@ -115,6 +115,10 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.moduleLevel === 1;
   }
 
+  get isLeafModule() {
+    return !this.hasSubmodules;
+  }
+
   private get maxModuleLevel() {
     // FIXME optimize
     let maxModuleLevel = this.moduleLevel;
@@ -167,6 +171,11 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       return;
     }
 
+    const network = this.parent;
+    if (!network) return;
+
+    network.isCustomSorted = false;
+
     leafNodes.forEach((node) => {
       node.moduleLevel = newModuleLevel;
       node.update();
@@ -194,6 +203,11 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       return false;
     }
 
+    const network = this.parent;
+    if (!network) return;
+
+    network.isCustomSorted = false;
+
     const newModuleLevel = this.moduleLevel - 1;
 
     leafNodes.forEach((node) => {
@@ -202,6 +216,41 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     });
   }
 
+  get parentIndex() {
+    return this.parent?.children.indexOf(this) ?? 0;
+  }
+
+  moveUp() {
+    const index = this.parentIndex;
+
+    const network = this.parent;
+    if (!network) return;
+
+    if (index === network.children.length - 1) {
+      console.warn(`Can't move module up because it is already at the top`);
+      return;
+    }
+
+    network.isCustomSorted = true;
+    network.moveToIndex(index, index + 1);
+  }
+
+  moveDown() {
+    const index = this.parentIndex;
+
+    if (index === 0) {
+      console.warn(
+        `Can't move module down because it is already at the bottom`
+      );
+      return;
+    }
+
+    const network = this.parent;
+    if (!network) return;
+
+    network.isCustomSorted = true;
+    network.moveToIndex(index, index - 1);
+  }
 
   *rightStreamlines() {
     for (let group of this) {

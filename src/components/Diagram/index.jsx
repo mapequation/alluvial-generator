@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { observer } from "mobx-react";
 import { useContext } from "react";
+import { LayoutGroup } from "framer-motion";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import DropShadows from "./DropShadows";
@@ -28,13 +29,15 @@ export default observer(function Diagram() {
       </defs>
       <ZoomableSvg>
         <g transform={translateCenter(diagram.root)}>
-          {diagram.root.children.map((network) => (
-            <Network
-              key={network.id}
-              network={network}
-              groupFillColor={groupFillColor}
-            />
-          ))}
+          <LayoutGroup>
+            {diagram.root.children.map((network) => (
+              <Network
+                key={network.id}
+                network={network}
+                groupFillColor={groupFillColor}
+              />
+            ))}
+          </LayoutGroup>
         </g>
       </ZoomableSvg>
     </svg>

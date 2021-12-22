@@ -1,15 +1,14 @@
 import { observer } from "mobx-react";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
+import { motion, useDragControls } from "framer-motion";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
 import useOnClick from "../../hooks/useOnClick";
 import raise from "../../utils/raise";
-import * as d3 from "d3";
-
-const drag = d3.drag().filter((event) => event.shiftKey);
 
 const Module = observer(function Module({ module, fillColor }) {
   const store = useContext(StoreContext);
+  const dragControls = useDragControls();
   const ref = useRef();
 
   const { fontSize, showModuleId, showModuleNames } = store;
@@ -18,10 +17,7 @@ const Module = observer(function Module({ module, fillColor }) {
   const isSelected = store.selectedModule === module;
 
   const handler = useOnClick({
-    onClick: () => {
-      raise(ref?.current);
-      store.setSelectedModule(module);
-    },
+    onClick: () => store.setSelectedModule(module),
     onDoubleClick: (event) => {
       if (event.shiftKey) {
         store.regroup(module);
@@ -31,28 +27,38 @@ const Module = observer(function Module({ module, fillColor }) {
     },
   });
 
-  useEffect(() => {
-    d3.select(ref.current).call(
-      drag.on("drag", function (event) {
-        const { y } = event;
-        d3.select(this).attr("transform", `translate(0, ${y})`);
-        console.log(event);
-      })
-    );
-  }, []);
-
   return (
-    <g
+    <motion.g
       ref={ref}
       className={`${isSelected ? "module selected" : "module"}`}
       style={{ filter: dropShadow(module) }}
       onClick={handler}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      whileDrag={{ opacity: 0.5 }}
+      drag="y"
+      dragListener={false}
+      dragControls={dragControls}
+      dragSnapToOrigin
+      onDragStart={(event) => {
+        raise(ref.current);
+      }}
+      onDrag={(event, info) => {
+        console.log(event, info);
+      }}
     >
       {module.children.map((group) => (
-        <rect
+        <motion.rect
+          onPointerDown={(event) => {
+            if (event.shiftKey) {
+              dragControls.start(event);
+            }
+          }}
           key={group.id}
           className="group"
-          {...group.layout}
+          initial={false}
+          animate={{ ...group.layout }}
           fill={fillColor(group)}
         />
       ))}
@@ -84,7 +90,7 @@ const Module = observer(function Module({ module, fillColor }) {
           {module.largestLeafNodes.join(", ")}
         </text>
       )}
-    </g>
+    </motion.g>
   );
 });
 

@@ -1,5 +1,7 @@
 import UploadIcon from "@mui/icons-material/Upload";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ExpandIcon from "@mui/icons-material/Expand";
 import CompressIcon from "@mui/icons-material/Compress";
 import {
@@ -62,6 +64,28 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           <Collapse key={selectedModule != null ? "module" : "no-module"}>
             {selectedModule != null ? (
               <>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => store.moveSelectedModule(true)}
+                    disabled={store.selectedModule === null}
+                  >
+                    <ListItemIcon>
+                      <ArrowUpwardIcon />
+                    </ListItemIcon>
+                    <ListItemText>Move up</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => store.moveSelectedModule(false)}
+                    disabled={store.selectedModule === null}
+                  >
+                    <ListItemIcon>
+                      <ArrowDownwardIcon />
+                    </ListItemIcon>
+                    <ListItemText>Move down</ListItemText>
+                  </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => store.expand(selectedModule)}

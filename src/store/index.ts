@@ -102,6 +102,7 @@ export class Store {
       // methods
       updateLayout: action,
       toggleUpdate: action,
+      moveSelectedModule: action,
     });
   }
 
@@ -256,6 +257,15 @@ export class Store {
 
   toggleUpdate() {
     this.updateFlag = !this.updateFlag;
+  }
+
+  moveSelectedModule(up: boolean) {
+    if (!this.selectedModule) return;
+
+    if (up) this.selectedModule.moveUp();
+    else this.selectedModule.moveDown();
+
+    this.updateLayout();
   }
 }
 

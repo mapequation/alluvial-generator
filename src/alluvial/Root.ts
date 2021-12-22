@@ -200,11 +200,26 @@ export default class Root extends AlluvialNodeBase<Network> {
           getNodeSize = getNodeSizeByProp(moduleSize);
           node.flowThreshold = flowThreshold;
           networkIndex = i;
-          new Tree(node.children, getNodeSizeByProp(sortModulesBy))
-            .sort()
-            .flatten()
-            .forEach((child: Module, index: number) => (child.index = index));
-          node.children.sort((a, b) => a.index - b.index);
+
+          const visibleModules = node.children.filter(
+            (module) => module.isVisible
+          );
+          const invisibleModules = node.children.filter(
+            (module) => !module.isVisible
+          );
+
+          if (!node.isCustomSorted) {
+            new Tree(visibleModules, getNodeSizeByProp(sortModulesBy))
+              .sort()
+              .flatten()
+              .forEach(
+                (module: Module, index: number) => (module.index = index)
+              );
+            visibleModules.sort((a, b) => a.index - b.index);
+          }
+
+          node.children = [...visibleModules, ...invisibleModules];
+
           if (i > 0) x += networkWidth;
           y = height;
         } else if (node instanceof Module && getNodeSize) {
