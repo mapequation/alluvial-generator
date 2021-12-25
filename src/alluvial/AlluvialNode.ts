@@ -119,6 +119,10 @@ export default abstract class AlluvialNode<
     );
   }
 
+  get childFlow(): number {
+    return this.children.reduce((tot, child) => tot + child.flow, 0);
+  }
+
   getAncestor(depth: Depth): Ancestors<this> | null {
     if (this.depth === depth) return this;
     if (!this.parent || this.depth < depth) return null;

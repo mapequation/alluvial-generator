@@ -133,16 +133,10 @@ export default class Root extends AlluvialNodeBase<Network> {
 
   calcFlow() {
     console.time("Root.calcFlow");
-    this.forEachDepthFirstPostOrder((node) => {
-      if (node instanceof HighlightGroup) {
-        node.flow = node.left.flow;
-      } else if (node.depth < Depth.LEAF_NODE) {
-        node.flow = node.children.reduce(
-          (total, child) => total + child.flow,
-          0
-        );
-      }
-    });
+    this.forEachDepthFirstPostOrderWhile(
+      (node: any) => node.depth < Depth.LEAF_NODE,
+      (node: any) => (node.flow = node.childFlow)
+    );
     console.timeEnd("Root.calcFlow");
   }
 

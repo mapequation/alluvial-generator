@@ -66,6 +66,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     return this.treePath.ancestorAtLevelAsString(this.moduleLevel);
   }
 
+  get childFlow() {
+    return this.flow;
+  }
+
   getParent(side: Side) {
     return side === LEFT ? this.leftParent : this.rightParent;
   }

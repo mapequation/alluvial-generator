@@ -50,6 +50,10 @@ export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
     return this.left.numLeafNodes;
   }
 
+  get childFlow() {
+    return this.left.childFlow;
+  }
+
   *leafNodes() {
     yield* this.left.leafNodes();
   }

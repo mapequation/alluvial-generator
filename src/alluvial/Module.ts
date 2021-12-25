@@ -119,6 +119,10 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return !this.hasSubmodules;
   }
 
+  get parentIndex() {
+    return this.parent?.children.indexOf(this) ?? 0;
+  }
+
   private get maxModuleLevel() {
     // FIXME optimize
     let maxModuleLevel = this.moduleLevel;
@@ -214,10 +218,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       node.moduleLevel = newModuleLevel;
       node.update();
     });
-  }
-
-  get parentIndex() {
-    return this.parent?.children.indexOf(this) ?? 0;
   }
 
   moveUp() {

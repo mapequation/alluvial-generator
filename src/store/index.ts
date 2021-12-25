@@ -22,7 +22,7 @@ export class Store {
   numNetworks = 0;
 
   height: number = 600;
-  duration: number = 400;
+  duration: number = 0.2;
   marginExponent: number = 5;
   moduleWidth: number = 100;
   streamlineFraction: number = 2;
@@ -132,7 +132,6 @@ export class Store {
   }
 
   setDuration(duration: number) {
-    // TODO remove
     this.duration = duration;
   }
 
