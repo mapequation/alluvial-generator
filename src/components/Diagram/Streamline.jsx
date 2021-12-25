@@ -8,6 +8,7 @@ export default function Streamline({ link, opacity }) {
   const d = streamlineGenerator(link.path);
   return (
     <motion.path
+      id={link.id}
       className="streamline"
       fill={LinearGradients.fill(link)}
       initial={{ opacity: 0 }}
