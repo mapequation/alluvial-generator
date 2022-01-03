@@ -12,6 +12,17 @@ export type VerticalAlign = "bottom" | "justify" | "top";
 
 export type ModuleSize = "flow" | "nodes";
 
+export interface LayoutOpts {
+  height: number;
+  streamlineFraction: number;
+  moduleWidth: number;
+  flowThreshold: number;
+  verticalAlign: VerticalAlign;
+  marginExponent: number;
+  moduleSize: ModuleSize;
+  sortModulesBy: ModuleSize;
+}
+
 type NodeProps = { flow: number; numLeafNodes: number };
 type GetNodeSize = (node: NodeProps) => number;
 
@@ -141,16 +152,16 @@ export default class Root extends AlluvialNodeBase<Network> {
     console.timeEnd("Root.calcFlow");
   }
 
-  updateLayout(
-    height: number,
-    streamlineFraction: number,
-    moduleWidth: number,
-    flowThreshold: number,
-    verticalAlign: VerticalAlign = "bottom",
-    marginExponent: number,
-    moduleSize: ModuleSize = "flow",
-    sortModulesBy: ModuleSize = "flow"
-  ) {
+  updateLayout({
+    height,
+    streamlineFraction,
+    moduleWidth,
+    flowThreshold,
+    marginExponent,
+    verticalAlign = "bottom",
+    moduleSize = "flow",
+    sortModulesBy = "flow",
+  }: LayoutOpts) {
     console.time("Root.updateLayout");
     const numNetworks = this.children.length;
 

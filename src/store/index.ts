@@ -28,7 +28,7 @@ export class Store {
   streamlineFraction: number = 2;
   streamlineThreshold: number = 1;
   streamlineOpacity: number = 0.9;
-  moduleFlowThreshold: number = 8e-3;
+  flowThreshold: number = 8e-3;
 
   defaultHighlightColor: string = "#b6b69f";
   highlightColors: typeof schemeSet2[] = [].concat(
@@ -75,8 +75,8 @@ export class Store {
       setStreamlineThreshold: action,
       streamlineOpacity: observable,
       setStreamlineOpacity: action,
-      moduleFlowThreshold: observable,
-      setModuleFlowThreshold: action,
+      flowThreshold: observable,
+      setFlowThreshold: action,
       defaultHighlightColor: observable,
       setDefaultHighlightColor: action,
       highlightColors: observable,
@@ -159,8 +159,8 @@ export class Store {
     this.streamlineOpacity = streamlineOpacity;
   }
 
-  setModuleFlowThreshold(moduleFlowThreshold: number) {
-    this.moduleFlowThreshold = moduleFlowThreshold;
+  setFlowThreshold(flowThreshold: number) {
+    this.flowThreshold = flowThreshold;
     this.updateLayout();
   }
 
@@ -241,16 +241,7 @@ export class Store {
   }
 
   updateLayout() {
-    this.diagram.updateLayout(
-      this.height,
-      this.streamlineFraction,
-      this.moduleWidth,
-      this.moduleFlowThreshold,
-      this.verticalAlign,
-      this.marginExponent,
-      this.moduleSize,
-      this.sortModulesBy
-    );
+    this.diagram.updateLayout(this);
     this.toggleUpdate();
   }
 
@@ -271,7 +262,8 @@ export class Store {
     if (up) this.selectedModule.moveUp();
     else this.selectedModule.moveDown();
 
-    this.updateLayout();
+    this.diagram.root.updateLayout(this);
+    this.toggleUpdate();
   }
 }
 

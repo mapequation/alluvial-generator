@@ -237,12 +237,12 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
         />
         <Slider
           label="Visible flow"
-          value={(1 - store.moduleFlowThreshold) * 100}
+          value={(1 - store.flowThreshold) * 100}
           min={95}
           max={100}
           step={0.1}
           valueLabelFormat={(value) => value + "%"}
-          onChange={(value) => store.setModuleFlowThreshold(1 - value / 100)}
+          onChange={(value) => store.setFlowThreshold(1 - value / 100)}
         />
         <Slider
           label="Streamline filter"
