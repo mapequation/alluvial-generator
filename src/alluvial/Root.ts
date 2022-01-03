@@ -12,7 +12,8 @@ export type VerticalAlign = "bottom" | "justify" | "top";
 
 export type ModuleSize = "flow" | "nodes";
 
-type GetNodeSize = (node: { flow: number; numLeafNodes: number }) => number;
+type NodeProps = { flow: number; numLeafNodes: number };
+type GetNodeSize = (node: NodeProps) => number;
 
 function getNodeSizeByPropForNetwork(
   { numLeafNodes }: Network,
@@ -20,9 +21,9 @@ function getNodeSizeByPropForNetwork(
 ) {
   return (property: string): GetNodeSize => {
     if (property === "flow") {
-      return (node: any) => node.flow / maxFlow;
+      return (node) => node.flow / maxFlow;
     } else if (property === "nodes") {
-      return (node: any) => node.numLeafNodes / numLeafNodes;
+      return (node) => node.numLeafNodes / numLeafNodes;
     }
     return () => 0;
   };
