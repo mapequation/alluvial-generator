@@ -4,7 +4,6 @@ import { motion, useDragControls } from "framer-motion";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
 import useOnClick from "../../hooks/useOnClick";
-import raise from "../../utils/raise";
 
 const Module = observer(function Module({ module, fillColor }) {
   const store = useContext(StoreContext);
@@ -38,23 +37,9 @@ const Module = observer(function Module({ module, fillColor }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      whileDrag={{ opacity: 0.5 }}
-      drag="y"
-      dragListener={false}
-      dragControls={dragControls}
-      dragSnapToOrigin
-      onDragStart={() => raise(ref.current)}
-      onDrag={(event, info) => {
-        console.log(event, info);
-      }}
     >
       {module.children.map((group) => (
         <motion.rect
-          onPointerDown={(event) => {
-            if (event.shiftKey) {
-              dragControls.start(event);
-            }
-          }}
           key={group.id}
           className="group"
           initial={false}

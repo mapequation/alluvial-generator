@@ -3,10 +3,7 @@ import { useContext, useEffect, useRef } from "react";
 import { StoreContext } from "../../store";
 import useEventListener from "../../hooks/useEventListener";
 
-const zoom = d3
-  .zoom()
-  .scaleExtent([0.1, 1000])
-  .filter((event) => !event.shiftKey);
+const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 
 export default function ZoomableSvg({ width, height, children }) {
   const ref = useRef();
