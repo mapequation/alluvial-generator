@@ -24,7 +24,7 @@ import {
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { TransitionGroup } from "react-transition-group";
-import { StoreContext } from "../../store";
+import { Direction, StoreContext } from "../../store";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
@@ -67,7 +67,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
               <>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => store.moveSelectedModule(true)}
+                    onClick={() => store.moveSelectedModule(Direction.Up)}
                     disabled={store.selectedModule === null}
                   >
                     <ListItemIcon>
@@ -78,7 +78,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => store.moveSelectedModule(false)}
+                    onClick={() => store.moveSelectedModule(Direction.Down)}
                     disabled={store.selectedModule === null}
                   >
                     <ListItemIcon>

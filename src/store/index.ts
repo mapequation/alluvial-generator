@@ -11,6 +11,11 @@ import Diagram from "../alluvial/Diagram";
 import type Module from "../alluvial/Module";
 import TreePath from "../utils/TreePath";
 
+export enum Direction {
+  Up,
+  Down,
+}
+
 export class Store {
   diagram = new Diagram();
 
@@ -256,10 +261,10 @@ export class Store {
     this.updateFlag = !this.updateFlag;
   }
 
-  moveSelectedModule(up: boolean) {
+  moveSelectedModule(direction: Direction) {
     if (!this.selectedModule) return;
 
-    if (up) this.selectedModule.moveUp();
+    if (direction === Direction.Up) this.selectedModule.moveUp();
     else this.selectedModule.moveDown();
 
     this.diagram.root.updateLayout(this);
