@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { LayoutGroup } from "framer-motion";
-import { Direction, StoreContext } from "../../store";
+import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import DropShadows from "./DropShadows";
 import ZoomableSvg from "./ZoomableSvg";
@@ -19,9 +19,9 @@ export default observer(function Diagram() {
 
   useEventListener("keydown", (event) => {
     if (event?.key === "w") {
-      store.moveSelectedModule(Direction.Up);
+      store.moveSelectedModule("up");
     } else if (event?.key === "s") {
-      store.moveSelectedModule(Direction.Down);
+      store.moveSelectedModule("down");
     }
   });
 
