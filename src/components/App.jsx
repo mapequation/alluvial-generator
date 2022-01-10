@@ -1,9 +1,10 @@
 import { Dialog, Drawer } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
+import useEventListener from "../hooks/useEventListener";
 
 export const drawerWidth = 350;
 
@@ -26,17 +27,11 @@ export default function App() {
     setIsLoadOpen(false);
   };
 
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === "l") {
-        openLoad();
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [setIsLoadOpen]);
+  useEventListener("keydown", (event) => {
+    if (event?.key === "l") {
+      openLoad();
+    }
+  });
 
   return (
     <>

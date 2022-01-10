@@ -9,12 +9,21 @@ import ZoomableSvg from "./ZoomableSvg";
 import translateCenter from "./translate-center";
 import "./Diagram.css";
 import Network from "./Network";
+import useEventListener from "../../hooks/useEventListener";
 
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
   const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
+
+  useEventListener("keydown", (event) => {
+    if (event?.key === "w") {
+      store.moveSelectedModule(true);
+    } else if (event?.key === "s") {
+      store.moveSelectedModule(false);
+    }
+  });
 
   return (
     <svg

@@ -40,6 +40,7 @@ import useRaisedShadow from "../hooks/useRaisedShadow";
 import TreePath from "../utils/TreePath";
 import { normalize } from "../utils/math";
 import humanFileSize from "../utils/human-file-size";
+import useEventListener from "../hooks/useEventListener";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
@@ -184,24 +185,17 @@ export default observer(function LoadNetworks({ onClose }) {
     setFiles(newFiles);
   };
 
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === "c" && files.length > 0) {
-        createDiagram();
-      } else if (e.key === "Backspace") {
-        reset();
-      } else if (e.key === "e") {
-        loadExample();
-      }
-    };
+  useEventListener("keydown", (event) => {
+    if (event?.key === "c" && files.length > 0) {
+      createDiagram();
+    } else if (event?.key === "Backspace") {
+      reset();
+    } else if (event?.key === "e") {
+      loadExample();
+    }
+  });
 
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [files, timeoutId, createDiagram, reset, loadExample]);
+  useEffect(() => () => window.clearTimeout(timeoutId), [timeoutId]);
 
   const fileErrors = [...errors, ...rejected];
 

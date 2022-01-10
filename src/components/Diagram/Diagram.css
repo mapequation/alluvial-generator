@@ -20,15 +20,3 @@ g.module.selected {
     stroke: #f00;
     stroke-width: 1;
 }
-
-.drag-mode rect.background {
-    cursor: default;
-}
-
-.drag-mode g.module {
-    cursor: grab;
-}
-
-.drag-mode g.module:active {
-    cursor: grabbing;
-}
