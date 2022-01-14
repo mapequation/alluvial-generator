@@ -22,6 +22,15 @@ export default observer(function Diagram() {
       store.moveSelectedModule("up");
     } else if (event?.key === "s") {
       store.moveSelectedModule("down");
+    } else if (event?.key === "1" && store.selectedModule != null) {
+      store.expand(store.selectedModule);
+    } else if (event?.key === "2" && store.selectedModule != null) {
+      store.regroup(store.selectedModule);
+    } else if (
+      ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event?.key)
+    ) {
+      const direction = event?.key.replace("Arrow", "").toLowerCase() ?? "";
+      store.selectModule(direction);
     }
   });
 
@@ -37,9 +46,9 @@ export default observer(function Diagram() {
         <DropShadows maxLevel={maxDropShadowModuleLevel} />
       </defs>
       <ZoomableSvg>
-        <g transform={translateCenter(diagram.root)}>
+        <g transform={translateCenter(diagram)}>
           <LayoutGroup>
-            {diagram.root.children.map((network) => (
+            {diagram.children.map((network) => (
               <Network
                 key={network.id}
                 network={network}

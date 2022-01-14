@@ -5,6 +5,8 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ExpandIcon from "@mui/icons-material/Expand";
 import CompressIcon from "@mui/icons-material/Compress";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import FormatColorFillIcon from "@mui/icons-material/FormatColorFill";
+import FormatColorResetIcon from "@mui/icons-material/FormatColorReset";
 import {
   Chip,
   Collapse,
@@ -22,14 +24,29 @@ import {
   Switch as MuiSwitch,
 } from "@mui/material";
 import { observer } from "mobx-react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
 import { StoreContext } from "../../store";
+
+function Key({ children }) {
+  return (
+    <span
+      style={{
+        color: "#666",
+        fontSize: "0.875rem",
+        fontWeight: 700,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
   const { selectedModule /*highlightColors, defaultHighlightColor*/ } = store;
   //const [color, setColor] = useState(defaultHighlightColor);
+  const [currentIndex, setCurrentIndex] = useState(0);
   console.log("selectedModule", selectedModule);
 
   const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
@@ -47,6 +64,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
               <UploadIcon />
             </ListItemIcon>
             <ListItemText>Load or arrange</ListItemText>
+            <Key>L</Key>
           </ListItemButton>
         </ListItem>
 
@@ -56,6 +74,83 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
               <HelpCenterIcon />
             </ListItemIcon>
             <ListItemText>Help and shortcuts</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListSubheader color="primary">Colors</ListSubheader>
+
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              store.colorModule(selectedModule, currentIndex);
+              setCurrentIndex((currentIndex + 1) % 20);
+            }}
+            disabled={store.selectedModule === null}
+          >
+            <ListItemIcon>
+              <FormatColorFillIcon />
+            </ListItemIcon>
+            <ListItemText>Paint selected</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              store.colorMatchingModules(selectedModule, currentIndex);
+              setCurrentIndex((currentIndex + 1) % 20);
+            }}
+            disabled={store.selectedModule === null}
+          >
+            <ListItemIcon>
+              <FormatColorFillIcon />
+            </ListItemIcon>
+            <ListItemText>Paint selected module and similar</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              store.colorModuleNodesInAllNetworks(selectedModule, currentIndex);
+              setCurrentIndex((currentIndex + 1) % 20);
+            }}
+            disabled={store.selectedModule === null}
+          >
+            <ListItemIcon>
+              <FormatColorFillIcon />
+            </ListItemIcon>
+            <ListItemText>Paint selected nodes everywhere</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              //store.colorNodesInAllNetworks(selectedModule?.networkId);
+            }}
+          >
+            <ListItemIcon>
+              <FormatColorFillIcon />
+            </ListItemIcon>
+            <ListItemText>Paint all modules by similarity</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              store.colorNodesInAllNetworks(selectedModule?.networkId);
+            }}
+          >
+            <ListItemIcon>
+              <FormatColorFillIcon />
+            </ListItemIcon>
+            <ListItemText>Paint all modules by node assignments</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => store.clearColors()}>
+            <ListItemIcon>
+              <FormatColorResetIcon />
+            </ListItemIcon>
+            <ListItemText>Remove all colors</ListItemText>
           </ListItemButton>
         </ListItem>
 
@@ -74,6 +169,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                       <ArrowUpwardIcon />
                     </ListItemIcon>
                     <ListItemText>Move up</ListItemText>
+                    <Key>W</Key>
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
@@ -85,6 +181,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                       <ArrowDownwardIcon />
                     </ListItemIcon>
                     <ListItemText>Move down</ListItemText>
+                    <Key>S</Key>
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
@@ -96,6 +193,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                       <ExpandIcon />
                     </ListItemIcon>
                     <ListItemText>Expand module</ListItemText>
+                    <Key>1</Key>
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
@@ -107,6 +205,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                       <CompressIcon />
                     </ListItemIcon>
                     <ListItemText>Contract module</ListItemText>
+                    <Key>2</Key>
                   </ListItemButton>
                 </ListItem>
                 <ListItem>

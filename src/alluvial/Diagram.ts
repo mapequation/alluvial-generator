@@ -41,7 +41,7 @@ function getNodeSizeByPropForNetwork(
 }
 
 /*
-                       Root
+                      Diagram
 +--------------------------------------------------------------------------------------------------------------------------+
 |                                                                                                                          |
 |                     Network                                                                                              |
@@ -94,12 +94,16 @@ function getNodeSizeByPropForNetwork(
 |                                                                                                                          |
 +--------------------------------------------------------------------------------------------------------------------------+
  */
-export default class Root extends AlluvialNodeBase<Network> {
+export default class Diagram extends AlluvialNodeBase<Network> {
   readonly depth = ROOT;
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
-  constructor() {
+  constructor(networks: any[] = []) {
     super(null, "", "root");
+
+    for (let network of networks) {
+      this.addNetwork(network);
+    }
   }
 
   getStreamlineNode(id: string) {
@@ -144,12 +148,12 @@ export default class Root extends AlluvialNodeBase<Network> {
   }
 
   calcFlow() {
-    console.time("Root.calcFlow");
+    console.time("Diagram.calcFlow");
     this.forEachDepthFirstPostOrderWhile(
       (node: any) => node.depth < Depth.LEAF_NODE,
       (node: any) => (node.flow = node.childFlow)
     );
-    console.timeEnd("Root.calcFlow");
+    console.timeEnd("Diagram.calcFlow");
   }
 
   updateLayout({
@@ -162,7 +166,7 @@ export default class Root extends AlluvialNodeBase<Network> {
     moduleSize = "flow",
     sortModulesBy = "flow",
   }: LayoutOpts) {
-    console.time("Root.updateLayout");
+    console.time("Diagram.updateLayout");
     const numNetworks = this.children.length;
 
     if (!numNetworks) return;
@@ -380,12 +384,12 @@ export default class Root extends AlluvialNodeBase<Network> {
           x += networkWidth;
           y = height;
           getNodeSize = null;
-        } else if (node instanceof Root) {
+        } else if (node instanceof Diagram) {
           node.layout = { x: 0, y: 0, width: totalWidth, height };
         }
       }
     );
 
-    console.timeEnd("Root.updateLayout");
+    console.timeEnd("Diagram.updateLayout");
   }
 }

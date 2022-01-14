@@ -10,6 +10,8 @@ import {
 import Diagram from "../alluvial/Diagram";
 import type Module from "../alluvial/Module";
 import TreePath from "../utils/TreePath";
+import { LEFT, RIGHT, Side } from "../alluvial/Side";
+import LeafNode from "../alluvial/LeafNode";
 
 export class Store {
   diagram = new Diagram();
@@ -211,6 +213,26 @@ export class Store {
     this.selectedModule = selectedModule;
   }
 
+  selectModule(direction: "up" | "down" | "left" | "right") {
+    if (!this.selectedModule) return;
+
+    if (direction === "up" || direction === "down") {
+      const modules = this.selectedModule.parent?.visibleChildren ?? [];
+      const index = this.selectedModule.parentIndex;
+      if (direction === "up" && index < modules.length - 1) {
+        this.setSelectedModule(modules[index + 1]);
+      } else if (direction === "down" && index > 0) {
+        this.setSelectedModule(modules[index - 1]);
+      }
+    } else if (direction === "left" || direction === "right") {
+      const side = direction === "left" ? LEFT : RIGHT;
+      const modules = this.selectedModule.getSimilarModules(side, 1);
+      if (modules.length) {
+        this.setSelectedModule(modules[0].module);
+      }
+    }
+  }
+
   expand(module: Module) {
     const { parent, moduleId } = module;
     module.expand();
@@ -240,13 +262,103 @@ export class Store {
     }
   }
 
+  colorModule(module: Module, highlightIndex: number, updateLayout = true) {
+    module.setColor(highlightIndex);
+
+    if (updateLayout) {
+      this.updateLayout();
+    }
+  }
+
+  colorMatchingModules(module: Module, highlightIndex: number, side?: Side) {
+    module.setColor(highlightIndex);
+
+    if (!side || side === LEFT) {
+      const left = module.getSimilarModules(LEFT);
+      if (left.length) {
+        this.colorMatchingModules(left[0].module, highlightIndex, LEFT);
+      }
+    }
+
+    if (!side || side === RIGHT) {
+      const right = module.getSimilarModules(RIGHT);
+      if (right.length) {
+        this.colorMatchingModules(right[0].module, highlightIndex, RIGHT);
+      }
+    }
+
+    if (!side) this.updateLayout();
+  }
+
+  colorModuleNodesInAllNetworks(
+    module: Module,
+    highlightIndex: number,
+    updateLayout = true
+  ) {
+    module.setColor(highlightIndex);
+
+    this.diagram.children
+      .filter((network) => network.networkId !== module.networkId)
+      .forEach((network) =>
+        [...module.leafNodes()]
+          .reduce((nodes, node) => {
+            const oppositeNode = network.getLeafNode(node.identifier);
+            if (oppositeNode) {
+              oppositeNode.highlightIndex = highlightIndex;
+              nodes.push(oppositeNode);
+            }
+            return nodes;
+          }, [] as LeafNode[])
+          .forEach((node) => node.update())
+      );
+
+    if (updateLayout) this.updateLayout();
+  }
+
+  colorNodesInAllNetworks(networkId: string | undefined) {
+    this.clearColors(false);
+
+    const network = this.diagram.getNetwork(
+      networkId ?? this.diagram.children[0].networkId
+    );
+
+    const highlightIndices = [...this.highlightColors.keys()];
+
+    network?.children
+      .filter((module) => module.isVisible)
+      .forEach((module, i) => {
+        const highlightIndex = highlightIndices[i % highlightIndices.length];
+        this.colorModuleNodesInAllNetworks(module, highlightIndex, false);
+      });
+
+    this.updateLayout();
+  }
+
+  clearColors(updateLayout = true) {
+    for (let network of this.diagram) {
+      const modules = [];
+      for (let module of network) {
+        for (let highlightGroup of module) {
+          if (highlightGroup.isHighlighted) {
+            modules.push(module);
+            break;
+          }
+        }
+      }
+      modules.forEach((module) => module.removeColors());
+    }
+
+    if (updateLayout) this.updateLayout();
+  }
+
   updateLayout() {
+    this.diagram.calcFlow();
     this.diagram.updateLayout(this);
     this.toggleUpdate();
   }
 
   resetLayout() {
-    this.diagram.root.children.forEach(
+    this.diagram.children.forEach(
       (network) => (network.isCustomSorted = false)
     );
     this.updateLayout();
@@ -262,7 +374,7 @@ export class Store {
     if (direction === "up") this.selectedModule.moveUp();
     else this.selectedModule.moveDown();
 
-    this.diagram.root.updateLayout(this);
+    this.diagram.updateLayout(this);
     this.toggleUpdate();
   }
 }

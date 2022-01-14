@@ -3,8 +3,11 @@ import TreePath from "../utils/TreePath";
 import AlluvialNodeBase from "./AlluvialNode";
 import { MODULE } from "./Depth";
 import type HighlightGroup from "./HighlightGroup";
+import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import type LeafNode from "./LeafNode";
 import type Network from "./Network";
+import { LEFT, Side } from "./Side";
+import { js_div } from "../utils/entropy";
 
 type CustomName = {
   name: string;
@@ -48,7 +51,8 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   }
 
   get largestLeafNodes() {
-    return new PriorityQueue<LeafNode>(5, this.leafNodes()).map(
+    const compare = (a: LeafNode, b: LeafNode) => b.flow - a.flow;
+    return new PriorityQueue<LeafNode>(5, compare, this.leafNodes()).map(
       (node) => node.name
     );
   }
@@ -220,6 +224,19 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     });
   }
 
+  setColor(highlightIndex: number) {
+    const leafNodes = [...this.leafNodes()];
+
+    leafNodes.forEach((node) => {
+      node.highlightIndex = highlightIndex;
+      node.update();
+    });
+  }
+
+  removeColors() {
+    this.setColor(NOT_HIGHLIGHTED);
+  }
+
   moveUp() {
     const index = this.parentIndex;
 
@@ -250,6 +267,72 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     network.isCustomSorted = true;
     network.moveToIndex(index, index - 1);
+  }
+
+  getSimilarModules(side: Side, numModules = 5, threshold = 1e-6) {
+    type Item = { module: Module; similarity: number };
+    const modules = new PriorityQueue(
+      numModules,
+      (a: Item, b: Item) => b.similarity - a.similarity
+    );
+
+    type NodeId = LeafNode["identifier"];
+    type NodeDistribution = { [nodeId: NodeId]: number };
+    const getNodeDistribution = (
+      module: Module
+    ): [NodeDistribution, Set<NodeId>] => {
+      const nodes: { [nodeId: string]: number } = {};
+      for (const node of module.leafNodes()) {
+        nodes[node.identifier] = node.flow;
+      }
+      return [nodes, new Set(Object.keys(nodes))];
+    };
+
+    const [thisNodes, thisIds] = getNodeDistribution(this);
+
+    for (let module of this.connectedModules(side)) {
+      if (!module.isVisible) continue;
+
+      const [otherNodes, otherIds] = getNodeDistribution(module);
+
+      const ids = new Set([...thisIds, ...otherIds]);
+
+      const X: [number[], number[]] = [Array(ids.size), Array(ids.size)];
+
+      let i = 0;
+      for (const id of ids) {
+        X[0][i] = thisNodes[id] ?? 0;
+        X[1][i] = otherNodes[id] ?? 0;
+        ++i;
+      }
+
+      const similarity = 1 - js_div(X[0], X[1], true);
+
+      if (similarity > threshold) {
+        modules.push({ module, similarity });
+      }
+    }
+
+    return modules.toArray();
+  }
+
+  private *connectedModules(side: Side) {
+    const moduleIds = new Set();
+
+    for (let group of this) {
+      const branch = side === LEFT ? group.left : group.right;
+
+      for (let streamlineNode of branch) {
+        const module = streamlineNode.opposite?.getAncestor(
+          MODULE
+        ) as Module | null;
+
+        if (module && !moduleIds.has(module.moduleId)) {
+          moduleIds.add(module.moduleId);
+          yield module;
+        }
+      }
+    }
   }
 
   *rightStreamlines() {

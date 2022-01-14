@@ -1,12 +1,12 @@
 import AlluvialNodeBase from "./AlluvialNode";
-import Root from "./Root";
+import Diagram from "./Diagram";
 import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
 import { moveItem } from "../utils/array";
 
-export default class Network extends AlluvialNodeBase<Module, Root> {
+export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   flowThreshold: number = 0;
   name: string;
@@ -16,7 +16,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   private readonly modulesById: Map<string, Module> = new Map();
 
   constructor(
-    parent: Root,
+    parent: Diagram,
     networkId: string,
     name: string,
     codelength: number
@@ -39,7 +39,7 @@ export default class Network extends AlluvialNodeBase<Module, Root> {
   }
 
   static create(
-    parent: Root,
+    parent: Diagram,
     networkId: string,
     name: string,
     codelength: number

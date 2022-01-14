@@ -1,7 +1,13 @@
-export default class PriorityQueue<T extends { flow: number }> {
-  heap: T[] = [];
+type CompareFn<T> = (a: T, b: T) => number;
 
-  constructor(public numValues: number, values: Iterable<T> = []) {
+export default class PriorityQueue<T = number> {
+  private heap: T[] = [];
+
+  constructor(
+    public numValues: number,
+    private compareFn: CompareFn<T>,
+    values: Iterable<T> = []
+  ) {
     for (const value of values) {
       this.push(value);
     }
@@ -19,7 +25,7 @@ export default class PriorityQueue<T extends { flow: number }> {
     if (this.length < this.numValues) {
       this.heap.push(value);
       this.sort();
-    } else if (value.flow > this.minValue.flow) {
+    } else if (this.compareFn(value, this.minValue) < 0) {
       this.heap.push(value);
       this.sort();
       if (this.length > this.numValues) {
@@ -32,7 +38,15 @@ export default class PriorityQueue<T extends { flow: number }> {
     return this.heap.map(callbackFn);
   }
 
+  [Symbol.iterator](): Iterator<T> {
+    return this.heap[Symbol.iterator]();
+  }
+
+  toArray() {
+    return this.heap;
+  }
+
   private sort() {
-    this.heap.sort((a, b) => b.flow - a.flow);
+    this.heap.sort(this.compareFn);
   }
 }
