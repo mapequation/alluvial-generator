@@ -59,63 +59,38 @@ export class Store {
     makeObservable(this, {
       diagram: observable.ref,
       files: observable.ref,
-      setFiles: action,
       updateFlag: observable,
       numNetworks: observable,
-      setNetworks: action,
       height: observable,
-      setHeight: action,
       duration: observable,
-      setDuration: action,
       marginExponent: observable,
-      setMarginExponent: action,
       moduleWidth: observable,
-      setModuleWidth: action,
       streamlineFraction: observable,
-      setStreamlineFraction: action,
       streamlineThreshold: observable,
-      setStreamlineThreshold: action,
       streamlineOpacity: observable,
-      setStreamlineOpacity: action,
       flowThreshold: observable,
-      setFlowThreshold: action,
       defaultHighlightColor: observable,
-      setDefaultHighlightColor: action,
       highlightColors: observable,
-      setHighlightColors: action,
       verticalAlign: observable,
-      setVerticalAlign: action,
       moduleSize: observable,
-      setModuleSize: action,
       sortModulesBy: observable,
-      setSortModulesBy: action,
       showModuleId: observable,
-      setShowModuleId: action,
       showModuleNames: observable,
-      setShowModuleNames: action,
       showNetworkNames: observable,
-      setShowNetworkNames: action,
       dropShadow: observable,
-      setDropShadow: action,
       fontSize: observable,
-      setFontSize: action,
       selectedModule: observable,
-      setSelectedModule: action,
-      // methods
-      updateLayout: action,
-      toggleUpdate: action,
-      moveSelectedModule: action,
     });
   }
 
-  setNetworks(networks: any[]) {
+  setNetworks = action((networks: any[]) => {
     console.time("Store.setNetworks");
     this.setSelectedModule(null);
     this.diagram = new Diagram(networks);
     this.numNetworks = networks.length;
     this.updateLayout();
     console.timeEnd("Store.setNetworks");
-  }
+  });
 
   addNetwork(network: any) {
     this.diagram.addNetwork(network);
@@ -123,95 +98,95 @@ export class Store {
     this.updateLayout();
   }
 
-  setFiles(files: any[]) {
+  setFiles = action((files: any[]) => {
     this.files = files;
     this.setNetworks(files);
-  }
+  });
 
-  setHeight(height: number) {
+  setHeight = action((height: number) => {
     this.height = height;
     this.updateLayout();
-  }
+  });
 
-  setDuration(duration: number) {
+  setDuration = action((duration: number) => {
     this.duration = duration;
-  }
+  });
 
-  setMarginExponent(marginExponent: number) {
+  setMarginExponent = action((marginExponent: number) => {
     this.marginExponent = marginExponent;
     this.updateLayout();
-  }
+  });
 
-  setModuleWidth(moduleWidth: number) {
+  setModuleWidth = action((moduleWidth: number) => {
     this.moduleWidth = moduleWidth;
     this.updateLayout();
-  }
+  });
 
-  setStreamlineFraction(streamlineFraction: number) {
+  setStreamlineFraction = action((streamlineFraction: number) => {
     this.streamlineFraction = streamlineFraction;
     this.updateLayout();
-  }
+  });
 
-  setStreamlineThreshold(streamlineThreshold: number) {
+  setStreamlineThreshold = action((streamlineThreshold: number) => {
     this.streamlineThreshold = streamlineThreshold;
     this.updateLayout();
-  }
+  });
 
-  setStreamlineOpacity(streamlineOpacity: number) {
+  setStreamlineOpacity = action((streamlineOpacity: number) => {
     this.streamlineOpacity = streamlineOpacity;
-  }
+  });
 
-  setFlowThreshold(flowThreshold: number) {
+  setFlowThreshold = action((flowThreshold: number) => {
     this.flowThreshold = flowThreshold;
     this.updateLayout();
-  }
+  });
 
-  setDefaultHighlightColor(defaultHighlightColor: string) {
+  setDefaultHighlightColor = action((defaultHighlightColor: string) => {
     this.defaultHighlightColor = defaultHighlightColor;
-  }
+  });
 
-  setHighlightColors(highlightColors: typeof schemeSet2[]) {
+  setHighlightColors = action((highlightColors: typeof schemeSet2[]) => {
     this.highlightColors = highlightColors;
-  }
+  });
 
-  setVerticalAlign(verticalAlign: "bottom" | "justify") {
+  setVerticalAlign = action((verticalAlign: "bottom" | "justify") => {
     this.verticalAlign = verticalAlign;
     this.updateLayout();
-  }
+  });
 
-  setModuleSize(moduleSize: "nodes" | "flow") {
+  setModuleSize = action((moduleSize: "nodes" | "flow") => {
     this.moduleSize = moduleSize;
     this.updateLayout();
-  }
+  });
 
-  setSortModulesBy(sortModulesBy: "nodes" | "flow") {
+  setSortModulesBy = action((sortModulesBy: "nodes" | "flow") => {
     this.sortModulesBy = sortModulesBy;
     this.updateLayout();
-  }
+  });
 
-  setShowModuleId(showModuleId: boolean) {
+  setShowModuleId = action((showModuleId: boolean) => {
     this.showModuleId = showModuleId;
-  }
+  });
 
-  setShowModuleNames(showModuleNames: boolean) {
+  setShowModuleNames = action((showModuleNames: boolean) => {
     this.showModuleNames = showModuleNames;
-  }
+  });
 
-  setShowNetworkNames(showNetworkNames: boolean) {
+  setShowNetworkNames = action((showNetworkNames: boolean) => {
     this.showNetworkNames = showNetworkNames;
-  }
+  });
 
-  setDropShadow(dropShadow: boolean) {
+  setDropShadow = action((dropShadow: boolean) => {
     this.dropShadow = dropShadow;
-  }
+  });
 
-  setFontSize(fontSize: number) {
+  setFontSize = action((fontSize: number) => {
     this.fontSize = fontSize;
-  }
+  });
 
-  setSelectedModule(selectedModule: Module | null) {
+  setSelectedModule = action((selectedModule: Module | null) => {
     this.selectedModule = selectedModule;
-  }
+  });
 
   selectModule(direction: "up" | "down" | "left" | "right") {
     if (!this.selectedModule) return;
@@ -364,9 +339,9 @@ export class Store {
     this.updateLayout();
   }
 
-  toggleUpdate() {
+  toggleUpdate = action(() => {
     this.updateFlag = !this.updateFlag;
-  }
+  });
 
   moveSelectedModule(direction: "up" | "down") {
     if (!this.selectedModule) return;
