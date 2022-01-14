@@ -10,6 +10,7 @@ import translateCenter from "./translate-center";
 import "./Diagram.css";
 import Network from "./Network";
 import useEventListener from "../../hooks/useEventListener";
+import { SelectedModule } from "./Module";
 
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
@@ -55,6 +56,7 @@ export default observer(function Diagram() {
                 groupFillColor={groupFillColor}
               />
             ))}
+            <SelectedModule module={store.selectedModule} />
           </LayoutGroup>
         </g>
       </ZoomableSvg>

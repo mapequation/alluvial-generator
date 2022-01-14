@@ -1,13 +1,12 @@
 import { observer } from "mobx-react";
 import { useContext, useRef } from "react";
-import { motion, useDragControls } from "framer-motion";
+import { motion } from "framer-motion";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
 import useOnClick from "../../hooks/useOnClick";
 
 const Module = observer(function Module({ module, fillColor }) {
   const store = useContext(StoreContext);
-  const dragControls = useDragControls();
   const ref = useRef();
 
   const { fontSize, showModuleId, showModuleNames } = store;
@@ -31,7 +30,7 @@ const Module = observer(function Module({ module, fillColor }) {
   return (
     <motion.g
       ref={ref}
-      className={`${isSelected ? "module selected" : "module"}`}
+      className="module"
       style={{ filter: dropShadow(module) }}
       onClick={handler}
       initial={{ opacity: 0 }}
@@ -85,3 +84,21 @@ const Module = observer(function Module({ module, fillColor }) {
 });
 
 export default Module;
+
+export function SelectedModule({ module }) {
+  if (module == null) {
+    return null;
+  }
+
+  return (
+    <motion.rect
+      initial={false}
+      animate={module.layout}
+      transition={{ bounce: 0, duration: 0.2 }}
+      stroke="#f00"
+      strokeWidth="1"
+      pointerEvents="none"
+      fill="none"
+    />
+  );
+}

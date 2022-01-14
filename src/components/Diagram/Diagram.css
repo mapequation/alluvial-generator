@@ -15,8 +15,3 @@ g.module:hover {
     stroke: #128bc2;
     stroke-width: 1;
 }
-
-g.module.selected {
-    stroke: #f00;
-    stroke-width: 1;
-}
