@@ -1,5 +1,3 @@
-import { path } from "d3";
-
 type Position = {
   x0: number;
   y0: number;
@@ -10,15 +8,15 @@ type Position = {
 };
 
 /*
-                    (cpx, p2.y) ________ p2, (x1, y1)
-                      ________/        |
- (x0, y0), p3 ______/                  |
-             |                         | h1
-             |                         |
-          h0 |                  _______|
-             |        ________/         p1
-             |______/
-           p0       (cpx, p0.y)
+                  (cpx, y1) ________ (x1, y1)
+                  ________/        |
+ (x0, y0) ______/                  |
+         |                         | h1
+         |                         |
+      h0 |                  _______|
+         |        ________/         (x1, y1 + h1)
+         |______/
+ (x0, y0 + h0)    (cpx, y0 + h0)
  */
 export function streamlineHorizontal() {
   const threshold = 1e-6;
@@ -26,18 +24,17 @@ export function streamlineHorizontal() {
     y0 = y0 < threshold ? 0 : y0;
     y1 = y1 < threshold ? 0 : y1;
 
-    const p0 = [x0, y0 + h0];
-    const p1 = [x1, y1 + h1];
-    const p2 = [x1, y1];
-    const p3 = [x0, y0];
+    const y2 = y0 + h0;
+    const y3 = y1 + h1;
     const cpx = (x0 + x1) / 2;
 
-    const context = path();
-    context.moveTo(p0[0], p0[1]);
-    context.bezierCurveTo(cpx, p0[1], cpx, p1[1], p1[0], p1[1]);
-    context.lineTo(p2[0], p2[1]);
-    context.bezierCurveTo(cpx, p2[1], cpx, p3[1], p3[0], p3[1]);
-    context.closePath();
-    return context.toString();
+    // prettier-ignore
+    return (
+      "M" + x0 + "," + y2 +
+      "C" + cpx + "," + y2 + "," + cpx + "," + y3 + "," + x1 + "," + y3 +
+      "L" + x1 + "," + y1 +
+      "C" + cpx + "," + y1 + "," + cpx + "," + y0 + "," + x0 + "," + y0 +
+      "Z"
+    );
   };
 }
