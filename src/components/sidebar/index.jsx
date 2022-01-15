@@ -9,7 +9,6 @@ import FormatColorFillIcon from "@mui/icons-material/FormatColorFill";
 import FormatColorResetIcon from "@mui/icons-material/FormatColorReset";
 import {
   Chip,
-  Collapse,
   FormControlLabel,
   List,
   ListItem,
@@ -25,7 +24,6 @@ import {
 } from "@mui/material";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
-import { TransitionGroup } from "react-transition-group";
 import { StoreContext } from "../../store";
 
 function Key({ children }) {
@@ -156,137 +154,101 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 
         <ListSubheader color="primary">Module</ListSubheader>
 
-        <TransitionGroup>
-          <Collapse key={selectedModule != null ? "module" : "no-module"}>
-            {selectedModule != null ? (
-              <>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => store.moveSelectedModule("up")}
-                    disabled={store.selectedModule === null}
-                  >
-                    <ListItemIcon>
-                      <ArrowUpwardIcon />
-                    </ListItemIcon>
-                    <ListItemText>Move up</ListItemText>
-                    <Key>W</Key>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => store.moveSelectedModule("down")}
-                    disabled={store.selectedModule === null}
-                  >
-                    <ListItemIcon>
-                      <ArrowDownwardIcon />
-                    </ListItemIcon>
-                    <ListItemText>Move down</ListItemText>
-                    <Key>S</Key>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => store.expand(selectedModule)}
-                    disabled={selectedModule.isLeafModule}
-                  >
-                    <ListItemIcon>
-                      <ExpandIcon />
-                    </ListItemIcon>
-                    <ListItemText>Expand module</ListItemText>
-                    <Key>1</Key>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => store.regroup(selectedModule)}
-                    disabled={selectedModule.isTopModule}
-                  >
-                    <ListItemIcon>
-                      <CompressIcon />
-                    </ListItemIcon>
-                    <ListItemText>Contract module</ListItemText>
-                    <Key>2</Key>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Network</Label>
-                    {selectedModule?.networkName}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Codelength</Label>
-                    {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Module id</Label>
-                    {selectedModule?.moduleId}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Name</Label>
-                    {selectedModule?.name?.toString()}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Level</Label>
-                    {selectedModule?.moduleLevel}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Flow</Label>
-                    {selectedModule?.flow.toPrecision(3)}
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <Label>Nodes</Label>
-                    {leafNodes.length}
-                  </ListItemText>
-                </ListItem>
-
-                {/* swatch
-            <div
-              style={{
-                margin: "0 1px 2px",
-                padding: "4px",
-                background: "#fff",
-                borderRadius: "4px",
-                boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-                display: "inline-block",
-                cursor: "pointer",
-              }}
-            >
-              <div
-                style={{
-                  width: "25px",
-                  height: "25px",
-                  background: color,
-                }}
-              />
-            </div>
-            <GithubPicker
-              colors={[defaultHighlightColor, ...highlightColors]}
-              onChangeComplete={(color) => setColor(color.hex)}
+        {selectedModule != null ? (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => store.moveSelectedModule("up")}
+                disabled={store.selectedModule === null}
+              >
+                <ListItemIcon>
+                  <ArrowUpwardIcon />
+                </ListItemIcon>
+                <ListItemText>Move up</ListItemText>
+                <Key>W</Key>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => store.moveSelectedModule("down")}
+                disabled={store.selectedModule === null}
+              >
+                <ListItemIcon>
+                  <ArrowDownwardIcon />
+                </ListItemIcon>
+                <ListItemText>Move down</ListItemText>
+                <Key>S</Key>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => store.expand(selectedModule)}
+                disabled={selectedModule.isLeafModule}
+              >
+                <ListItemIcon>
+                  <ExpandIcon />
+                </ListItemIcon>
+                <ListItemText>Expand module</ListItemText>
+                <Key>1</Key>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => store.regroup(selectedModule)}
+                disabled={selectedModule.isTopModule}
+              >
+                <ListItemIcon>
+                  <CompressIcon />
+                </ListItemIcon>
+                <ListItemText>Contract module</ListItemText>
+                <Key>2</Key>
+              </ListItemButton>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Network</Label>
+                {selectedModule?.networkName}
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Codelength</Label>
+                {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Module id</Label>
+                {selectedModule?.moduleId}
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Level</Label>
+                {selectedModule?.moduleLevel}
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Flow</Label>
+                {selectedModule?.flow.toPrecision(3)}
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>
+                <Label>Nodes</Label>
+                {leafNodes.length}
+              </ListItemText>
+            </ListItem>
+          </>
+        ) : (
+          <ListItem>
+            <ListItemText
+              primary="No module selected."
+              secondary="Click on any module."
             />
-            */}
-              </>
-            ) : (
-              <ListItem>
-                <ListItemText
-                  primary="No module selected."
-                  secondary="Click on any module."
-                />
-              </ListItem>
-            )}
-          </Collapse>
-        </TransitionGroup>
+          </ListItem>
+        )}
 
         <ListSubheader color="primary">Layout</ListSubheader>
 
