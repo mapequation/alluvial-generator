@@ -1,44 +1,34 @@
-import UploadIcon from "@mui/icons-material/Upload";
-import HelpCenterIcon from "@mui/icons-material/HelpCenter";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ExpandIcon from "@mui/icons-material/Expand";
-import CompressIcon from "@mui/icons-material/Compress";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import FormatColorFillIcon from "@mui/icons-material/FormatColorFill";
-import FormatColorResetIcon from "@mui/icons-material/FormatColorReset";
 import {
-  Chip,
-  FormControlLabel,
+  Box,
+  Button as CkButton,
+  HStack,
+  Kbd,
   List,
   ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
   Radio,
-  RadioGroup as MuiRadioGroup,
-  Slider as MuiSlider,
-  Stack,
-  Switch as MuiSwitch,
-} from "@mui/material";
+  RadioGroup as CkRadioGroup,
+  Slider as CkSlider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
+  Switch as CkSwitch,
+  Tag,
+  TagLabel,
+  Tooltip,
+} from "@chakra-ui/react";
+import {
+  MdFileUpload,
+  MdHelp,
+  MdOutlineArrowDownward,
+  MdOutlineArrowUpward,
+  MdRestartAlt,
+  MdUnfoldLess,
+  MdUnfoldMore,
+} from "react-icons/md";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
 import { StoreContext } from "../../store";
-
-function Key({ children }) {
-  return (
-    <span
-      style={{
-        color: "#666",
-        fontSize: "0.875rem",
-        fontWeight: 700,
-      }}
-    >
-      {children}
-    </span>
-  );
-}
+import { drawerWidth } from "../App";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
@@ -50,216 +40,153 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
 
   return (
-    <>
-      <List dense>
+    <Box
+      position="fixed"
+      bottom="0"
+      right="0"
+      width={drawerWidth}
+      height="100%"
+      bg="white"
+      zIndex="1"
+      overflowY="scroll"
+      boxShadow="2xl"
+      p="5"
+    >
+      <List spacing={2} fontSize="0.9rem">
         <ListItem>
           <Logo />
         </ListItem>
 
-        <ListItem disablePadding>
-          <ListItemButton onClick={onLoadClick}>
-            <ListItemIcon>
-              <UploadIcon />
-            </ListItemIcon>
-            <ListItemText>Load or arrange</ListItemText>
-            <Key>L</Key>
-          </ListItemButton>
-        </ListItem>
+        <ListItemButton onClick={onLoadClick} leftIcon={<MdFileUpload />}>
+          Load or arrange
+          <Kbd ml="auto">L</Kbd>
+        </ListItemButton>
 
-        <ListItem disablePadding>
-          <ListItemButton onClick={onAboutClick}>
-            <ListItemIcon>
-              <HelpCenterIcon />
-            </ListItemIcon>
-            <ListItemText>Help and shortcuts</ListItemText>
-          </ListItemButton>
-        </ListItem>
+        <ListItemButton onClick={onAboutClick} leftIcon={<MdHelp />}>
+          Help
+        </ListItemButton>
 
-        <ListSubheader color="primary">Colors</ListSubheader>
+        <ListItemHeader>Colors</ListItemHeader>
 
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              store.colorModule(selectedModule, currentIndex);
-              setCurrentIndex((currentIndex + 1) % 20);
-            }}
-            disabled={store.selectedModule === null}
-          >
-            <ListItemIcon>
-              <FormatColorFillIcon />
-            </ListItemIcon>
-            <ListItemText>Paint selected</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              store.colorMatchingModules(selectedModule, currentIndex);
-              setCurrentIndex((currentIndex + 1) % 20);
-            }}
-            disabled={store.selectedModule === null}
-          >
-            <ListItemIcon>
-              <FormatColorFillIcon />
-            </ListItemIcon>
-            <ListItemText>Paint selected module and similar</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              store.colorModuleNodesInAllNetworks(selectedModule, currentIndex);
-              setCurrentIndex((currentIndex + 1) % 20);
-            }}
-            disabled={store.selectedModule === null}
-          >
-            <ListItemIcon>
-              <FormatColorFillIcon />
-            </ListItemIcon>
-            <ListItemText>Paint selected nodes everywhere</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              //store.colorNodesInAllNetworks(selectedModule?.networkId);
-            }}
-          >
-            <ListItemIcon>
-              <FormatColorFillIcon />
-            </ListItemIcon>
-            <ListItemText>Paint all modules by similarity</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              store.colorNodesInAllNetworks(selectedModule?.networkId);
-            }}
-          >
-            <ListItemIcon>
-              <FormatColorFillIcon />
-            </ListItemIcon>
-            <ListItemText>Paint all modules by node assignments</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => store.clearColors()}>
-            <ListItemIcon>
-              <FormatColorResetIcon />
-            </ListItemIcon>
-            <ListItemText>Remove all colors</ListItemText>
-          </ListItemButton>
-        </ListItem>
+        <ListItemButton
+          onClick={() => {
+            store.colorModule(selectedModule, currentIndex);
+            setCurrentIndex((currentIndex + 1) % 20);
+          }}
+          isDisabled={store.selectedModule === null}
+        >
+          Paint selected
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            store.colorMatchingModules(selectedModule, currentIndex);
+            setCurrentIndex((currentIndex + 1) % 20);
+          }}
+          isDisabled={store.selectedModule === null}
+        >
+          Paint selected module and similar
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            store.colorModuleNodesInAllNetworks(selectedModule, currentIndex);
+            setCurrentIndex((currentIndex + 1) % 20);
+          }}
+          isDisabled={store.selectedModule === null}
+        >
+          Paint selected nodes everywhere
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            //store.colorNodesInAllNetworks(selectedModule?.networkId);
+          }}
+        >
+          Paint all modules by similarity
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            store.colorNodesInAllNetworks(selectedModule?.networkId);
+          }}
+        >
+          Paint all modules by node assignments
+        </ListItemButton>
+        <ListItemButton onClick={() => store.clearColors()}>
+          Remove all colors
+        </ListItemButton>
 
-        <ListSubheader color="primary">Module</ListSubheader>
+        <ListItemHeader>Module</ListItemHeader>
 
         {selectedModule != null ? (
           <>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => store.moveSelectedModule("up")}
-                disabled={store.selectedModule === null}
-              >
-                <ListItemIcon>
-                  <ArrowUpwardIcon />
-                </ListItemIcon>
-                <ListItemText>Move up</ListItemText>
-                <Key>W</Key>
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => store.moveSelectedModule("down")}
-                disabled={store.selectedModule === null}
-              >
-                <ListItemIcon>
-                  <ArrowDownwardIcon />
-                </ListItemIcon>
-                <ListItemText>Move down</ListItemText>
-                <Key>S</Key>
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => store.expand(selectedModule)}
-                disabled={selectedModule.isLeafModule}
-              >
-                <ListItemIcon>
-                  <ExpandIcon />
-                </ListItemIcon>
-                <ListItemText>Expand module</ListItemText>
-                <Key>1</Key>
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => store.regroup(selectedModule)}
-                disabled={selectedModule.isTopModule}
-              >
-                <ListItemIcon>
-                  <CompressIcon />
-                </ListItemIcon>
-                <ListItemText>Contract module</ListItemText>
-                <Key>2</Key>
-              </ListItemButton>
+            <ListItemButton
+              onClick={() => store.moveSelectedModule("up")}
+              isDisabled={store.selectedModule === null}
+              leftIcon={<MdOutlineArrowUpward />}
+            >
+              Move up
+              <Kbd ml="auto">W</Kbd>
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => store.moveSelectedModule("down")}
+              isDisabled={store.selectedModule === null}
+              leftIcon={<MdOutlineArrowDownward />}
+            >
+              Move down
+              <Kbd ml="auto">S</Kbd>
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => store.expand(selectedModule)}
+              isDisabled={selectedModule.isLeafModule}
+              leftIcon={<MdUnfoldMore />}
+            >
+              Expand module
+              <Kbd ml="auto">1</Kbd>
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => store.regroup(selectedModule)}
+              isDisabled={selectedModule.isTopModule}
+              leftIcon={<MdUnfoldLess />}
+            >
+              Contract module
+              <Kbd ml="auto">2</Kbd>
+            </ListItemButton>
+
+            <ListItem>
+              <Label>Network</Label>
+              {selectedModule?.networkName}
             </ListItem>
             <ListItem>
-              <ListItemText>
-                <Label>Network</Label>
-                {selectedModule?.networkName}
-              </ListItemText>
+              <Label>Codelength</Label>
+              {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
             </ListItem>
             <ListItem>
-              <ListItemText>
-                <Label>Codelength</Label>
-                {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
-              </ListItemText>
+              <Label>Module id</Label>
+              {selectedModule?.moduleId}
             </ListItem>
             <ListItem>
-              <ListItemText>
-                <Label>Module id</Label>
-                {selectedModule?.moduleId}
-              </ListItemText>
+              <Label>Level</Label>
+              {selectedModule?.moduleLevel}
             </ListItem>
             <ListItem>
-              <ListItemText>
-                <Label>Level</Label>
-                {selectedModule?.moduleLevel}
-              </ListItemText>
+              <Label>Flow</Label>
+              {selectedModule?.flow.toPrecision(3)}
             </ListItem>
             <ListItem>
-              <ListItemText>
-                <Label>Flow</Label>
-                {selectedModule?.flow.toPrecision(3)}
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemText>
-                <Label>Nodes</Label>
-                {leafNodes.length}
-              </ListItemText>
+              <Label>Nodes</Label>
+              {leafNodes.length}
             </ListItem>
           </>
         ) : (
-          <ListItem>
-            <ListItemText
-              primary="No module selected."
-              secondary="Click on any module."
-            />
-          </ListItem>
+          <ListItem>No module selected. Click on any module.</ListItem>
         )}
 
-        <ListSubheader color="primary">Layout</ListSubheader>
+        <ListItemHeader>Layout</ListItemHeader>
 
-        <ListItem disablePadding>
-          <ListItemButton onClick={() => store.resetLayout()}>
-            <ListItemIcon>
-              <RestartAltIcon />
-            </ListItemIcon>
-            <ListItemText>Sort modules</ListItemText>
-          </ListItemButton>
-        </ListItem>
+        <ListItemButton
+          onClick={() => store.resetLayout()}
+          leftIcon={<MdRestartAlt />}
+        >
+          Sort modules
+        </ListItemButton>
 
         <Slider
           label="Height"
@@ -267,7 +194,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           min={400}
           max={2000}
           step={10}
-          onChange={(value) => store.setHeight(value)}
+          onChange={store.setHeight}
         />
         <Slider
           label="Module width"
@@ -275,7 +202,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           min={10}
           max={200}
           step={10}
-          onChange={(value) => store.setModuleWidth(value)}
+          onChange={store.setModuleWidth}
         />
         <Slider
           label="Module spacing"
@@ -284,9 +211,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           max={10}
           step={0.1}
           valueLabelFormat={(value) => Math.round(value * 100) + "%"}
-          onChange={(value) => {
-            return store.setStreamlineFraction(value);
-          }}
+          onChange={store.setStreamlineFraction}
         />
         <Slider
           label="Margin"
@@ -294,7 +219,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           min={1}
           max={6}
           valueLabelFormat={(value) => 2 ** (value - 1)}
-          onChange={(value) => store.setMarginExponent(value)}
+          onChange={store.setMarginExponent}
         />
         <Slider
           label="Visible flow"
@@ -311,7 +236,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           min={0}
           max={5}
           step={0.01}
-          onChange={(value) => store.setStreamlineThreshold(value)}
+          onChange={store.setStreamlineThreshold}
         />
         <Slider
           label="Transparency"
@@ -327,81 +252,132 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           value={store.fontSize}
           min={5}
           max={40}
-          onChange={(value) => store.setFontSize(value)}
+          onChange={store.setFontSize}
         />
 
         <RadioGroup
           legend="Module size"
           value={store.moduleSize}
-          onChange={(value) => store.setModuleSize(value)}
-          options={[
-            { value: "flow", label: "Flow" },
-            { value: "nodes", label: "Nodes" },
-          ]}
+          onChange={store.setModuleSize}
+          options={["flow", "nodes"]}
         />
 
         <RadioGroup
           legend="Module order"
           value={store.sortModulesBy}
-          onChange={(value) => store.setSortModulesBy(value)}
-          options={[
-            { value: "flow", label: "Flow" },
-            { value: "nodes", label: "Nodes" },
-          ]}
+          onChange={store.setSortModulesBy}
+          options={["flow", "nodes"]}
         />
 
         <Switch
           label="Bottom align"
-          checked={store.verticalAlign === "bottom"}
+          isChecked={store.verticalAlign === "bottom"}
           onChange={(value) =>
             store.setVerticalAlign(value ? "bottom" : "justify")
           }
         />
         <Switch
           label="Module ids"
-          checked={store.showModuleId}
-          onChange={(value) => store.setShowModuleId(value)}
+          isChecked={store.showModuleId}
+          onChange={store.setShowModuleId}
         />
         <Switch
           label="Module names"
-          checked={store.showModuleNames}
-          onChange={(value) => store.setShowModuleNames(value)}
+          isChecked={store.showModuleNames}
+          onChange={store.setShowModuleNames}
         />
         <Switch
           label="Network names"
-          checked={store.showNetworkNames}
-          onChange={(value) => store.setShowNetworkNames(value)}
+          isChecked={store.showNetworkNames}
+          onChange={store.setShowNetworkNames}
         />
         <Switch
           label="Drop shadow"
-          checked={store.dropShadow}
-          onChange={(value) => store.setDropShadow(value)}
+          isChecked={store.dropShadow}
+          onChange={store.setDropShadow}
         />
       </List>
-    </>
+    </Box>
   );
 });
 
-function Label({ children }) {
+function Button(props) {
   return (
-    <span style={{ display: "inline-block", width: "50%" }}>{children}</span>
+    <CkButton
+      isFullWidth
+      variant="ghost"
+      size="sm"
+      justifyContent="flex-start"
+      fontWeight={500}
+      {...props}
+    />
   );
 }
 
-function Slider({ label, value, onChange, ...props }) {
+function ListItemButton(props) {
   return (
     <ListItem>
-      <ListItemText>{label}</ListItemText>
-      <MuiSlider
-        sx={{
-          width: "50%",
-        }}
-        size="small"
+      <Button {...props} />
+    </ListItem>
+  );
+}
+
+function ListItemHeader(props) {
+  return (
+    <ListItem
+      {...props}
+      color="blue.600"
+      fontWeight={700}
+      textTransform="uppercase"
+      letterSpacing="tight"
+      fontSize="0.8rem"
+      pt={6}
+    />
+  );
+}
+
+function Label({ children, ...props }) {
+  return (
+    <span style={{ display: "inline-block", width: "50%" }} {...props}>
+      {children}
+    </span>
+  );
+}
+
+function Slider({ label, value, onChange, valueLabelFormat, ...props }) {
+  const [currentValue, setCurrentValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <ListItem>
+      <Label>{label}</Label>
+      <CkSlider
         defaultValue={value}
-        onChangeCommitted={(_, value) => onChange(value)}
-        valueLabelDisplay="auto"
+        w="50%"
+        size="sm"
+        onChange={setCurrentValue}
+        onChangeEnd={onChange}
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
         {...props}
-      />
+      >
+        <SliderTrack>
+          <SliderFilledTrack />
+        </SliderTrack>
+        <Tooltip
+          hasArrow
+          placement="top"
+          bg="blue.600"
+          isOpen={isOpen}
+          label={
+            valueLabelFormat != null
+              ? valueLabelFormat(currentValue)
+              : currentValue
+          }
+        >
+          <SliderThumb />
+        </Tooltip>
+      </CkSlider>
     </ListItem>
   );
 }
@@ -409,17 +385,18 @@ function Slider({ label, value, onChange, ...props }) {
 function RadioGroup({ legend, value, onChange, options }) {
   return (
     <ListItem>
-      <ListItemText>{legend}</ListItemText>
-      <MuiRadioGroup row value={value} onChange={(_, value) => onChange(value)}>
-        {options.map(({ value, label }) => (
-          <FormControlLabel
-            key={value}
-            value={value}
-            control={<Radio size="small" />}
-            label={label}
-          />
-        ))}
-      </MuiRadioGroup>
+      <HStack>
+        <Label>{legend}</Label>
+        <CkRadioGroup value={value} onChange={onChange} size="sm">
+          <HStack>
+            {options.map((value) => (
+              <Radio value={value} key={value}>
+                {value}
+              </Radio>
+            ))}
+          </HStack>
+        </CkRadioGroup>
+      </HStack>
     </ListItem>
   );
 }
@@ -427,10 +404,10 @@ function RadioGroup({ legend, value, onChange, options }) {
 function Switch({ onChange, label, ...props }) {
   return (
     <ListItem>
-      <ListItemText>{label}</ListItemText>
-      <MuiSwitch
-        size="small"
-        onChange={(_, value) => onChange(value)}
+      <Label>{label}</Label>
+      <CkSwitch
+        size="sm"
+        onChange={(event) => onChange(event.target.checked)}
         {...props}
       />
     </ListItem>
@@ -453,18 +430,8 @@ function Logo() {
   };
 
   return (
-    <Stack
-      sx={{ width: "100%" }}
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-    >
-      <Stack
-        direction="row"
-        justifyContent="flex-start"
-        alignItems="center"
-        spacing={3}
-      >
+    <HStack w="100%" justify="space-between" align="center">
+      <HStack justify="flex-start" align="center" spacing={3}>
         <img
           alt="MapEquation"
           width="32px"
@@ -477,12 +444,10 @@ function Logo() {
             <span style={brand.alluvial}>Generator</span>
           </span>
         </div>
-      </Stack>
-      <Chip
-        size="small"
-        variant="outlined"
-        label={"v" + process.env.REACT_APP_VERSION}
-      />
-    </Stack>
+      </HStack>
+      <Tag size="md" borderRadius="full">
+        <TagLabel>{"v" + process.env.REACT_APP_VERSION}</TagLabel>
+      </Tag>
+    </HStack>
   );
 }

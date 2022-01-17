@@ -3,36 +3,27 @@ import {
   parse,
   readFile,
 } from "@mapequation/infomap/parser";
-import ClearIcon from "@mui/icons-material/Clear";
-import DeleteIcon from "@mui/icons-material/Delete";
-import UploadIcon from "@mui/icons-material/Upload";
+import { MdClear, MdOutlineDelete, MdUpload } from "react-icons/md";
 import {
-  Alert,
-  AlertTitle,
   Avatar,
+  Box,
   Button,
-  Card,
-  CardContent,
-  Collapse,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   List,
   ListItem,
-  ListItemText,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Tooltip,
-  Typography,
-} from "@mui/material";
+} from "@chakra-ui/react";
+import { Step, Steps } from "../chakra-ui-steps";
 import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import * as d3 from "d3";
 import { StoreContext } from "../store";
 import id from "../utils/id";
 import "./LoadNetworks.css";
@@ -201,72 +192,91 @@ export default observer(function LoadNetworks({ onClose }) {
 
   return (
     <>
-      <DialogTitle>Load network partitions</DialogTitle>
-      <DialogContent>
-        <MyStepper activeStep={files.length > 0 ? 2 : 1} />
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Load network partitions</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <MyStepper activeStep={files.length > 0 ? 2 : 1} />
 
-        <div className="dropzone" {...getRootProps()}>
-          <Reorder.Group
-            className="parent"
-            axis="x"
-            layoutScroll
-            values={files}
-            onReorder={setFiles}
+          <div className="dropzone" {...getRootProps()}>
+            <Reorder.Group
+              className="parent"
+              axis="x"
+              layoutScroll
+              values={files}
+              onReorder={setFiles}
+            >
+              {files.map((file, i) => (
+                <Item
+                  number={i + 1}
+                  key={file.id}
+                  file={file}
+                  onClick={removeFileId}
+                />
+              ))}
+            </Reorder.Group>
+            <input {...getInputProps()} />
+          </div>
+
+          {errorsOpen && (
+            <>
+              {fileErrors.map(({ file, errors }, i) => (
+                <div>
+                  <h1>{file.name}</h1>
+                  {errors[0].message}
+                </div>
+              ))}
+            </>
+            // <Stack spacing={2} my={2}>
+            //   {fileErrors.map(({ file, errors }, i) => (
+            //     <Alert key={i} severity="error">
+            //       <AlertTitle>{file.name}</AlertTitle>
+            //       {errors[0].message}
+            //     </Alert>
+            //   ))}
+            // </Stack>
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <Button mr={2} onClick={loadExample} variant="outline">
+            Load Example
+          </Button>
+          <Button
+            disabled={files.length === 0}
+            onClick={reset}
+            leftIcon={<MdOutlineDelete />}
+            mr="auto"
+            variant="outline"
           >
-            {files.map((file, i) => (
-              <Item
-                number={i + 1}
-                key={file.id}
-                file={file}
-                onClick={removeFileId}
-              />
-            ))}
-          </Reorder.Group>
-          <input {...getInputProps()} />
-        </div>
-
-        <Collapse in={errorsOpen}>
-          <Stack spacing={2} my={2}>
-            {fileErrors.map(({ file, errors }, i) => (
-              <Alert key={i} severity="error">
-                <AlertTitle>{file.name}</AlertTitle>
-                {errors[0].message}
-              </Alert>
-            ))}
-          </Stack>
-        </Collapse>
-      </DialogContent>
-
-      <DialogActions>
-        <Button variant="outlined" onClick={loadExample}>
-          Load Example
-        </Button>
-        <Button
-          variant="outlined"
-          disabled={files.length === 0}
-          onClick={reset}
-          startIcon={<DeleteIcon />}
-          sx={{ marginRight: "auto" }}
-        >
-          Clear
-        </Button>
-        <Button variant="contained" onClick={open} startIcon={<UploadIcon />}>
-          Open
-        </Button>
-        <Button
-          variant="contained"
-          disabled={files.length === 0}
-          onClick={createDiagram}
-        >
-          Create Diagram
-        </Button>
-      </DialogActions>
+            Clear
+          </Button>
+          <Button
+            onClick={open}
+            mr={2}
+            variant="outline"
+            isActive={files.length === 0}
+            leftIcon={<MdUpload />}
+          >
+            Open
+          </Button>
+          <Button
+            variant="outline"
+            disabled={files.length === 0}
+            isActive={files.length > 0}
+            onClick={createDiagram}
+          >
+            Create Diagram
+          </Button>
+        </ModalFooter>
+      </ModalContent>
     </>
   );
 });
 
-function FileBackground({ file, ...props }) {
-  const colors = d3.interpolateSinebow;
+const FileBackground = observer(function FileBackground({ file, ...props }) {
+  const store = useContext(StoreContext);
   const minFlow = 1e-4;
 
   const values = normalize(
@@ -295,13 +305,13 @@ function FileBackground({ file, ...props }) {
             y={y}
             width="100%"
             height={rectHeight}
-            fill={colors(1 - i / values.length)}
+            fill={store.defaultHighlightColor}
           />
         );
       })}
     </svg>
   );
-}
+});
 
 function Item({ number, file, onClick }) {
   const x = useMotionValue(0);
@@ -324,126 +334,91 @@ function Item({ number, file, onClick }) {
       style={{ boxShadow, x }}
     >
       <FileBackground file={file} style={{ position: "absolute" }} />
-      <Card
-        sx={{
-          maxWidth: "100%",
-          height: "100%",
-          position: "relative",
-          background: "transparent",
-        }}
-        variant="outlined"
-      >
-        <CardContent sx={{ p: "10px" }}>
+      <Box maxW="100%" h="100%" pos="relative" bg="transparent">
+        <Box p={4}>
           <Avatar
-            sx={{
-              bgcolor: "background.paper",
-              boxShadow: 1,
-              color: "text.primary",
-              marginLeft: "-2px",
-            }}
-          >
-            {number}
-          </Avatar>
+            bg="white"
+            boxShadow="md"
+            color="gray.500"
+            name={number.toString()}
+          />
 
           <List
-            dense
-            sx={{
-              bgcolor: "white",
-              boxShadow: 1,
-              borderRadius: "5px",
-              mt: "10px",
-            }}
+            bg="white"
+            fontSize="sm"
+            borderRadius={5}
+            boxShadow="md"
+            p={2}
+            mt={8}
           >
-            <ListItem sx={{ overflowWrap: "anywhere" }}>
+            <ListItem fontWeight={600} overflowWrap="anyhwere">
               {truncatedName.length === file.name.length ? (
-                <ListItemText primary={file.name} />
+                file.name
               ) : (
-                <Tooltip title={file.name}>
-                  <ListItemText primary={truncatedName} />
+                <Tooltip label={file.name} aria-label={file.name}>
+                  {truncatedName}
                 </Tooltip>
               )}
             </ListItem>
 
-            {file.nodes && (
-              <ListItem>
-                <ListItemText primary={file.nodes.length + " nodes"} />
-              </ListItem>
-            )}
+            {file.nodes && <ListItem>{file.nodes.length + " nodes"}</ListItem>}
             {file.numTopModules && (
-              <ListItem>
-                <ListItemText primary={file.numTopModules + " top modules"} />
-              </ListItem>
+              <ListItem>{file.numTopModules + " top modules"}</ListItem>
             )}
             {file.numLevels && (
-              <ListItem>
-                <ListItemText primary={file.numLevels + " levels"} />
-              </ListItem>
+              <ListItem>{file.numLevels + " levels"}</ListItem>
             )}
             {file.codelength && (
-              <ListItem>
-                <ListItemText primary={file.codelength.toFixed(3) + " bits"} />
-              </ListItem>
+              <ListItem>{file.codelength.toFixed(3) + " bits"}</ListItem>
             )}
-            {file.size > 0 && (
-              <ListItem>
-                <ListItemText primary={humanFileSize(file.size)} />
-              </ListItem>
-            )}
+            {file.size > 0 && <ListItem>{humanFileSize(file.size)}</ListItem>}
           </List>
 
           <IconButton
-            size="small"
+            isRound
+            size="xs"
             onClick={() => onClick(file.id)}
             className="delete-button"
-          >
-            <ClearIcon fontSize="small" />
-          </IconButton>
-        </CardContent>
-      </Card>
+            aria-label="delete"
+            color="gray.500"
+            bg="white"
+            variant="unstyled"
+            fontSize="1.5rem"
+            icon={<MdClear />}
+          />
+        </Box>
+      </Box>
     </Reorder.Item>
   );
 }
 
 function MyStepper({ activeStep }) {
   return (
-    <Stepper
+    <Steps
       activeStep={activeStep}
+      size="sm"
+      colorScheme="blue"
       sx={{ margin: "1em auto 2em", width: "90%" }}
     >
-      <Step>
-        <StepLabel
-          optional={
-            <Typography variant="caption">
-              Infomap Online or standalone
-            </Typography>
-          }
-        >
-          <a href="//mapequation.org/infomap">Run Infomap</a>
-        </StepLabel>
-      </Step>
-      <Step>
-        <StepLabel
-          optional={
-            <Typography variant="caption">
-              Infomap output formats: {acceptedFormats}
-            </Typography>
-          }
-        >
-          Load network partitions
-        </StepLabel>
-      </Step>
-      <Step>
-        <StepLabel
-          optional={
-            <Typography variant="caption">
-              Highlight partition differences
-            </Typography>
-          }
-        >
-          Create alluvial diagram
-        </StepLabel>
-      </Step>
-    </Stepper>
+      <Step
+        label="Run Infomap"
+        description={
+          <a href="//mapequation.org/infomap">Infomap Online or standalone</a>
+        }
+      />
+      <Step
+        label="Load network partitions"
+        description={
+          <a href="//mapequation.org/infomap/#Output">
+            Infomap output formats: {acceptedFormats}
+          </a>
+        }
+      />
+      <Step
+        label="Create alluvial diagram"
+        description="Highlight partition differences"
+      />
+    </Steps>
   );
 }
 

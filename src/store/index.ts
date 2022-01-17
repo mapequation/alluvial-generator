@@ -233,7 +233,9 @@ export class Store {
     const parentModuleId = TreePath.parentPath(moduleId)?.toString() ?? null;
     if (parentModuleId) {
       const superModule = parent.getModule(parentModuleId) ?? null;
-      this.setSelectedModule(superModule);
+      if (superModule != null) {
+        this.setSelectedModule(superModule);
+      }
     }
   }
 

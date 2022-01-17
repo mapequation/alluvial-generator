@@ -1,17 +1,19 @@
-import { Dialog, Drawer } from "@mui/material";
 import { useCallback, useState } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
 import useEventListener from "../hooks/useEventListener";
+import { Modal } from "@chakra-ui/react";
 
 export const drawerWidth = 350;
 
 export default function App() {
   const [isLoadOpen, setIsLoadOpen] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+
   const onLoadClose = useCallback(() => setIsLoadOpen(false), [setIsLoadOpen]);
+
   const onAboutClose = useCallback(
     () => setIsAboutOpen(false),
     [setIsAboutOpen]
@@ -35,28 +37,17 @@ export default function App() {
 
   return (
     <>
-      <Dialog open={isLoadOpen} onClose={onLoadClose} maxWidth="lg" fullWidth>
-        <LoadNetworks onClose={onLoadClose} />
-      </Dialog>
-      <Dialog open={isAboutOpen} onClose={onAboutClose} maxWidth="md" fullWidth>
-        <Documentation onClose={onAboutClose} />
-      </Dialog>
+      <Modal size="5xl" isCentered isOpen={isLoadOpen} onClose={onLoadClose}>
+        <LoadNetworks isOpen={isLoadOpen} onClose={onLoadClose} />
+      </Modal>
 
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="permanent"
-        anchor="right"
-      >
-        <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
-      </Drawer>
+      <Modal size="2xl" isOpen={isAboutOpen} onClose={onAboutClose}>
+        <Documentation onClose={onAboutClose} />
+      </Modal>
+
       <Diagram />
+
+      <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
     </>
   );
 }
