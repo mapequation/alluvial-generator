@@ -18,11 +18,12 @@ import {
   ModalHeader,
   ModalOverlay,
   Tooltip,
+  useToast,
 } from "@chakra-ui/react";
 import { Step, Steps } from "../chakra-ui-steps";
 import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { StoreContext } from "../store";
 import id from "../utils/id";
@@ -43,35 +44,25 @@ async function fetchExampleData(filename = exampleDataFilename) {
 
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
+  const toast = useToast();
   const [files, setFiles] = useState(store.files);
-  const [errors, setErrors] = useState([]);
-  const [rejected, setRejected] = useState([]);
-  const [errorsOpen, setErrorsOpen] = useState(false);
-  const [timeoutId, setTimeoutId] = useState(-1);
-
-  const reset = useCallback(() => {
-    setFiles([]);
-    setErrors([]);
-    setRejected([]);
-    setErrorsOpen(false);
-  }, [setFiles, setErrors, setRejected, setErrorsOpen]);
-
-  const showErrors = () => {
-    if (errorsOpen) return;
-    setErrorsOpen(true);
-    setTimeoutId(window.setTimeout(() => setErrorsOpen(false), 5000));
-  };
+  const reset = useCallback(() => setFiles([]), [setFiles]);
 
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
-    onDropRejected: (rejectedFiles) => {
-      setRejected(rejectedFiles);
-      if (rejectedFiles.length > 0) showErrors();
-    },
+    onDropRejected: (rejectedFiles) =>
+      toast({
+        title: "File rejected",
+        description: `${rejectedFiles[0]} is not a valid file format.`,
+        status: "error",
+        duration: 5000,
+        variant: "subtle",
+        isClosable: true,
+      }),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
-      setErrors([]);
+      //setErrors([]);
 
       const readFiles = await Promise.all(acceptedFiles.map(readFile));
       const newFiles = [];
@@ -101,7 +92,7 @@ export default observer(function LoadNetworks({ onClose }) {
               continue;
             }
           } catch (e) {
-            console.error(e);
+            console.warn(e);
             newErrors.push({
               file,
               errors: [
@@ -114,11 +105,25 @@ export default observer(function LoadNetworks({ onClose }) {
             continue;
           }
         } else {
-          contents = parse(readFiles[i]);
+          try {
+            contents = parse(readFiles[i]);
+          } catch (e) {
+            console.warn(e);
+            newErrors.push({
+              file,
+              errors: [
+                {
+                  code: "parse-error",
+                  message: e.message,
+                },
+              ],
+            });
+            continue;
+          }
         }
 
         if (!contents) {
-          console.error(`Could not parse ${file.name}`);
+          console.warn(`Could not parse ${file.name}`);
           newErrors.push({
             file,
             errors: [
@@ -133,19 +138,44 @@ export default observer(function LoadNetworks({ onClose }) {
 
         setIdentifiers(contents.nodes, format);
 
-        newFiles.push(
-          Object.assign(file, {
-            id: id(),
-            format,
-            flowDistribution: calculateFlowDistribution(contents),
-            ...contents,
-          })
-        );
+        try {
+          const flowDistribution = calculateFlowDistribution(contents);
+
+          newFiles.push(
+            Object.assign(file, {
+              id: id(),
+              format,
+              flowDistribution,
+              ...contents,
+            })
+          );
+        } catch (e) {
+          console.warn(e);
+          newErrors.push({
+            file,
+            errors: [
+              {
+                code: "invalid-format",
+                message: e.message,
+              },
+            ],
+          });
+        }
       }
 
       setFiles([...files, ...newFiles]);
-      setErrors(newErrors);
-      if (newErrors.length > 0) showErrors();
+
+      newErrors.forEach(({ file, errors }) => {
+        toast({
+          title: `Could not load ${file.name}`,
+          description: errors.map(({ message }) => message).join("\n"),
+          status: "error",
+          variant: "subtle",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
+
       console.timeEnd("onDrop");
     },
   });
@@ -186,10 +216,6 @@ export default observer(function LoadNetworks({ onClose }) {
     }
   });
 
-  useEffect(() => () => window.clearTimeout(timeoutId), [timeoutId]);
-
-  const fileErrors = [...errors, ...rejected];
-
   return (
     <>
       <ModalOverlay />
@@ -218,25 +244,6 @@ export default observer(function LoadNetworks({ onClose }) {
             </Reorder.Group>
             <input {...getInputProps()} />
           </div>
-
-          {errorsOpen && (
-            <>
-              {fileErrors.map(({ file, errors }, i) => (
-                <div>
-                  <h1>{file.name}</h1>
-                  {errors[0].message}
-                </div>
-              ))}
-            </>
-            // <Stack spacing={2} my={2}>
-            //   {fileErrors.map(({ file, errors }, i) => (
-            //     <Alert key={i} severity="error">
-            //       <AlertTitle>{file.name}</AlertTitle>
-            //       {errors[0].message}
-            //     </Alert>
-            //   ))}
-            // </Stack>
-          )}
         </ModalBody>
 
         <ModalFooter>
