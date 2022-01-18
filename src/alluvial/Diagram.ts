@@ -126,14 +126,10 @@ export default class Diagram extends AlluvialNodeBase<Network> {
 
   addNetwork(network: any) {
     // FIXME remove any
-    const { nodes, id, codelength, name, moduleNames } = network;
+    const { nodes, id, codelength, name } = network;
 
     if (this.children.some((network) => network.networkId === id)) {
       throw new Error(`Network with id ${id} already exists`);
-    }
-
-    if (moduleNames) {
-      Module.customNames = new Map([...Module.customNames, ...moduleNames]);
     }
 
     Network.create(this, id, name, codelength).addNodes(nodes);

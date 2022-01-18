@@ -9,18 +9,13 @@ import type Network from "./Network";
 import { LEFT, Side } from "./Side";
 import { js_div } from "../utils/entropy";
 
-type CustomName = {
-  name: string;
-  flow: number;
-};
-
 export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
-  static customNames: Map<string, CustomName> = new Map(); // FIXME should this really be static?
   readonly depth = MODULE;
   readonly path: number[] = [];
   readonly moduleId: string;
   margin: number = 0;
   index: number;
+  name: string = "";
   readonly moduleLevel: number = 1;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
@@ -28,26 +23,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
-    const customName = Module.customNames.get(this.id);
-    this._name = customName ? [customName.name] : this.subModuleNames();
     this.index = parent.addChild(this) - 1;
-  }
-
-  private _name: string[] | null = null;
-
-  get name() {
-    // @ts-ignore
-    return this._name;
-  }
-
-  set name(name: string | null) {
-    if (!name || name === "") {
-      Module.customNames.delete(this.id);
-      this._name = this.subModuleNames();
-    } else {
-      Module.customNames.set(this.id, { name, flow: this.flow });
-      this._name = [name];
-    }
   }
 
   get largestLeafNodes() {
@@ -349,13 +325,5 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
         if (streamlineNode.link) yield streamlineNode.link;
       }
     }
-  }
-
-  private subModuleNames() {
-    const names = Array.from(Module.customNames.entries())
-      .filter(([id, ..._]) => id.startsWith(this.id))
-      .sort((a, b) => a[1].flow - b[1].flow)
-      .map(([_, { name }]) => name);
-    return names.length ? names : null;
   }
 }

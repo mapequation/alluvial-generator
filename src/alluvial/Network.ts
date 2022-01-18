@@ -105,13 +105,6 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     moveItem(this.children, fromIndex, toIndex);
   }
 
-  getModuleNames(): any[] {
-    // FIXME
-    return Array.from(Module.customNames.entries()).filter(([key, _]) =>
-      key.startsWith(this.id)
-    );
-  }
-
   getLinks(streamlineThreshold: number = 0) {
     return Array.from(this.rightStreamlines())
       .filter((link) => link.avgHeight > streamlineThreshold)

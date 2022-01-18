@@ -184,6 +184,21 @@ export class Store {
     this.fontSize = fontSize;
   });
 
+  setNetworkName = (networkId: string) =>
+    action((name: string) => {
+      const network = this.diagram.getNetwork(networkId);
+      if (network) {
+        network.name = name;
+        this.toggleUpdate();
+      }
+    });
+
+  setModuleName = (module: Module) =>
+    action((name: string) => {
+      module.name = name;
+      this.toggleUpdate();
+    });
+
   setSelectedModule = action((selectedModule: Module | null) => {
     this.selectedModule = selectedModule;
   });

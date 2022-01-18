@@ -1,6 +1,9 @@
 import {
   Box,
   Button as CkButton,
+  Editable,
+  EditableInput,
+  EditablePreview,
   HStack,
   Kbd,
   List,
@@ -152,23 +155,43 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 
             <ListItem>
               <Label>Network</Label>
-              {selectedModule?.networkName}
+              <Editable
+                w="50%"
+                display="inline-block"
+                defaultValue={selectedModule.networkName || "Click to set name"}
+                onSubmit={store.setNetworkName(selectedModule.networkId)}
+              >
+                <EditablePreview />
+                <EditableInput />
+              </Editable>
+            </ListItem>
+            <ListItem>
+              <Label>Module name</Label>
+              <Editable
+                w="50%"
+                display="inline-block"
+                defaultValue={selectedModule.name || "Click to set name"}
+                onSubmit={store.setModuleName(selectedModule)}
+              >
+                <EditablePreview />
+                <EditableInput />
+              </Editable>
             </ListItem>
             <ListItem>
               <Label>Codelength</Label>
-              {selectedModule?.networkCodelength.toPrecision(3) + " bits"}
+              {selectedModule.networkCodelength.toPrecision(3) + " bits"}
             </ListItem>
             <ListItem>
               <Label>Module id</Label>
-              {selectedModule?.moduleId}
+              {selectedModule.moduleId}
             </ListItem>
             <ListItem>
               <Label>Level</Label>
-              {selectedModule?.moduleLevel}
+              {selectedModule.moduleLevel}
             </ListItem>
             <ListItem>
               <Label>Flow</Label>
-              {selectedModule?.flow.toPrecision(3)}
+              {selectedModule.flow.toPrecision(3)}
             </ListItem>
             <ListItem>
               <Label>Nodes</Label>

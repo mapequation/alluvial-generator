@@ -76,7 +76,7 @@ const Module = observer(function Module({ module, fillColor }) {
           animate={module.namePosition}
           transition={transition}
         >
-          {module.largestLeafNodes.join(", ")}
+          {module.name || module.largestLeafNodes.join(", ")}
         </motion.text>
       )}
     </motion.g>
