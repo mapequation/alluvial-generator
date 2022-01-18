@@ -21,6 +21,8 @@ export default observer(function Diagram() {
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
 
+    event.preventDefault();
+
     if (event?.key === "w") {
       store.moveSelectedModule("up");
     } else if (event?.key === "s") {
