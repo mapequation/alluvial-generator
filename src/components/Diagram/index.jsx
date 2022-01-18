@@ -25,9 +25,9 @@ export default observer(function Diagram() {
       store.moveSelectedModule("up");
     } else if (event?.key === "s") {
       store.moveSelectedModule("down");
-    } else if (event?.key === "1" && store.selectedModule != null) {
+    } else if (event?.key === "e" && store.selectedModule != null) {
       store.expand(store.selectedModule);
-    } else if (event?.key === "2" && store.selectedModule != null) {
+    } else if (event?.key === "d" && store.selectedModule != null) {
       store.regroup(store.selectedModule);
     } else if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event?.key)

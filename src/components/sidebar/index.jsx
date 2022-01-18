@@ -1,6 +1,7 @@
 import {
   Box,
   Button as CkButton,
+  ButtonGroup,
   Editable,
   EditableInput,
   EditablePreview,
@@ -18,9 +19,11 @@ import {
   Switch as CkSwitch,
   Tag,
   TagLabel,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
 import {
+  MdClear,
   MdFileUpload,
   MdHelp,
   MdOutlineArrowDownward,
@@ -29,10 +32,12 @@ import {
   MdUnfoldLess,
   MdUnfoldMore,
 } from "react-icons/md";
+import { IoMdColorFill } from "react-icons/io";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
 import { COLOR_SCHEMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
+import useEventListener from "../../hooks/useEventListener";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
@@ -41,6 +46,26 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   console.log("selectedModule", selectedModule);
 
   const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
+
+  useEventListener("keydown", (e) => {
+    if (store.editMode) return;
+
+    const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+
+    if (e?.key === "p" && store.selectedModule != null) {
+      store.colorModule(store.selectedModule, color);
+    } else if (numbers.includes(e?.key)) {
+      let index = parseInt(e?.key);
+      if (index === 0) index = 10;
+      index -= 2;
+
+      if (index === -1) {
+        setColor(defaultHighlightColor);
+      } else if (index < store.selectedScheme.length - 1) {
+        setColor(store.selectedScheme[index]);
+      }
+    }
+  });
 
   return (
     <Box
@@ -105,80 +130,134 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           </HStack>
         </ListItem>
 
-        <ListItemButton
-          onClick={() => store.colorModule(selectedModule, color)}
-          isDisabled={store.selectedModule === null}
-        >
-          Paint selected
-        </ListItemButton>
-        <ListItemButton
-          onClick={() => store.colorMatchingModules(selectedModule, color)}
-          isDisabled={store.selectedModule === null}
-        >
-          Paint selected module and similar
-        </ListItemButton>
-        <ListItemButton
-          onClick={() =>
-            store.colorModuleNodesInAllNetworks(selectedModule, color)
-          }
-          isDisabled={store.selectedModule === null}
-        >
-          Paint selected nodes everywhere
-        </ListItemButton>
-        <ListItemButton
-          onClick={() => {
-            //store.colorNodesInAllNetworks(selectedModule?.networkId);
-          }}
-        >
-          Paint all modules by similarity
-        </ListItemButton>
-        <ListItemButton
-          onClick={() => {
-            store.colorNodesInAllNetworks(selectedModule?.networkId);
-          }}
-        >
-          Paint all modules by node assignments
-        </ListItemButton>
-        <ListItemButton onClick={() => store.clearColors()}>
-          Remove all colors
-        </ListItemButton>
+        <ListItem>
+          <ButtonGroup isAttached w="100%">
+            <Button
+              onClick={() => store.colorModule(selectedModule, color)}
+              isDisabled={store.selectedModule === null}
+              justifyContent="center"
+              leftIcon={<IoMdColorFill />}
+            >
+              Paint
+              <Kbd ml={8}>P</Kbd>
+            </Button>
+            <Button
+              onClick={() => store.clearColors()}
+              leftIcon={<MdClear />}
+              justifyContent="center"
+              colorScheme="red"
+            >
+              Clear all
+            </Button>
+          </ButtonGroup>
+        </ListItem>
+
+        <ListItem>
+          <Text
+            color="blue.600"
+            fontWeight={600}
+            textTransform="uppercase"
+            letterSpacing="tight"
+            fontSize="0.75rem"
+            pt={2}
+          >
+            By similarity
+          </Text>
+          <ButtonGroup isAttached w="100%" mt={1}>
+            <Button
+              onClick={() => store.colorMatchingModules(selectedModule, color)}
+              isDisabled={store.selectedModule === null}
+              justifyContent="center"
+            >
+              Paint modules
+            </Button>
+            <Button
+              onClick={() => {
+                store.colorMatchingModulesInAllNetworks();
+              }}
+              justifyContent="center"
+            >
+              Paint all
+            </Button>
+          </ButtonGroup>
+        </ListItem>
+
+        <ListItem>
+          <Text
+            color="blue.600"
+            fontWeight={600}
+            textTransform="uppercase"
+            letterSpacing="tight"
+            fontSize="0.75rem"
+            pt={2}
+          >
+            By node assignments
+          </Text>
+          <ButtonGroup isAttached w="100%" mt={1}>
+            <Button
+              onClick={() =>
+                store.colorModuleNodesInAllNetworks(selectedModule, color)
+              }
+              isDisabled={store.selectedModule === null}
+              justifyContent="center"
+            >
+              Paint modules
+            </Button>
+            <Button
+              onClick={() => {
+                store.colorNodesInAllNetworks(selectedModule?.networkId);
+              }}
+              justifyContent="center"
+            >
+              Paint all
+            </Button>
+          </ButtonGroup>
+        </ListItem>
 
         <ListItemHeader>Module</ListItemHeader>
 
         {selectedModule != null ? (
           <>
-            <ListItemButton
-              onClick={() => store.moveSelectedModule("up")}
-              isDisabled={store.selectedModule === null}
-              leftIcon={<MdOutlineArrowUpward />}
-            >
-              Move up
-              <Kbd ml="auto">W</Kbd>
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => store.moveSelectedModule("down")}
-              isDisabled={store.selectedModule === null}
-              leftIcon={<MdOutlineArrowDownward />}
-            >
-              Move down
-              <Kbd ml="auto">S</Kbd>
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => store.expand(selectedModule)}
-              isDisabled={selectedModule.isLeafModule}
-              leftIcon={<MdUnfoldMore />}
-            >
-              Expand module
-              <Kbd ml="auto">1</Kbd>
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => store.regroup(selectedModule)}
-              isDisabled={selectedModule.isTopModule}
-              leftIcon={<MdUnfoldLess />}
-            >
-              Contract module
-              <Kbd ml="auto">2</Kbd>
-            </ListItemButton>
+            <ListItem>
+              <ButtonGroup isAttached w="100%">
+                <Button
+                  onClick={() => store.moveSelectedModule("up")}
+                  isDisabled={store.selectedModule === null}
+                  leftIcon={<MdOutlineArrowUpward />}
+                >
+                  Move up
+                  <Kbd ml="auto">W</Kbd>
+                </Button>
+                <Button
+                  onClick={() => store.moveSelectedModule("down")}
+                  isDisabled={store.selectedModule === null}
+                  leftIcon={<MdOutlineArrowDownward />}
+                >
+                  Move down
+                  <Kbd ml="auto">S</Kbd>
+                </Button>
+              </ButtonGroup>
+            </ListItem>
+            <ListItem>
+              <ButtonGroup isAttached w="100%">
+                <Button
+                  onClick={() => store.expand(selectedModule)}
+                  isDisabled={selectedModule.isLeafModule}
+                  leftIcon={<MdUnfoldMore />}
+                >
+                  Expand
+                  <Kbd ml="auto">E</Kbd>
+                </Button>
+                <Button
+                  onClick={() => store.regroup(selectedModule)}
+                  isDisabled={selectedModule.isTopModule}
+                  leftIcon={<MdUnfoldLess />}
+                >
+                  Contract
+                  <Kbd ml="auto">D</Kbd>
+                </Button>
+              </ButtonGroup>
+            </ListItem>
 
             <ListItem>
               <Label>Network</Label>
@@ -386,7 +465,7 @@ function Button(props) {
   return (
     <CkButton
       isFullWidth
-      variant="ghost"
+      variant="outline"
       size="sm"
       justifyContent="flex-start"
       fontWeight={500}
@@ -406,13 +485,13 @@ function ListItemButton(props) {
 function ListItemHeader(props) {
   return (
     <ListItem
-      {...props}
       color="blue.600"
       fontWeight={700}
       textTransform="uppercase"
       letterSpacing="tight"
       fontSize="0.8rem"
       pt={6}
+      {...props}
     />
   );
 }

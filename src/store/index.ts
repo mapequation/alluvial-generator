@@ -17,6 +17,7 @@ import type Module from "../alluvial/Module";
 import TreePath from "../utils/TreePath";
 import { LEFT, RIGHT, Side } from "../alluvial/Side";
 import LeafNode from "../alluvial/LeafNode";
+import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
 
 export const COLOR_SCHEMES = {
   Category10: schemeCategory10,
@@ -348,6 +349,103 @@ export class Store {
       );
 
     if (updateLayout) this.updateLayout();
+  }
+
+  colorMatchingModulesInAllNetworks() {
+    this.clearColors(false);
+
+    const networks = this.diagram.children;
+
+    if (networks.length < 2) {
+      networks[0].children.forEach((module, i) => {
+        const color = this.selectedScheme[i % this.selectedScheme.length];
+        this.colorModule(module, color, false);
+      });
+      this.updateLayout();
+      return;
+    }
+
+    console.time("Store.colorMatchingModulesInAllNetworks");
+
+    class BipartiteGraph {
+      nodes: Map<Module, number> = new Map();
+      links: Map<Module, Map<Module, number>> = new Map();
+
+      addLink(left: Module, right: Module, weight: number) {
+        if (!this.links.has(left)) {
+          this.links.set(left, new Map());
+        }
+        this.links.get(left)!.set(right, weight);
+
+        this.nodes.set(left, 0);
+        this.nodes.set(right, 1);
+      }
+
+      get left() {
+        return this.getNodes(0);
+      }
+
+      get right() {
+        return this.getNodes(1);
+      }
+
+      private *getNodes(side: number = 0) {
+        for (const [node, value] of this.nodes.entries()) {
+          if (side === value) yield node;
+        }
+      }
+    }
+
+    const bipartiteGraphs = [];
+
+    for (let i = 0; i < networks.length - 1; ++i) {
+      const leftNetwork = networks[i];
+      const B = (bipartiteGraphs[i] = new BipartiteGraph());
+
+      for (const module of leftNetwork) {
+        module
+          .getSimilarModules(RIGHT, 1)
+          .forEach((match) =>
+            B.addLink(module, match.module, match.similarity)
+          );
+      }
+
+      let highlightIndex = 0;
+      for (const left of B.left) {
+        let color: string;
+
+        if (left.isHighlighted) {
+          color = this.highlightColors[left.highlightIndex];
+        } else {
+          const largestLink = Array.from(B.links.get(left)!.keys()).reduce(
+            (max, module) =>
+              module.isHighlighted && max.flow < module.flow ? module : max,
+            {
+              flow: -Infinity,
+              isHighlighted: false,
+              highlightIndex: NOT_HIGHLIGHTED,
+            } as Module
+          );
+
+          if (largestLink.isHighlighted) {
+            color = this.highlightColors[largestLink.highlightIndex];
+          } else {
+            color =
+              this.selectedScheme[highlightIndex % this.selectedScheme.length];
+          }
+
+          this.colorModule(left, color, false);
+          highlightIndex++;
+        }
+
+        for (const right of B.links.get(left)!.keys()) {
+          if (!right.isHighlighted) this.colorModule(right, color, false);
+        }
+      }
+    }
+
+    console.timeEnd("Store.colorMatchingModulesInAllNetworks");
+    this.updateLayout();
   }
 
   colorNodesInAllNetworks(networkId: string | undefined) {

@@ -213,6 +213,23 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.setColor(NOT_HIGHLIGHTED);
   }
 
+  get isHighlighted() {
+    return this.children.some((group) => group.isHighlighted);
+  }
+
+  private get largestGroup(): HighlightGroup {
+    return this.children.reduce(
+      (max, group) => {
+        return group.flow > max.flow ? group : max;
+      },
+      { flow: -Infinity, highlightIndex: -1 } as HighlightGroup
+    );
+  }
+
+  get highlightIndex() {
+    return this.largestGroup.highlightIndex;
+  }
+
   moveUp() {
     const index = this.parentIndex;
 
