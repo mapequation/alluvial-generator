@@ -1,10 +1,15 @@
 import { action, makeObservable, observable } from "mobx";
 import { createContext } from "react";
 import {
+  schemeAccent,
+  schemeCategory10,
   schemeDark2,
+  schemePaired,
   schemePastel1,
   schemePastel2,
+  schemeSet1,
   schemeSet2,
+  schemeSet3,
   schemeTableau10,
 } from "d3";
 import Diagram from "../alluvial/Diagram";
@@ -12,6 +17,19 @@ import type Module from "../alluvial/Module";
 import TreePath from "../utils/TreePath";
 import { LEFT, RIGHT, Side } from "../alluvial/Side";
 import LeafNode from "../alluvial/LeafNode";
+
+export const COLOR_SCHEMES = {
+  Category10: schemeCategory10,
+  Accent: schemeAccent,
+  Dark2: schemeDark2,
+  Paired: schemePaired,
+  Pastel1: schemePastel1,
+  Pastel2: schemePastel2,
+  Set1: schemeSet1,
+  Set2: schemeSet2,
+  Set3: schemeSet3,
+  Tableau10: schemeTableau10,
+} as const;
 
 export class Store {
   diagram = new Diagram();
@@ -32,15 +50,11 @@ export class Store {
   streamlineOpacity: number = 0.9;
   flowThreshold: number = 8e-3;
 
+  selectedScheme = COLOR_SCHEMES["Tableau10"];
+  selectedSchemeName = "Tableau10";
+
   defaultHighlightColor: string = "#b6b69f";
-  highlightColors: typeof schemeSet2[] = [].concat(
-    // @ts-ignore
-    schemeTableau10,
-    schemeDark2,
-    schemePastel1,
-    schemePastel2,
-    schemeSet2
-  );
+  highlightColors: string[] = [...COLOR_SCHEMES["Tableau10"]];
 
   verticalAlign: "bottom" | "justify" = "bottom";
   moduleSize: "nodes" | "flow" = "flow";
@@ -69,6 +83,8 @@ export class Store {
       streamlineThreshold: observable,
       streamlineOpacity: observable,
       flowThreshold: observable,
+      selectedScheme: observable.ref,
+      selectedSchemeName: observable,
       defaultHighlightColor: observable,
       highlightColors: observable,
       verticalAlign: observable,
@@ -141,12 +157,31 @@ export class Store {
     this.updateLayout();
   });
 
+  setSelectedScheme = action((scheme: keyof typeof COLOR_SCHEMES) => {
+    this.selectedSchemeName = scheme;
+    this.selectedScheme = COLOR_SCHEMES[scheme];
+  });
+
   setDefaultHighlightColor = action((defaultHighlightColor: string) => {
     this.defaultHighlightColor = defaultHighlightColor;
   });
 
-  setHighlightColors = action((highlightColors: typeof schemeSet2[]) => {
+  setHighlightColors = action((highlightColors: string[]) => {
     this.highlightColors = highlightColors;
+  });
+
+  getHighlightIndex = action((highlightColor: string) => {
+    const colors = this.highlightColors;
+
+    if (colors.includes(highlightColor)) {
+      return colors.indexOf(highlightColor);
+    }
+
+    const index = colors.push(highlightColor) - 1;
+
+    this.highlightColors = [...colors];
+
+    return index;
   });
 
   setVerticalAlign = action((verticalAlign: "bottom" | "justify") => {
@@ -254,7 +289,8 @@ export class Store {
     }
   }
 
-  colorModule(module: Module, highlightIndex: number, updateLayout = true) {
+  colorModule(module: Module, color: string, updateLayout = true) {
+    const highlightIndex = this.getHighlightIndex(color);
     module.setColor(highlightIndex);
 
     if (updateLayout) {
@@ -262,20 +298,21 @@ export class Store {
     }
   }
 
-  colorMatchingModules(module: Module, highlightIndex: number, side?: Side) {
+  colorMatchingModules(module: Module, color: string, side?: Side) {
+    const highlightIndex = this.getHighlightIndex(color);
     module.setColor(highlightIndex);
 
     if (!side || side === LEFT) {
       const left = module.getSimilarModules(LEFT);
       if (left.length) {
-        this.colorMatchingModules(left[0].module, highlightIndex, LEFT);
+        this.colorMatchingModules(left[0].module, color, LEFT);
       }
     }
 
     if (!side || side === RIGHT) {
       const right = module.getSimilarModules(RIGHT);
       if (right.length) {
-        this.colorMatchingModules(right[0].module, highlightIndex, RIGHT);
+        this.colorMatchingModules(right[0].module, color, RIGHT);
       }
     }
 
@@ -284,9 +321,10 @@ export class Store {
 
   colorModuleNodesInAllNetworks(
     module: Module,
-    highlightIndex: number,
+    color: string,
     updateLayout = true
   ) {
+    const highlightIndex = this.getHighlightIndex(color);
     module.setColor(highlightIndex);
 
     this.diagram.children
@@ -314,13 +352,11 @@ export class Store {
       networkId ?? this.diagram.children[0].networkId
     );
 
-    const highlightIndices = [...this.highlightColors.keys()];
-
     network?.children
       .filter((module) => module.isVisible)
       .forEach((module, i) => {
-        const highlightIndex = highlightIndices[i % highlightIndices.length];
-        this.colorModuleNodesInAllNetworks(module, highlightIndex, false);
+        const color = this.selectedScheme[i % this.selectedScheme.length];
+        this.colorModuleNodesInAllNetworks(module, color, false);
       });
 
     this.updateLayout();

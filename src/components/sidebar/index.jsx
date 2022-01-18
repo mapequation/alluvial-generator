@@ -10,6 +10,7 @@ import {
   ListItem,
   Radio,
   RadioGroup as CkRadioGroup,
+  Select,
   Slider as CkSlider,
   SliderFilledTrack,
   SliderThumb,
@@ -30,14 +31,13 @@ import {
 } from "react-icons/md";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
-import { StoreContext } from "../../store";
+import { COLOR_SCHEMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
-  const { selectedModule /*highlightColors, defaultHighlightColor*/ } = store;
-  //const [color, setColor] = useState(defaultHighlightColor);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { selectedModule, defaultHighlightColor } = store;
+  const [color, setColor] = useState(defaultHighlightColor);
   console.log("selectedModule", selectedModule);
 
   const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
@@ -71,29 +71,56 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 
         <ListItemHeader>Colors</ListItemHeader>
 
+        <ListItem>
+          <Label>Color scheme</Label>
+          <Select
+            size="sm"
+            w="50%"
+            variant="flushed"
+            display="inline-block"
+            value={store.selectedSchemeName}
+            onChange={(event) => store.setSelectedScheme(event.target.value)}
+          >
+            {Array.from(Object.keys(COLOR_SCHEMES)).map((scheme) => (
+              <option key={scheme} value={scheme}>
+                {scheme}
+              </option>
+            ))}
+          </Select>
+
+          <HStack mt={2} spacing={1} shouldWrapChildren>
+            <Swatch
+              color={defaultHighlightColor}
+              isSelected={color === defaultHighlightColor}
+              onClick={() => setColor(defaultHighlightColor)}
+            />
+            {store.selectedScheme.map((schemeColor) => (
+              <Swatch
+                key={schemeColor}
+                color={schemeColor}
+                isSelected={color === schemeColor}
+                onClick={() => setColor(schemeColor)}
+              />
+            ))}
+          </HStack>
+        </ListItem>
+
         <ListItemButton
-          onClick={() => {
-            store.colorModule(selectedModule, currentIndex);
-            setCurrentIndex((currentIndex + 1) % 20);
-          }}
+          onClick={() => store.colorModule(selectedModule, color)}
           isDisabled={store.selectedModule === null}
         >
           Paint selected
         </ListItemButton>
         <ListItemButton
-          onClick={() => {
-            store.colorMatchingModules(selectedModule, currentIndex);
-            setCurrentIndex((currentIndex + 1) % 20);
-          }}
+          onClick={() => store.colorMatchingModules(selectedModule, color)}
           isDisabled={store.selectedModule === null}
         >
           Paint selected module and similar
         </ListItemButton>
         <ListItemButton
-          onClick={() => {
-            store.colorModuleNodesInAllNetworks(selectedModule, currentIndex);
-            setCurrentIndex((currentIndex + 1) % 20);
-          }}
+          onClick={() =>
+            store.colorModuleNodesInAllNetworks(selectedModule, color)
+          }
           isDisabled={store.selectedModule === null}
         >
           Paint selected nodes everywhere
@@ -323,6 +350,27 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
     </Box>
   );
 });
+
+function Swatch({ color, isSelected, onClick }) {
+  return (
+    <Box
+      as="button"
+      bg={color}
+      h="24px"
+      w="25px"
+      rounded="sm"
+      transition="all 0.1s linear"
+      boxShadow={isSelected ? "lg" : "md"}
+      borderWidth={3}
+      borderColor={isSelected ? color : "white"}
+      _hover={{
+        transform: "scale(1.2)",
+        borderColor: color,
+      }}
+      onClick={onClick}
+    />
+  );
+}
 
 function Button(props) {
   return (
