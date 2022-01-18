@@ -21,8 +21,6 @@ export default observer(function Diagram() {
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
 
-    event.preventDefault();
-
     if (event?.key === "w") {
       store.moveSelectedModule("up");
     } else if (event?.key === "s") {
@@ -34,6 +32,8 @@ export default observer(function Diagram() {
     } else if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event?.key)
     ) {
+      event.preventDefault();
+
       const direction = event?.key.replace("Arrow", "").toLowerCase() ?? "";
       store.selectModule(direction);
     }
