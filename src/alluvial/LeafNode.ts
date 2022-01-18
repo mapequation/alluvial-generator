@@ -163,7 +163,9 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   private remove(removeNetwork: boolean = false) {
-    const group = this.getAncestor(HIGHLIGHT_GROUP) as HighlightGroup | null;
+    const group = this.leftParent?.getAncestor(
+      HIGHLIGHT_GROUP
+    ) as HighlightGroup | null;
 
     this.removeFromSide(LEFT);
     this.removeFromSide(RIGHT);
