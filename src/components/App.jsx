@@ -1,14 +1,17 @@
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
 import useEventListener from "../hooks/useEventListener";
 import { Modal } from "@chakra-ui/react";
+import { observer } from "mobx-react";
+import { StoreContext } from "../store";
 
 export const drawerWidth = 350;
 
-export default function App() {
+export default observer(function App() {
+  const store = useContext(StoreContext);
   const [isLoadOpen, setIsLoadOpen] = useState(true);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
 
@@ -30,7 +33,7 @@ export default function App() {
   };
 
   useEventListener("keydown", (event) => {
-    if (event?.key === "l") {
+    if (!store.editMode && event?.key === "l") {
       openLoad();
     }
   });
@@ -50,4 +53,4 @@ export default function App() {
       <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
     </>
   );
-}
+});

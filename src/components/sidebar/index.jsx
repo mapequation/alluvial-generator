@@ -186,7 +186,12 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 w="50%"
                 display="inline-block"
                 defaultValue={selectedModule.networkName || "Click to set name"}
-                onSubmit={store.setNetworkName(selectedModule.networkId)}
+                onSubmit={(value) => {
+                  store.setNetworkName(selectedModule.networkId, value);
+                  store.setEditMode(false);
+                }}
+                onCancel={() => store.setEditMode(false)}
+                onEdit={() => store.setEditMode(true)}
               >
                 <EditablePreview />
                 <EditableInput />
@@ -198,7 +203,12 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 w="50%"
                 display="inline-block"
                 defaultValue={selectedModule.name || "Click to set name"}
-                onSubmit={store.setModuleName(selectedModule)}
+                onSubmit={(value) => {
+                  store.setModuleName(selectedModule, value);
+                  store.setEditMode(false);
+                }}
+                onCancel={() => store.setEditMode(false)}
+                onEdit={() => store.setEditMode(true)}
               >
                 <EditablePreview />
                 <EditableInput />

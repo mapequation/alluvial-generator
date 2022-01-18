@@ -207,6 +207,8 @@ export default observer(function LoadNetworks({ onClose }) {
   };
 
   useEventListener("keydown", (event) => {
+    if (store.editMode) return;
+
     if (event?.key === "c" && files.length > 0) {
       createDiagram();
     } else if (event?.key === "Backspace") {

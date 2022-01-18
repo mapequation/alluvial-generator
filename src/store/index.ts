@@ -69,6 +69,8 @@ export class Store {
 
   selectedModule: Module | null = null;
 
+  editMode: boolean = false;
+
   constructor() {
     makeObservable(this, {
       diagram: observable.ref,
@@ -96,6 +98,7 @@ export class Store {
       dropShadow: observable,
       fontSize: observable,
       selectedModule: observable,
+      editMode: observable,
     });
   }
 
@@ -219,23 +222,25 @@ export class Store {
     this.fontSize = fontSize;
   });
 
-  setNetworkName = (networkId: string) =>
-    action((name: string) => {
-      const network = this.diagram.getNetwork(networkId);
-      if (network) {
-        network.name = name;
-        this.toggleUpdate();
-      }
-    });
-
-  setModuleName = (module: Module) =>
-    action((name: string) => {
-      module.name = name;
-      this.toggleUpdate();
-    });
-
   setSelectedModule = action((selectedModule: Module | null) => {
     this.selectedModule = selectedModule;
+  });
+
+  setEditMode = action((editMode: boolean) => {
+    this.editMode = editMode;
+  });
+
+  setModuleName = action((module: Module, name: string) => {
+    module.name = name;
+    this.toggleUpdate();
+  });
+
+  setNetworkName = action((networkId: string, name: string) => {
+    const network = this.diagram.getNetwork(networkId);
+    if (network) {
+      network.name = name;
+      this.toggleUpdate();
+    }
   });
 
   selectModule(direction: "up" | "down" | "left" | "right") {
