@@ -31,22 +31,23 @@ const Module = observer(function Module({ module, fillColor }) {
     <motion.g
       ref={ref}
       className="module"
-      style={{ filter: dropShadow(module) }}
       onClick={handler}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {module.children.map((group) => (
-        <motion.rect
-          key={group.id}
-          className="group"
-          initial={false}
-          animate={group.layout}
-          transition={transition}
-          fill={fillColor(group)}
-        />
-      ))}
+      <g style={{ filter: dropShadow(module) }}>
+        {module.children.map((group) => (
+          <motion.rect
+            key={group.id}
+            className="group"
+            initial={false}
+            animate={group.layout}
+            transition={transition}
+            fill={fillColor(group)}
+          />
+        ))}
+      </g>
 
       {showModuleId && (
         <motion.text
