@@ -11,9 +11,11 @@ import "./Diagram.css";
 import Network from "./Network";
 import useEventListener from "../../hooks/useEventListener";
 import { SelectedModule } from "./Module";
+import useWindowSize from "../../hooks/useWindowSize";
 
 export default observer(function Diagram() {
   const store = useContext(StoreContext);
+  const { width, height } = useWindowSize();
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
   const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
@@ -41,7 +43,9 @@ export default observer(function Diagram() {
 
   return (
     <svg
-      style={{ width: "100vw", height: "100vh" }}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       xmlns={d3.namespaces.svg}
       xmlnsXlink={d3.namespaces.xlink}
       id="alluvialSvg"
@@ -50,7 +54,11 @@ export default observer(function Diagram() {
       <defs>
         <DropShadows maxLevel={maxDropShadowModuleLevel} />
       </defs>
-      <ZoomableSvg>
+      <ZoomableSvg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+      >
         <g transform={translateCenter(diagram)}>
           <LayoutGroup>
             {diagram.children.map((network) => (

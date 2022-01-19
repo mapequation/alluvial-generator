@@ -5,7 +5,7 @@ import useEventListener from "../../hooks/useEventListener";
 
 const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 
-export default function ZoomableSvg({ width, height, children }) {
+export default function ZoomableSvg({ children, ...props }) {
   const ref = useRef();
   const store = useContext(StoreContext);
 
@@ -26,10 +26,10 @@ export default function ZoomableSvg({ width, height, children }) {
 
   return (
     <svg
-      style={{ width, height }}
       ref={ref}
       xmlns={d3.namespaces.svg}
       xmlnsXlink={d3.namespaces.xlink}
+      {...props}
     >
       <rect className="background" width="100%" height="100%" fill="#fff" />
       <g id="zoomable" children={children} />
