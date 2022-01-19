@@ -97,17 +97,36 @@ export default class StreamlineLink {
     return (this.h0 + this.h1) / 2;
   }
 
+  /*
+                    (cpx, y1) ________ (x1, y1)
+                    ________/        |
+   (x0, y0) ______/                  |
+           |                         | h1
+           |                         |
+        h0 |                  _______|
+           |        ________/         (x1, y1 + h1)
+           |______/
+   (x0, y0 + h0)    (cpx, y0 + h0)
+   */
   get path() {
-    const { x0, x1, y0, y1, h0, h1 } = this;
+    let { x0, x1, y0, y1, h0, h1 } = this;
 
-    return {
-      x0,
-      x1,
-      y0,
-      y1,
-      h0,
-      h1,
-    };
+    const threshold = 1e-6;
+    y0 = y0 < threshold ? 0 : y0;
+    y1 = y1 < threshold ? 0 : y1;
+
+    const y2 = y0 + h0;
+    const y3 = y1 + h1;
+    const cpx = (x0 + x1) / 2;
+
+    // prettier-ignore
+    return (
+      "M" + x0 + "," + y2 +
+      "C" + cpx + "," + y2 + "," + cpx + "," + y3 + "," + x1 + "," + y3 +
+      "L" + x1 + "," + y1 +
+      "C" + cpx + "," + y1 + "," + cpx + "," + y0 + "," + x0 + "," + y0 +
+      "Z"
+    );
   }
 
   remove() {
