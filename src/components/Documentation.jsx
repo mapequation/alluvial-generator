@@ -33,7 +33,23 @@ const Documentation = ({ onClose }) => (
       <ModalHeader>Help</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        <Text>
+        <Heading as="h2" size="md" my={8}>
+          New version since January 2022
+        </Heading>
+        <Text mt={4}>
+          Some features are still missing, but we are working on it.
+          <br />
+          If you desperately miss the old version, its available at <br />
+          <a href="//mapequation.org/alluvial/old">
+            mapequation.org/alluvial/old
+          </a>
+          .
+        </Text>
+
+        <Heading as="h2" size="md" my={8}>
+          About
+        </Heading>
+        <Text mt={4}>
           The Alluvial Generator visualizes how clusters change between
           different networks in an{" "}
           <a href="//en.wikipedia.org/wiki/Alluvial_diagram">
@@ -156,15 +172,7 @@ const Documentation = ({ onClose }) => (
           </a>{" "}
           or use the following format:
         </Text>
-        <Text
-          mt={4}
-          mx={4}
-          py={4}
-          px={6}
-          bg="gray.100"
-          boxShadow="sm"
-          rounded="md"
-        >
+        <Text mt={4} mx={4} py={4} px={6}>
           D. Edler, A. Eriksson and M. Rosvall, The MapEquation software
           package, available online at{" "}
           <a href="https://www.mapequation.org">mapequation.org</a>.

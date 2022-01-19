@@ -600,12 +600,14 @@ function Logo() {
   return (
     <HStack w="100%" justify="space-between" align="center" pb={3}>
       <HStack justify="flex-start" align="center" spacing={3}>
-        <img
-          alt="MapEquation"
-          width="32px"
-          height="32px"
-          src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
-        />
+        <a href="//mapequation.org">
+          <img
+            alt="MapEquation"
+            width="32px"
+            height="32px"
+            src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
+          />
+        </a>
         <div>
           <span style={styles.base}>
             <span style={styles.infomap}>Alluvial</span>{" "}
