@@ -35,6 +35,7 @@ const Module = observer(function Module({ module, fillColor }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={transition}
     >
       <g style={{ filter: dropShadow(module) }}>
         {module.children.map((group) => (

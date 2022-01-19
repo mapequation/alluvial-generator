@@ -1,24 +1,38 @@
 import * as d3 from "d3";
 import { observer } from "mobx-react";
-import { useContext } from "react";
-import { LayoutGroup } from "framer-motion";
+import { useContext, useEffect, useRef } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import DropShadows from "./DropShadows";
-import ZoomableSvg from "./ZoomableSvg";
-import translateCenter from "./translate-center";
 import "./Diagram.css";
 import Network from "./Network";
 import useEventListener from "../../hooks/useEventListener";
 import { SelectedModule } from "./Module";
 import useWindowSize from "../../hooks/useWindowSize";
+import { drawerWidth } from "../App";
+
+const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 
 export default observer(function Diagram() {
+  const ref = useRef();
   const store = useContext(StoreContext);
   const { width, height } = useWindowSize();
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
   const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
+
+  useEventListener("click", () => store.setSelectedModule(null), ref);
+
+  useEffect(() => {
+    const currentRef = ref?.current;
+
+    d3.select(currentRef).call(zoom).on("dblclick.zoom", null);
+    //.call(zoom.transform, d3.zoomIdentity);
+
+    const zoomable = d3.select("#zoomable"); //.attr("transform", d3.zoomIdentity);
+
+    zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
+  }, [ref, store]);
 
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
@@ -43,6 +57,7 @@ export default observer(function Diagram() {
 
   return (
     <svg
+      ref={ref}
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
@@ -54,24 +69,29 @@ export default observer(function Diagram() {
       <defs>
         <DropShadows maxLevel={maxDropShadowModuleLevel} />
       </defs>
-      <ZoomableSvg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-      >
+      <rect className="background" width="100%" height="100%" fill="#fff" />
+      <g id="zoomable">
         <g transform={translateCenter(diagram)}>
-          <LayoutGroup>
-            {diagram.children.map((network) => (
-              <Network
-                key={network.id}
-                network={network}
-                groupFillColor={groupFillColor}
-              />
-            ))}
-            <SelectedModule module={store.selectedModule} />
-          </LayoutGroup>
+          {diagram.children.map((network) => (
+            <Network
+              key={network.id}
+              network={network}
+              groupFillColor={groupFillColor}
+            />
+          ))}
+          <SelectedModule module={store.selectedModule} />
         </g>
-      </ZoomableSvg>
+      </g>
     </svg>
   );
 });
+
+function translateCenter({ width, height }) {
+  let { innerWidth, innerHeight } = window;
+  innerWidth -= drawerWidth;
+
+  const dx = Math.max((innerWidth - width) / 2, 100);
+  const dy = Math.max((innerHeight - height) / 3, 100);
+
+  return `translate(${dx}, ${dy})`;
+}
