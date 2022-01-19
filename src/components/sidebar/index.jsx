@@ -21,6 +21,7 @@ import {
   TagLabel,
   Text,
   Tooltip,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import {
   MdClear,
@@ -42,6 +43,8 @@ import useEventListener from "../../hooks/useEventListener";
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
   const { selectedModule, defaultHighlightColor } = store;
+  const bg = useColorModeValue("white", "gray.800");
+  const headerColor = useColorModeValue("blue.600", "blue.200");
   const [color, setColor] = useState(defaultHighlightColor);
   console.log("selectedModule", selectedModule);
 
@@ -74,11 +77,12 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
       right="0"
       width={drawerWidth}
       height="100%"
-      bg="white"
+      bg={bg}
       zIndex="1"
       overflowY="scroll"
       boxShadow="2xl"
       p="5"
+      pb={10}
     >
       <List spacing={2} fontSize="0.9rem">
         <ListItem>
@@ -94,7 +98,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           Help
         </ListItemButton>
 
-        <ListItemHeader>Colors</ListItemHeader>
+        <ListItemHeader color={headerColor}>Colors</ListItemHeader>
 
         <ListItem>
           <Label>Color scheme</Label>
@@ -154,7 +158,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 
         <ListItem>
           <Text
-            color="blue.600"
+            color={headerColor}
             fontWeight={600}
             textTransform="uppercase"
             letterSpacing="tight"
@@ -184,7 +188,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 
         <ListItem>
           <Text
-            color="blue.600"
+            color={headerColor}
             fontWeight={600}
             textTransform="uppercase"
             letterSpacing="tight"
@@ -214,7 +218,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           </ButtonGroup>
         </ListItem>
 
-        <ListItemHeader>Module</ListItemHeader>
+        <ListItemHeader color={headerColor}>Module</ListItemHeader>
 
         {selectedModule != null ? (
           <>
@@ -318,7 +322,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           <ListItem>No module selected. Click on any module.</ListItem>
         )}
 
-        <ListItemHeader>Layout</ListItemHeader>
+        <ListItemHeader color={headerColor}>Layout</ListItemHeader>
 
         <ListItemButton
           onClick={() => store.resetLayout()}
@@ -441,6 +445,8 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
 });
 
 function Swatch({ color, isSelected, onClick }) {
+  const border = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
+
   return (
     <Box
       as="button"
@@ -451,7 +457,7 @@ function Swatch({ color, isSelected, onClick }) {
       transition="all 0.1s linear"
       boxShadow={isSelected ? "lg" : "md"}
       borderWidth={3}
-      borderColor={isSelected ? color : "white"}
+      borderColor={isSelected ? color : border}
       _hover={{
         transform: "scale(1.2)",
         borderColor: color,
@@ -485,7 +491,6 @@ function ListItemButton(props) {
 function ListItemHeader(props) {
   return (
     <ListItem
-      color="blue.600"
       fontWeight={700}
       textTransform="uppercase"
       letterSpacing="tight"
@@ -575,22 +580,25 @@ function Switch({ onChange, label, ...props }) {
 }
 
 function Logo() {
-  const brand = {
+  const color = useColorModeValue("hsl(0, 0%, 33%)", "hsl(0, 0%, 60%)");
+  const brand = useColorModeValue("hsl(0, 68%, 42%)", "hsl(0, 68%, 62%)");
+
+  const styles = {
     base: {
       fontFamily: "Philosopher, serif",
       fontWeight: 700,
       fontSize: "1.4em",
     },
     infomap: {
-      color: "#555",
+      color,
     },
     alluvial: {
-      color: "#B22222",
+      color: brand,
     },
   };
 
   return (
-    <HStack w="100%" justify="space-between" align="center">
+    <HStack w="100%" justify="space-between" align="center" pb={3}>
       <HStack justify="flex-start" align="center" spacing={3}>
         <img
           alt="MapEquation"
@@ -599,9 +607,9 @@ function Logo() {
           src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
         />
         <div>
-          <span style={brand.base}>
-            <span style={brand.infomap}>Alluvial</span>{" "}
-            <span style={brand.alluvial}>Generator</span>
+          <span style={styles.base}>
+            <span style={styles.infomap}>Alluvial</span>{" "}
+            <span style={styles.alluvial}>Generator</span>
           </span>
         </div>
       </HStack>

@@ -1,19 +1,14 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { StepsStyleConfig as Steps } from "./chakra-ui-steps";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import { theme } from "./theme";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
-const theme = extendTheme({
-  components: {
-    Steps,
-  },
-});
-
 ReactDOM.render(
   <StrictMode>
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <ChakraProvider theme={theme}>
       <App />
     </ChakraProvider>

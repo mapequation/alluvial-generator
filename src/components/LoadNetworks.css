@@ -1,5 +1,4 @@
 .dropzone {
-    background: hsl(0, 0%, 98%);
     border: 1px dashed #999;
     border-radius: 5px;
 }
@@ -18,7 +17,6 @@
     flex: 0 0 var(--box-width);
     margin: 0 1em 0 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
-    background: #fff;
     border-radius: 5px;
     list-style-type: none;
     cursor: grab;

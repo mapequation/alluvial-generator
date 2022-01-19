@@ -18,6 +18,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Tooltip,
+  useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
 import { Step, Steps } from "../chakra-ui-steps";
@@ -45,6 +46,10 @@ async function fetchExampleData(filename = exampleDataFilename) {
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
   const toast = useToast();
+  const dropzoneBg = useColorModeValue(
+    "var(--chakra-colors-gray-50)",
+    "var(--chakra-colors-gray-600)"
+  );
   const [files, setFiles] = useState(store.files);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
@@ -62,7 +67,6 @@ export default observer(function LoadNetworks({ onClose }) {
       }),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
-      //setErrors([]);
 
       const readFiles = await Promise.all(acceptedFiles.map(readFile));
       const newFiles = [];
@@ -227,7 +231,11 @@ export default observer(function LoadNetworks({ onClose }) {
         <ModalBody>
           <MyStepper activeStep={files.length > 0 ? 2 : 1} />
 
-          <div className="dropzone" {...getRootProps()}>
+          <div
+            style={{ background: dropzoneBg }}
+            className="dropzone"
+            {...getRootProps()}
+          >
             <Reorder.Group
               className="parent"
               axis="x"
@@ -284,8 +292,7 @@ export default observer(function LoadNetworks({ onClose }) {
   );
 });
 
-const FileBackground = observer(function FileBackground({ file, ...props }) {
-  const store = useContext(StoreContext);
+function FileBackground({ file, fill, ...props }) {
   const minFlow = 1e-4;
 
   const values = normalize(
@@ -314,16 +321,22 @@ const FileBackground = observer(function FileBackground({ file, ...props }) {
             y={y}
             width="100%"
             height={rectHeight}
-            fill={store.defaultHighlightColor}
+            fill={fill}
           />
         );
       })}
     </svg>
   );
-});
+}
 
 function Item({ number, file, onClick }) {
   const x = useMotionValue(0);
+  const bg = useColorModeValue("white", "gray.600");
+  const fg = useColorModeValue("gray.800", "whiteAlpha.900");
+  const fill = useColorModeValue(
+    "var(--chakra-colors-gray-800)",
+    "var(--chakra-colors-whiteAlpha-900)"
+  );
   const boxShadow = useRaisedShadow(x);
 
   const truncatedName = ((name) => {
@@ -342,18 +355,17 @@ function Item({ number, file, onClick }) {
       className="child"
       style={{ boxShadow, x }}
     >
-      <FileBackground file={file} style={{ position: "absolute" }} />
+      <FileBackground
+        file={file}
+        style={{ position: "absolute" }}
+        fill={fill}
+      />
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={4}>
-          <Avatar
-            bg="white"
-            boxShadow="md"
-            color="gray.500"
-            name={number.toString()}
-          />
+          <Avatar bg={bg} boxShadow="md" color={fg} name={number.toString()} />
 
           <List
-            bg="white"
+            bg={bg}
             fontSize="sm"
             borderRadius={5}
             boxShadow="md"
@@ -389,8 +401,8 @@ function Item({ number, file, onClick }) {
             onClick={() => onClick(file.id)}
             className="delete-button"
             aria-label="delete"
-            color="gray.500"
-            bg="white"
+            color={fg}
+            bg={bg}
             variant="unstyled"
             fontSize="1.5rem"
             icon={<MdClear />}
