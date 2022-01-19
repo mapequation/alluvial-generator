@@ -6,10 +6,9 @@ import LinearGradients from "./LinearGradients";
 import Streamline from "./Streamline";
 import Module from "./Module";
 
-const Network = observer(function Network({ network, groupFillColor }) {
-  const store = useContext(StoreContext);
+const Network = observer(function Network({ network, fillColor }) {
   const { streamlineThreshold, streamlineOpacity, fontSize, showNetworkNames } =
-    store;
+    useContext(StoreContext);
 
   const links = network.getLinks(streamlineThreshold);
 
@@ -37,7 +36,7 @@ const Network = observer(function Network({ network, groupFillColor }) {
       ))}
 
       {network.visibleChildren.map((module) => (
-        <Module key={module.id} module={module} fillColor={groupFillColor} />
+        <Module key={module.id} module={module} fillColor={fillColor} />
       ))}
     </g>
   );

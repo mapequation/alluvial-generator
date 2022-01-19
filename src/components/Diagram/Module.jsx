@@ -6,9 +6,8 @@ import DropShadows from "./DropShadows";
 import useOnClick from "../../hooks/useOnClick";
 
 const Module = observer(function Module({ module, fillColor }) {
-  const store = useContext(StoreContext);
   const ref = useRef();
-
+  const store = useContext(StoreContext);
   const { fontSize, showModuleId, showModuleNames } = store;
   const dropShadow = DropShadows.filter(store.dropShadow);
 

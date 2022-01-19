@@ -15,10 +15,10 @@ const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 
 export default observer(function Diagram() {
   const ref = useRef();
-  const store = useContext(StoreContext);
   const { width, height } = useWindowSize();
+  const store = useContext(StoreContext);
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
-  const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
+  const fillColor = highlightColor(defaultHighlightColor, highlightColors);
 
   useEventListener("click", () => store.setSelectedModule(null), ref);
 
@@ -74,11 +74,7 @@ export default observer(function Diagram() {
       <g id="zoomable">
         <g transform={translateCenter(diagram)}>
           {diagram.children.map((network) => (
-            <Network
-              key={network.id}
-              network={network}
-              groupFillColor={groupFillColor}
-            />
+            <Network key={network.id} network={network} fillColor={fillColor} />
           ))}
           <SelectedModule module={store.selectedModule} />
         </g>
