@@ -4,7 +4,7 @@ import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
 import useEventListener from "../hooks/useEventListener";
-import { Modal } from "@chakra-ui/react";
+import { Modal, Slide } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { StoreContext } from "../store";
 
@@ -50,7 +50,9 @@ export default observer(function App() {
 
       <Diagram />
 
-      <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
+      <Slide in={!isLoadOpen} style={{ width: drawerWidth }}>
+        <Sidebar onLoadClick={openLoad} onAboutClick={openAbout} />
+      </Slide>
     </>
   );
 });
