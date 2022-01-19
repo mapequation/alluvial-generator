@@ -18,7 +18,6 @@ export default observer(function Diagram() {
   const store = useContext(StoreContext);
   const { width, height } = useWindowSize();
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
-  const maxDropShadowModuleLevel = 3;
   const groupFillColor = highlightColor(defaultHighlightColor, highlightColors);
 
   useEventListener("click", () => store.setSelectedModule(null), ref);
@@ -54,6 +53,8 @@ export default observer(function Diagram() {
       store.selectModule(direction);
     }
   });
+
+  const maxDropShadowModuleLevel = 3;
 
   return (
     <svg

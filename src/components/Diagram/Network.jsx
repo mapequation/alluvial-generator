@@ -12,20 +12,11 @@ const Network = observer(function Network({ network, groupFillColor }) {
     store;
 
   const links = network.getLinks(streamlineThreshold);
-  const uniqueIndices = new Set();
-
-  for (const { leftHighlightIndex, rightHighlightIndex } of links) {
-    uniqueIndices.add(`${leftHighlightIndex}_${rightHighlightIndex}`);
-  }
-
-  const activeIndices = Array.from(uniqueIndices, (indices) =>
-    indices.split("_").map(Number)
-  );
 
   return (
     <g className="network">
       <defs>
-        <LinearGradients activeIndices={activeIndices} />
+        <LinearGradients activeIndices={activeHighlightIndices(links)} />
       </defs>
       {showNetworkNames && (
         <motion.text
@@ -51,5 +42,15 @@ const Network = observer(function Network({ network, groupFillColor }) {
     </g>
   );
 });
+
+function activeHighlightIndices(links) {
+  const uniqueIndices = new Set();
+
+  for (const { leftHighlightIndex, rightHighlightIndex } of links) {
+    uniqueIndices.add(`${leftHighlightIndex}_${rightHighlightIndex}`);
+  }
+
+  return Array.from(uniqueIndices, (indices) => indices.split("_").map(Number));
+}
 
 export default Network;
