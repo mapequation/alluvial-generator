@@ -57,6 +57,8 @@ export default observer(function LoadNetworks({ onClose }) {
     "var(--chakra-colors-gray-50)",
     "var(--chakra-colors-gray-600)"
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingExample, setIsLoadingExample] = useState(false);
   const [files, setFiles] = useState(store.files);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
@@ -160,12 +162,14 @@ export default observer(function LoadNetworks({ onClose }) {
   const createDiagram = useCallback(() => {
     // TODO already loaded?
     // TODO set state from json
+    setIsLoading(true);
     store.setFiles(files);
     onClose();
-  }, [onClose, files, store]);
+  }, [onClose, files, store, setIsLoading]);
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");
+    setIsLoadingExample(true);
     try {
       const json = await fetchExampleData();
       const emptyFile = new File([], exampleDataFilename);
@@ -176,7 +180,7 @@ export default observer(function LoadNetworks({ onClose }) {
       console.error(e);
     }
     console.timeEnd("loadExample");
-  }, [onClose, store]);
+  }, [onClose, store, setIsLoadingExample]);
 
   const removeFileId = (id) => {
     const newFiles = files.filter((file) => file.id !== id);
@@ -230,7 +234,12 @@ export default observer(function LoadNetworks({ onClose }) {
         </ModalBody>
 
         <ModalFooter>
-          <Button mr={2} onClick={loadExample} variant="outline">
+          <Button
+            mr={2}
+            onClick={loadExample}
+            variant="outline"
+            isLoading={isLoadingExample}
+          >
             Load Example
           </Button>
           <Button
@@ -255,6 +264,7 @@ export default observer(function LoadNetworks({ onClose }) {
             variant="outline"
             disabled={files.length === 0}
             isActive={files.length > 0}
+            isLoading={isLoading}
             onClick={createDiagram}
           >
             Create Diagram
