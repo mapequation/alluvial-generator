@@ -1,41 +1,44 @@
 import FileSaver from "file-saver";
 
-export const saveSvg = (elementId, filename) => {
-  const svg = document.getElementById(elementId);
+export function saveSvg(svg, filename) {
+  const labels = svg.querySelectorAll("text");
+  const rects = svg.querySelectorAll(".group");
+
+  [...labels, ...rects].forEach((element) => {
+    const style = element.getAttribute("style");
+    if (!style) return;
+
+    const parts = style.split(";");
+    for (const part of parts) {
+      const matches = [...part.matchAll(/translate([X|Y])\((-?\d+)/g)];
+      if (matches.length === 0) continue;
+      const x = matches[0]?.[2] ?? 0;
+      const y = matches[1]?.[2] ?? 0;
+      element.setAttribute("x", x);
+      element.setAttribute("y", y);
+    }
+
+    element.setAttribute("data-style", style);
+    element.removeAttribute("style");
+  });
+
   const string = new XMLSerializer().serializeToString(svg);
+
+  [...labels, ...rects].forEach((element) => {
+    element.removeAttribute("x");
+    element.removeAttribute("y");
+
+    const style = element.getAttribute("data-style");
+    if (!style) return;
+    element.setAttribute("style", style);
+    element.removeAttribute("data-style");
+  });
+
   const blob = new Blob([string], { type: "image/svg+xml;charset=utf-8" });
   FileSaver.saveAs(blob, filename);
-};
+}
 
-export const savePng = (elementId, filename) => {
-  const svg = document.getElementById(elementId);
-  const { width, height } = svg.getBoundingClientRect();
-
-  svg.setAttribute("width", width);
-  svg.setAttribute("height", height);
-  const string = new XMLSerializer().serializeToString(svg);
-  svg.removeAttribute("width");
-  svg.removeAttribute("height");
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-
-  const image = new Image(width, height);
-  image.onload = () => {
-    context.drawImage(image, 0, 0);
-    canvas.toBlob((blob) => FileSaver.saveAs(blob, filename));
-  };
-
-  image.onerror = (err) => {
-    console.error(err.type, err.message);
-  };
-
-  image.src = "data:image/svg+xml; charset=utf8, " + encodeURIComponent(string);
-};
-
-export const saveDiagram = (version, networks, root, state = {}) => {
+export function saveDiagram(version, networks, root, state = {}) {
   const filename = networks.map((network) => network.name).join(",") + ".json";
 
   const getNetwork = (id) => {
@@ -103,4 +106,4 @@ export const saveDiagram = (version, networks, root, state = {}) => {
 
   const blob = new Blob([json], { type: "application/json;charset=utf-8" });
   FileSaver.saveAs(blob, filename);
-};
+}

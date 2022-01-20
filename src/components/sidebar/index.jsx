@@ -25,6 +25,7 @@ import {
 } from "@chakra-ui/react";
 import {
   MdClear,
+  MdFileDownload,
   MdFileUpload,
   MdHelp,
   MdOutlineArrowDownward,
@@ -39,6 +40,7 @@ import { useContext, useState } from "react";
 import { COLOR_SCHEMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
+import { saveSvg } from "../../io/export";
 
 export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const store = useContext(StoreContext);
@@ -69,6 +71,15 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
       }
     }
   });
+
+  const downloadSvg = () => {
+    store.setSelectedModule(null);
+    const svg = document.getElementById("alluvialSvg");
+    const filename =
+      store.diagram.children.map((n) => n.name).join("-") + ".svg";
+
+    setTimeout(() => saveSvg(svg, filename), 500);
+  };
 
   return (
     <Box
@@ -439,6 +450,16 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           isChecked={store.dropShadow}
           onChange={store.setDropShadow}
         />
+
+        <ListItemHeader color={headerColor}>Export</ListItemHeader>
+
+        <ListItemButton
+          onClick={downloadSvg}
+          variant="link"
+          leftIcon={<MdFileDownload />}
+        >
+          Download SVG
+        </ListItemButton>
       </List>
     </Box>
   );
