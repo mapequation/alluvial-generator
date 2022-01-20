@@ -43,6 +43,13 @@ async function fetchExampleData(filename = exampleDataFilename) {
   return await res.json();
 }
 
+function createError(file, code, message) {
+  return {
+    file,
+    errors: [{ code, message }],
+  };
+}
+
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
   const toast = useToast();
@@ -70,7 +77,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
       const readFiles = await Promise.all(acceptedFiles.map(readFile));
       const newFiles = [];
-      const newErrors = [];
+      const errors = [];
 
       for (let i = 0; i < acceptedFiles.length; ++i) {
         const file = acceptedFiles[i];
@@ -96,47 +103,22 @@ export default observer(function LoadNetworks({ onClose }) {
               continue;
             }
           } catch (e) {
-            console.warn(e);
-            newErrors.push({
-              file,
-              errors: [
-                {
-                  code: "invalid-json",
-                  message: e.message,
-                },
-              ],
-            });
+            errors.push(createError(file, "invalid-json", e.message));
             continue;
           }
         } else {
           try {
             contents = parse(readFiles[i]);
           } catch (e) {
-            console.warn(e);
-            newErrors.push({
-              file,
-              errors: [
-                {
-                  code: "parse-error",
-                  message: e.message,
-                },
-              ],
-            });
+            errors.push(createError(file, "parse-error", e.message));
             continue;
           }
         }
 
         if (!contents) {
-          console.warn(`Could not parse ${file.name}`);
-          newErrors.push({
-            file,
-            errors: [
-              {
-                code: "invalid-format",
-                message: "Could not parse file",
-              },
-            ],
-          });
+          errors.push(
+            createError(file, "invalid-format", "Could not parse file")
+          );
           continue;
         }
 
@@ -154,22 +136,13 @@ export default observer(function LoadNetworks({ onClose }) {
             })
           );
         } catch (e) {
-          console.warn(e);
-          newErrors.push({
-            file,
-            errors: [
-              {
-                code: "invalid-format",
-                message: e.message,
-              },
-            ],
-          });
+          errors.push(createError(file, "invalid-format", e.message));
         }
       }
 
       setFiles([...files, ...newFiles]);
 
-      newErrors.forEach(({ file, errors }) => {
+      errors.forEach(({ file, errors }) => {
         toast({
           title: `Could not load ${file.name}`,
           description: errors.map(({ message }) => message).join("\n"),
