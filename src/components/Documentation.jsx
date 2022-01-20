@@ -2,6 +2,7 @@ import {
   Button,
   Code,
   Heading,
+  Image,
   Kbd,
   List,
   ListItem,
@@ -77,7 +78,7 @@ const Documentation = ({ onClose }) => (
         <Heading as="h2" size="md" my={8}>
           Step by step explanation
         </Heading>
-        <img
+        <Image
           src={compareSvg}
           alt="Comparing nodes across networks"
           width={500}
