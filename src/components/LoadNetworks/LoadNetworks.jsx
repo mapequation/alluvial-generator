@@ -24,19 +24,19 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { Step, Steps } from "../chakra-ui-steps";
+import { Step, Steps } from "../../chakra-ui-steps";
 import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { StoreContext } from "../store";
-import id from "../utils/id";
+import { StoreContext } from "../../store";
+import id from "../../utils/id";
 import "./LoadNetworks.css";
-import useRaisedShadow from "../hooks/useRaisedShadow";
-import TreePath from "../utils/TreePath";
-import { normalize } from "../utils/math";
-import humanFileSize from "../utils/human-file-size";
-import useEventListener from "../hooks/useEventListener";
+import useRaisedShadow from "../../hooks/useRaisedShadow";
+import TreePath from "../../utils/TreePath";
+import { normalize } from "../../utils/math";
+import humanFileSize from "../../utils/human-file-size";
+import useEventListener from "../../hooks/useEventListener";
 
 const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
