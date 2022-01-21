@@ -4,10 +4,12 @@ import {
   readFile,
 } from "@mapequation/infomap/parser";
 import { MdClear, MdOutlineDelete, MdUpload } from "react-icons/md";
+import { IoLayersOutline } from "react-icons/io5";
+import { BiNetworkChart } from "react-icons/bi";
 import {
-  Avatar,
   Box,
   Button,
+  Icon,
   IconButton,
   List,
   ListItem,
@@ -135,13 +137,11 @@ export default observer(function LoadNetworks({ onClose }) {
         setIdentifiers(contents.nodes, format);
 
         try {
-          const flowDistribution = calculateFlowDistribution(contents);
-
           newFiles.push(
             Object.assign(file, {
               id: id(),
               format,
-              flowDistribution,
+              ...calcStatistics(contents),
               ...contents,
             })
           );
@@ -230,13 +230,8 @@ export default observer(function LoadNetworks({ onClose }) {
               values={files}
               onReorder={setFiles}
             >
-              {files.map((file, i) => (
-                <Item
-                  number={i + 1}
-                  key={file.id}
-                  file={file}
-                  onClick={removeFileId}
-                />
+              {files.map((file) => (
+                <Item key={file.id} file={file} onClick={removeFileId} />
               ))}
             </Reorder.Group>
             <input {...getInputProps()} />
@@ -302,7 +297,7 @@ function FileBackground({ file, fill, ...props }) {
   let prevY = 0;
 
   return (
-    <svg width="100%" height="100%" {...props} opacity={0.2}>
+    <svg width="100%" height="100%" opacity={0.2} {...props}>
       {values.map((k, i) => {
         const y = prevY;
         const rectHeight = k * usableHeight;
@@ -322,7 +317,7 @@ function FileBackground({ file, fill, ...props }) {
   );
 }
 
-function Item({ number, file, onClick }) {
+function Item({ file, onClick }) {
   const x = useMotionValue(0);
   const bg = useColorModeValue("white", "gray.600");
   const fg = useColorModeValue("gray.800", "whiteAlpha.900");
@@ -341,6 +336,8 @@ function Item({ number, file, onClick }) {
     return nameParts[0].slice(0, maxLength) + "..." + nameParts[1];
   })(file.name);
 
+  const offset = 8 / file.numLayers;
+
   return (
     <Reorder.Item
       id={file.id}
@@ -348,14 +345,45 @@ function Item({ number, file, onClick }) {
       className="child"
       style={{ boxShadow, x }}
     >
-      <FileBackground
-        file={file}
-        style={{ position: "absolute" }}
-        fill={fill}
-      />
+      {file.isMultilayer &&
+        Array.from({ length: file.numLayers }).map((_, layer) => (
+          <FileBackground
+            key={layer}
+            file={file}
+            style={{
+              position: "absolute",
+              top: `${offset * (file.numLayers - layer - 1)}px`,
+              left: `${offset * (file.numLayers - layer - 1)}px`,
+            }}
+            fill={fill}
+            opacity={0.2 / file.numLayers}
+          />
+        ))}
+      {!file.isMultilayer && (
+        <FileBackground
+          file={file}
+          style={{ position: "absolute" }}
+          fill={fill}
+        />
+      )}
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
-        <Box p={4}>
-          <Avatar bg={bg} boxShadow="md" color={fg} name={number.toString()} />
+        <Box p={2}>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            boxSize={10}
+            bg={bg}
+            color={fg}
+            borderRadius="full"
+            boxShadow="md"
+          >
+            {file.isMultilayer ? (
+              <Icon as={IoLayersOutline} boxSize={6} color={fg} />
+            ) : (
+              <Icon as={BiNetworkChart} boxSize={6} color={fg} />
+            )}
+          </Box>
 
           <List
             bg={bg}
@@ -375,12 +403,20 @@ function Item({ number, file, onClick }) {
               )}
             </ListItem>
 
-            {file.nodes && <ListItem>{file.nodes.length + " nodes"}</ListItem>}
+            {file.nodes && (
+              <ListItem>
+                {file.nodes.length +
+                  (file.isStateNetwork ? " state nodes" : " nodes")}
+              </ListItem>
+            )}
             {file.numTopModules && (
               <ListItem>{file.numTopModules + " top modules"}</ListItem>
             )}
             {file.numLevels && (
               <ListItem>{file.numLevels + " levels"}</ListItem>
+            )}
+            {file.isMultilayer && (
+              <ListItem>{file.numLayers + " layers"}</ListItem>
             )}
             {file.codelength && (
               <ListItem>{file.codelength.toFixed(3) + " bits"}</ListItem>
@@ -448,36 +484,41 @@ function createFilesFromDiagramObject(json, file) {
   return json.networks.map((network) => {
     setIdentifiers(network.nodes, "json");
 
-    const part = {
+    return {
       ...file,
       lastModified: file.lastModified,
       size: (file.size * network.nodes.length) / totNodes,
       name: network.name,
       id: network.id,
       format: "json",
+      ...calcStatistics(network),
       ...network,
     };
-
-    if (!part.flowDistribution) {
-      part.flowDistribution = calculateFlowDistribution(network);
-    }
-
-    return part;
   });
 }
 
-function calculateFlowDistribution(file) {
+function calcStatistics(file) {
   const flowDistribution = {};
+  const layerIds = new Set();
 
-  file.nodes.forEach(({ flow, path }) => {
-    const topModule = path[0];
+  file.nodes.forEach((node) => {
+    const topModule = node.path[0];
     if (!flowDistribution[topModule]) {
       flowDistribution[topModule] = 0;
     }
-    flowDistribution[topModule] += flow;
+    flowDistribution[topModule] += node.flow;
+
+    if (node.layerId !== undefined) {
+      layerIds.add(node.layerId);
+    }
   });
 
-  return flowDistribution;
+  return {
+    flowDistribution,
+    isMultilayer: file?.nodes?.[0]["layerId"] !== undefined,
+    isStateNetwork: file?.nodes?.[0]["stateId"] !== undefined,
+    numLayers: layerIds.size || 1,
+  };
 }
 
 function setIdentifiers(nodes, format) {
