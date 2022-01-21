@@ -210,9 +210,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
           </Text>
           <ButtonGroup isAttached w="100%" mt={1}>
             <Button
-              onClick={() =>
-                store.colorModuleNodesInAllNetworks(selectedModule, color)
-              }
+              onClick={() => store.colorNodesInModule(selectedModule, color)}
               isDisabled={store.selectedModule === null}
               justifyContent="center"
             >
@@ -220,7 +218,39 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
             </Button>
             <Button
               onClick={() => {
-                store.colorNodesInAllNetworks(selectedModule?.networkId);
+                store.colorNodesInModulesInAllNetworks(
+                  selectedModule?.networkId
+                );
+              }}
+              justifyContent="center"
+            >
+              Paint all
+            </Button>
+          </ButtonGroup>
+        </ListItem>
+
+        <ListItem>
+          <Text
+            color={headerColor}
+            fontWeight={600}
+            textTransform="uppercase"
+            letterSpacing="tight"
+            fontSize="0.75rem"
+            pt={2}
+          >
+            By module id
+          </Text>
+          <ButtonGroup isAttached w="100%" mt={1}>
+            <Button
+              onClick={() => store.colorModuleIds(selectedModule, color)}
+              isDisabled={store.selectedModule === null}
+              justifyContent="center"
+            >
+              Paint modules
+            </Button>
+            <Button
+              onClick={() => {
+                store.colorModuleIdsInAllNetworks();
               }}
               justifyContent="center"
             >

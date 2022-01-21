@@ -325,32 +325,6 @@ export class Store {
     if (!side) this.updateLayout();
   }
 
-  colorModuleNodesInAllNetworks(
-    module: Module,
-    color: string,
-    updateLayout = true
-  ) {
-    const highlightIndex = this.getHighlightIndex(color);
-    module.setColor(highlightIndex);
-
-    this.diagram.children
-      .filter((network) => network.networkId !== module.networkId)
-      .forEach((network) =>
-        [...module.leafNodes()]
-          .reduce((nodes, node) => {
-            const oppositeNode = network.getLeafNode(node.identifier);
-            if (oppositeNode) {
-              oppositeNode.highlightIndex = highlightIndex;
-              nodes.push(oppositeNode);
-            }
-            return nodes;
-          }, [] as LeafNode[])
-          .forEach((node) => node.update())
-      );
-
-    if (updateLayout) this.updateLayout();
-  }
-
   colorMatchingModulesInAllNetworks() {
     this.clearColors(false);
 
@@ -448,7 +422,29 @@ export class Store {
     this.updateLayout();
   }
 
-  colorNodesInAllNetworks(networkId: string | undefined) {
+  colorNodesInModule(module: Module, color: string, updateLayout = true) {
+    const highlightIndex = this.getHighlightIndex(color);
+    module.setColor(highlightIndex);
+
+    this.diagram.children
+      .filter((network) => network.networkId !== module.networkId)
+      .forEach((network) =>
+        [...module.leafNodes()]
+          .reduce((nodes, node) => {
+            const oppositeNode = network.getLeafNode(node.identifier);
+            if (oppositeNode) {
+              oppositeNode.highlightIndex = highlightIndex;
+              nodes.push(oppositeNode);
+            }
+            return nodes;
+          }, [] as LeafNode[])
+          .forEach((node) => node.update())
+      );
+
+    if (updateLayout) this.updateLayout();
+  }
+
+  colorNodesInModulesInAllNetworks(networkId: string | undefined) {
     this.clearColors(false);
 
     const network = this.diagram.getNetwork(
@@ -459,8 +455,52 @@ export class Store {
       .filter((module) => module.isVisible)
       .forEach((module, i) => {
         const color = this.selectedScheme[i % this.selectedScheme.length];
-        this.colorModuleNodesInAllNetworks(module, color, false);
+        this.colorNodesInModule(module, color, false);
       });
+
+    this.updateLayout();
+  }
+
+  colorModuleIds(module: Module, color: string) {
+    const highlightIndex = this.getHighlightIndex(color);
+    module.setColor(highlightIndex);
+    const { moduleId } = module;
+
+    this.diagram.children
+      .filter((network) => network.networkId !== module.networkId)
+      .forEach((network) =>
+        network.children.forEach((module) => {
+          if (module.isVisible && module.moduleId === moduleId) {
+            module.setColor(highlightIndex);
+          }
+        })
+      );
+
+    this.updateLayout();
+  }
+
+  colorModuleIdsInAllNetworks() {
+    const moduleIdColorMap = new Map();
+
+    this.diagram.children.forEach((network) =>
+      network.children.forEach((module) => {
+        if (module.isVisible) {
+          const color = moduleIdColorMap.get(module.moduleId);
+          if (color) {
+            const highligtIndex = this.getHighlightIndex(color);
+            module.setColor(highligtIndex);
+          } else {
+            const color =
+              this.selectedScheme[
+                moduleIdColorMap.size % this.selectedScheme.length
+              ];
+            moduleIdColorMap.set(module.moduleId, color);
+            const highlightIndex = this.getHighlightIndex(color);
+            module.setColor(highlightIndex);
+          }
+        }
+      })
+    );
 
     this.updateLayout();
   }
