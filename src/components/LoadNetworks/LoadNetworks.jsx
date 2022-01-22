@@ -205,9 +205,11 @@ export default observer(function LoadNetworks({ onClose }) {
     if (file.isExpanded) {
       const aggregated = Object.assign({}, file);
       aggregated.id = file.originalId;
+      aggregated.originalId = undefined;
       aggregated.nodes = [];
       aggregated.numLayers = 0;
       aggregated.isExpanded = false;
+      aggregated.layerId = undefined;
 
       let firstIndex = 0;
 
