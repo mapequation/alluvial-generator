@@ -42,7 +42,7 @@ export default observer(function Diagram() {
       store.moveSelectedModule("down");
     } else if (event?.key === "e" && store.selectedModule != null) {
       store.expand(store.selectedModule);
-    } else if (event?.key === "d" && store.selectedModule != null) {
+    } else if (event?.key === "c" && store.selectedModule != null) {
       store.regroup(store.selectedModule);
     } else if (
       ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event?.key)

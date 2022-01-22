@@ -299,7 +299,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                   leftIcon={<MdUnfoldLess />}
                 >
                   Contract
-                  <Kbd ml="auto">D</Kbd>
+                  <Kbd ml="auto">C</Kbd>
                 </Button>
               </ButtonGroup>
             </ListItem>
