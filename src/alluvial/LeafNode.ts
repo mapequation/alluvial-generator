@@ -95,6 +95,14 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     }
   }
 
+  getOpposite(side: Side): LeafNode | null {
+    return this.oppositeNodes[side];
+  }
+
+  setOpposite(node: LeafNode | null, side: Side) {
+    this.oppositeNodes[side] = node;
+  }
+
   add() {
     const root = this.network.parent;
     const module =
@@ -106,11 +114,12 @@ export default class LeafNode extends AlluvialNodeBase<never> {
 
     for (let branch of group) {
       const { side } = branch;
-      let oppositeNode = this.oppositeNodes[side];
+      let oppositeNode = this.getOpposite(side);
 
       if (!oppositeNode) {
-        oppositeNode = this.oppositeNodes[side] =
-          this.network.getNeighbor(side)?.getLeafNode(this.identifier) ?? null;
+        oppositeNode =
+          this.network.getNeighbor(side)?.getLeafNode(this.identifier) || null;
+        this.setOpposite(oppositeNode, side);
       }
 
       const streamlineId = StreamlineNode.createId(this, side, oppositeNode);
@@ -188,14 +197,8 @@ export default class LeafNode extends AlluvialNodeBase<never> {
             if (removeNetwork && network.isEmpty) {
               root.removeChild(network);
 
-              if (this.oppositeNodes[LEFT]) {
-                // @ts-ignore
-                this.oppositeNodes[LEFT].oppositeNodes[RIGHT] = null;
-              }
-              if (this.oppositeNodes[RIGHT]) {
-                // @ts-ignore
-                this.oppositeNodes[RIGHT].oppositeNodes[LEFT] = null;
-              }
+              this.getOpposite(LEFT)?.setOpposite(null, RIGHT);
+              this.getOpposite(RIGHT)?.setOpposite(null, LEFT);
             }
           }
         }
