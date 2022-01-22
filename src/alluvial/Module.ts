@@ -136,7 +136,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   }
 
   expand() {
-    const leafNodes: LeafNode[] = Array.from(this.leafNodes());
+    const leafNodes = this.getLeafNodes();
     if (!leafNodes.length) {
       console.warn(`No leaf nodes found`);
       return;
@@ -179,7 +179,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     const leafNodes: LeafNode[] = [].concat.apply(
       [],
       // @ts-ignore FIXME
-      modules.map((module) => [...module.leafNodes()])
+      modules.map((module) => module.getLeafNodes())
     );
 
     if (!leafNodes.length) {
@@ -201,9 +201,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   }
 
   setColor(highlightIndex: number) {
-    const leafNodes = [...this.leafNodes()];
-
-    leafNodes.forEach((node) => {
+    this.getLeafNodes().forEach((node) => {
       node.highlightIndex = highlightIndex;
       node.update();
     });

@@ -50,7 +50,7 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
   const [color, setColor] = useState(defaultHighlightColor);
   console.log("selectedModule", selectedModule);
 
-  const leafNodes = selectedModule ? [...selectedModule.leafNodes()] : [];
+  const leafNodes = selectedModule ? selectedModule.getLeafNodes() : [];
 
   useEventListener("keydown", (e) => {
     if (store.editMode) return;

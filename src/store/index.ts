@@ -429,7 +429,8 @@ export class Store {
     this.diagram.children
       .filter((network) => network.networkId !== module.networkId)
       .forEach((network) =>
-        [...module.leafNodes()]
+        module
+          .getLeafNodes()
           .reduce((nodes, node) => {
             const oppositeNode = network.getLeafNode(node.identifier);
             if (oppositeNode) {
