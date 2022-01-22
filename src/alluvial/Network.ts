@@ -11,6 +11,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   flowThreshold: number = 0;
   name: string;
   isCustomSorted = false;
+  readonly layerId: number | undefined;
   readonly codelength: number;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
@@ -19,12 +20,14 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     parent: Diagram,
     networkId: string,
     name: string,
-    codelength: number
+    codelength: number,
+    layerId?: number
   ) {
     super(parent, networkId, networkId);
     parent.addChild(this);
     this.name = name;
     this.codelength = codelength;
+    this.layerId = layerId;
   }
 
   get namePosition() {
@@ -42,9 +45,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     parent: Diagram,
     networkId: string,
     name: string,
-    codelength: number
+    codelength: number,
+    layerId?: number
   ) {
-    return new Network(parent, networkId, name, codelength);
+    return new Network(parent, networkId, name, codelength, layerId);
   }
 
   addNodes(nodes: Node[]) {

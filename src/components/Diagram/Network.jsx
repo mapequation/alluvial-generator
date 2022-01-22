@@ -27,7 +27,7 @@ const Network = observer(function Network({ network, fillColor }) {
           animate={network.namePosition}
           transition={{ bounce: 0, duration: 0.2 }}
         >
-          {network.name}
+          {network.layerId != null ? `Layer ${network.layerId}` : network.name}
         </motion.text>
       )}
 
