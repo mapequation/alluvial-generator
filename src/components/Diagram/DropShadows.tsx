@@ -1,10 +1,10 @@
 import { range } from "d3";
 
-const id = (level) => `shadow${level}`;
+const id = (level: number) => `shadow${level}`;
 
 export default function DropShadows({ maxLevel = 1 }) {
   const levels = range(1, maxLevel + 1);
-  const x = (level) => maxLevel + 1 - level;
+  const x = (level: number) => maxLevel + 1 - level;
 
   return (
     <>
@@ -29,10 +29,12 @@ export default function DropShadows({ maxLevel = 1 }) {
   );
 }
 
-DropShadows.getUrl = function (level) {
+DropShadows.getUrl = function (level: number) {
   return `url(#${id(level)})`;
 };
 
 DropShadows.filter = function (enabled = true) {
-  return enabled ? (d) => DropShadows.getUrl(d.moduleLevel) : () => "none";
+  return enabled
+    ? (d: { moduleLevel: number }) => DropShadows.getUrl(d.moduleLevel)
+    : () => "none";
 };
