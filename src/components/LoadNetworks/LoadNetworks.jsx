@@ -9,7 +9,6 @@ import { BiNetworkChart } from "react-icons/bi";
 import {
   Box,
   Button,
-  Icon,
   IconButton,
   List,
   ListItem,
@@ -134,7 +133,7 @@ export default observer(function LoadNetworks({ onClose }) {
           continue;
         }
 
-        setIdentifiers(contents.nodes, format);
+        setIdentifiers(contents, format);
 
         try {
           newFiles.push(
@@ -196,6 +195,86 @@ export default observer(function LoadNetworks({ onClose }) {
     setFiles(newFiles);
   };
 
+  const toggleMultilayerExpanded = (file) => {
+    if (!file.isMultilayer) return;
+
+    if (file.isExpanded === undefined) {
+      file.isExpanded = false;
+    }
+
+    if (file.isExpanded) {
+      const aggregated = Object.assign({}, file);
+      aggregated.id = file.originalId;
+      aggregated.nodes = [];
+      aggregated.numLayers = 0;
+      aggregated.isExpanded = false;
+
+      let firstIndex = 0;
+
+      const parts = files.filter((f, i) => {
+        const part = f.isMultilayer && f.originalId === file.originalId;
+        if (part) {
+          firstIndex = Math.min(firstIndex, i);
+        }
+        return part;
+      });
+
+      for (const part of parts) {
+        aggregated.numLayers++;
+        aggregated.nodes.push(...part.nodes);
+      }
+
+      const numTopModules = new Set();
+      for (const node of aggregated.nodes) {
+        numTopModules.add(node.path[0]);
+      }
+
+      aggregated.numTopModules = numTopModules.size;
+
+      Object.assign(aggregated, calcStatistics(aggregated));
+      setIdentifiers(aggregated, "tree");
+
+      const newFiles = files.filter((f) => f.originalId !== file.originalId);
+      newFiles.splice(firstIndex, 0, aggregated);
+
+      setFiles(newFiles);
+    } else {
+      const layers = {};
+
+      file.isExpanded = true;
+      setIdentifiers(file, "tree");
+
+      file.nodes.forEach((node) => {
+        if (!layers[node.layerId]) {
+          const layer = (layers[node.layerId] = Object.assign({}, file));
+          layer.numTopModules = new Set();
+          layer.id = id();
+          layer.originalId = file.id;
+          layer.name = file.name;
+          layer.lastModified = file.lastModified;
+          layer.numLayers = 1;
+          layer.layerId = node.layerId;
+          layer.size = file.size;
+          layer.nodes = [];
+          layer.isExpanded = true;
+        }
+
+        layers[node.layerId].numTopModules.add(node.path[0]);
+        layers[node.layerId].nodes.push(node);
+      });
+
+      for (const layer of Object.values(layers)) {
+        layer.numTopModules = layer.numTopModules.size;
+        Object.assign(layer, calcStatistics(layer));
+      }
+
+      const index = files.indexOf(file);
+      const newFiles = [...files];
+      newFiles.splice(index, 1, ...Object.values(layers));
+      setFiles(newFiles);
+    }
+  };
+
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
 
@@ -231,7 +310,12 @@ export default observer(function LoadNetworks({ onClose }) {
               onReorder={setFiles}
             >
               {files.map((file) => (
-                <Item key={file.id} file={file} onClick={removeFileId} />
+                <Item
+                  key={file.id}
+                  file={file}
+                  onRemove={() => removeFileId(file.id)}
+                  onMultilayerClick={() => toggleMultilayerExpanded(file)}
+                />
               ))}
             </Reorder.Group>
             <input {...getInputProps()} />
@@ -321,7 +405,7 @@ function FileBackground({ file, fill, ...props }) {
   );
 }
 
-function Item({ file, onClick }) {
+function Item({ file, onRemove, onMultilayerClick }) {
   const x = useMotionValue(0);
   const bg = useColorModeValue("white", "gray.600");
   const fg = useColorModeValue("gray.800", "whiteAlpha.900");
@@ -340,54 +424,46 @@ function Item({ file, onClick }) {
     return nameParts[0].slice(0, maxLength) + "..." + nameParts[1];
   })(file.name);
 
-  const offset = 8 / file.numLayers;
-
   return (
     <Reorder.Item
       id={file.id}
       value={file}
       className="child"
+      role="group"
       style={{ boxShadow, x }}
     >
-      {file.isMultilayer &&
-        Array.from({ length: file.numLayers }).map((_, layer) => (
-          <FileBackground
-            key={layer}
-            file={file}
-            style={{
-              position: "absolute",
-              top: `${offset * (file.numLayers - layer - 1)}px`,
-              left: `${offset * (file.numLayers - layer - 1)}px`,
-            }}
-            fill={fill}
-            opacity={0.2 / file.numLayers}
-          />
-        ))}
-      {!file.isMultilayer && (
-        <FileBackground
-          file={file}
-          style={{ position: "absolute" }}
-          fill={fill}
-        />
-      )}
+      <FileBackground
+        file={file}
+        style={{ position: "absolute" }}
+        fill={fill}
+      />
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={2}>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            boxSize={10}
-            bg={bg}
-            color={fg}
-            borderRadius="full"
-            boxShadow="md"
-          >
-            {file.isMultilayer ? (
-              <Icon as={IoLayersOutline} boxSize={6} color={fg} />
-            ) : (
-              <Icon as={BiNetworkChart} boxSize={6} color={fg} />
-            )}
-          </Box>
+          {file.isMultilayer ? (
+            <IconButton
+              onClick={onMultilayerClick}
+              aria-label="expand"
+              isRound
+              icon={<IoLayersOutline />}
+              size="md"
+              fontSize="1.3rem"
+              color={fg}
+              bg={bg}
+              boxShadow="md"
+            />
+          ) : (
+            <IconButton
+              aria-label="graph"
+              isRound
+              icon={<BiNetworkChart />}
+              size="md"
+              fontSize="1.3rem"
+              pointerEvents="none"
+              color={fg}
+              bg={bg}
+              boxShadow="md"
+            />
+          )}
 
           <List
             bg={bg}
@@ -407,6 +483,12 @@ function Item({ file, onClick }) {
               )}
             </ListItem>
 
+            {file.isMultilayer && !file.isExpanded && (
+              <ListItem>{file.numLayers + " layers"}</ListItem>
+            )}
+            {file.isMultilayer && file.isExpanded && (
+              <ListItem>{"layer " + file.layerId}</ListItem>
+            )}
             {file.nodes && (
               <ListItem>
                 {file.nodes.length +
@@ -414,13 +496,15 @@ function Item({ file, onClick }) {
               </ListItem>
             )}
             {file.numTopModules && (
-              <ListItem>{file.numTopModules + " top modules"}</ListItem>
+              <ListItem>
+                {file.numTopModules +
+                  (file.numTopModules > 1 ? " top modules" : " top module")}
+              </ListItem>
             )}
             {file.numLevels && (
-              <ListItem>{file.numLevels + " levels"}</ListItem>
-            )}
-            {file.isMultilayer && (
-              <ListItem>{file.numLayers + " layers"}</ListItem>
+              <ListItem>
+                {file.numLevels + (file.numLevels > 1 ? " levels" : "level")}
+              </ListItem>
             )}
             {file.codelength && (
               <ListItem>{file.codelength.toFixed(3) + " bits"}</ListItem>
@@ -431,12 +515,21 @@ function Item({ file, onClick }) {
           <IconButton
             isRound
             size="xs"
-            onClick={() => onClick(file.id)}
-            className="delete-button"
+            onClick={onRemove}
+            pos="absolute"
+            top={2}
+            right={2}
+            opacity={0}
+            transform="scale(0.9)"
+            transition="all 0.2s"
+            _groupHover={{
+              opacity: 1,
+              transform: "scale(1)",
+            }}
             aria-label="delete"
             color={fg}
             bg={bg}
-            variant="unstyled"
+            variant="ghost"
             fontSize="1.5rem"
             icon={<MdClear />}
           />
@@ -486,7 +579,7 @@ function createFilesFromDiagramObject(json, file) {
   // TODO extract state
 
   return json.networks.map((network) => {
-    setIdentifiers(network.nodes, "json");
+    setIdentifiers(network, "json");
 
     return {
       ...file,
@@ -525,9 +618,15 @@ function calcStatistics(file) {
   };
 }
 
-function setIdentifiers(nodes, format) {
-  const stateOrNodeId = (node) =>
-    node.stateId != null ? node.stateId : node.id;
+function setIdentifiers(network, format) {
+  const { nodes } = network;
+
+  const stateOrNodeId = (node) => {
+    if (network.isMultilayer && network.isExpanded) {
+      return node.id;
+    }
+    return node.stateId != null ? node.stateId : node.id;
+  };
 
   if (format === "json") {
     nodes.forEach((node) => {
