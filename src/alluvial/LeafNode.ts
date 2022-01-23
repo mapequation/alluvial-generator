@@ -74,7 +74,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     return side === LEFT ? this.leftParent : this.rightParent;
   }
 
-  setParent(parent: StreamlineNode, side: Side) {
+  setParent(parent: StreamlineNode | null, side: Side) {
     if (side === LEFT) {
       this.leftParent = parent;
     } else {
@@ -107,20 +107,26 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     const module =
       this.network.getModule(this.moduleId) ??
       new Module(this.network, this.moduleId, this.moduleLevel);
+
     const group =
       module.getGroup(this.highlightIndex, this.insignificant) ??
       new HighlightGroup(module, this.highlightIndex, this.insignificant);
 
+    // Add the node to the matching streamline node in each branch
+    // of the highlight group. The matching streamline node is determined
+    // by the node's highlight index and whether it is insignificant.
     for (let branch of group) {
       const { side } = branch;
       let oppositeNode = this.getOpposite(side);
       const neighborNetwork = this.network.getNeighbor(side);
 
+      // Does a matching node exist in the neighbor network?
       if (!oppositeNode) {
         oppositeNode = neighborNetwork?.getLeafNode(this.identifier) || null;
         this.setOpposite(oppositeNode, side);
       }
 
+      // Get or create the streamline node this node should be attached to
       const streamlineId = StreamlineNode.createId(this, side, oppositeNode);
       let streamlineNode = this.network.getStreamlineNode(streamlineId);
 
@@ -129,34 +135,42 @@ export default class LeafNode extends AlluvialNodeBase<never> {
         this.network.setStreamlineNode(streamlineNode.id, streamlineNode);
       }
 
+      // If we have a matching node, we need to connect the streamline nodes
+      // that this node and the opposite node are attached to.
       if (oppositeNode) {
         const oppositeSide = opposite(side);
-        oppositeNode.removeFromSide(oppositeSide);
+
+        // Remove the node from its streamline node
+        const oppositeBranch = oppositeNode.removeFromSide(oppositeSide);
+
+        // Look up the opposite streamline node that we should connect to
         const oppositeId = streamlineNode.oppositeId;
         let oppositeStreamlineNode =
           neighborNetwork!.getStreamlineNode(oppositeId);
 
+        // If the corresponding streamline node does not exist, create it
+        // and link to it from this node's streamline node
         if (!oppositeStreamlineNode) {
-          const oldStreamlineNode = oppositeNode.getParent(oppositeSide);
-          if (!oldStreamlineNode || !oldStreamlineNode.parent) {
-            return;
-          }
-
           oppositeStreamlineNode = new StreamlineNode(
-            oldStreamlineNode.parent,
+            oppositeBranch!,
             oppositeId
           );
+
           neighborNetwork!.setStreamlineNode(
             oppositeStreamlineNode.id,
             oppositeStreamlineNode
           );
+
+          // Link the streamline nodes
           streamlineNode.linkTo(oppositeStreamlineNode);
         }
 
+        // Add the opposite node to the (new) streamline node
         oppositeStreamlineNode.addChild(oppositeNode);
         oppositeNode.setParent(oppositeStreamlineNode, oppositeSide);
       }
 
+      // Finally, add the node
       streamlineNode.addChild(this);
       this.setParent(streamlineNode, side);
     }
@@ -207,6 +221,9 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   private removeFromSide(side: Side) {
+    // Returns the branch (parent) of the streamline node
+    // the node is attached to.
+
     const streamlineNode = this.getParent(side);
 
     if (!streamlineNode) {
@@ -214,11 +231,14 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       return;
     }
 
-    // Do not remove node parent, it is used in add later
+    // Convenience reference used in add()
+    const branch = streamlineNode.parent!;
+
     streamlineNode.removeChild(this);
+    this.setParent(null, side);
 
     if (streamlineNode.isEmpty) {
-      // We are deleting streamlineNode,
+      // We are deleting a streamline node,
       // so opposite streamline node must be made dangling.
       const oppositeStreamlineNode = streamlineNode.opposite;
 
@@ -251,7 +271,9 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       }
 
       this.network.removeStreamlineNode(streamlineNode.id);
-      streamlineNode.parent.removeChild(streamlineNode);
+      branch.removeChild(streamlineNode);
     }
+
+    return branch;
   }
 }
