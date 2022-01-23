@@ -32,6 +32,8 @@ export const COLOR_SCHEMES = {
   Tableau10: schemeTableau10,
 } as const;
 
+type SchemeName = keyof typeof COLOR_SCHEMES;
+
 export class Store {
   diagram = new Diagram();
 
@@ -161,7 +163,7 @@ export class Store {
     this.updateLayout();
   });
 
-  setSelectedScheme = action((scheme: keyof typeof COLOR_SCHEMES) => {
+  setSelectedScheme = action((scheme: SchemeName) => {
     this.selectedSchemeName = scheme;
     this.selectedScheme = COLOR_SCHEMES[scheme];
   });
