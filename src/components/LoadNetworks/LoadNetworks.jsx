@@ -23,7 +23,7 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { Step, Steps } from "../../chakra-ui-steps";
+import { Step, Steps } from "chakra-ui-steps";
 import { Reorder, useMotionValue } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useState } from "react";
