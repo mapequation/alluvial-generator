@@ -26,20 +26,6 @@ export interface LayoutOpts {
 type NodeProps = { flow: number; numLeafNodes: number };
 type GetNodeSize = (node: NodeProps) => number;
 
-function getNodeSizeByPropForNetwork(
-  { numLeafNodes }: Network,
-  maxFlow: number
-) {
-  return (property: string): GetNodeSize => {
-    if (property === "flow") {
-      return (node) => node.flow / maxFlow;
-    } else if (property === "nodes") {
-      return (node) => node.numLeafNodes / numLeafNodes;
-    }
-    return () => 0;
-  };
-}
-
 /*
                       Diagram
 +--------------------------------------------------------------------------------------------------------------------------+
@@ -96,7 +82,6 @@ function getNodeSizeByPropForNetwork(
  */
 export default class Diagram extends AlluvialNodeBase<Network> {
   readonly depth = ROOT;
-  private streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
   constructor(networks: any[] = []) {
     super(null, "", "root");
@@ -104,24 +89,6 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     for (let network of networks) {
       this.addNetwork(network);
     }
-  }
-
-  getStreamlineNode(id: string) {
-    return this.streamlineNodesById.get(id);
-  }
-
-  setStreamlineNode(id: string, node: StreamlineNode) {
-    this.streamlineNodesById.set(id, node);
-  }
-
-  removeStreamlineNode(id: string) {
-    this.streamlineNodesById.delete(id);
-  }
-
-  getNetwork(networkId: string): Network | null {
-    return (
-      this.children.find((network) => network.networkId === networkId) ?? null
-    );
   }
 
   addNetwork(network: any) {
@@ -133,6 +100,12 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     }
 
     Network.create(this, id, name, codelength, layerId).addNodes(nodes);
+  }
+
+  getNetwork(networkId: string): Network | null {
+    return (
+      this.children.find((network) => network.networkId === networkId) ?? null
+    );
   }
 
   removeNetwork(network: Network) {
@@ -388,4 +361,18 @@ export default class Diagram extends AlluvialNodeBase<Network> {
 
     console.timeEnd("Diagram.updateLayout");
   }
+}
+
+function getNodeSizeByPropForNetwork(
+  { numLeafNodes }: Network,
+  maxFlow: number
+) {
+  return (property: string): GetNodeSize => {
+    if (property === "flow") {
+      return (node) => node.flow / maxFlow;
+    } else if (property === "nodes") {
+      return (node) => node.numLeafNodes / numLeafNodes;
+    }
+    return () => 0;
+  };
 }

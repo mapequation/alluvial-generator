@@ -5,6 +5,7 @@ import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
 import { moveItem } from "../utils/array";
+import StreamlineNode from "./StreamlineNode";
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
@@ -15,6 +16,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly codelength: number;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
+  private streamlineNodesById: Map<string, StreamlineNode> = new Map();
 
   constructor(
     parent: Diagram,
@@ -103,6 +105,18 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   getLeafNode(identifier: string): LeafNode | null {
     return this.nodesByIdentifier.get(identifier) ?? null;
+  }
+
+  getStreamlineNode(id: string) {
+    return this.streamlineNodesById.get(id);
+  }
+
+  setStreamlineNode(id: string, node: StreamlineNode) {
+    this.streamlineNodesById.set(id, node);
+  }
+
+  removeStreamlineNode(id: string) {
+    this.streamlineNodesById.delete(id);
   }
 
   moveToIndex(fromIndex: number, toIndex: number) {
