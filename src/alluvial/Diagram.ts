@@ -108,14 +108,6 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     );
   }
 
-  removeNetwork(network: Network) {
-    if (!this.children.includes(network)) {
-      throw new Error(`Network with id ${network.networkId} does not exist`);
-    }
-
-    this.children = this.children.filter((child) => child !== network);
-  }
-
   calcFlow() {
     console.time("Diagram.calcFlow");
     this.forEachDepthFirstPostOrderWhile(
