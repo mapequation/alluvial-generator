@@ -40,6 +40,10 @@ export default observer(function Diagram() {
       store.moveSelectedModule("up");
     } else if (event?.key === "s") {
       store.moveSelectedModule("down");
+    } else if (event?.key === "a") {
+      store.moveNetwork("left");
+    } else if (event?.key === "d") {
+      store.moveNetwork("right");
     } else if (event?.key === "e" && store.selectedModule != null) {
       store.expand(store.selectedModule);
     } else if (event?.key === "c" && store.selectedModule != null) {

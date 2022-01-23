@@ -246,6 +246,10 @@ export class Store {
     }
   });
 
+  toggleUpdate = action(() => {
+    this.updateFlag = !this.updateFlag;
+  });
+
   selectModule(direction: "up" | "down" | "left" | "right") {
     if (!this.selectedModule) return;
 
@@ -538,16 +542,24 @@ export class Store {
     this.updateLayout();
   }
 
-  toggleUpdate = action(() => {
-    this.updateFlag = !this.updateFlag;
-  });
-
   moveSelectedModule(direction: "up" | "down") {
     if (!this.selectedModule) return;
 
     if (direction === "up") this.selectedModule.moveUp();
     else this.selectedModule.moveDown();
 
+    this.diagram.updateLayout(this);
+    this.toggleUpdate();
+  }
+
+  moveNetwork(direction: "left" | "right") {
+    if (!this.selectedModule) return;
+
+    this.diagram
+      .getNetwork(this.selectedModule.networkId)
+      ?.moveTo(direction === "left" ? LEFT : RIGHT);
+
+    console.log(this.diagram);
     this.diagram.updateLayout(this);
     this.toggleUpdate();
   }

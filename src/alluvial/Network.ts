@@ -4,6 +4,7 @@ import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
+import { LEFT, RIGHT } from "./Side";
 import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
 
@@ -121,6 +122,28 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   moveToIndex(fromIndex: number, toIndex: number) {
     moveItem(this.children, fromIndex, toIndex);
+  }
+
+  moveTo(direction: Side) {
+    const index = this.parent.children.indexOf(this);
+    const newIndex = index + direction;
+
+    if (newIndex < 0 || newIndex > this.parent.children.length - 1) {
+      console.warn("Cannot move network further");
+      return;
+    }
+
+    // Moving a network to the left is equivalent to moving
+    // the network to the left of this network to the right.
+    if (direction === LEFT) {
+      this.getNeighbor(LEFT)?.moveTo(RIGHT);
+      return;
+    }
+
+    // Only implement moving to the right.
+
+    // this.parent.children.splice(index, 1);
+    // this.parent.children.splice(index + 1, 0, this);
   }
 
   getLinks(streamlineThreshold: number = 0) {
