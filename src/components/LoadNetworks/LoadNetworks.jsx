@@ -244,7 +244,7 @@ export default observer(function LoadNetworks({ onClose }) {
       const layers = {};
 
       file.isExpanded = true;
-      setIdentifiers(file, "tree");
+      setIdentifiers(file, "multilayer-expanded");
 
       file.nodes.forEach((node) => {
         if (!layers[node.layerId]) {
@@ -623,14 +623,14 @@ function calcStatistics(file) {
 function setIdentifiers(network, format) {
   const { nodes } = network;
 
-  const stateOrNodeId = (node) => {
-    if (network.isMultilayer && network.isExpanded) {
-      return node.id;
-    }
-    return node.stateId != null ? node.stateId : node.id;
-  };
+  const stateOrNodeId = (node) =>
+    node.stateId != null ? node.stateId : node.id;
 
-  if (format === "json") {
+  if (format === "multilayer-expanded") {
+    // Expanded multilayer networks must use the physical
+    // node id, as the state ids are unique per layer.
+    nodes.forEach((node) => (node.identifier = node.id.toString()));
+  } else if (format === "json") {
     nodes.forEach((node) => {
       node.identifier = node.identifier ?? stateOrNodeId(node).toString();
       if (!Array.isArray(node.path)) {
