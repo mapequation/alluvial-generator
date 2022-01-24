@@ -58,19 +58,23 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     side: Side,
     target: LeafNode | null = null
   ) {
+    const sourceInsignificant = source.insignificant ? "i" : "";
+
+    // prettier-ignore
+    const sourceString = `${source.networkId}_module${source.moduleId}` +
+      `_group${sourceInsignificant}${source.highlightIndex}_${sideToString(side)}`;
+
     if (!target) {
-      return `${source.networkId}_module${source.moduleId}_group${
-        source.insignificant ? "i" : ""
-      }${source.highlightIndex}_${sideToString(side)}`;
+      return sourceString;
     }
 
-    return `${source.networkId}_module${source.moduleId}_group${
-      source.insignificant ? "i" : ""
-    }${source.highlightIndex}_${sideToString(side)}--${
-      target.networkId
-    }_module${target.moduleId}_group${target.insignificant ? "i" : ""}${
-      target.highlightIndex
-    }_${sideToString(opposite(side))}`;
+    const targetInsignificant = target.insignificant ? "i" : "";
+
+    // prettier-ignore
+    const targetString = `${target.networkId}_module${target.moduleId}` +
+      `_group${targetInsignificant}${target.highlightIndex}_${sideToString(opposite(side))}`;
+
+    return `${sourceString}--${targetString}`;
   }
 
   addChild(node: LeafNode): number {
