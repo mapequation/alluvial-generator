@@ -144,48 +144,52 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     // We know that there is a neighbor to the right.
     const neighbor = this.getNeighbor(RIGHT)!;
 
-    const rewire = (network: Network, reverse = true) => {
+    // Reverse the "inner" branch of the network.
+    // This network's right branch,
+    // and the neighbor's left branch.
+    const rewire = (network: Network, side: Side, reverse = true) => {
       for (const module of network) {
         for (const group of module) {
-          for (const branch of group) {
-            const { side } = branch;
-            const oppositeSide = opposite(side);
+          const branch = side === LEFT ? group.left : group.right;
 
-            for (const streamlineNode of branch) {
-              if (reverse && streamlineNode.link) {
-                streamlineNode.link.reverse();
-              }
+          const oppositeSide = opposite(side);
 
-              streamlineNode.side = oppositeSide;
-              network.removeStreamlineNode(streamlineNode.id);
+          for (const streamlineNode of branch) {
+            if (reverse && streamlineNode.link) {
+              // Only do this once per streamline link.
+              streamlineNode.link.reverse();
+            }
 
-              streamlineNode.sourceId = streamlineNode.sourceId.replace(
-                sideToString(side),
-                sideToString(oppositeSide)
-              );
+            network.removeStreamlineNode(streamlineNode.id);
 
-              if (streamlineNode.targetId) {
-                streamlineNode.targetId = streamlineNode.targetId.replace(
-                  sideToString(oppositeSide),
-                  sideToString(side)
-                );
-              }
+            // Reverse the side and ids.
+            streamlineNode.side = oppositeSide;
 
-              streamlineNode.id = streamlineNode.targetId
-                ? `${streamlineNode.sourceId}--${streamlineNode.targetId}`
-                : streamlineNode.sourceId;
-              network.setStreamlineNode(streamlineNode.id, streamlineNode);
+            const sideString = sideToString(side);
+            const oppositeSideString = sideToString(oppositeSide);
 
-              for (const node of streamlineNode) {
-                const leftOpposite = node.getOpposite(LEFT);
-                const rightOpposite = node.getOpposite(RIGHT);
-                node.setOpposite(leftOpposite, RIGHT);
-                node.setOpposite(rightOpposite, LEFT);
-                const leftParent = node.getParent(LEFT);
-                const rightParent = node.getParent(RIGHT);
-                node.setParent(leftParent, RIGHT);
-                node.setParent(rightParent, LEFT);
-              }
+            streamlineNode.sourceId.replace(sideString, oppositeSideString);
+
+            if (streamlineNode.targetId) {
+              streamlineNode.targetId.replace(oppositeSideString, sideString);
+            }
+
+            streamlineNode.id = streamlineNode.targetId
+              ? `${streamlineNode.sourceId}--${streamlineNode.targetId}`
+              : streamlineNode.sourceId;
+
+            network.setStreamlineNode(streamlineNode.id, streamlineNode);
+
+            // Set (and unset) opposite nodes and parents.
+            for (const node of streamlineNode) {
+              const oppositeNode = node.getOpposite(side);
+              node.setOpposite(oppositeNode, oppositeSide);
+              node.setOpposite(null, side);
+
+              const sideParent = node.getParent(side);
+              const oppositeParent = node.getParent(oppositeSide);
+              node.setParent(sideParent, oppositeSide);
+              node.setParent(oppositeParent, side);
             }
           }
 
@@ -197,11 +201,14 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       }
     };
 
-    rewire(this);
-    rewire(neighbor, false);
+    rewire(this, RIGHT);
+    rewire(neighbor, LEFT, false);
 
     this.parent.children.splice(index, 1);
     this.parent.children.splice(index + 1, 0, this);
+
+    const leftAdjacent = this.getNeighbor(LEFT);
+    const rightAdjacent = neighbor.getNeighbor(RIGHT);
   }
 
   getLinks(streamlineThreshold: number = 0) {
