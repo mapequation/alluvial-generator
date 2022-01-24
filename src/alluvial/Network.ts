@@ -4,7 +4,7 @@ import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
-import { LEFT, RIGHT } from "./Side";
+import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
 
@@ -141,9 +141,67 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
 
     // Only implement moving to the right.
+    // We know that there is a neighbor to the right.
+    const neighbor = this.getNeighbor(RIGHT)!;
 
-    // this.parent.children.splice(index, 1);
-    // this.parent.children.splice(index + 1, 0, this);
+    const rewire = (network: Network, reverse = true) => {
+      for (const module of network) {
+        for (const group of module) {
+          for (const branch of group) {
+            const { side } = branch;
+            const oppositeSide = opposite(side);
+
+            for (const streamlineNode of branch) {
+              if (reverse && streamlineNode.link) {
+                streamlineNode.link.reverse();
+              }
+
+              streamlineNode.side = oppositeSide;
+              network.removeStreamlineNode(streamlineNode.id);
+
+              streamlineNode.sourceId = streamlineNode.sourceId.replace(
+                sideToString(side),
+                sideToString(oppositeSide)
+              );
+
+              if (streamlineNode.targetId) {
+                streamlineNode.targetId = streamlineNode.targetId.replace(
+                  sideToString(oppositeSide),
+                  sideToString(side)
+                );
+              }
+
+              streamlineNode.id = streamlineNode.targetId
+                ? `${streamlineNode.sourceId}--${streamlineNode.targetId}`
+                : streamlineNode.sourceId;
+              network.setStreamlineNode(streamlineNode.id, streamlineNode);
+
+              for (const node of streamlineNode) {
+                const leftOpposite = node.getOpposite(LEFT);
+                const rightOpposite = node.getOpposite(RIGHT);
+                node.setOpposite(leftOpposite, RIGHT);
+                node.setOpposite(rightOpposite, LEFT);
+                const leftParent = node.getParent(LEFT);
+                const rightParent = node.getParent(RIGHT);
+                node.setParent(leftParent, RIGHT);
+                node.setParent(rightParent, LEFT);
+              }
+            }
+          }
+
+          const [left, right] = group.children;
+          left.side = RIGHT;
+          right.side = LEFT;
+          group.children.reverse();
+        }
+      }
+    };
+
+    rewire(this);
+    rewire(neighbor, false);
+
+    this.parent.children.splice(index, 1);
+    this.parent.children.splice(index + 1, 0, this);
   }
 
   getLinks(streamlineThreshold: number = 0) {

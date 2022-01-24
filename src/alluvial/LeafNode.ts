@@ -260,6 +260,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
             node.setParent(alreadyDanglingStreamlineNode, oppositeSide);
           }
 
+          oppositeStreamlineNode.children.length = 0;
           oppositeStreamlineNode.parent?.removeChild(oppositeStreamlineNode);
         } else {
           // Update with the new dangling id
