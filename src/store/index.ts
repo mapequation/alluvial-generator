@@ -105,18 +105,24 @@ export class Store {
     });
   }
 
-  setNetworks = action((networks: any[]) => {
+  setNetworks = action((networks: any[], selectLargest = true) => {
     console.time("Store.setNetworks");
     this.setSelectedModule(null);
     this.diagram = new Diagram(networks);
     this.numNetworks = networks.length;
     this.updateLayout();
+
+    // Select the largest module in the leftmost network.
+    if (selectLargest) {
+      this.setSelectedModule(this.diagram.children[0]?.children[0]);
+    }
+
     console.timeEnd("Store.setNetworks");
   });
 
-  setFiles = action((files: any[]) => {
+  setFiles = action((files: any[], selectLargest = true) => {
     this.files = files;
-    this.setNetworks(files);
+    this.setNetworks(files, selectLargest);
   });
 
   setHeight = action((height: number) => {
@@ -574,12 +580,11 @@ export class Store {
 
     const file = files.splice(index, 1)[0];
     files.splice(newIndex, 0, file);
-    this.setFiles(files);
+    this.setFiles(files, false);
 
-    const module = this.diagram.children[newIndex].getModule(
-      selectedModule.moduleId
-    )!;
-    this.setSelectedModule(module);
+    this.setSelectedModule(
+      this.diagram.children[newIndex].getModule(selectedModule.moduleId)!
+    );
   }
 }
 
