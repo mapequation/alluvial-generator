@@ -44,7 +44,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     this.identifier = node.identifier;
     this.treePath = new TreePath(node.path);
     this.highlightIndex =
-      node.highlightIndex && Number.isInteger(node.highlightIndex)
+      node.highlightIndex != null && Number.isInteger(node.highlightIndex)
         ? node.highlightIndex
         : NOT_HIGHLIGHTED;
     this.moduleLevel =

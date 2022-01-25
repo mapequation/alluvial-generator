@@ -114,12 +114,6 @@ export class Store {
     console.timeEnd("Store.setNetworks");
   });
 
-  addNetwork(network: any) {
-    this.diagram.addNetwork(network);
-    this.numNetworks++;
-    this.updateLayout();
-  }
-
   setFiles = action((files: any[]) => {
     this.files = files;
     this.setNetworks(files);
@@ -553,14 +547,39 @@ export class Store {
   }
 
   moveNetwork(direction: "left" | "right") {
-    if (!this.selectedModule) return;
+    const selectedModule = this.selectedModule;
+    if (!selectedModule) return;
 
-    this.diagram
-      .getNetwork(this.selectedModule.networkId)
-      ?.moveTo(direction === "left" ? LEFT : RIGHT);
+    const network = this.diagram.getNetwork(selectedModule.networkId)!;
+    const index = this.diagram.children.indexOf(network);
+    const newIndex = index + (direction === "left" ? LEFT : RIGHT);
 
-    this.diagram.updateLayout(this);
-    this.toggleUpdate();
+    if (newIndex < 0 || newIndex > this.diagram.children.length - 1) {
+      console.warn("Cannot move network further");
+      return;
+    }
+
+    const { files } = this;
+
+    for (const file of files) {
+      const network = this.diagram.getNetwork(file.id)!;
+      file.name = network.name;
+
+      for (const node of file.nodes) {
+        const leafNode = network.getLeafNode(node.identifier)!;
+        node.highlightIndex = leafNode.highlightIndex;
+        node.moduleLevel = leafNode.moduleLevel;
+      }
+    }
+
+    const file = files.splice(index, 1)[0];
+    files.splice(newIndex, 0, file);
+    this.setFiles(files);
+
+    const module = this.diagram.children[newIndex].getModule(
+      selectedModule.moduleId
+    )!;
+    this.setSelectedModule(module);
   }
 }
 

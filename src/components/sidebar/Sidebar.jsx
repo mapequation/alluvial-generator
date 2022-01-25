@@ -28,7 +28,9 @@ import {
   MdFileDownload,
   MdFileUpload,
   MdHelp,
+  MdOutlineArrowBack,
   MdOutlineArrowDownward,
+  MdOutlineArrowForward,
   MdOutlineArrowUpward,
   MdRestartAlt,
   MdUnfoldLess,
@@ -280,6 +282,26 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
                 >
                   Move down
                   <Kbd ml="auto">S</Kbd>
+                </Button>
+              </ButtonGroup>
+            </ListItem>
+            <ListItem>
+              <ButtonGroup isAttached w="100%">
+                <Button
+                  onClick={() => store.moveNetwork("left")}
+                  isDisabled={store.selectedModule === null}
+                  leftIcon={<MdOutlineArrowBack />}
+                >
+                  Move left
+                  <Kbd ml="auto">A</Kbd>
+                </Button>
+                <Button
+                  onClick={() => store.moveNetwork("right")}
+                  isDisabled={store.selectedModule === null}
+                  leftIcon={<MdOutlineArrowForward />}
+                >
+                  Move right
+                  <Kbd ml="auto">D</Kbd>
                 </Button>
               </ButtonGroup>
             </ListItem>

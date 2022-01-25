@@ -4,7 +4,6 @@ import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
-import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
 
@@ -122,93 +121,6 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   moveToIndex(fromIndex: number, toIndex: number) {
     moveItem(this.children, fromIndex, toIndex);
-  }
-
-  moveTo(direction: Side) {
-    const index = this.parent.children.indexOf(this);
-    const newIndex = index + direction;
-
-    if (newIndex < 0 || newIndex > this.parent.children.length - 1) {
-      console.warn("Cannot move network further");
-      return;
-    }
-
-    // Moving a network to the left is equivalent to moving
-    // the network to the left of this network to the right.
-    if (direction === LEFT) {
-      this.getNeighbor(LEFT)?.moveTo(RIGHT);
-      return;
-    }
-
-    // Only implement moving to the right.
-    // We know that there is a neighbor to the right.
-    const neighbor = this.getNeighbor(RIGHT)!;
-
-    // Reverse the "inner" branch of the network.
-    // This network's right branch,
-    // and the neighbor's left branch.
-    const rewire = (network: Network, side: Side, reverse = true) => {
-      for (const module of network) {
-        for (const group of module) {
-          const branch = side === LEFT ? group.left : group.right;
-
-          const oppositeSide = opposite(side);
-
-          for (const streamlineNode of branch) {
-            if (reverse && streamlineNode.link) {
-              // Only do this once per streamline link.
-              streamlineNode.link.reverse();
-            }
-
-            network.removeStreamlineNode(streamlineNode.id);
-
-            // Reverse the side and ids.
-            streamlineNode.side = oppositeSide;
-
-            const sideString = sideToString(side);
-            const oppositeSideString = sideToString(oppositeSide);
-
-            streamlineNode.sourceId.replace(sideString, oppositeSideString);
-
-            if (streamlineNode.targetId) {
-              streamlineNode.targetId.replace(oppositeSideString, sideString);
-            }
-
-            streamlineNode.id = streamlineNode.targetId
-              ? `${streamlineNode.sourceId}--${streamlineNode.targetId}`
-              : streamlineNode.sourceId;
-
-            network.setStreamlineNode(streamlineNode.id, streamlineNode);
-
-            // Set (and unset) opposite nodes and parents.
-            for (const node of streamlineNode) {
-              const oppositeNode = node.getOpposite(side);
-              node.setOpposite(oppositeNode, oppositeSide);
-              node.setOpposite(null, side);
-
-              const sideParent = node.getParent(side);
-              const oppositeParent = node.getParent(oppositeSide);
-              node.setParent(sideParent, oppositeSide);
-              node.setParent(oppositeParent, side);
-            }
-          }
-
-          const [left, right] = group.children;
-          left.side = RIGHT;
-          right.side = LEFT;
-          group.children.reverse();
-        }
-      }
-    };
-
-    rewire(this, RIGHT);
-    rewire(neighbor, LEFT, false);
-
-    this.parent.children.splice(index, 1);
-    this.parent.children.splice(index + 1, 0, this);
-
-    const leftAdjacent = this.getNeighbor(LEFT);
-    const rightAdjacent = neighbor.getNeighbor(RIGHT);
   }
 
   getLinks(streamlineThreshold: number = 0) {
