@@ -556,6 +556,8 @@ export class Store {
     const selectedModule = this.selectedModule;
     if (!selectedModule) return;
 
+    console.time("Store.moveNetwork");
+
     const network = this.diagram.getNetwork(selectedModule.networkId)!;
     const index = this.diagram.children.indexOf(network);
     const newIndex = index + (direction === "left" ? LEFT : RIGHT);
@@ -585,6 +587,8 @@ export class Store {
     this.setSelectedModule(
       this.diagram.children[newIndex].getModule(selectedModule.moduleId)!
     );
+
+    console.timeEnd("Store.moveNetwork");
   }
 }
 
