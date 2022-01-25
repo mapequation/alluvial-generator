@@ -1,12 +1,9 @@
 import type StreamlineNode from "./StreamlineNode";
 
 export default class StreamlineLink {
-  left: StreamlineNode;
-  right: StreamlineNode;
-
   constructor(
-    left: StreamlineNode,
-    right: StreamlineNode,
+    public readonly left: StreamlineNode,
+    public readonly right: StreamlineNode,
     reverse: boolean = false
   ) {
     this.left = reverse ? right : left;
@@ -100,11 +97,5 @@ export default class StreamlineLink {
   remove() {
     this.left.link = null;
     this.right.link = null;
-  }
-
-  reverse() {
-    const { left, right } = this;
-    this.left = right;
-    this.right = left;
   }
 }

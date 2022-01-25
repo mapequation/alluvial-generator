@@ -91,7 +91,7 @@ export default abstract class AlluvialNode<
   protected constructor(
     public parent: ParentType,
     public readonly networkId: string,
-    public id: string = ""
+    public readonly id: string = ""
   ) {
     super();
   }

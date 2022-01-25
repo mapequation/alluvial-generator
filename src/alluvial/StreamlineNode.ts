@@ -10,8 +10,8 @@ import type HighlightGroup from "./HighlightGroup";
 export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
   readonly depth = STREAMLINE_NODE;
   link: StreamlineLink | null = null;
-  side: Side;
-  sourceId: string;
+  readonly side: Side;
+  readonly sourceId: string;
   targetId: string | null;
 
   constructor(parent: Branch, id: string) {
