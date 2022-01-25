@@ -132,7 +132,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
 
       if (!streamlineNode) {
         streamlineNode = new StreamlineNode(branch, streamlineId);
-        this.network.setStreamlineNode(streamlineNode.id, streamlineNode);
+        this.network.setStreamlineNode(
+          streamlineNode.currentId,
+          streamlineNode
+        );
       }
 
       // If we have a matching node, we need to connect the streamline nodes
@@ -157,7 +160,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
           );
 
           neighborNetwork!.setStreamlineNode(
-            oppositeStreamlineNode.id,
+            oppositeStreamlineNode.currentId,
             oppositeStreamlineNode
           );
 
@@ -246,12 +249,13 @@ export default class LeafNode extends AlluvialNodeBase<never> {
         const neighborNetwork = this.network.getNeighbor(side)!;
 
         // Delete the old id
-        neighborNetwork.removeStreamlineNode(oppositeStreamlineNode.id);
+        neighborNetwork.removeStreamlineNode(oppositeStreamlineNode.currentId);
         oppositeStreamlineNode.makeDangling().removeLink();
 
         const alreadyDanglingStreamlineNode = neighborNetwork.getStreamlineNode(
-          oppositeStreamlineNode.id
+          oppositeStreamlineNode.currentId
         );
+
         // Does the (new) dangling id already exist? Move nodes from it.
         if (alreadyDanglingStreamlineNode) {
           const oppositeSide = opposite(side);
@@ -265,13 +269,13 @@ export default class LeafNode extends AlluvialNodeBase<never> {
         } else {
           // Update with the new dangling id
           neighborNetwork.setStreamlineNode(
-            oppositeStreamlineNode.id,
+            oppositeStreamlineNode.currentId,
             oppositeStreamlineNode
           );
         }
       }
 
-      this.network.removeStreamlineNode(streamlineNode.id);
+      this.network.removeStreamlineNode(streamlineNode.currentId);
       branch.removeChild(streamlineNode);
     }
 

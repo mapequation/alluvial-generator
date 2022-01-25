@@ -15,7 +15,7 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
   targetId: string | null;
 
   constructor(parent: Branch, id: string) {
-    super(parent, parent.networkId, id);
+    super(parent, parent.networkId, "");
     parent.addChild(this);
     this.side = parent.side;
     const [source, target] = id.split("--");
@@ -27,8 +27,18 @@ export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
     return this.children.length;
   }
 
+  get currentId() {
+    return !this.isDangling
+      ? `${this.sourceId}--${this.targetId}`
+      : this.sourceId;
+  }
+
   get oppositeId() {
-    return `${this.targetId || "NULL"}--${this.sourceId}`;
+    return `${this.targetId ?? "NULL"}--${this.sourceId}`;
+  }
+
+  get isDangling() {
+    return this.targetId === null;
   }
 
   get oppositeStreamlinePosition() {

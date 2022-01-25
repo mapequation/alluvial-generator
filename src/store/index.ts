@@ -559,7 +559,6 @@ export class Store {
       .getNetwork(this.selectedModule.networkId)
       ?.moveTo(direction === "left" ? LEFT : RIGHT);
 
-    console.log(this.diagram);
     this.diagram.updateLayout(this);
     this.toggleUpdate();
   }

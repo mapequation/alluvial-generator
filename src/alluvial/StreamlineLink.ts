@@ -14,31 +14,7 @@ export default class StreamlineLink {
   }
 
   get id() {
-    return this.left?.id ?? "";
-  }
-
-  get sourceId() {
-    return this.left?.sourceId.replace("_right", "");
-  }
-
-  get targetId() {
-    return this.left?.targetId?.replace("_left", "") ?? "";
-  }
-
-  get leftNetworkId() {
-    return this.left?.networkId ?? "";
-  }
-
-  get rightNetworkId() {
-    return this.right?.networkId ?? "";
-  }
-
-  get leftModuleId() {
-    return this.left?.parent?.parent?.parent?.moduleId ?? 0;
-  }
-
-  get rightModuleId() {
-    return this.right?.parent?.parent?.parent?.moduleId ?? 0;
+    return this.left?.currentId ?? "";
   }
 
   get leftHighlightIndex() {
@@ -51,14 +27,6 @@ export default class StreamlineLink {
 
   get highlightIndex() {
     return Math.max(this.leftHighlightIndex, this.rightHighlightIndex);
-  }
-
-  get leftInsignificant() {
-    return this.left?.parent?.parent?.insignificant ?? false;
-  }
-
-  get rightInsignificant() {
-    return this.right?.parent?.parent?.insignificant ?? false;
   }
 
   get x0() {
