@@ -128,12 +128,20 @@ export default observer(function LoadNetworks({ onClose }) {
 
         try {
           newFiles.push(
-            Object.assign(file, {
-              id: id(),
-              format,
-              ...calcStatistics(contents),
-              ...contents,
-            })
+            Object.assign(
+              {},
+              {
+                ...file,
+                fileName: file.name, // Save the original filename so we don't overwrite it
+                name: file.name,
+                lastModified: file.lastModified,
+                size: file.size,
+                id: id(),
+                format,
+                ...calcStatistics(contents),
+                ...contents,
+              }
+            )
           );
         } catch (e) {
           errors.push(createError(file, "invalid-format", e.message));
@@ -195,6 +203,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
     if (file.isExpanded) {
       const aggregated = Object.assign({}, file);
+      aggregated.name = file.fileName;
       aggregated.id = file.originalId;
       aggregated.originalId = undefined;
       aggregated.nodes = [];
@@ -239,17 +248,31 @@ export default observer(function LoadNetworks({ onClose }) {
 
       file.nodes.forEach((node) => {
         if (!layers[node.layerId]) {
-          const layer = (layers[node.layerId] = Object.assign({}, file));
+          const layerId = node.layerId;
+          const layer = (layers[layerId] = Object.assign({}, file));
           layer.numTopModules = new Set();
           layer.id = id();
           layer.originalId = file.id;
-          layer.name = file.name;
+
           layer.lastModified = file.lastModified;
           layer.numLayers = 1;
-          layer.layerId = node.layerId;
+          layer.layerId = layerId;
           layer.size = file.size;
           layer.nodes = [];
           layer.isExpanded = true;
+
+          let layerNameFound = false;
+          if (file.layers != null) {
+            const name = file.layers?.find((l) => l.id === layerId)?.name;
+            if (name != null) {
+              layerNameFound = true;
+              layer.name = name;
+            }
+          }
+
+          if (!layerNameFound) {
+            layer.name = `Layer ${layerId}`;
+          }
         }
 
         layers[node.layerId].numTopModules.add(node.path[0]);
@@ -376,6 +399,7 @@ function createFilesFromDiagramObject(json, file) {
       ...file,
       lastModified: file.lastModified,
       size: (file.size * network.nodes.length) / totNodes,
+      fileName: file.name,
       name: network.name,
       id: network.id,
       format: "json",

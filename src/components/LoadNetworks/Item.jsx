@@ -32,7 +32,7 @@ export default function Item({ file, onRemove, onMultilayerClick }) {
       return name;
     }
     return nameParts[0].slice(0, maxLength) + "..." + nameParts[1];
-  })(file.name);
+  })(file.fileName);
 
   return (
     <Reorder.Item
@@ -84,10 +84,10 @@ export default function Item({ file, onRemove, onMultilayerClick }) {
             mt={8}
           >
             <ListItem fontWeight={600} overflowWrap="anyhwere">
-              {truncatedName.length === file.name.length ? (
-                file.name
+              {truncatedName.length === file.fileName.length ? (
+                file.fileName
               ) : (
-                <Tooltip label={file.name} aria-label={file.name}>
+                <Tooltip label={file.fileName} aria-label={file.fileName}>
                   {truncatedName}
                 </Tooltip>
               )}
