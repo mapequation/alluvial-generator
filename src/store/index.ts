@@ -569,20 +569,27 @@ export class Store {
 
     const { files } = this;
 
+    const newFiles = [];
+
     for (const file of files) {
       const network = this.diagram.getNetwork(file.id)!;
-      file.name = network.name;
 
       for (const node of file.nodes) {
         const leafNode = network.getLeafNode(node.identifier)!;
         node.highlightIndex = leafNode.highlightIndex;
         node.moduleLevel = leafNode.moduleLevel;
       }
+
+      const newFile = { ...file };
+      newFile.name = network.name;
+      newFile.size = file.size;
+      newFile.lastModified = file.lastModified;
+      newFiles.push(file);
     }
 
-    const file = files.splice(index, 1)[0];
-    files.splice(newIndex, 0, file);
-    this.setFiles(files, false);
+    const file = newFiles.splice(index, 1)[0];
+    newFiles.splice(newIndex, 0, file);
+    this.setFiles(newFiles, false);
 
     this.setSelectedModule(
       this.diagram.children[newIndex].getModule(selectedModule.moduleId)!
