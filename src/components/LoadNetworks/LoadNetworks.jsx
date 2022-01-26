@@ -119,7 +119,7 @@ export default observer(function LoadNetworks({ onClose }) {
           }
         } else {
           try {
-            contents = parse(readFiles[i]);
+            contents = parse(readFiles[i], null, true);
           } catch (e) {
             errors.push(createError(file, "parse-error", e.message));
             continue;

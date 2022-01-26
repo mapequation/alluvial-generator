@@ -6,6 +6,7 @@ import Module from "./Module";
 import type { Side } from "./Side";
 import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
+import type { Module as InfomapModule } from "@mapequation/infomap";
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
@@ -17,19 +18,28 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
+  moduleLinks?: Map<string, InfomapModule> = undefined;
 
   constructor(
     parent: Diagram,
     networkId: string,
     name: string,
     codelength: number,
-    layerId?: number
+    layerId?: number,
+    modules?: InfomapModule[]
   ) {
     super(parent, networkId, networkId);
     parent.addChild(this);
     this.name = name;
     this.codelength = codelength;
     this.layerId = layerId;
+
+    if (modules) {
+      this.moduleLinks = new Map();
+      for (const module of modules) {
+        this.moduleLinks.set(module.path.join(":"), module);
+      }
+    }
   }
 
   get namePosition() {
@@ -48,9 +58,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     networkId: string,
     name: string,
     codelength: number,
-    layerId?: number
+    layerId?: number,
+    modules?: InfomapModule[]
   ) {
-    return new Network(parent, networkId, name, codelength, layerId);
+    return new Network(parent, networkId, name, codelength, layerId, modules);
   }
 
   addNodes(nodes: Node[]) {

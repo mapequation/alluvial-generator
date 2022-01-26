@@ -43,8 +43,13 @@ import { COLOR_SCHEMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
+import { Swatch } from "./Swatch";
 
-export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
+export default observer(function Sidebar({
+  onLoadClick,
+  onAboutClick,
+  onModuleViewClick,
+}) {
   const store = useContext(StoreContext);
   const { selectedModule, defaultHighlightColor } = store;
   const bg = useColorModeValue("white", "gray.800");
@@ -326,6 +331,14 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
               </ButtonGroup>
             </ListItem>
 
+            <ListItemButton
+              onClick={onModuleViewClick}
+              leftIcon={<MdFileUpload />}
+            >
+              Open module
+              {/*<Kbd ml="auto">L</Kbd>*/}
+            </ListItemButton>
+
             <ListItem>
               <Label>Network</Label>
               <Editable
@@ -516,29 +529,6 @@ export default observer(function Sidebar({ onLoadClick, onAboutClick }) {
     </Box>
   );
 });
-
-function Swatch({ color, isSelected, onClick }) {
-  const border = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
-
-  return (
-    <Box
-      as="button"
-      bg={color}
-      h="24px"
-      w="25px"
-      rounded="sm"
-      transition="all 0.1s linear"
-      boxShadow={isSelected ? "lg" : "md"}
-      borderWidth={3}
-      borderColor={isSelected ? color : border}
-      _hover={{
-        transform: "scale(1.2)",
-        borderColor: color,
-      }}
-      onClick={onClick}
-    />
-  );
-}
 
 function Button(props) {
   return (

@@ -26,9 +26,8 @@ export default observer(function Diagram() {
     const currentRef = ref?.current;
 
     d3.select(currentRef).call(zoom).on("dblclick.zoom", null);
-    //.call(zoom.transform, d3.zoomIdentity);
 
-    const zoomable = d3.select("#zoomable"); //.attr("transform", d3.zoomIdentity);
+    const zoomable = d3.select("#zoomable");
 
     zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
   }, [ref, store]);
