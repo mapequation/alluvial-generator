@@ -7,7 +7,7 @@ import Streamline from "./Streamline";
 import Module from "./Module";
 
 const Network = observer(function Network({ network, fillColor }) {
-  const { streamlineThreshold, streamlineOpacity, fontSize, showNetworkNames } =
+  const { streamlineThreshold, streamlineOpacity, networkFontSize, showNetworkNames } =
     useContext(StoreContext);
 
   const links = network.getLinks(streamlineThreshold);
@@ -20,8 +20,8 @@ const Network = observer(function Network({ network, fillColor }) {
       {showNetworkNames && (
         <motion.text
           className="name"
-          fontSize={fontSize}
-          dy={3}
+          fontSize={networkFontSize}
+          dy={networkFontSize / 2}
           textAnchor="middle"
           initial={false}
           animate={network.namePosition}

@@ -474,6 +474,13 @@ export default observer(function Sidebar({
           max={40}
           onChange={store.setFontSize}
         />
+        <Slider
+          label="Network font size"
+          value={store.networkFontSize}
+          min={5}
+          max={40}
+          onChange={store.setNetworkFontSize}
+        />
 
         <RadioGroup
           legend="Module size"
