@@ -20,6 +20,7 @@ import { StoreContext } from "../../store";
 import { useContext } from "react";
 import { Swatch } from "../Sidebar/Swatch";
 import SubGraph from "./SubGraph";
+import ErrorBoundary from "../ErrorBoundary";
 
 export default observer(function ModuleView({ onClose }) {
   const store = useContext(StoreContext);
@@ -80,7 +81,9 @@ export default observer(function ModuleView({ onClose }) {
 
           {selectedModule.parent.moduleLinks != null && (
             <Box mx={8} mt={10} rounded="md" boxShadow="md" overflow="hidden">
-              <SubGraph module={selectedModule} />
+              <ErrorBoundary>
+                <SubGraph module={selectedModule} />
+              </ErrorBoundary>
             </Box>
           )}
         </ModalBody>
