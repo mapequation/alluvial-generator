@@ -26,6 +26,9 @@ const Module = observer(function Module({ module, fillColor }) {
 
   const transition = { bounce: 0, duration: 0.2 };
 
+  const baseFontSize = 5;
+  const adaptiveFontSize = baseFontSize + Math.min(fontSize, module.height);
+
   return (
     <motion.g
       ref={ref}
@@ -51,9 +54,9 @@ const Module = observer(function Module({ module, fillColor }) {
 
       {showModuleId && (
         <motion.text
-          fontSize={fontSize}
+          fontSize={adaptiveFontSize}
           textAnchor="middle"
-          dy={3}
+          dy={adaptiveFontSize / 3}
           stroke="#fff"
           strokeWidth={3}
           paintOrder="stroke"
@@ -68,9 +71,9 @@ const Module = observer(function Module({ module, fillColor }) {
 
       {showModuleNames && module.textAnchor != null && (
         <motion.text
-          fontSize={fontSize}
+          fontSize={adaptiveFontSize}
           textAnchor={module.textAnchor}
-          dy={3}
+          dy={adaptiveFontSize / 3}
           strokeWidth={0}
           fill={isSelected ? "#f00" : "#000"}
           initial={false}
