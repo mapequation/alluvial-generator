@@ -35,9 +35,13 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     this.layerId = layerId;
 
     if (modules) {
-      this.moduleLinks = new Map();
       for (const module of modules) {
-        this.moduleLinks.set(module.path.join(":"), module);
+        if (module.links) {
+          if (this.moduleLinks == null) {
+            this.moduleLinks = new Map();
+          }
+          this.moduleLinks.set(module.path.join(":"), module);
+        }
       }
     }
   }
