@@ -39,7 +39,7 @@ import {
 import { IoMdColorFill } from "react-icons/io";
 import { observer } from "mobx-react";
 import { useContext, useState } from "react";
-import { COLOR_SCHEMES, StoreContext } from "../../store";
+import { SCHEME_NAMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
@@ -128,7 +128,7 @@ export default observer(function Sidebar({
             value={store.selectedSchemeName}
             onChange={(event) => store.setSelectedScheme(event.target.value)}
           >
-            {Array.from(Object.keys(COLOR_SCHEMES)).map((scheme) => (
+            {SCHEME_NAMES.map((scheme) => (
               <option key={scheme} value={scheme}>
                 {scheme}
               </option>

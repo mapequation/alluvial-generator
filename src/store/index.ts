@@ -32,6 +32,9 @@ export const COLOR_SCHEMES = {
   Tableau10: schemeTableau10,
 } as const;
 
+export const SCHEME_NAMES = [...Object.keys(COLOR_SCHEMES)];
+
+type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
 type SchemeName = keyof typeof COLOR_SCHEMES;
 
 export class Store {
@@ -53,7 +56,7 @@ export class Store {
   streamlineOpacity: number = 0.9;
   flowThreshold: number = 8e-3;
 
-  selectedScheme = COLOR_SCHEMES["Tableau10"];
+  selectedScheme: ColorScheme = COLOR_SCHEMES["Tableau10"];
   selectedSchemeName = "Tableau10";
 
   defaultHighlightColor: string = "#b6b69f";
