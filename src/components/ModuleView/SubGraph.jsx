@@ -50,29 +50,11 @@ export default observer(function SubGraph({ module }) {
   const nodes = [...nodesById.values()];
 
   const maxFlow = Math.max(...nodes.map((node) => node.flow));
-  const nodeRadius = d3.scaleSqrt([0, maxFlow]).range([1, 10]);
+  const nodeRadius = d3.scaleSqrt([0, maxFlow]).range([2, 6]);
   const maxLinkFlow = Math.max(...links.map((link) => link.flow));
   const linkWidth = d3.scaleLinear().domain([0, maxLinkFlow]).range([0.05, 1]);
 
   const radius = 5;
-
-  function drawLink(d) {
-    const r = radius;
-    const x1 = d.source.x || 0;
-    const y1 = d.source.y || 0;
-    const x2 = d.target.x || 0;
-    const y2 = d.target.y || 0;
-    const dx = x2 - x1 || 1e-6;
-    const dy = y2 - y1 || 1e-6;
-    const l = Math.sqrt(dx * dx + dy * dy);
-    const dir = { x: dx / l, y: dy / l };
-
-    d3.select(this)
-      .attr("x1", x1 + r * dir.x)
-      .attr("y1", y1 + r * dir.y)
-      .attr("x2", x2 - r * dir.x)
-      .attr("y2", y2 - r * dir.y);
-  }
 
   useEffect(() => {
     const currentRef = ref.current;
@@ -134,6 +116,25 @@ export default observer(function SubGraph({ module }) {
 
     const link = zoomable.selectAll(".link").data(links);
 
+    function drawLink(d) {
+      const r1 = nodeRadius(d.source.flow);
+      const r2 = nodeRadius(d.target.flow);
+      const x1 = d.source.x || 0;
+      const y1 = d.source.y || 0;
+      const x2 = d.target.x || 0;
+      const y2 = d.target.y || 0;
+      const dx = x2 - x1 || 1e-6;
+      const dy = y2 - y1 || 1e-6;
+      const l = Math.sqrt(dx * dx + dy * dy);
+      const dir = { x: dx / l, y: dy / l };
+
+      d3.select(this)
+        .attr("x1", x1 + r1 * dir.x)
+        .attr("y1", y1 + r1 * dir.y)
+        .attr("x2", x2 - r2 * dir.x)
+        .attr("y2", y2 - r2 * dir.y);
+    }
+
     simulation.on("tick", () => {
       link.each(drawLink);
 
@@ -147,7 +148,7 @@ export default observer(function SubGraph({ module }) {
         .attr("x", (d) => d.x)
         .attr("y", (d) => d.y);
     });
-  }, [ref, nodes, links]);
+  }, [ref, nodes, links, nodeRadius]);
 
   return (
     <svg
@@ -169,7 +170,9 @@ export default observer(function SubGraph({ module }) {
             y1={link.source?.y ?? 0}
             x2={link.target?.x ?? 0}
             y2={link.target?.y ?? 0}
-            stroke="#888"
+            style={{
+              stroke: "var(--chakra-colors-blackAlpha-400)",
+            }}
             strokeWidth={linkWidth(link.flow)}
             //markerEnd="url(#arrow_black)"
           />
@@ -186,19 +189,25 @@ export default observer(function SubGraph({ module }) {
                   ? defaultHighlightColor
                   : highlightColors[node.highlightIndex]
               }
-              stroke="#888"
+              strokeWidth={1}
+              paintOrder="stroke"
+              style={{
+                stroke: "var(--chakra-colors-whiteAlpha-700)",
+              }}
             />
             <text
               x={node.x}
               y={node.y}
-              dy={-8}
+              dy={-(nodeRadius(node.flow) + 2)}
               textAnchor="middle"
-              stroke="#fff"
-              strokeWidth={2}
+              style={{
+                stroke: "var(--chakra-colors-whiteAlpha-700)",
+              }}
+              strokeWidth={1}
               paintOrder="stroke"
               fontWeight={600}
               fill="#888"
-              fontSize={8}
+              fontSize={Math.max(nodeRadius(node.flow), 3)}
             >
               {node.name}
             </text>
