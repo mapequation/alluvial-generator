@@ -8,7 +8,7 @@ export function Swatch({ color, isSelected, onClick }) {
       as="button"
       bg={color}
       h="24px"
-      w="25px"
+      w="24px"
       rounded="sm"
       transition="all 0.1s linear"
       boxShadow={isSelected ? "lg" : "md"}

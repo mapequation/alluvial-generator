@@ -5,6 +5,7 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
+  Flex,
   HStack,
   IconButton,
   Kbd,
@@ -135,13 +136,13 @@ export default observer(function Sidebar({
             ))}
           </Select>
 
-          <HStack mt={2} spacing={1} shouldWrapChildren>
+          <Flex mt={2} gap={1} wrap="wrap">
             <Swatch
               color={defaultHighlightColor}
               isSelected={color === defaultHighlightColor}
               onClick={() => setColor(defaultHighlightColor)}
             />
-            {store.selectedScheme.map((schemeColor) => (
+            {store.selectedScheme.slice(0, 21).map((schemeColor) => (
               <Swatch
                 key={schemeColor}
                 color={schemeColor}
@@ -149,7 +150,7 @@ export default observer(function Sidebar({
                 onClick={() => setColor(schemeColor)}
               />
             ))}
-          </HStack>
+          </Flex>
         </ListItem>
 
         <ListItem>

@@ -18,6 +18,16 @@ import TreePath from "../utils/TreePath";
 import { LEFT, RIGHT, Side } from "../alluvial/Side";
 import LeafNode from "../alluvial/LeafNode";
 import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
+import * as c3 from "@mapequation/c3";
+
+const c3options = {
+  saturation: 0.55,
+  saturationEnd: 0.8,
+  lightness: 0.5,
+  lightnessEnd: 0.9,
+  midpoint: 4.5,
+  steepness: 1,
+};
 
 export const COLOR_SCHEMES = {
   Category10: schemeCategory10,
@@ -30,6 +40,10 @@ export const COLOR_SCHEMES = {
   Set2: schemeSet2,
   Set3: schemeSet3,
   Tableau10: schemeTableau10,
+  Turbo: c3.colors(512, { scheme: "Turbo", ...c3options }),
+  Rainbow: c3.colors(512, { scheme: "Rainbow", ...c3options }),
+  Sinebow: c3.colors(512, { scheme: "Sinebow", ...c3options }),
+  Viridis: c3.colors(512, { scheme: "Viridis", ...c3options }),
 } as const;
 
 export const SCHEME_NAMES = [...Object.keys(COLOR_SCHEMES)];
