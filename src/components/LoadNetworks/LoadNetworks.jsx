@@ -61,14 +61,16 @@ export default observer(function LoadNetworks({ onClose }) {
     noClick: true,
     accept: acceptedFormats,
     onDropRejected: (rejectedFiles) =>
-      toast({
-        title: "File rejected",
-        description: `${rejectedFiles[0]} is not a valid file format.`,
-        status: "error",
-        duration: 5000,
-        variant: "subtle",
-        isClosable: true,
-      }),
+      rejectedFiles.forEach((rejectedFile) =>
+        toast({
+          title: `Cannot open ${rejectedFile.file.name}`,
+          description: rejectedFile.errors[0].message,
+          status: "error",
+          variant: "subtle",
+          duration: 5000,
+          isClosable: true,
+        })
+      ),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
       setProgressVisible(true);
