@@ -512,25 +512,47 @@ export class Store {
   colorModuleIdsInAllNetworks() {
     const moduleIdColorMap = new Map();
 
-    this.diagram.children.forEach((network) =>
-      network.children.forEach((module) => {
-        if (module.isVisible) {
-          const color = moduleIdColorMap.get(module.moduleId);
-          if (color) {
-            const highligtIndex = this.getHighlightIndex(color);
-            module.setColor(highligtIndex);
-          } else {
-            const color =
-              this.selectedScheme[
-                moduleIdColorMap.size % this.selectedScheme.length
-              ];
-            moduleIdColorMap.set(module.moduleId, color);
-            const highlightIndex = this.getHighlightIndex(color);
-            module.setColor(highlightIndex);
+    const setModuleColor = (module: Module) => {
+      const color = moduleIdColorMap.get(module.moduleId);
+      if (color) {
+        const highligtIndex = this.getHighlightIndex(color);
+        module.setColor(highligtIndex);
+      } else {
+        const color =
+          this.selectedScheme[
+            moduleIdColorMap.size % this.selectedScheme.length
+          ];
+        moduleIdColorMap.set(module.moduleId, color);
+        const highlightIndex = this.getHighlightIndex(color);
+        module.setColor(highlightIndex);
+      }
+    };
+
+    // If we only have one expanded multilayer network,
+    // sort all modules and assign "higher" colors to the largest modules.
+    // FIXME Assumes only one expanded multilayer network.
+    if (this.diagram.children.every((network) => network.layerId != null)) {
+      const modules: Module[] = [];
+
+      this.diagram.children.forEach((network) =>
+        network.children.forEach((module) => {
+          if (module.isVisible) {
+            modules.push(module);
           }
-        }
-      })
-    );
+        })
+      );
+
+      modules.sort((a, b) => b.flow - a.flow);
+      modules.forEach(setModuleColor);
+    } else {
+      this.diagram.children.forEach((network) =>
+        network.children.forEach((module) => {
+          if (module.isVisible) {
+            setModuleColor(module);
+          }
+        })
+      );
+    }
 
     this.updateLayout();
   }
