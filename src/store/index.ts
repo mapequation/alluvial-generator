@@ -86,7 +86,7 @@ export class Store {
 
   dropShadow: boolean = false;
   fontSize: number = 10;
-  networkFontSize: number = 20;
+  networkFontSize: number = 10;
 
   selectedModule: Module | null = null;
 
