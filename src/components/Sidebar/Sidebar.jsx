@@ -39,7 +39,7 @@ import {
 } from "react-icons/md";
 import { IoMdColorFill } from "react-icons/io";
 import { observer } from "mobx-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SCHEME_NAMES, StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
@@ -584,11 +584,14 @@ function Slider({ label, value, onChange, valueLabelFormat, ...props }) {
   const [currentValue, setCurrentValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => setCurrentValue(value), [value, setCurrentValue]);
+
   return (
     <ListItem>
       <Label>{label}</Label>
       <CkSlider
         defaultValue={value}
+        value={currentValue}
         w="50%"
         size="sm"
         onChange={setCurrentValue}
