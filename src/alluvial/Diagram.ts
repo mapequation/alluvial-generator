@@ -82,6 +82,7 @@ type GetNodeSize = (node: NodeProps) => number;
  */
 export default class Diagram extends AlluvialNodeBase<Network> {
   readonly depth = ROOT;
+  flowThreshold: number = 0;
 
   constructor(networks: any[] = []) {
     super(null, "", "root");
@@ -140,6 +141,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
 
     this.width = totalWidth;
     this.height = height;
+    this.flowThreshold = flowThreshold;
 
     let x = 0;
     let y = height;
@@ -171,7 +173,6 @@ export default class Diagram extends AlluvialNodeBase<Network> {
             maxNetworkFlow
           );
           getNodeSize = getNodeSizeByProp(moduleSize);
-          node.flowThreshold = flowThreshold;
           networkIndex = i;
 
           const visibleModules = node.children.filter(
@@ -197,6 +198,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
           y = height;
         } else if (node instanceof Module && getNodeSize) {
           node.children.sort((a: HighlightGroup, b: HighlightGroup) => {
+            // FIXME Sort by flow?
             const byHighlightIndex = a.highlightIndex - b.highlightIndex;
             if (byHighlightIndex !== 0) return byHighlightIndex;
             return a.insignificant ? 1 : -1;

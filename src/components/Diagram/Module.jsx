@@ -34,6 +34,8 @@ const Module = observer(function Module({ module, fillColor }) {
     baseFontSize + Math.min(fontSize, module.height)
   );
 
+  const dy = adaptiveFontSize / 3;
+
   return (
     <motion.g
       ref={ref}
@@ -61,7 +63,7 @@ const Module = observer(function Module({ module, fillColor }) {
         <motion.text
           fontSize={adaptiveFontSize}
           textAnchor="middle"
-          dy={adaptiveFontSize / 3}
+          dy={dy}
           stroke="hsla(0, 0%, 100%, 0.6)"
           strokeLinejoin="round"
           strokeWidth={Math.max(adaptiveFontSize / 5, 1)}
@@ -79,7 +81,7 @@ const Module = observer(function Module({ module, fillColor }) {
         <motion.text
           fontSize={adaptiveFontSize}
           textAnchor={module.textAnchor}
-          dy={adaptiveFontSize / 3}
+          dy={dy}
           strokeWidth={0}
           fill={isSelected ? "#f00" : "#000"}
           initial={false}

@@ -10,7 +10,6 @@ import type { Module as InfomapModule } from "@mapequation/infomap";
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
-  flowThreshold: number = 0;
   name: string;
   isCustomSorted = false;
   readonly layerId: number | undefined;
@@ -55,6 +54,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   get visibleChildren() {
     return this.children.filter((module) => module.isVisible);
+  }
+
+  get flowThreshold() {
+    return this.parent?.flowThreshold ?? 0;
   }
 
   static create(
