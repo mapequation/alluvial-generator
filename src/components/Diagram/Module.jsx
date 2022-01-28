@@ -26,7 +26,7 @@ const Module = observer(function Module({ module, fillColor }) {
 
   const transition = { bounce: 0, duration: 0.2 };
 
-  const baseFontSize = 5;
+  const baseFontSize = 1;
   const adaptiveFontSize = baseFontSize + Math.min(fontSize, module.height);
 
   return (
@@ -57,7 +57,8 @@ const Module = observer(function Module({ module, fillColor }) {
           fontSize={adaptiveFontSize}
           textAnchor="middle"
           dy={adaptiveFontSize / 3}
-          stroke="#fff"
+          stroke="hsla(0, 0%, 100%, 0.6)"
+          strokeLinejoin="round"
           strokeWidth={3}
           paintOrder="stroke"
           strokeLinecap="round"

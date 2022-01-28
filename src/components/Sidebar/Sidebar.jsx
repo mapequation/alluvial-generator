@@ -468,10 +468,10 @@ export default observer(function Sidebar({
           onChange={(value) => store.setStreamlineOpacity(1 - value)}
         />
         <Slider
-          label="Font size"
+          label="Module font size"
           value={store.fontSize}
-          min={5}
-          max={40}
+          min={2}
+          max={20}
           onChange={store.setFontSize}
         />
         <Slider
