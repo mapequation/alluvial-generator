@@ -659,23 +659,6 @@ function Logo() {
   const brand = useColorModeValue("hsl(0, 68%, 42%)", "hsl(0, 68%, 62%)");
   const version = useColorModeValue("hsl(0, 0%, 70%)", "hsl(0, 0%, 30%)");
 
-  const styles = {
-    base: {
-      fontFamily: "Philosopher, serif",
-      fontWeight: 700,
-      fontSize: "1.4em",
-    },
-    infomap: {
-      color,
-    },
-    alluvial: {
-      color: brand,
-    },
-    version: {
-      color: version,
-    },
-  };
-
   return (
     <HStack w="100%" justify="space-between" align="center" pb={3}>
       <HStack justify="flex-start" align="center" spacing={3}>
@@ -688,11 +671,17 @@ function Logo() {
           />
         </a>
         <div>
-          <span style={styles.base}>
-            <span style={styles.infomap}>Alluvial</span>{" "}
-            <span style={styles.alluvial}>Generator</span>
+          <span
+            style={{
+              fontFamily: "Philosopher, serif",
+              fontWeight: 700,
+              fontSize: "1.4em",
+            }}
+          >
+            <span style={{ color }}>Alluvial</span>{" "}
+            <span style={{ color: brand }}>Generator</span>
           </span>
-          <span style={styles.version}>
+          <span style={{ color: version }}>
             {" v" + process.env.REACT_APP_VERSION}
           </span>
         </div>
