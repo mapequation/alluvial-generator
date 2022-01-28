@@ -334,6 +334,12 @@ export default observer(function LoadNetworks({ onClose }) {
       const newFiles = [...files];
       newFiles.splice(index, 1, ...Object.values(layers));
       setFiles(newFiles);
+
+      // Decrease flow threshold as layers contain less flow than an individual file
+      // TODO: Show a minimum number of modules per level in each network?
+      if (store.flowThreshold > 1e-3) {
+        store.setFlowThreshold(1e-3);
+      }
     }
   };
 
