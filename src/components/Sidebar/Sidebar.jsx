@@ -425,7 +425,7 @@ export default observer(function Sidebar({
           onChange={store.setModuleWidth}
         />
         <Slider
-          label="Module spacing"
+          label="Streamline width"
           value={store.streamlineFraction}
           min={0}
           max={10}
@@ -434,7 +434,7 @@ export default observer(function Sidebar({
           onChange={store.setStreamlineFraction}
         />
         <Slider
-          label="Margin"
+          label="Module top margin"
           value={store.marginExponent}
           min={1}
           max={6}
