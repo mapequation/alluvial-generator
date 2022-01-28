@@ -26,8 +26,9 @@ import TreePath from "../../utils/TreePath";
 import useEventListener from "../../hooks/useEventListener";
 import Item from "./Item";
 import Stepper from "./Stepper";
+import JSZip from "jszip";
 
-const acceptedFormats = [".tree", ".ftree", ".clu", ".json"].join(",");
+const acceptedFormats = [".tree", ".ftree", ".clu", ".json", ".zip"].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
 
 async function fetchExampleData(filename = exampleDataFilename) {
@@ -71,10 +72,61 @@ export default observer(function LoadNetworks({ onClose }) {
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
 
-      const readFiles = await Promise.all(acceptedFiles.map(readFile));
-      const newFiles = [];
+      const readFiles = [];
       const errors = [];
 
+      const accepted = acceptedFormats
+        .split(",")
+        .map((ext) => ext.slice(1))
+        .filter((ext) => ext !== "zip");
+
+      let fileIndex = 0;
+      for (const file of [...acceptedFiles]) {
+        if (file?.type === "application/zip") {
+          try {
+            // Remove the zipped file from the list of files
+            acceptedFiles.splice(fileIndex, 1);
+
+            const zipFile = await JSZip.loadAsync(file);
+
+            for (const [name, compressedFile] of Object.entries(
+              zipFile.files
+            )) {
+              const extension = fileExtension(name);
+
+              if (!accepted.includes(extension)) {
+                errors.push(
+                  createError(
+                    { name },
+                    "unsupported-format",
+                    `Unsupported file format: ${extension}`
+                  )
+                );
+                continue;
+              }
+
+              const uncompressedFile = await compressedFile.async("string");
+              readFiles.push(uncompressedFile);
+
+              // Add the decompressed file to the list of files
+              acceptedFiles.splice(fileIndex, 0, {
+                name,
+                // Hack to get the decompressed size. Uses private fields of the JSZip object
+                size: compressedFile?._data?.uncompressedSize ?? file.size,
+                lastModified: file.lastModified,
+              });
+              fileIndex++;
+            }
+          } catch (e) {
+            errors.push(createError(file, "unsupported-format", e.message));
+          }
+        } else {
+          readFiles.push(await readFile(file));
+          fileIndex++;
+        }
+      }
+
+      const newFiles = [];
 
       for (let i = 0; i < acceptedFiles.length; ++i) {
         const file = acceptedFiles[i];
