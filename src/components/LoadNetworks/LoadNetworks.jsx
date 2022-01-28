@@ -12,7 +12,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Progress,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
@@ -52,8 +51,6 @@ export default observer(function LoadNetworks({ onClose }) {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressVisible, setProgressVisible] = useState(false);
   const [files, setFiles] = useState(store.files);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
@@ -73,17 +70,13 @@ export default observer(function LoadNetworks({ onClose }) {
       ),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
-      setProgressVisible(true);
 
       const readFiles = await Promise.all(acceptedFiles.map(readFile));
       const newFiles = [];
       const errors = [];
 
-      const totProgress = acceptedFiles.length + 1;
-      setProgress(100 / totProgress);
 
       for (let i = 0; i < acceptedFiles.length; ++i) {
-        setProgress((100 * (i + 2)) / totProgress);
         const file = acceptedFiles[i];
         const format = fileExtension(file.name);
 
@@ -163,7 +156,6 @@ export default observer(function LoadNetworks({ onClose }) {
         });
       });
 
-      setProgressVisible(false);
       console.timeEnd("onDrop");
     },
   });
@@ -317,7 +309,6 @@ export default observer(function LoadNetworks({ onClose }) {
             acceptedFormats={acceptedFormats}
           />
 
-          {progressVisible && <Progress value={progress} size="xs" />}
           <div
             style={{ background: dropzoneBg }}
             className="dropzone"
