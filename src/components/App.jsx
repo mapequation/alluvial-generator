@@ -51,7 +51,12 @@ export default observer(function App() {
         <LoadNetworks onClose={onLoadClose} />
       </Modal>
 
-      <Modal size="2xl" isOpen={isAboutOpen} onClose={onAboutClose}>
+      <Modal
+        size="2xl"
+        scrollBehavior="inside"
+        isOpen={isAboutOpen}
+        onClose={onAboutClose}
+      >
         <Documentation onClose={onAboutClose} />
       </Modal>
 
