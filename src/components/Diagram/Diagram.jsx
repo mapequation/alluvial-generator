@@ -27,9 +27,11 @@ export default observer(function Diagram() {
 
     d3.select(currentRef).call(zoom).on("dblclick.zoom", null);
 
-    const zoomable = d3.select("#zoomable");
+    const zoomable = currentRef?.getElementById("zoomable");
 
-    zoom.on("zoom", (event) => zoomable.attr("transform", event.transform));
+    zoom.on("zoom", (event) =>
+      zoomable?.setAttribute("transform", event.transform)
+    );
   }, [ref, store]);
 
   useEventListener("keydown", (event) => {

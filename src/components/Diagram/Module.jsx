@@ -27,7 +27,12 @@ const Module = observer(function Module({ module, fillColor }) {
   const transition = { bounce: 0, duration: 0.2 };
 
   const baseFontSize = 1;
-  const adaptiveFontSize = baseFontSize + Math.min(fontSize, module.height);
+
+  // Rounding because fractional font sizes causes Google Chrome
+  // to stutter when zooming.
+  const adaptiveFontSize = Math.round(
+    baseFontSize + Math.min(fontSize, module.height)
+  );
 
   return (
     <motion.g
