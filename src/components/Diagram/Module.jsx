@@ -36,6 +36,8 @@ const Module = observer(function Module({ module, fillColor }) {
 
   const dy = adaptiveFontSize / 3;
 
+  const { idPosition, namePosition } = module;
+
   return (
     <motion.g
       ref={ref}
@@ -55,41 +57,55 @@ const Module = observer(function Module({ module, fillColor }) {
             animate={group.layout}
             transition={transition}
             fill={fillColor(group)}
+            data-x={group.x}
+            data-y={group.y}
           />
         ))}
       </g>
 
       {showModuleId && (
-        <motion.text
-          fontSize={adaptiveFontSize}
-          textAnchor="middle"
-          dy={dy}
-          stroke="hsla(0, 0%, 100%, 0.6)"
-          strokeLinejoin="round"
-          strokeWidth={Math.max(adaptiveFontSize / 5, 1)}
-          paintOrder="stroke"
-          strokeLinecap="round"
+        <motion.g
+          className="label"
           initial={false}
-          animate={module.idPosition}
+          animate={idPosition}
           transition={transition}
         >
-          {module.moduleId}
-        </motion.text>
+          <text
+            fontSize={adaptiveFontSize}
+            textAnchor="middle"
+            dy={dy}
+            stroke="hsla(0, 0%, 100%, 0.6)"
+            strokeLinejoin="round"
+            strokeWidth={Math.max(adaptiveFontSize / 5, 1)}
+            paintOrder="stroke"
+            strokeLinecap="round"
+            data-x={idPosition.x}
+            data-y={idPosition.y}
+          >
+            {module.moduleId}
+          </text>
+        </motion.g>
       )}
 
       {showModuleNames && module.textAnchor != null && (
-        <motion.text
-          fontSize={adaptiveFontSize}
-          textAnchor={module.textAnchor}
-          dy={dy}
-          strokeWidth={0}
-          fill={isSelected ? "#f00" : "#000"}
+        <motion.g
+          className="label"
           initial={false}
-          animate={module.namePosition}
+          animate={namePosition}
           transition={transition}
         >
-          {module.name || module.largestLeafNodes.join(", ")}
-        </motion.text>
+          <text
+            fontSize={adaptiveFontSize}
+            textAnchor={module.textAnchor}
+            dy={dy}
+            strokeWidth={0}
+            fill={isSelected ? "#f00" : "#000"}
+            data-x={namePosition.x}
+            data-y={namePosition.y}
+          >
+            {module.name || module.largestLeafNodes.join(", ")}
+          </text>
+        </motion.g>
       )}
     </motion.g>
   );

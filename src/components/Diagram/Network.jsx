@@ -15,6 +15,7 @@ const Network = observer(function Network({ network, fillColor }) {
   } = useContext(StoreContext);
 
   const links = network.getLinks(streamlineThreshold);
+  const { namePosition } = network;
 
   return (
     <g className="network">
@@ -22,17 +23,23 @@ const Network = observer(function Network({ network, fillColor }) {
         <LinearGradients activeIndices={activeHighlightIndices(links)} />
       </defs>
       {showNetworkNames && (
-        <motion.text
-          className="name"
-          fontSize={networkFontSize}
-          dy={networkFontSize}
-          textAnchor="middle"
+        <motion.g
+          className="label"
           initial={false}
-          animate={network.namePosition}
+          animate={namePosition}
           transition={{ bounce: 0, duration: 0.2 }}
         >
-          {network.name}
-        </motion.text>
+          <text
+            className="name"
+            fontSize={networkFontSize}
+            dy={networkFontSize}
+            textAnchor="middle"
+            data-x={namePosition.x}
+            data-y={namePosition.y}
+          >
+            {network.name}
+          </text>
+        </motion.g>
       )}
 
       {links.map((link) => (

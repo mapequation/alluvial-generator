@@ -1,36 +1,38 @@
 import FileSaver from "file-saver";
 
 export function saveSvg(svg, filename) {
-  const labels = svg.querySelectorAll("text");
-  const rects = svg.querySelectorAll(".group");
+  const labels = svg.querySelectorAll(".label");
+  const groups = svg.querySelectorAll(".group");
 
-  [...labels, ...rects].forEach((element) => {
-    const style = element.getAttribute("style");
-    if (!style) return;
+  groups.forEach((element) => {
+    element.setAttribute("x", element.getAttribute("data-x"));
+    element.setAttribute("y", element.getAttribute("data-y"));
+    element.setAttribute("data-style", element.getAttribute("style"));
+    element.removeAttribute("style");
+  });
 
-    const parts = style.split(";");
-    for (const part of parts) {
-      const matches = [...part.matchAll(/translate([X|Y])\((-?\d+)/g)];
-      if (matches.length === 0) continue;
-      const x = matches[0]?.[2] ?? 0;
-      const y = matches[1]?.[2] ?? 0;
-      element.setAttribute("x", x);
-      element.setAttribute("y", y);
-    }
-
-    element.setAttribute("data-style", style);
+  labels.forEach((element) => {
+    const text = element.querySelector("text");
+    text.setAttribute("x", text.getAttribute("data-x"));
+    text.setAttribute("y", text.getAttribute("data-y"));
+    element.setAttribute("data-style", element.getAttribute("style"));
     element.removeAttribute("style");
   });
 
   const string = new XMLSerializer().serializeToString(svg);
 
-  [...labels, ...rects].forEach((element) => {
+  groups.forEach((element) => {
     element.removeAttribute("x");
     element.removeAttribute("y");
+    element.setAttribute("style", element.getAttribute("data-style"));
+    element.removeAttribute("data-style");
+  });
 
-    const style = element.getAttribute("data-style");
-    if (!style) return;
-    element.setAttribute("style", style);
+  labels.forEach((element) => {
+    const text = element.querySelector("text");
+    text.removeAttribute("x");
+    text.removeAttribute("y");
+    element.setAttribute("style", element.getAttribute("data-style"));
     element.removeAttribute("data-style");
   });
 
