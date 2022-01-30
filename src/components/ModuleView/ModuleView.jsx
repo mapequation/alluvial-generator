@@ -59,7 +59,7 @@ export default observer(function ModuleView({ onClose }) {
               <Tbody>
                 {nodes.map((node) => (
                   <Tr key={node.nodeId}>
-                    <Td isNumeric>{node.id}</Td>
+                    <Td isNumeric>{node.nodeId}</Td>
                     <Td>{node.treePath.toString()}</Td>
                     {node.stateId != null && <Td isNumeric>{node.stateId}</Td>}
                     <Td isNumeric>{node.flow.toFixed(6)}</Td>
