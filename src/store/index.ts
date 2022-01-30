@@ -85,8 +85,9 @@ export class Store {
   showNetworkNames: boolean = true;
 
   dropShadow: boolean = false;
-  fontSize: number = 10;
+  fontSize: number = 8;
   networkFontSize: number = 10;
+  adaptiveFontSize: boolean = false;
 
   selectedModule: Module | null = null;
 
@@ -119,6 +120,7 @@ export class Store {
       dropShadow: observable,
       fontSize: observable,
       networkFontSize: observable,
+      adaptiveFontSize: observable,
       selectedModule: observable,
       editMode: observable,
     });
@@ -246,6 +248,10 @@ export class Store {
 
   setNetworkFontSize = action((fontSize: number) => {
     this.networkFontSize = fontSize;
+  });
+
+  setAdaptiveFontSize = action((value: boolean) => {
+    this.adaptiveFontSize = value;
   });
 
   setSelectedModule = action((selectedModule: Module | null) => {

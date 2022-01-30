@@ -8,7 +8,7 @@ import useOnClick from "../../hooks/useOnClick";
 const Module = observer(function Module({ module, fillColor }) {
   const ref = useRef();
   const store = useContext(StoreContext);
-  const { fontSize, showModuleId, showModuleNames } = store;
+  const { fontSize, adaptiveFontSize, showModuleId, showModuleNames } = store;
   const dropShadow = DropShadows.filter(store.dropShadow);
 
   const isSelected = store.selectedModule === module;
@@ -26,15 +26,14 @@ const Module = observer(function Module({ module, fillColor }) {
 
   const transition = { bounce: 0, duration: 0.2 };
 
-  const baseFontSize = 1;
-
   // Rounding because fractional font sizes causes Google Chrome
   // to stutter when zooming.
-  const adaptiveFontSize = Math.round(
-    baseFontSize + Math.min(fontSize, module.height)
-  );
+  const baseFontSize = 1;
+  const adaptive = baseFontSize + Math.round(Math.min(fontSize, module.height));
 
-  const dy = adaptiveFontSize / 3;
+  const actualFontSize = adaptiveFontSize ? adaptive : fontSize;
+  const dy = actualFontSize / 3;
+  const strokeWidth = Math.max(actualFontSize / 5, 1);
 
   const { idPosition, namePosition } = module;
 
@@ -71,12 +70,12 @@ const Module = observer(function Module({ module, fillColor }) {
           transition={transition}
         >
           <text
-            fontSize={adaptiveFontSize}
+            fontSize={actualFontSize}
             textAnchor="middle"
             dy={dy}
             stroke="hsla(0, 0%, 100%, 0.6)"
             strokeLinejoin="round"
-            strokeWidth={Math.max(adaptiveFontSize / 5, 1)}
+            strokeWidth={strokeWidth}
             paintOrder="stroke"
             strokeLinecap="round"
             data-x={idPosition.x}
@@ -95,7 +94,7 @@ const Module = observer(function Module({ module, fillColor }) {
           transition={transition}
         >
           <text
-            fontSize={adaptiveFontSize}
+            fontSize={actualFontSize}
             textAnchor={module.textAnchor}
             dy={dy}
             strokeWidth={0}

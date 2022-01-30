@@ -519,6 +519,11 @@ export default observer(function Sidebar({
           onChange={store.setShowNetworkNames}
         />
         <Switch
+          label="Adaptive font size"
+          isChecked={store.adaptiveFontSize}
+          onChange={store.setAdaptiveFontSize}
+        />
+        <Switch
           label="Drop shadow"
           isChecked={store.dropShadow}
           onChange={store.setDropShadow}
