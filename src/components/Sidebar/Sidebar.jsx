@@ -684,7 +684,7 @@ function Logo() {
             }}
           >
             <span style={{ color }}>Alluvial</span>{" "}
-            <span style={{ color: brand }}>Generator</span>
+            <span style={{ color: brand }}>Diagram</span>
           </span>
           <span style={{ color: version }}>
             {" v" + process.env.REACT_APP_VERSION}

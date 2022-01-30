@@ -51,8 +51,8 @@ const Documentation = ({ onClose }) => (
           About
         </Heading>
         <Text mt={4}>
-          The Alluvial Generator visualizes how clusters change between
-          different networks in an{" "}
+          The Alluvial Diagram generator visualizes change in network partitions
+          using an{" "}
           <a href="//en.wikipedia.org/wiki/Alluvial_diagram">
             alluvial diagram
           </a>
