@@ -6,17 +6,16 @@ import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
 
 const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 
-export default observer(function SubGraph({ module }) {
+export default observer(function SubGraph({ selectedModule, leafNodes }) {
   const ref = useRef();
   const store = useContext(StoreContext);
   const { defaultHighlightColor, highlightColors } = store;
 
-  const network = module.parent;
-  const leafNodes = module.getLeafNodes();
+  const network = selectedModule.parent;
 
-  const nodesById = new Map(
+  const nodesByPath = new Map(
     leafNodes.map((node) => [
-      node.treePath.rank,
+      node.treePath.toString(),
       {
         path: node.treePath,
         name: node.name,
@@ -27,34 +26,32 @@ export default observer(function SubGraph({ module }) {
     ])
   );
 
-  const moduleLinks = network.moduleLinks.get(module.moduleId);
+  const nodes = [...nodesByPath.values()];
 
-  const subModules = [...network.moduleLinks.keys()].filter((moduleId) =>
-    moduleId.startsWith(module.moduleId)
+  const subModuleIds = [...network.moduleLinks.keys()].filter((id) =>
+    id.startsWith(selectedModule.moduleId)
   );
 
-  console.log(moduleLinks);
-  console.log(subModules);
+  const links = [];
 
-  const links = moduleLinks.links
-    .map((link) => {
-      const source = nodesById.get(link.source);
-      const target = nodesById.get(link.target);
-
-      if (!source || !target) return null;
-
-      return { source, target, flow: link.flow };
-    })
-    .filter((link) => link != null);
-
-  const nodes = [...nodesById.values()];
-
+  for (const moduleId of subModuleIds) {
+    const subModule = network.moduleLinks.get(moduleId);
+    for (const link of subModule.links) {
+      const sourcePath = [...subModule.path, link.source].join(":");
+      const targetPath = [...subModule.path, link.target].join(":");
+      const source = nodesByPath.get(sourcePath);
+      const target = nodesByPath.get(targetPath);
+      if (source && target) {
+        // A link between leaf-nodes
+        links.push({ source, target, flow: link.flow });
+      }
+    }
+  }
   const maxFlow = Math.max(...nodes.map((node) => node.flow));
-  const nodeRadius = d3.scaleSqrt([0, maxFlow]).range([2, 6]);
+  const maxRadius = 6;
+  const nodeRadius = d3.scaleSqrt([0, maxFlow]).range([2, maxRadius]);
   const maxLinkFlow = Math.max(...links.map((link) => link.flow));
   const linkWidth = d3.scaleLinear().domain([0, maxLinkFlow]).range([0.05, 1]);
-
-  const radius = 5;
 
   useEffect(() => {
     const currentRef = ref.current;
@@ -73,8 +70,10 @@ export default observer(function SubGraph({ module }) {
     const simulation = d3
       .forceSimulation(nodes)
       .force("center", d3.forceCenter(0, 0))
-      .force("collide", d3.forceCollide(2 * radius))
+      .force("collide", d3.forceCollide(maxRadius))
       .force("charge", d3.forceManyBody().strength(-200))
+      .force("x", d3.forceX())
+      .force("y", d3.forceY())
       .force("link", d3.forceLink(links).distance(10));
 
     const node = zoomable
@@ -103,50 +102,44 @@ export default observer(function SubGraph({ module }) {
           })
       );
 
-    node.on("click", function () {
-      node.selectAll("circle").attr("stroke", "#888");
-      d3.select(this).select("circle").attr("stroke", "#f00");
-    });
-
-    d3.select(currentRef)
-      .select("rect")
-      .on("click", function () {
-        node.selectAll("circle").attr("stroke", "#888");
-      });
+    // node.on("click", function () {
+    //   node.selectAll("circle").attr("stroke", "#888");
+    //   d3.select(this).select("circle").attr("stroke", "#f00");
+    // });
+    //
+    // d3.select(currentRef)
+    //   .select("rect")
+    //   .on("click", function () {
+    //     node.selectAll("circle").attr("stroke", "#888");
+    //   });
 
     const link = zoomable.selectAll(".link").data(links);
-
-    function drawLink(d) {
-      const r1 = nodeRadius(d.source.flow);
-      const r2 = nodeRadius(d.target.flow);
-      const x1 = d.source.x || 0;
-      const y1 = d.source.y || 0;
-      const x2 = d.target.x || 0;
-      const y2 = d.target.y || 0;
-      const dx = x2 - x1 || 1e-6;
-      const dy = y2 - y1 || 1e-6;
-      const l = Math.sqrt(dx * dx + dy * dy);
-      const dir = { x: dx / l, y: dy / l };
-
-      d3.select(this)
-        .attr("x1", x1 + r1 * dir.x)
-        .attr("y1", y1 + r1 * dir.y)
-        .attr("x2", x2 - r2 * dir.x)
-        .attr("y2", y2 - r2 * dir.y);
-    }
+    const circle = node.select("circle");
+    const text = node.select("text");
 
     simulation.on("tick", () => {
-      link.each(drawLink);
+      link.each(function (d) {
+        const r1 = nodeRadius(d.source.flow);
+        const r2 = nodeRadius(d.target.flow);
+        const x1 = d.source.x || 0;
+        const y1 = d.source.y || 0;
+        const x2 = d.target.x || 0;
+        const y2 = d.target.y || 0;
+        const dx = x2 - x1 || 1e-6;
+        const dy = y2 - y1 || 1e-6;
+        const l = Math.sqrt(dx * dx + dy * dy);
+        const x = dx / l;
+        const y = dy / l;
 
-      node
-        .select("circle")
-        .attr("cx", (d) => d.x)
-        .attr("cy", (d) => d.y);
+        d3.select(this)
+          .attr("x1", x1 + r1 * x)
+          .attr("y1", y1 + r1 * y)
+          .attr("x2", x2 - r2 * x)
+          .attr("y2", y2 - r2 * y);
+      });
 
-      node
-        .select("text")
-        .attr("x", (d) => d.x)
-        .attr("y", (d) => d.y);
+      circle.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+      text.attr("x", (d) => d.x).attr("y", (d) => d.y);
     });
   }, [ref, nodes, links, nodeRadius]);
 
@@ -160,7 +153,7 @@ export default observer(function SubGraph({ module }) {
       xmlnsXlink={d3.namespaces.xlink}
       style={{ background: "#fff" }}
     >
-      <rect width="100%" height="100%" fill="#fff" />
+      <rect x={-100} y={-100} width="100%" height="100%" fill="#fff" />
       <g id="zoomable-graph">
         {links.map((link) => (
           <line

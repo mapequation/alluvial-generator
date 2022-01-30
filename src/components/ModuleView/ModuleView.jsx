@@ -82,7 +82,7 @@ export default observer(function ModuleView({ onClose }) {
           {selectedModule.parent.moduleLinks != null && (
             <Box mx={8} mt={10} rounded="md" boxShadow="md" overflow="hidden">
               <ErrorBoundary>
-                <SubGraph module={selectedModule} />
+                <SubGraph selectedModule={selectedModule} leafNodes={nodes} />
               </ErrorBoundary>
             </Box>
           )}
