@@ -22,7 +22,7 @@ import { Swatch } from "../Sidebar/Swatch";
 import SubGraph from "./SubGraph";
 import ErrorBoundary from "../ErrorBoundary";
 
-export default observer(function ModuleView({ onClose }) {
+export default observer(function Explorer({ onClose }) {
   const store = useContext(StoreContext);
   const bg = useColorModeValue("white", "gray.700");
 
