@@ -43,6 +43,7 @@ import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
 import { Swatch } from "./Swatch";
+import Logo from "../Logo";
 
 export default observer(function Sidebar({
   onLoadClick,
@@ -101,7 +102,11 @@ export default observer(function Sidebar({
       p="5"
       pb={10}
     >
-      <List spacing={2} fontSize="0.9rem" pt="4rem">
+      <List spacing={2} fontSize="0.9rem">
+        <ListItem mb={5}>
+          <Logo />
+        </ListItem>
+
         <ListItemButton onClick={onLoadClick} leftIcon={<MdFileUpload />}>
           Load or arrange
           <Kbd ml="auto">L</Kbd>

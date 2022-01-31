@@ -1,19 +1,20 @@
 import { useContext, useState } from "react";
 import { observer } from "mobx-react";
-import { Modal, Slide } from "@chakra-ui/react";
+import { Box, Modal, Slide, useColorModeValue } from "@chakra-ui/react";
 import Diagram from "./Diagram";
 import LoadNetworks from "./LoadNetworks";
 import Sidebar from "./Sidebar";
 import Documentation from "./Documentation";
 import Explorer from "./Explorer";
+import Logo from "./Logo";
 import useEventListener from "../hooks/useEventListener";
 import { StoreContext } from "../store";
-import Logo from "./Sidebar/Logo";
 
 export const drawerWidth = 350;
 
 export default observer(function App() {
   const store = useContext(StoreContext);
+  const bg = useColorModeValue("white", "var(--chakra-colors-gray-800)");
   const [isLoadOpen, setIsLoadOpen] = useState(true);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isExplorerOpen, setIsExplorerOpen] = useState(false);
@@ -67,7 +68,15 @@ export default observer(function App() {
 
       <Diagram />
 
-      <Logo in={isLoadOpen} />
+      <Slide
+        in={isLoadOpen}
+        direction="top"
+        style={{ height: "6rem", zIndex: 1500 }}
+      >
+        <Box px={10} display="flex" alignItems="center" h="6rem" bg={bg}>
+          <Logo />
+        </Box>
+      </Slide>
 
       <Slide in={!isLoadOpen} style={{ width: drawerWidth }}>
         <Sidebar
