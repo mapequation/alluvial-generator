@@ -104,7 +104,7 @@ export default observer(function Sidebar({
     >
       <List spacing={2} fontSize="0.9rem">
         <ListItem mb={5}>
-          <Logo />
+          <Logo showVersion />
         </ListItem>
 
         <ListItemButton onClick={onLoadClick} leftIcon={<MdFileUpload />}>
