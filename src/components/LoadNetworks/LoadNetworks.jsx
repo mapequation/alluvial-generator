@@ -12,6 +12,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Progress,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
@@ -27,8 +28,16 @@ import useEventListener from "../../hooks/useEventListener";
 import Item from "./Item";
 import Stepper from "./Stepper";
 import JSZip from "jszip";
+import Infomap from "@mapequation/infomap";
 
-const acceptedFormats = [".tree", ".ftree", ".clu", ".json", ".zip"].join(",");
+const acceptedFormats = [
+  ".tree",
+  ".ftree",
+  ".clu",
+  ".json",
+  ".net",
+  ".zip",
+].join(",");
 const exampleDataFilename = "science-1998-2001-2007.json";
 
 async function fetchExampleData(filename = exampleDataFilename) {
@@ -53,11 +62,14 @@ export default observer(function LoadNetworks({ onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
   const [files, setFiles] = useState(store.files);
+  const [progressVisible, setProgressVisible] = useState(false);
+  const [progress, setProgress] = useState(0);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
+    disabled: progressVisible,
     onDropRejected: (rejectedFiles) =>
       rejectedFiles.forEach((rejectedFile) =>
         toast({
@@ -157,6 +169,29 @@ export default observer(function LoadNetworks({ onClose }) {
             }
           } catch (e) {
             errors.push(createError(file, "invalid-json", e.message));
+            continue;
+          }
+        } else if (format === "net") {
+          try {
+            setProgressVisible(true);
+            setProgress(0);
+
+            const result = await new Infomap()
+              .on("progress", setProgress)
+              .runAsync({
+                network: readFiles[i],
+                filename: file.name,
+                args: { output: "ftree", numTrials: 5 },
+              });
+
+            setProgressVisible(false);
+
+            const tree = result.ftree_states || result.ftree;
+            if (tree) {
+              contents = parse(tree, null, true);
+            }
+          } catch (e) {
+            errors.push(createError(file, "invalid-net", e.message));
             continue;
           }
         } else {
@@ -394,10 +429,15 @@ export default observer(function LoadNetworks({ onClose }) {
             </Reorder.Group>
             <input {...getInputProps()} />
           </div>
+
+          {progressVisible && (
+            <Progress value={progress} size="xs" mb={-2} mt={1} />
+          )}
         </ModalBody>
 
         <ModalFooter>
           <Button
+            disabled={progressVisible}
             mr={2}
             onClick={loadExample}
             variant="outline"
@@ -416,6 +456,7 @@ export default observer(function LoadNetworks({ onClose }) {
           </Button>
           <Button
             onClick={open}
+            disabled={progressVisible}
             mr={2}
             variant="outline"
             isActive={files.length === 0}
