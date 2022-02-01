@@ -66,19 +66,28 @@ export default observer(function LoadNetworks({ onClose }) {
   const [progress, setProgress] = useState(0);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
+  const onError = ({ title, description, ...props }) => {
+    toast({
+      title,
+      description,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      ...props,
+    });
+  };
+
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
     disabled: progressVisible,
     onDropRejected: (rejectedFiles) =>
       rejectedFiles.forEach((rejectedFile) =>
-        toast({
+        onError({
           title: `Cannot open ${rejectedFile.file.name}`,
-          description: rejectedFile.errors[0].message,
-          status: "error",
-          variant: "subtle",
-          duration: 5000,
-          isClosable: true,
+          description: rejectedFile.errors
+            .map(({ message }) => message)
+            .join("\n"),
         })
       ),
     onDrop: async (acceptedFiles) => {
@@ -236,16 +245,12 @@ export default observer(function LoadNetworks({ onClose }) {
 
       setFiles([...files, ...newFiles]);
 
-      errors.forEach(({ file, errors }) => {
-        toast({
+      errors.forEach(({ file, errors }) =>
+        onError({
           title: `Could not load ${file.name}`,
           description: errors.map(({ message }) => message).join("\n"),
-          status: "error",
-          variant: "subtle",
-          duration: 5000,
-          isClosable: true,
-        });
-      });
+        })
+      );
 
       console.timeEnd("onDrop");
     },
