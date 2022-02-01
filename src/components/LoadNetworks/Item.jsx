@@ -89,9 +89,13 @@ export default function Item({
         setSettingsVisible(false);
       }
     } catch (e) {
+      setIsRunning(false);
+      setProgressVisible(false);
+      console.log(e);
+
       onError({
         title: `Error running Infomap on ${file.name}`,
-        description: e.message,
+        description: e.toString(),
       });
     }
   };
