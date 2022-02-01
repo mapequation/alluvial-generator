@@ -247,6 +247,7 @@ export default function Item({
                   <Button
                     mt={1}
                     isDisabled={progressVisible}
+                    isLoading={progressVisible}
                     size="xs"
                     isFullWidth
                     type="submit"
