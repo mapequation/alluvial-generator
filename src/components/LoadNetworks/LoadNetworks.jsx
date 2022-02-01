@@ -497,6 +497,7 @@ export default observer(function LoadNetworks({ onClose }) {
               </Tooltip>
             </FormLabel>
             <RadioGroup
+              isDisabled={files.length === 0}
               onChange={updateIdentifiers}
               value={store.identifier}
               size="sm"
