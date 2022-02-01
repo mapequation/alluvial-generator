@@ -1,6 +1,10 @@
 import { normalize } from "../../utils/math";
 
 export default function FileBackground({ file, fill, ...props }) {
+  if (!file.flowDistribution) {
+    return null;
+  }
+
   const minFlow = 1e-4;
 
   const values = normalize(
@@ -25,7 +29,6 @@ export default function FileBackground({ file, fill, ...props }) {
       width="100%"
       height="100%"
       viewBox="0 0 150 300"
-      opacity={0.2}
       preserveAspectRatio="none"
       {...props}
     >
