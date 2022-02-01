@@ -1,14 +1,13 @@
 import { normalize } from "../../utils/math";
+import { motion } from "framer-motion";
 
 export default function FileBackground({ file, fill, ...props }) {
-  if (!file.flowDistribution) {
-    return null;
-  }
+  const flowDistribution = file.flowDistribution ?? { 0: 1 };
 
   const minFlow = 1e-4;
 
   const values = normalize(
-    Array.from(Object.values(file.flowDistribution))
+    Array.from(Object.values(flowDistribution))
       .filter((flow) => flow > minFlow)
       .sort()
   );
@@ -37,7 +36,16 @@ export default function FileBackground({ file, fill, ...props }) {
           const y = prevY;
           const height = flow * usableHeight;
           prevY += height + margin;
-          return <rect key={i} x={0} y={y} width="100%" height={height} />;
+          return (
+            <motion.rect
+              key={i}
+              x={0}
+              width={150}
+              initial={{ y: 300, height: 0 }}
+              animate={{ y, height }}
+              transition={{ duration: 0.1, bounce: 0 }}
+            />
+          );
         })}
       </g>
     </svg>

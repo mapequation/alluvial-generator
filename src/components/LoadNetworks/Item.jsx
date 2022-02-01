@@ -139,12 +139,7 @@ export default function Item({
         style={{ position: "absolute" }}
         fill={fill}
       />
-      <Box
-        maxW="100%"
-        h="100%"
-        pos="relative"
-        bg={file.noModularResult ? fill : "transparent"}
-      >
+      <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={2}>
           {icon}
 
