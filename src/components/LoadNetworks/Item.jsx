@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Reorder, useMotionValue } from "framer-motion";
+import { motion, Reorder, useMotionValue } from "framer-motion";
 import {
   Box,
   Button,
@@ -8,24 +8,23 @@ import {
   FormLabel,
   HStack,
   IconButton,
-  List,
-  ListItem,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   Progress,
+  Text,
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import useRaisedShadow from "../../hooks/useRaisedShadow";
 import FileBackground from "./FileBackground";
 import LayerIcon from "./LayerIcon";
-import { IoLayersOutline } from "react-icons/io5";
+import { IoLayersOutline, IoMenu } from "react-icons/io5";
 import { BiNetworkChart } from "react-icons/bi";
 import { GrTextAlignFull } from "react-icons/gr";
-import { MdClear, MdOutlineMoreHoriz } from "react-icons/md";
+import { MdClear } from "react-icons/md";
 import humanFileSize from "../../utils/human-file-size";
 import Infomap from "@mapequation/infomap";
 
@@ -67,32 +66,6 @@ export default function Item({
     return nameParts[0].slice(0, maxLength) + "..." + nameParts[1];
   })(file.fileName);
 
-  const icon = file.isMultilayer ? (
-    <IconButton
-      onClick={onMultilayerClick}
-      aria-label="expand"
-      isRound
-      icon={file.isExpanded ? <LayerIcon /> : <IoLayersOutline />}
-      size="md"
-      fontSize="1.3rem"
-      color={fg}
-      bg={bg}
-      boxShadow="md"
-    />
-  ) : (
-    <IconButton
-      aria-label="graph"
-      isRound
-      icon={settingsVisible ? <GrTextAlignFull /> : <BiNetworkChart />}
-      size="md"
-      fontSize="1.3rem"
-      pointerEvents="none"
-      color={fg}
-      bg={bg}
-      boxShadow="md"
-    />
-  );
-
   const runInfomap = async () => {
     try {
       setProgressVisible(true);
@@ -108,9 +81,7 @@ export default function Item({
       setIsRunning(false);
       setProgressVisible(false);
 
-      file.numTrials = numTrials;
-      file.directed = directed;
-      file.twoLevel = twoLevel;
+      Object.assign(file, { numTrials, directed, twoLevel });
 
       const tree = result.ftree_states || result.ftree;
       if (tree) {
@@ -118,12 +89,20 @@ export default function Item({
         setSettingsVisible(false);
       }
     } catch (e) {
-      console.log(e);
       onError({
         title: `Error running Infomap on ${file.name}`,
         description: e.message,
       });
     }
+  };
+
+  const iconProps = {
+    isRound: true,
+    fontSize: "1.3rem",
+    color: fg,
+    bg,
+    size: "md",
+    boxShadow: "md",
   };
 
   return (
@@ -141,17 +120,48 @@ export default function Item({
       />
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={2}>
-          {icon}
+          {file.isMultilayer ? (
+            <IconButton
+              onClick={onMultilayerClick}
+              aria-label="expand"
+              icon={file.isExpanded ? <LayerIcon /> : <IoLayersOutline />}
+              {...iconProps}
+            />
+          ) : (
+            <IconButton
+              aria-label="graph"
+              icon={
+                file.noModularResult ? <GrTextAlignFull /> : <BiNetworkChart />
+              }
+              pointerEvents="none"
+              {...iconProps}
+            />
+          )}
 
-          <List
+          <Box
             bg={bg}
             fontSize="sm"
             borderRadius={5}
             boxShadow="md"
             p={2}
             mt={8}
+            pos="relative"
           >
-            <ListItem fontWeight={600} overflowWrap="anyhwere">
+            {file.network && !file.noModularResult && !file.isExpanded && (
+              <IconButton
+                aria-label="settings"
+                onClick={toggleSettings}
+                isRound
+                size="sm"
+                variant="ghost"
+                pos="absolute"
+                top={0}
+                right={0}
+                icon={<IoMenu />}
+              />
+            )}
+
+            <Text fontWeight={600} overflowWrap="anyhwere">
               {truncatedName.length === file.fileName.length ? (
                 file.fileName
               ) : (
@@ -159,44 +169,52 @@ export default function Item({
                   {truncatedName}
                 </Tooltip>
               )}
-            </ListItem>
+            </Text>
 
-            {!settingsVisible && (
-              <>
+            {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
+
+            {!settingsVisible && !file.noModularResult && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
                 {file.isMultilayer && !file.isExpanded && (
-                  <ListItem>{file.numLayers + " layers"}</ListItem>
+                  <Text>{file.numLayers + " layers"}</Text>
                 )}
                 {file.isMultilayer && file.isExpanded && (
-                  <ListItem>{"layer " + file.layerId}</ListItem>
+                  <Text>{"layer " + file.layerId}</Text>
                 )}
                 {file.nodes && (
-                  <ListItem>
+                  <Text>
                     {file.nodes.length +
                       (file.isStateNetwork ? " state nodes" : " nodes")}
-                  </ListItem>
+                  </Text>
                 )}
                 {file.numTopModules && (
-                  <ListItem>
+                  <Text>
                     {file.numTopModules +
                       (file.numTopModules > 1 ? " top modules" : " top module")}
-                  </ListItem>
+                  </Text>
                 )}
                 {file.numLevels && (
-                  <ListItem>
+                  <Text>
                     {file.numLevels +
                       (file.numLevels > 1 ? " levels" : "level")}
-                  </ListItem>
+                  </Text>
                 )}
                 {file.codelength && (
-                  <ListItem>{file.codelength.toFixed(3) + " bits"}</ListItem>
+                  <Text>{file.codelength.toFixed(3) + " bits"}</Text>
                 )}
-              </>
+              </motion.div>
             )}
 
-            {file.size > 0 && <ListItem>{humanFileSize(file.size)}</ListItem>}
-
-            {file.network && settingsVisible && (
-              <ListItem>
+            {settingsVisible && file.network && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
                 <FormControl isDisabled={progressVisible}>
                   <HStack justify="space-between">
                     <FormLabel
@@ -251,23 +269,9 @@ export default function Item({
                     Run Infomap
                   </Button>
                 </FormControl>
-              </ListItem>
+              </motion.div>
             )}
-          </List>
-
-          {file.network && !file.noModularResult && !file.isExpanded && (
-            <IconButton
-              aria-label="settings"
-              onClick={toggleSettings}
-              isRound
-              size="sm"
-              variant="ghost"
-              pos="absolute"
-              top="2.5rem"
-              right="0.5"
-              icon={<MdOutlineMoreHoriz />}
-            />
-          )}
+          </Box>
 
           <IconButton
             isRound
