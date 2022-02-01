@@ -55,6 +55,7 @@ export class Store {
   diagram = new Diagram();
 
   files: any[] = [];
+  identifier: "id" | "name" = "id";
 
   // hack to force updates when we call updateLayout
   updateFlag = true;
@@ -97,6 +98,7 @@ export class Store {
     makeObservable(this, {
       diagram: observable.ref,
       files: observable.ref,
+      identifier: observable,
       updateFlag: observable,
       numNetworks: observable,
       height: observable,
@@ -144,6 +146,10 @@ export class Store {
   setFiles = action((files: any[], selectLargest = true) => {
     this.files = files;
     this.setNetworks(files, selectLargest);
+  });
+
+  setIdentifier = action((identifier: "id" | "name") => {
+    this.identifier = identifier;
   });
 
   setHeight = action((height: number) => {

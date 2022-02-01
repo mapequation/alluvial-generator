@@ -5,16 +5,23 @@ import {
 } from "@mapequation/infomap/parser";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import {
+  Box,
   Button,
+  FormLabel,
+  HStack,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
+  Tooltip,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
+import { QuestionOutlineIcon } from "@chakra-ui/icons";
 import { Reorder } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useState } from "react";
@@ -405,6 +412,20 @@ export default observer(function LoadNetworks({ onClose }) {
     }
   });
 
+  const updateIdentifiers = (identifier) => {
+    files.forEach((file) => {
+      if (file.isExpanded) {
+        // No need to do anything
+        //setIdentifiers(file, "multilayer-expanded");
+      } else if (file.format === "net") {
+        setIdentifiers(file, "ftree", identifier);
+      } else {
+        setIdentifiers(file, file.format, identifier);
+      }
+    });
+    store.setIdentifier(identifier);
+  };
+
   return (
     <>
       <ModalOverlay />
@@ -459,11 +480,33 @@ export default observer(function LoadNetworks({ onClose }) {
             disabled={files.length === 0 || infomapRunning}
             onClick={reset}
             leftIcon={<MdOutlineDelete />}
-            mr="auto"
+            mr={8}
             variant="outline"
           >
             Clear
           </Button>
+          <Box mr="auto">
+            <FormLabel fontSize="sm" htmlFor="identifier" mr={0} mb={0}>
+              Node Identifier{" "}
+              <Tooltip
+                hasArrow
+                placement="top"
+                label="Node identifiers are used to match nodes across different networks. Choose between matching nodes by node id or node name."
+              >
+                <QuestionOutlineIcon />
+              </Tooltip>
+            </FormLabel>
+            <RadioGroup
+              onChange={updateIdentifiers}
+              value={store.identifier}
+              size="sm"
+            >
+              <HStack spacing={2}>
+                <Radio value="id">Id</Radio>
+                <Radio value="name">Name</Radio>
+              </HStack>
+            </RadioGroup>
+          </Box>
           <Button
             onClick={open}
             disabled={infomapRunning}
@@ -543,11 +586,19 @@ function calcStatistics(file) {
   };
 }
 
-function setIdentifiers(network, format) {
+function setIdentifiers(network, format, identifier = "id") {
   const { nodes } = network;
 
   const stateOrNodeId = (node) =>
     node.stateId != null ? node.stateId : node.id;
+
+  const getIdentifier = (node) => {
+    if (identifier === "id") {
+      return stateOrNodeId(node).toString();
+    } else if (identifier === "name") {
+      return node.name ?? stateOrNodeId(node).toString();
+    }
+  };
 
   if (format === "multilayer-expanded") {
     // Expanded multilayer networks must use the physical
@@ -555,13 +606,13 @@ function setIdentifiers(network, format) {
     nodes.forEach((node) => (node.identifier = node.id.toString()));
   } else if (format === "json") {
     nodes.forEach((node) => {
-      node.identifier = node.identifier ?? stateOrNodeId(node).toString();
+      node.identifier = node.identifier ?? getIdentifier(node);
       if (!Array.isArray(node.path)) {
         node.path = TreePath.toArray(node.path);
       }
     });
   } else if (format === "tree" || format === "ftree") {
-    nodes.forEach((node) => (node.identifier = stateOrNodeId(node).toString()));
+    nodes.forEach((node) => (node.identifier = getIdentifier(node)));
   } else if (format === "clu") {
     nodes.forEach((node) => {
       const id = stateOrNodeId(node);
