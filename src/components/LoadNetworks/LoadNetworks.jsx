@@ -392,8 +392,6 @@ export default observer(function LoadNetworks({ onClose }) {
 
     if (event?.key === "c" && files.length > 0) {
       createDiagram();
-    } else if (event?.key === "Backspace") {
-      reset();
     } else if (event?.key === "e") {
       loadExample();
     }
