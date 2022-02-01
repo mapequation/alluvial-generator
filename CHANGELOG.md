@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/mapequation/alluvial-generator/compare/v1.0.0...v1.1.0) (2022-02-01)
+
+
+### Features
+
+* Add node identifier toggle ([3298716](https://github.com/mapequation/alluvial-generator/commit/3298716df778a0ae7bd1f9da457c51efc312c5a7))
+* Animate FileBackground modules ([89e2cc5](https://github.com/mapequation/alluvial-generator/commit/89e2cc567c5482bf22bc03cef1d0341e82cd9bba))
+* Run directed and two-level Infomap with multiple trials ([8587fe7](https://github.com/mapequation/alluvial-generator/commit/8587fe751da850c5262951d3ff696ffc882cf0bc))
+* Run undirected Infomap on net-files ([4572739](https://github.com/mapequation/alluvial-generator/commit/45727395025390b66512a09ed28d83d1420a8ae7))
+
+
+### Bug Fixes
+
+* Disable node identifier radio group when no files are loaded ([ce861b3](https://github.com/mapequation/alluvial-generator/commit/ce861b3e2cbb6f8d1bb4e43f51bd3f93a563e9f3))
+* Remove clear keyboard shortcut on loading screen ([57296f6](https://github.com/mapequation/alluvial-generator/commit/57296f681c69b2d2e476072b22f8ac9c29c4da1f))
+* Show loading button when running Infomap ([00ae162](https://github.com/mapequation/alluvial-generator/commit/00ae16270df90313c733eab89e1eb47b10697bcd))
+* Show version in sidebar ([cd23acd](https://github.com/mapequation/alluvial-generator/commit/cd23acd1931d8855597fea734578269cb10a48a3))
+
 ## [1.0.0](https://github.com/mapequation/alluvial-generator/compare/v0.5.2...v1.0.0) (2022-01-31)
 
 
