@@ -427,7 +427,9 @@ export default observer(function LoadNetworks({ onClose }) {
         // No need to do anything
         //setIdentifiers(file, "multilayer-expanded");
       } else if (file.format === "net") {
-        setIdentifiers(file, "ftree", identifier);
+        if (!file.noModularResult) {
+          setIdentifiers(file, "ftree", identifier);
+        }
       } else {
         setIdentifiers(file, file.format, identifier);
       }
