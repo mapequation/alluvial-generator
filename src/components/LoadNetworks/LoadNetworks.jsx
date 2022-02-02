@@ -75,6 +75,7 @@ export default observer(function LoadNetworks({ onClose }) {
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
   const onError = ({ title, description, ...props }) => {
+    console.warn(description);
     toast({
       title,
       description,

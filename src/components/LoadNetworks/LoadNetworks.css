@@ -17,7 +17,8 @@
 .parent .child {
     flex: 0 0 var(--box-width);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
-    border-radius: 5px;
+    border-radius: 3px;
+    overflow: hidden;
     list-style-type: none;
     cursor: grab;
     position: relative;
