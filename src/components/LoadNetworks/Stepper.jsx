@@ -17,9 +17,7 @@ export default function Stepper({ activeStep, acceptedFormats }) {
       <Step
         label="Load network partitions"
         description={
-          <a href="//mapequation.org/infomap/#Output">
-            Infomap formats: {acceptedFormats}
-          </a>
+          <a href="//mapequation.org/infomap/#Output">{acceptedFormats}</a>
         }
       />
       <Step

@@ -38,11 +38,13 @@ import JSZip from "jszip";
 const acceptedFormats = [
   ".tree",
   ".ftree",
+  ".stree",
   ".clu",
   ".json",
   ".net",
   ".zip",
 ].join(",");
+
 const exampleDataFilename = "science-1998-2001-2007.json";
 
 async function fetchExampleData(filename = exampleDataFilename) {
@@ -104,6 +106,7 @@ export default observer(function LoadNetworks({ onClose }) {
         .map((ext) => ext.slice(1))
         .filter((ext) => ext !== "zip");
 
+      // Unzip compressed files, read uncompressed files
       let fileIndex = 0;
       for (const file of [...acceptedFiles]) {
         if (file?.type === "application/zip") {
@@ -152,6 +155,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
       const newFiles = [];
 
+      // Parse files
       for (let i = 0; i < acceptedFiles.length; ++i) {
         const file = acceptedFiles[i];
         const format = fileExtension(file.name);
@@ -612,7 +616,7 @@ function setIdentifiers(network, format, identifier = "id") {
         node.path = TreePath.toArray(node.path);
       }
     });
-  } else if (format === "tree" || format === "ftree") {
+  } else if (format === "tree" || format === "ftree" || format === "stree") {
     nodes.forEach((node) => (node.identifier = getIdentifier(node)));
   } else if (format === "clu") {
     nodes.forEach((node) => {

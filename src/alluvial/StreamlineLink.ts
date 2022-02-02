@@ -22,6 +22,14 @@ export default class StreamlineLink {
     return this.right?.parent?.parent?.highlightIndex ?? -1;
   }
 
+  get leftInsignificant() {
+    return this.left?.parent?.parent?.insignificant ?? false;
+  }
+
+  get rightInsignificant() {
+    return this.right?.parent?.parent?.insignificant ?? false;
+  }
+
   get highlightIndex() {
     return Math.max(this.leftHighlightIndex, this.rightHighlightIndex);
   }
