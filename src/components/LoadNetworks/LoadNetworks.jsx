@@ -17,6 +17,7 @@ import {
   ModalOverlay,
   Radio,
   RadioGroup,
+  Skeleton,
   Tooltip,
   useColorModeValue,
   useToast,
@@ -66,10 +67,11 @@ export default observer(function LoadNetworks({ onClose }) {
     "var(--chakra-colors-gray-50)",
     "var(--chakra-colors-gray-600)"
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingDiagram, setIsCreatingDiagram] = useState(false);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
-  const [files, setFiles] = useState(store.files);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [infomapRunning, setInfomapRunning] = useState(false);
+  const [files, setFiles] = useState(store.files);
   const reset = useCallback(() => setFiles([]), [setFiles]);
 
   const onError = ({ title, description, ...props }) => {
@@ -97,6 +99,7 @@ export default observer(function LoadNetworks({ onClose }) {
       ),
     onDrop: async (acceptedFiles) => {
       console.time("onDrop");
+      setIsLoadingFiles(true);
 
       const readFiles = [];
       const errors = [];
@@ -244,6 +247,7 @@ export default observer(function LoadNetworks({ onClose }) {
         })
       );
 
+      setIsLoadingFiles(false);
       console.timeEnd("onDrop");
     },
   });
@@ -278,10 +282,10 @@ export default observer(function LoadNetworks({ onClose }) {
   const createDiagram = useCallback(() => {
     // TODO already loaded?
     // TODO set state from json
-    setIsLoading(true);
+    setIsCreatingDiagram(true);
     store.setFiles(files);
     onClose();
-  }, [onClose, files, store, setIsLoading]);
+  }, [onClose, files, store, setIsCreatingDiagram]);
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");
@@ -454,32 +458,34 @@ export default observer(function LoadNetworks({ onClose }) {
             }
           />
 
-          <div
-            style={{ background: dropzoneBg }}
-            className="dropzone"
-            {...getRootProps()}
-          >
-            <Reorder.Group
-              className="parent"
-              axis="x"
-              layoutScroll
-              values={files}
-              onReorder={setFiles}
+          <Skeleton isLoaded={!isLoadingFiles}>
+            <div
+              style={{ background: dropzoneBg }}
+              className="dropzone"
+              {...getRootProps()}
             >
-              {files.map((file) => (
-                <Item
-                  key={file.id}
-                  file={file}
-                  onRemove={() => removeFileId(file.id)}
-                  onMultilayerClick={() => toggleMultilayerExpanded(file)}
-                  setIsRunning={setInfomapRunning}
-                  updateFile={updateFileWithTree}
-                  onError={onError}
-                />
-              ))}
-            </Reorder.Group>
-            <input {...getInputProps()} />
-          </div>
+              <Reorder.Group
+                className="parent"
+                axis="x"
+                layoutScroll
+                values={files}
+                onReorder={setFiles}
+              >
+                {files.map((file) => (
+                  <Item
+                    key={file.id}
+                    file={file}
+                    onRemove={() => removeFileId(file.id)}
+                    onMultilayerClick={() => toggleMultilayerExpanded(file)}
+                    setIsRunning={setInfomapRunning}
+                    updateFile={updateFileWithTree}
+                    onError={onError}
+                  />
+                ))}
+              </Reorder.Group>
+              <input {...getInputProps()} />
+            </div>
+          </Skeleton>
         </ModalBody>
 
         <ModalFooter>
@@ -542,7 +548,7 @@ export default observer(function LoadNetworks({ onClose }) {
               infomapRunning
             }
             isActive={files.length > 0}
-            isLoading={isLoading}
+            isLoading={isCreatingDiagram}
             onClick={createDiagram}
           >
             Create Diagram
