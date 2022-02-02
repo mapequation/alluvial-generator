@@ -430,6 +430,11 @@ export default observer(function LoadNetworks({ onClose }) {
     store.setIdentifier(identifier);
   };
 
+  let activeStep = 1;
+  if (files.length > 0) {
+    activeStep = files.some((f) => f.noModularResult) ? 0 : 2;
+  }
+
   return (
     <>
       <ModalOverlay />
@@ -438,8 +443,15 @@ export default observer(function LoadNetworks({ onClose }) {
         <ModalCloseButton />
         <ModalBody>
           <Stepper
-            activeStep={files.length > 0 ? 2 : 1}
-            acceptedFormats={acceptedFormats}
+            activeStep={activeStep}
+            acceptedFormats={
+              "Formats: " +
+              acceptedFormats
+                .split(",")
+                .filter((f) => f !== ".net" && f !== ".stree")
+                .map((f) => f.slice(1))
+                .join(", ")
+            }
           />
 
           <div

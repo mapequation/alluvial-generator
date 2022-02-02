@@ -11,7 +11,9 @@ export default function Stepper({ activeStep, acceptedFormats }) {
       <Step
         label="Run Infomap"
         description={
-          <a href="//mapequation.org/infomap">Infomap Online or standalone</a>
+          <a href="//mapequation.org/infomap">
+            Infomap Online or load net-files
+          </a>
         }
       />
       <Step
