@@ -212,7 +212,7 @@ export default observer(function LoadNetworks({ onClose }) {
           continue;
         }
 
-        setIdentifiers(contents, format);
+        setIdentifiers(contents, format, store.identifier);
 
         try {
           const newFile = Object.assign(
@@ -263,7 +263,7 @@ export default observer(function LoadNetworks({ onClose }) {
     try {
       const contents = parse(tree, null, true);
 
-      setIdentifiers(contents, "ftree");
+      setIdentifiers(contents, "ftree", store.identifier);
 
       Object.assign(file, {
         noModularResult: false,
