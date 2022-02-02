@@ -163,12 +163,12 @@ export default observer(function LoadNetworks({ onClose }) {
             contents = JSON.parse(readFiles[i]);
 
             if (contents.networks !== undefined) {
-              // a diagram contains several networks
-              // duplicate file for each network
+              // A diagram contains several networks.
+              // Create a new file for each network.
               const diagramFiles = createFilesFromDiagramObject(contents, file);
 
-              // if any file ids already exist, give a new id
-              for (let existingFile of newFiles) {
+              // If any file ids already exist, give a new id
+              for (let existingFile of [...files, ...newFiles]) {
                 for (let diagramFile of diagramFiles) {
                   if (existingFile.id === diagramFile.id) {
                     diagramFile.id = id();
