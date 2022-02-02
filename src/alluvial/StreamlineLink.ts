@@ -1,5 +1,14 @@
 import type StreamlineNode from "./StreamlineNode";
 
+type Layout = {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+  h0: number;
+  h1: number;
+};
+
 export default class StreamlineLink {
   constructor(
     public readonly left: StreamlineNode,
@@ -70,6 +79,26 @@ export default class StreamlineLink {
     return (this.h0 + this.h1) / 2;
   }
 
+  get path() {
+    return this._path();
+  }
+
+  get transitionPath() {
+    const { x0, x1, y0, y1, h0, h1 } = this;
+
+    const xMid = (x0 + x1) / 2;
+    const yMid = (y0 + y1) / 2;
+
+    return this._path({
+      x0: xMid,
+      x1: xMid,
+      y0: yMid + h0 / 4,
+      y1: yMid + h1 / 4,
+      h0: h0 / 2,
+      h1: h1 / 2,
+    });
+  }
+
   /*
                     (cpx, y1) ________ (x1, y1)
                     ________/        |
@@ -81,9 +110,7 @@ export default class StreamlineLink {
            |______/
    (x0, y0 + h0)    (cpx, y0 + h0)
    */
-  get path() {
-    let { x0, x1, y0, y1, h0, h1 } = this;
-
+  private _path({ x0, x1, y0, y1, h0, h1 }: Layout = this) {
     const threshold = 1e-6;
     y0 = y0 < threshold ? 0 : y0;
     y1 = y1 < threshold ? 0 : y1;
