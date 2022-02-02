@@ -458,7 +458,7 @@ export default observer(function LoadNetworks({ onClose }) {
             }
           />
 
-          <Skeleton isLoaded={!isLoadingFiles}>
+          <Skeleton isLoaded={!isLoadingFiles} rounded="md">
             <div
               style={{ background: dropzoneBg }}
               className="dropzone"
