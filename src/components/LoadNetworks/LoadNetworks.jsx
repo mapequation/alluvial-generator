@@ -23,7 +23,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { QuestionOutlineIcon } from "@chakra-ui/icons";
-import { Reorder } from "framer-motion";
+import { AnimatePresence, Reorder } from "framer-motion";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -474,17 +474,19 @@ export default observer(function LoadNetworks({ onClose }) {
                 values={files}
                 onReorder={setFiles}
               >
-                {files.map((file) => (
-                  <Item
-                    key={file.id}
-                    file={file}
-                    onRemove={() => removeFileId(file.id)}
-                    onMultilayerClick={() => toggleMultilayerExpanded(file)}
-                    setIsRunning={setInfomapRunning}
-                    updateFile={updateFileWithTree}
-                    onError={onError}
-                  />
-                ))}
+                <AnimatePresence>
+                  {files.map((file) => (
+                    <Item
+                      key={file.id}
+                      file={file}
+                      onRemove={() => removeFileId(file.id)}
+                      onMultilayerClick={() => toggleMultilayerExpanded(file)}
+                      setIsRunning={setInfomapRunning}
+                      updateFile={updateFileWithTree}
+                      onError={onError}
+                    />
+                  ))}
+                </AnimatePresence>
               </Reorder.Group>
               <input {...getInputProps()} />
             </div>

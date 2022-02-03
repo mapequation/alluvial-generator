@@ -116,6 +116,10 @@ export default function Item({
       className="child"
       role="group"
       style={{ boxShadow, x }}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8, y: -100 }}
+      transition={{ duration: 0.15 }}
     >
       <FileBackground
         file={file}
@@ -161,6 +165,9 @@ export default function Item({
                 pos="absolute"
                 top={0}
                 right={0}
+                _focus={{
+                  outline: "none",
+                }}
                 icon={<IoMenu />}
               />
             )}
