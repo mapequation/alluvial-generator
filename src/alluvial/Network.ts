@@ -1,4 +1,4 @@
-import AlluvialNodeBase from "./AlluvialNode";
+import AlluvialNodeBase, { Layout } from "./AlluvialNode";
 import Diagram from "./Diagram";
 import { NETWORK } from "./Depth";
 import LeafNode from "./LeafNode";
@@ -7,6 +7,7 @@ import type { Side } from "./Side";
 import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
 import type { Module as InfomapModule } from "@mapequation/infomap";
+import TreePath from "../utils/TreePath";
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
@@ -54,6 +55,41 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   get visibleChildren() {
     return this.children.filter((module) => module.isVisible);
+  }
+
+  get hierarchicalChildren() {
+    const root = new TreeNode();
+
+    const nodesByPath: Map<string, TreeNode> = new Map().set(root.path, root);
+
+    for (const module of this.children) {
+      if (!module.isVisible) {
+        continue;
+      }
+
+      let parent = root;
+      const path = new TreePath(module.path);
+
+      for (
+        let moduleLevel = 0;
+        moduleLevel <= module.moduleLevel;
+        ++moduleLevel
+      ) {
+        const parentPath = path.ancestorAtLevelAsString(moduleLevel);
+
+        if (!nodesByPath.has(parentPath)) {
+          const isLeaf = moduleLevel === module.moduleLevel;
+          parent = new TreeNode(parentPath, moduleLevel, isLeaf, parent);
+          nodesByPath.set(parentPath, parent);
+        } else {
+          parent = nodesByPath.get(parentPath)!;
+        }
+      }
+
+      parent?.addChild(module);
+    }
+
+    return root;
   }
 
   get flowThreshold() {
@@ -160,5 +196,76 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
       yield* module.rightStreamlines();
     }
+  }
+}
+
+class TreeNode extends Layout {
+  children: (TreeNode | Module)[] = [];
+  maxModuleLevel: number = 1;
+  y = Infinity;
+  private maxY = -Infinity;
+  private maxHeight = -Infinity;
+
+  constructor(
+    public path: string = "root",
+    public moduleLevel: number = 1,
+    public isLeaf: boolean = false,
+    private parent?: TreeNode
+  ) {
+    super();
+
+    if (parent) {
+      parent.children.push(this);
+      this.updateMaxModuleLevel(moduleLevel);
+    }
+  }
+
+  private updateMaxModuleLevel(moduleLevel: number) {
+    if (moduleLevel > this.maxModuleLevel) {
+      this.maxModuleLevel = moduleLevel;
+    }
+    this.parent?.updateMaxModuleLevel(moduleLevel);
+  }
+
+  *visit(): Iterable<TreeNode | Module> {
+    for (const node of this.children) {
+      if (node instanceof TreeNode) {
+        if (!node.isLeaf) yield node;
+        yield* node.visit();
+      } else {
+        yield node;
+      }
+    }
+  }
+
+  addChild(module: Module) {
+    if (!this.isLeaf || !this.parent) {
+      throw new Error("Module added to non-leaf TreeNode");
+    }
+
+    this.parent.updateLayout(module);
+    this.children.push(module);
+  }
+
+  private updateLayout(module: Module) {
+    this.x = module.x;
+    this.width = module.width;
+    this.y = Math.min(this.y, module.y);
+
+    if (module.y > this.maxY) {
+      this.maxY = module.y;
+      this.maxHeight = module.height;
+      this.height = Math.max(
+        this.height,
+        Math.abs(this.y - module.y) + module.height
+      );
+    } else {
+      this.height = Math.max(
+        this.height,
+        Math.abs(this.y - this.maxY) + this.maxHeight
+      );
+    }
+
+    this.parent?.updateLayout(module);
   }
 }

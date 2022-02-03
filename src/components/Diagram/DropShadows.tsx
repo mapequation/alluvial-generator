@@ -4,7 +4,6 @@ const id = (level: number) => `shadow${level}`;
 
 export default function DropShadows({ maxLevel = 1 }) {
   const levels = range(1, maxLevel + 1);
-  const x = (level: number) => maxLevel + 1 - level;
 
   return (
     <>
@@ -18,10 +17,10 @@ export default function DropShadows({ maxLevel = 1 }) {
           height="400%"
         >
           <feDropShadow
-            dx={0.5 * x(level)}
-            dy={0.5 * x(level)}
-            stdDeviation={0.5 * x(level)}
-            floodOpacity={-0.05 * x(level) + 0.95}
+            dx={1.5 + 0.2 * level}
+            dy={1.5 + 0.2 * level}
+            stdDeviation={1 + 0.1 * level}
+            floodOpacity={0.5}
           />
         </filter>
       ))}

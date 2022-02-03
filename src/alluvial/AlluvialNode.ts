@@ -1,7 +1,7 @@
 import { Depth } from "./Depth";
 import LeafNode from "./LeafNode";
 
-class Layout {
+export class Layout {
   x: number = 0;
   y: number = 0;
   width: number = 0;

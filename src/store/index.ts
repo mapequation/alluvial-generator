@@ -85,6 +85,7 @@ export class Store {
   showModuleNames: boolean = true;
   showNetworkNames: boolean = true;
 
+  hierarchicalModules: "none" | "outline" | "shadow" = "shadow";
   dropShadow: boolean = false;
   fontSize: number = 8;
   networkFontSize: number = 10;
@@ -119,6 +120,7 @@ export class Store {
       showModuleId: observable,
       showModuleNames: observable,
       showNetworkNames: observable,
+      hierarchicalModules: observable,
       dropShadow: observable,
       fontSize: observable,
       networkFontSize: observable,
@@ -243,6 +245,12 @@ export class Store {
   setShowNetworkNames = action((showNetworkNames: boolean) => {
     this.showNetworkNames = showNetworkNames;
   });
+
+  setHierarchicalModules = action(
+    (hierarchicalModules: "none" | "outline" | "shadow") => {
+      this.hierarchicalModules = hierarchicalModules;
+    }
+  );
 
   setDropShadow = action((dropShadow: boolean) => {
     this.dropShadow = dropShadow;

@@ -8,14 +8,21 @@ import Module from "./Module";
 
 const Network = observer(function Network({ network, fillColor }) {
   const {
+    defaultHighlightColor,
     streamlineThreshold,
     streamlineOpacity,
     networkFontSize,
     showNetworkNames,
+    hierarchicalModules,
   } = useContext(StoreContext);
 
   const links = network.getLinks(streamlineThreshold);
   const { namePosition } = network;
+
+  const modules =
+    hierarchicalModules === "none"
+      ? network.visibleChildren
+      : [...network.hierarchicalChildren.visit()];
 
   const transition = { bounce: 0, duration: 0.2 };
 
@@ -44,16 +51,88 @@ const Network = observer(function Network({ network, fillColor }) {
         </motion.g>
       )}
 
+      {modules.map((module) => {
+        if (hierarchicalModules === "none" || !("isLeaf" in module)) {
+          return (
+            <Module key={module.id} module={module} fillColor={fillColor} />
+          );
+        } else if (hierarchicalModules === "shadow") {
+          return (
+            <ShadowModule
+              key={module.path.toString()}
+              module={module}
+              transition={transition}
+              fill={defaultHighlightColor}
+            />
+          );
+        } else {
+          return (
+            <OutlineModule
+              key={module.path.toString()}
+              module={module}
+              transition={transition}
+              stroke={defaultHighlightColor}
+            />
+          );
+        }
+      })}
+
       {links.map((link) => (
         <Streamline key={link.id} link={link} opacity={streamlineOpacity} />
-      ))}
-
-      {network.visibleChildren.map((module) => (
-        <Module key={module.id} module={module} fillColor={fillColor} />
       ))}
     </g>
   );
 });
+
+function OutlineModule({ module, transition, stroke }) {
+  let { x, y, width, height, maxModuleLevel, moduleLevel } = module;
+  const offset = 1 + 2.5 * (maxModuleLevel - moduleLevel);
+
+  x -= offset;
+  y -= offset;
+  width += 2 * offset;
+  height += 2 * offset;
+
+  return (
+    <motion.rect
+      id={module.path.toString()}
+      initial={{ ...module.layout, opacity: 0 }}
+      animate={{ x, y, width, height, opacity: 1 }}
+      exit={{ ...module.layout, opacity: 0 }}
+      rx={offset}
+      transition={transition}
+      fill="none"
+      stroke={stroke}
+      strokeWidth={2}
+      strokeDasharray="1,4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  );
+}
+
+function ShadowModule({ module, transition, fill }) {
+  const offset = 5 * (module.maxModuleLevel - module.moduleLevel);
+
+  return (
+    <g style={{ isolation: "isolate", mixBlendMode: "difference" }}>
+      <motion.g
+        initial={false}
+        animate={{ x: offset, y: offset }}
+        transition={transition}
+      >
+        <motion.rect
+          id={module.path.toString()}
+          initial={{ ...module.layout, opacity: 0 }}
+          animate={{ ...module.layout, opacity: 0.3 }}
+          exit={{ ...module.layout, opacity: 0 }}
+          transition={transition}
+          fill={fill}
+        />
+      </motion.g>
+    </g>
+  );
+}
 
 function activeHighlightIndices(links) {
   const uniqueIndices = new Set();

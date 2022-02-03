@@ -482,6 +482,13 @@ export default observer(function Sidebar({
         />
 
         <RadioGroup
+          legend="Hierarchical modules"
+          value={store.hierarchicalModules}
+          onChange={store.setHierarchicalModules}
+          options={["none", "shadow", "outline"]}
+        />
+
+        <RadioGroup
           legend="Module size"
           value={store.moduleSize}
           onChange={store.setModuleSize}
