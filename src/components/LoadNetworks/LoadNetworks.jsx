@@ -569,8 +569,6 @@ function createFilesFromDiagramObject(json, file) {
       .map((network) => network.nodes.length)
       .reduce((tot, b) => tot + b, 0) || 1;
 
-  // TODO extract state
-
   return json.networks.map((network) => {
     setIdentifiers(network, "json");
 

@@ -137,7 +137,7 @@ export default class TreePath {
     }
 
     const p = path.toString();
-    return new TreePath(p.substr(0, p.lastIndexOf(":"))); // FIXME substr is deprecated
+    return new TreePath(p.slice(0, p.lastIndexOf(":")));
   }
 
   /**
