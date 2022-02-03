@@ -1,13 +1,13 @@
 import * as d3 from "d3";
 import { observer } from "mobx-react";
 import { useContext, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import DropShadows from "./DropShadows";
 import "./Diagram.css";
 import Network from "./Network";
 import useEventListener from "../../hooks/useEventListener";
-import { SelectedModule } from "./Module";
 import useWindowSize from "../../hooks/useWindowSize";
 import { drawerWidth } from "../App";
 
@@ -87,6 +87,24 @@ export default observer(function Diagram() {
     </svg>
   );
 });
+
+function SelectedModule({ module }) {
+  if (module == null) {
+    return null;
+  }
+
+  return (
+    <motion.rect
+      initial={false}
+      animate={module.layout}
+      transition={{ bounce: 0, duration: 0.2 }}
+      stroke="#f00"
+      strokeWidth="1"
+      pointerEvents="none"
+      fill="none"
+    />
+  );
+}
 
 function translateCenter({ width, height }) {
   let { innerWidth, innerHeight } = window;

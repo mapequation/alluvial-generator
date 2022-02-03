@@ -125,21 +125,3 @@ const Module = observer(function Module({ module, fillColor }) {
 });
 
 export default Module;
-
-export function SelectedModule({ module }) {
-  if (module == null) {
-    return null;
-  }
-
-  return (
-    <motion.rect
-      initial={false}
-      animate={module.layout}
-      transition={{ bounce: 0, duration: 0.2 }}
-      stroke="#f00"
-      strokeWidth="1"
-      pointerEvents="none"
-      fill="none"
-    />
-  );
-}
