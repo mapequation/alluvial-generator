@@ -291,14 +291,27 @@ export default observer(function LoadNetworks({ onClose }) {
   const loadExample = useCallback(async () => {
     console.time("loadExample");
     setIsLoadingExample(true);
+    setIsLoadingFiles(true);
     try {
       const json = await fetchExampleData();
+      setIsLoadingFiles(false);
+      //setIsLoadingExample(false);
+      setIsCreatingDiagram(true);
       const emptyFile = new File([], exampleDataFilename);
       const files = createFilesFromDiagramObject(json, emptyFile);
-      store.setFiles(files);
-      onClose();
+      setFiles(files);
+      setTimeout(() => {
+        store.setFiles(files);
+        onClose();
+      }, 500);
     } catch (e) {
-      console.error(e);
+      onError({
+        title: "Could not load example data",
+        description: e.message,
+      });
+      setIsLoadingFiles(false);
+      setIsLoadingExample(false);
+      setIsCreatingDiagram(false);
     }
     console.timeEnd("loadExample");
   }, [onClose, store, setIsLoadingExample]);
@@ -495,7 +508,12 @@ export default observer(function LoadNetworks({ onClose }) {
 
         <ModalFooter>
           <Button
-            disabled={infomapRunning}
+            disabled={
+              isLoadingFiles ||
+              infomapRunning ||
+              isLoadingExample ||
+              isCreatingDiagram
+            }
             mr={2}
             onClick={loadExample}
             variant="outline"
@@ -504,7 +522,12 @@ export default observer(function LoadNetworks({ onClose }) {
             Load Example
           </Button>
           <Button
-            disabled={files.length === 0 || infomapRunning}
+            disabled={
+              files.length === 0 ||
+              infomapRunning ||
+              isLoadingExample ||
+              isCreatingDiagram
+            }
             onClick={reset}
             leftIcon={<MdOutlineDelete />}
             mr={8}
@@ -524,7 +547,12 @@ export default observer(function LoadNetworks({ onClose }) {
               </Tooltip>
             </FormLabel>
             <RadioGroup
-              isDisabled={files.length === 0}
+              isDisabled={
+                files.length === 0 ||
+                isLoadingExample ||
+                infomapRunning ||
+                isCreatingDiagram
+              }
               onChange={updateIdentifiers}
               value={store.identifier}
               size="sm"
@@ -537,7 +565,12 @@ export default observer(function LoadNetworks({ onClose }) {
           </Box>
           <Button
             onClick={open}
-            disabled={infomapRunning}
+            disabled={
+              isLoadingFiles ||
+              infomapRunning ||
+              isLoadingExample ||
+              isCreatingDiagram
+            }
             mr={2}
             variant="outline"
             isActive={files.length === 0}
@@ -550,7 +583,8 @@ export default observer(function LoadNetworks({ onClose }) {
             disabled={
               files.length === 0 ||
               files.some((f) => f.noModularResult) ||
-              infomapRunning
+              infomapRunning ||
+              isLoadingExample
             }
             isActive={files.length > 0}
             isLoading={isCreatingDiagram}
