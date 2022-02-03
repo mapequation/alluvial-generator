@@ -303,7 +303,7 @@ export default observer(function LoadNetworks({ onClose }) {
       setTimeout(() => {
         store.setFiles(files);
         onClose();
-      }, 500);
+      }, 200);
     } catch (e) {
       onError({
         title: "Could not load example data",
