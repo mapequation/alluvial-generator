@@ -307,7 +307,8 @@ export class Store {
 
   expand(module: Module) {
     const { parent, moduleId } = module;
-    module.expand();
+    const success = module.expand();
+    if (!success) return false;
     this.updateLayout();
 
     const visibleSubModules = parent.children.filter(
@@ -320,11 +321,13 @@ export class Store {
       );
       this.setSelectedModule(largestSubModule);
     }
+    return success;
   }
 
   regroup(module: Module) {
     const { parent, moduleId } = module;
-    module.regroup();
+    const success = module.regroup();
+    if (!success) return false;
     this.updateLayout();
 
     const parentModuleId = TreePath.parentPath(moduleId)?.toString() ?? null;
@@ -334,6 +337,7 @@ export class Store {
         this.setSelectedModule(superModule);
       }
     }
+    return success;
   }
 
   colorModule(module: Module, color: string, updateLayout = true) {

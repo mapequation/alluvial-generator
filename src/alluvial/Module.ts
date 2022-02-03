@@ -135,11 +135,11 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     );
   }
 
-  expand() {
+  expand(): boolean {
     const leafNodes = this.getLeafNodes();
     if (!leafNodes.length) {
-      console.warn(`No leaf nodes found`);
-      return;
+      console.warn("No leaf nodes found");
+      return false;
     }
 
     const newModuleLevel = this.moduleLevel + 1;
@@ -152,11 +152,13 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
         `Module can't be expanded to level ${newModuleLevel} ` +
           `because some nodes are at level ${newModuleLevel - 1}`
       );
-      return;
+      return false;
     }
 
     const network = this.parent;
-    if (!network) return;
+    if (!network) {
+      throw new Error("No parent network found");
+    }
 
     network.isCustomSorted = false;
 
@@ -164,31 +166,33 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       node.moduleLevel = newModuleLevel;
       node.update();
     });
+
+    return true;
   }
 
-  regroup() {
+  regroup(): boolean {
     if (this.moduleLevel <= 1) {
       console.warn(
         `Module with id ${this.moduleId} is already at module level ${this.moduleLevel}`
       );
-      return;
+      return false;
     }
 
     const modules = this.siblings;
 
-    const leafNodes: LeafNode[] = [].concat.apply(
-      [],
-      // @ts-ignore FIXME
-      modules.map((module) => module.getLeafNodes())
-    );
+    const leafNodes: LeafNode[] = modules
+      .map((module) => module.getLeafNodes())
+      .flat();
 
     if (!leafNodes.length) {
-      console.warn(`No leaf nodes found`);
+      console.warn("No leaf nodes found");
       return false;
     }
 
     const network = this.parent;
-    if (!network) return;
+    if (!network) {
+      throw new Error("No parent network found");
+    }
 
     network.isCustomSorted = false;
 
@@ -198,6 +202,8 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       node.moduleLevel = newModuleLevel;
       node.update();
     });
+
+    return true;
   }
 
   setColor(highlightIndex: number) {
@@ -228,36 +234,42 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.largestGroup.highlightIndex;
   }
 
-  moveUp() {
+  moveUp(): boolean {
     const index = this.parentIndex;
 
     const network = this.parent;
-    if (!network) return;
+    if (!network) {
+      throw new Error("No parent network found");
+    }
 
     if (index === network.children.length - 1) {
       console.warn(`Can't move module up because it is already at the top`);
-      return;
+      return false;
     }
 
     network.isCustomSorted = true;
     network.moveToIndex(index, index + 1);
+    return true;
   }
 
-  moveDown() {
+  moveDown(): boolean {
     const index = this.parentIndex;
 
     if (index === 0) {
       console.warn(
         `Can't move module down because it is already at the bottom`
       );
-      return;
+      return false;
     }
 
     const network = this.parent;
-    if (!network) return;
+    if (!network) {
+      throw new Error("No parent network found");
+    }
 
     network.isCustomSorted = true;
     network.moveToIndex(index, index - 1);
+    return true;
   }
 
   getSimilarModules(side: Side, numModules = 5, threshold = 1e-6) {

@@ -17,6 +17,8 @@ const Network = observer(function Network({ network, fillColor }) {
   const links = network.getLinks(streamlineThreshold);
   const { namePosition } = network;
 
+  const transition = { bounce: 0, duration: 0.2 };
+
   return (
     <g className="network">
       <defs>
@@ -27,18 +29,18 @@ const Network = observer(function Network({ network, fillColor }) {
           className="label"
           initial={false}
           animate={namePosition}
-          transition={{ bounce: 0, duration: 0.2 }}
+          transition={transition}
         >
-          <text
+          <motion.text
             className="name"
-            fontSize={networkFontSize}
-            dy={networkFontSize}
+            animate={{ fontSize: networkFontSize, dy: networkFontSize }}
+            transition={transition}
             textAnchor="middle"
             data-x={namePosition.x}
             data-y={namePosition.y}
           >
             {network.name}
-          </text>
+          </motion.text>
         </motion.g>
       )}
 
