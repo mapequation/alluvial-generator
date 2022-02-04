@@ -590,11 +590,14 @@ export class Store {
   moveSelectedModule(direction: "up" | "down") {
     if (!this.selectedModule) return;
 
-    if (direction === "up") this.selectedModule.moveUp();
-    else this.selectedModule.moveDown();
+    const didMove = this.selectedModule.move(direction);
 
-    this.diagram.updateLayout(this);
-    this.toggleUpdate();
+    if (didMove) {
+      this.diagram.updateLayout(this);
+      this.toggleUpdate();
+    }
+
+    return didMove;
   }
 
   moveNetwork(direction: "left" | "right") {

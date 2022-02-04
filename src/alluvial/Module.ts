@@ -234,7 +234,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.setColor(NOT_HIGHLIGHTED);
   }
 
-  moveUp(): boolean {
+  move(direction: "up" | "down") {
     const index = this.parentIndex;
 
     const network = this.parent;
@@ -242,33 +242,22 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       throw new Error("No parent network found");
     }
 
-    if (index === network.children.length - 1) {
-      console.warn(`Can't move module up because it is already at the top`);
-      return false;
-    }
+    const indexBoundary = direction === "up" ? network.children.length - 1 : 0;
 
-    network.isCustomSorted = true;
-    network.moveToIndex(index, index + 1);
-    return true;
-  }
-
-  moveDown(): boolean {
-    const index = this.parentIndex;
-
-    if (index === 0) {
+    if (index === indexBoundary) {
       console.warn(
-        `Can't move module down because it is already at the bottom`
+        `Can't move module ${direction} because it is already at the ${
+          direction === "down" ? "bottom" : "top"
+        }`
       );
       return false;
     }
 
-    const network = this.parent;
-    if (!network) {
-      throw new Error("No parent network found");
-    }
+    const indexDirection = direction === "down" ? -1 : 1;
+    let newIndex = index + indexDirection;
 
     network.isCustomSorted = true;
-    network.moveToIndex(index, index - 1);
+    network.moveToIndex(index, newIndex);
     return true;
   }
 

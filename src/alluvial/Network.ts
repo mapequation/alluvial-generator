@@ -58,9 +58,11 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   }
 
   get hierarchicalChildren() {
-    const root = new TreeNode();
+    return [...this.tree.visitBreadthFirst()];
+  }
 
-    const nodesByPath: Map<string, TreeNode> = new Map().set(root.path, root);
+  get tree() {
+    const root = new TreeNode();
 
     for (const module of this.children) {
       if (!module.isVisible) {
@@ -71,25 +73,24 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       const path = new TreePath(module.path);
 
       for (
-        let moduleLevel = 0;
+        let moduleLevel = 1;
         moduleLevel <= module.moduleLevel;
         ++moduleLevel
       ) {
         const parentPath = path.ancestorAtLevelAsString(moduleLevel);
 
-        if (!nodesByPath.has(parentPath)) {
+        if (!parent.has(parentPath)) {
           const isLeaf = moduleLevel === module.moduleLevel;
-          parent = new TreeNode(parentPath, moduleLevel, isLeaf, parent);
-          nodesByPath.set(parentPath, parent);
+          parent = parent.createChild(parentPath, moduleLevel, isLeaf);
         } else {
-          parent = nodesByPath.get(parentPath)!;
+          parent = parent.get(parentPath)!;
         }
       }
 
       parent?.addChild(module);
     }
 
-    return [...root.visitBreadthFirst()];
+    return root;
   }
 
   get flowThreshold() {
@@ -201,6 +202,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
 class TreeNode extends Layout {
   children: (TreeNode | Module)[] = [];
+  childPathMap = new Map<string, TreeNode>();
   maxModuleLevel: number = 1;
   y = Infinity;
   private maxY = -Infinity;
@@ -216,8 +218,21 @@ class TreeNode extends Layout {
 
     if (parent) {
       parent.children.push(this);
+      parent.childPathMap.set(path, this);
       this.updateMaxModuleLevel(moduleLevel);
     }
+  }
+
+  has(path: string) {
+    return this.childPathMap.has(path);
+  }
+
+  get(path: string) {
+    return this.childPathMap.get(path);
+  }
+
+  createChild(path: string, moduleLevel: number, isLeaf: boolean): TreeNode {
+    return new TreeNode(path, moduleLevel, isLeaf, this);
   }
 
   *visitBreadthFirst(): Iterable<TreeNode | Module> {
