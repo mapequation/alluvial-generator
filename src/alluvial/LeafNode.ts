@@ -196,30 +196,23 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     this.removeFromSide(LEFT);
     this.removeFromSide(RIGHT);
 
-    if (group) {
-      const module = group.parent;
-      if (module) {
-        if (group.isEmpty) {
-          module.removeChild(group);
-        }
+    const module = group?.parent;
+    const network = module?.parent;
+    const root = network?.parent;
 
-        const network = module.parent;
-        if (network) {
-          if (module.isEmpty) {
-            network.removeChild(module);
-          }
+    if (group?.isEmpty) {
+      module?.removeChild(group);
+    }
 
-          const root = network.parent;
-          if (root) {
-            if (removeNetwork && network.isEmpty) {
-              root.removeChild(network);
+    if (module?.isEmpty) {
+      network?.removeChild(module);
+    }
 
-              this.getOpposite(LEFT)?.setOpposite(null, RIGHT);
-              this.getOpposite(RIGHT)?.setOpposite(null, LEFT);
-            }
-          }
-        }
-      }
+    if (removeNetwork && network?.isEmpty) {
+      root?.removeChild(network);
+
+      this.getOpposite(LEFT)?.setOpposite(null, RIGHT);
+      this.getOpposite(RIGHT)?.setOpposite(null, LEFT);
     }
   }
 
