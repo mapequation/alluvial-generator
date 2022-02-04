@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/mapequation/alluvial-generator/compare/v1.1.0...v1.2.0) (2022-02-04)
+
+
+### Features
+
+* Animate presence when files enter and exit the loading screen ([497e3ad](https://github.com/mapequation/alluvial-generator/commit/497e3ad1b1d113a03a52991c0c2073d3bce1d806))
+* More animation ([806e756](https://github.com/mapequation/alluvial-generator/commit/806e756739902db6801bf5651a117848da2c6dca))
+* Show hierarchical modules ([87cba0e](https://github.com/mapequation/alluvial-generator/commit/87cba0ee3460930c28b8bb29a2a9d02745633db3))
+
+
+### Bug Fixes
+
+* Decrease example data timeout to 200 ms ([3064400](https://github.com/mapequation/alluvial-generator/commit/3064400ea46a26bf6fdb2e86617103edef28bb21))
+* Error handling when loading example data ([7337506](https://github.com/mapequation/alluvial-generator/commit/7337506ddd00520e1036d86d4c034267a991c98f))
+* File id confict resolve for json with multiple networks ([f08627f](https://github.com/mapequation/alluvial-generator/commit/f08627f06310885ca2248cc395925f0b3b156525))
+* Fix hook deps in LoadNetworks ([2f26c93](https://github.com/mapequation/alluvial-generator/commit/2f26c935adfe736ca8e98d61656be94ed1484fb7))
+* Improve module animation ([152f076](https://github.com/mapequation/alluvial-generator/commit/152f076d674d810e67c6ccb52d2068f6f668d776))
+* LoadNetworks tweaks ([6a4702b](https://github.com/mapequation/alluvial-generator/commit/6a4702b13c8e9b91264685750ae09f3ea9576d9e))
+* Only set identifiers on net files when we have a modular result ([011fb3a](https://github.com/mapequation/alluvial-generator/commit/011fb3a47fbe71766dc6f587c65afdbbc36bfffd))
+* Render hierarchical super-modules below all leaf-modules ([2884e77](https://github.com/mapequation/alluvial-generator/commit/2884e777d2ba01d7cb1ebd962d502afb0fcb9ab3))
+* Reset state and show correct Infomap errors when Infomap fails ([3a2d1ad](https://github.com/mapequation/alluvial-generator/commit/3a2d1ad0b84748dfd0a64a9ce926b8be6687095e))
+* Restore streamline enter/exit transitions ([a212c9b](https://github.com/mapequation/alluvial-generator/commit/a212c9b3e4ebea963e6aa425d8df95f16cc0e1de))
+* Rounded Skeleton ([b026283](https://github.com/mapequation/alluvial-generator/commit/b026283cd9be327b01c15371818fce2cb063d1a1))
+* Set the selected identifiers when parsing new files ([c85c077](https://github.com/mapequation/alluvial-generator/commit/c85c077b822c4059e11975f48dcd51de0c35a1db))
+* Show "Run Infomap" as not completed when loading .net files ([0a4ba61](https://github.com/mapequation/alluvial-generator/commit/0a4ba6197bc1a1029ddd472423d72d4daa7a8a2b))
+* Show dropzone state ([e2260fb](https://github.com/mapequation/alluvial-generator/commit/e2260fb97021c236b8f7ba459589c24cfbbd90f4))
+* Support stree files ([b63dc72](https://github.com/mapequation/alluvial-generator/commit/b63dc72d907a32da3b5d58b547f49b97357e367e))
+
 ## [1.1.0](https://github.com/mapequation/alluvial-generator/compare/v1.0.0...v1.1.0) (2022-02-01)
 
 
