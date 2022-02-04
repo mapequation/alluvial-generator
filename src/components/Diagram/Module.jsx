@@ -50,15 +50,7 @@ const Module = observer(function Module({ module, fillColor }) {
   const { idPosition, namePosition } = module;
 
   return (
-    <motion.g
-      ref={ref}
-      className="module"
-      onClick={handler}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={transition}
-    >
+    <g ref={ref} className="module" onClick={handler}>
       <motion.g animate={controls}>
         <g style={{ filter: dropShadow(module) }}>
           {module.children.map((group) => (
@@ -121,7 +113,7 @@ const Module = observer(function Module({ module, fillColor }) {
           </motion.text>
         </motion.g>
       )}
-    </motion.g>
+    </g>
   );
 });
 

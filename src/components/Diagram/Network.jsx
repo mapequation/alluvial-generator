@@ -113,19 +113,21 @@ function OutlineModule({ module, transition, stroke }) {
 
 function ShadowModule({ module, transition, fill }) {
   const offset = 5 * (module.maxModuleLevel - module.moduleLevel);
+  const { layout } = module;
 
   return (
     <g style={{ isolation: "isolate", mixBlendMode: "difference" }}>
       <motion.g
-        initial={false}
+        initial={{ x: 0, y: 0 }}
         animate={{ x: offset, y: offset }}
+        exit={{ x: 0, y: 0 }}
         transition={transition}
       >
         <motion.rect
           id={module.path.toString()}
-          initial={{ ...module.layout, opacity: 0 }}
-          animate={{ ...module.layout, opacity: 0.3 }}
-          exit={{ ...module.layout, opacity: 0 }}
+          initial={{ ...layout, opacity: 0 }}
+          animate={{ ...layout, opacity: 0.3 }}
+          exit={{ ...layout, opacity: 0 }}
           transition={transition}
           fill={fill}
         />
