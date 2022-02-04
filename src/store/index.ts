@@ -68,7 +68,7 @@ export class Store {
   moduleWidth: number = 80;
   streamlineFraction: number = 2;
   streamlineThreshold: number = 1;
-  streamlineOpacity: number = 0.9;
+  streamlineOpacity: number = 0.8;
   flowThreshold: number = 5e-3;
 
   selectedScheme: ColorScheme = COLOR_SCHEMES["Tableau10"];
