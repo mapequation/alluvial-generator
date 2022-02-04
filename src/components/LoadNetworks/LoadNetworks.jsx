@@ -72,19 +72,22 @@ export default observer(function LoadNetworks({ onClose }) {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [infomapRunning, setInfomapRunning] = useState(false);
   const [files, setFiles] = useState(store.files);
-  const reset = useCallback(() => setFiles([]), [setFiles]);
+  const reset = useCallback(() => setFiles([]), []);
 
-  const onError = ({ title, description, ...props }) => {
-    console.warn(description);
-    toast({
-      title,
-      description,
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-      ...props,
-    });
-  };
+  const onError = useCallback(
+    ({ title, description, ...props }) => {
+      console.warn(description);
+      toast({
+        title,
+        description,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        ...props,
+      });
+    },
+    [toast]
+  );
 
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
@@ -286,7 +289,7 @@ export default observer(function LoadNetworks({ onClose }) {
     setIsCreatingDiagram(true);
     store.setFiles(files);
     onClose();
-  }, [onClose, files, store, setIsCreatingDiagram]);
+  }, [onClose, files, store]);
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");
@@ -314,7 +317,7 @@ export default observer(function LoadNetworks({ onClose }) {
       setIsCreatingDiagram(false);
     }
     console.timeEnd("loadExample");
-  }, [onClose, store, setIsLoadingExample]);
+  }, [onClose, store, onError]);
 
   const removeFileId = (id) => {
     const newFiles = files.filter((file) => file.id !== id);
