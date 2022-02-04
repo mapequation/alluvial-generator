@@ -22,7 +22,7 @@ const Network = observer(function Network({ network, fillColor }) {
   const modules =
     hierarchicalModules === "none"
       ? network.visibleChildren
-      : [...network.hierarchicalChildren.visit()];
+      : network.hierarchicalChildren;
 
   const transition = { bounce: 0, duration: 0.2 };
 

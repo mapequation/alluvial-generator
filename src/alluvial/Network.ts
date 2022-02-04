@@ -89,7 +89,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       parent?.addChild(module);
     }
 
-    return root;
+    return [...root.visitBreadthFirst()];
   }
 
   get flowThreshold() {
@@ -227,11 +227,15 @@ class TreeNode extends Layout {
     this.parent?.updateMaxModuleLevel(moduleLevel);
   }
 
-  *visit(): Iterable<TreeNode | Module> {
-    for (const node of this.children) {
+  *visitBreadthFirst(): Iterable<TreeNode | Module> {
+    let queue = this.children;
+
+    while (queue.length) {
+      const node = queue.shift()!;
+
       if (node instanceof TreeNode) {
         if (!node.isLeaf) yield node;
-        yield* node.visit();
+        queue.push(...node.children);
       } else {
         yield node;
       }
