@@ -1,11 +1,11 @@
 import AlluvialNodeBase from "./AlluvialNode";
 import Branch from "./Branch";
 import { HIGHLIGHT_GROUP, STREAMLINE_NODE } from "./Depth";
+import type HighlightGroup from "./HighlightGroup";
+import type LeafNode from "./LeafNode";
 import type { Side } from "./Side";
 import { LEFT, opposite, sideToString } from "./Side";
 import StreamlineLink from "./StreamlineLink";
-import type LeafNode from "./LeafNode";
-import type HighlightGroup from "./HighlightGroup";
 
 export default class StreamlineNode extends AlluvialNodeBase<LeafNode, Branch> {
   readonly depth = STREAMLINE_NODE;

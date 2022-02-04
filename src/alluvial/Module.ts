@@ -1,3 +1,4 @@
+import { js_div } from "../utils/entropy";
 import PriorityQueue from "../utils/PriorityQueue";
 import TreePath from "../utils/TreePath";
 import AlluvialNodeBase from "./AlluvialNode";
@@ -7,7 +8,6 @@ import { NOT_HIGHLIGHTED } from "./HighlightGroup";
 import type LeafNode from "./LeafNode";
 import type Network from "./Network";
 import { LEFT, Side } from "./Side";
-import { js_div } from "../utils/entropy";
 
 export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   readonly depth = MODULE;
@@ -103,6 +103,14 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.parent?.children.indexOf(this) ?? 0;
   }
 
+  get isHighlighted() {
+    return this.children.some((group) => group.isHighlighted);
+  }
+
+  get highlightIndex() {
+    return this.largestGroup.highlightIndex;
+  }
+
   private get maxModuleLevel() {
     // FIXME optimize
     let maxModuleLevel = this.moduleLevel;
@@ -125,6 +133,15 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
     const parentPath = TreePath.ancestorAtLevel(this.moduleId, moduleLevel);
     return modules.filter((module) => parentPath.isAncestor(module.moduleId));
+  }
+
+  private get largestGroup(): HighlightGroup {
+    return this.children.reduce(
+      (max, group) => {
+        return group.flow > max.flow ? group : max;
+      },
+      { flow: -Infinity, highlightIndex: -1 } as HighlightGroup
+    );
   }
 
   getGroup(highlightIndex: number, insignificant: boolean) {
@@ -217,23 +234,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.setColor(NOT_HIGHLIGHTED);
   }
 
-  get isHighlighted() {
-    return this.children.some((group) => group.isHighlighted);
-  }
-
-  private get largestGroup(): HighlightGroup {
-    return this.children.reduce(
-      (max, group) => {
-        return group.flow > max.flow ? group : max;
-      },
-      { flow: -Infinity, highlightIndex: -1 } as HighlightGroup
-    );
-  }
-
-  get highlightIndex() {
-    return this.largestGroup.highlightIndex;
-  }
-
   moveUp(): boolean {
     const index = this.parentIndex;
 
@@ -319,6 +319,22 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return modules.toArray();
   }
 
+  *rightStreamlines() {
+    for (let group of this) {
+      for (let streamlineNode of group.right) {
+        const module = streamlineNode.opposite?.getAncestor(
+          MODULE
+        ) as Module | null;
+
+        if (!module?.isVisible) {
+          continue;
+        }
+
+        if (streamlineNode.link) yield streamlineNode.link;
+      }
+    }
+  }
+
   private *connectedModules(side: Side) {
     const moduleIds = new Set();
 
@@ -334,22 +350,6 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
           moduleIds.add(module.moduleId);
           yield module;
         }
-      }
-    }
-  }
-
-  *rightStreamlines() {
-    for (let group of this) {
-      for (let streamlineNode of group.right) {
-        const module = streamlineNode.opposite?.getAncestor(
-          MODULE
-        ) as Module | null;
-
-        if (!module?.isVisible) {
-          continue;
-        }
-
-        if (streamlineNode.link) yield streamlineNode.link;
       }
     }
   }

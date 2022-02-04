@@ -16,8 +16,8 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
-import { StoreContext } from "../../store";
 import { useContext } from "react";
+import { StoreContext } from "../../store";
 import { Swatch } from "../Sidebar/Swatch";
 import SubGraph from "./SubGraph";
 import ErrorBoundary from "../ErrorBoundary";

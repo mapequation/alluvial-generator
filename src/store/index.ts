@@ -1,5 +1,4 @@
-import { action, makeObservable, observable } from "mobx";
-import { createContext } from "react";
+import * as c3 from "@mapequation/c3";
 import {
   schemeAccent,
   schemeCategory10,
@@ -12,13 +11,19 @@ import {
   schemeSet3,
   schemeTableau10,
 } from "d3";
-import Diagram from "../alluvial/Diagram";
-import type Module from "../alluvial/Module";
+import { action, makeObservable, observable } from "mobx";
+import { createContext } from "react";
+import {
+  Diagram,
+  LeafNode,
+  LEFT,
+  Module,
+  NOT_HIGHLIGHTED,
+  RIGHT,
+  Side,
+} from "../alluvial";
 import TreePath from "../utils/TreePath";
-import { LEFT, RIGHT, Side } from "../alluvial/Side";
-import LeafNode from "../alluvial/LeafNode";
-import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
-import * as c3 from "@mapequation/c3";
+import BipartiteGraph from "./BipartiteGraph";
 
 const c3options = {
   saturation: 0.55,
@@ -393,35 +398,6 @@ export class Store {
     }
 
     console.time("Store.colorMatchingModulesInAllNetworks");
-
-    class BipartiteGraph {
-      nodes: Map<Module, number> = new Map();
-      links: Map<Module, Map<Module, number>> = new Map();
-
-      addLink(left: Module, right: Module, weight: number) {
-        if (!this.links.has(left)) {
-          this.links.set(left, new Map());
-        }
-        this.links.get(left)!.set(right, weight);
-
-        this.nodes.set(left, 0);
-        this.nodes.set(right, 1);
-      }
-
-      get left() {
-        return this.getNodes(0);
-      }
-
-      get right() {
-        return this.getNodes(1);
-      }
-
-      private *getNodes(side: number = 0) {
-        for (const [node, value] of this.nodes.entries()) {
-          if (side === value) yield node;
-        }
-      }
-    }
 
     const bipartiteGraphs = [];
 

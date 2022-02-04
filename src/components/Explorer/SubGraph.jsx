@@ -1,8 +1,8 @@
 import * as d3 from "d3";
-import { useContext, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
+import { useContext, useEffect, useRef } from "react";
+import { NOT_HIGHLIGHTED } from "../../alluvial";
 import { StoreContext } from "../../store";
-import { NOT_HIGHLIGHTED } from "../../alluvial/HighlightGroup";
 
 const zoom = d3.zoom().scaleExtent([0.1, 2000]);
 

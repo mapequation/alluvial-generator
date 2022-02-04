@@ -1,14 +1,14 @@
-import { useContext, useState } from "react";
-import { observer } from "mobx-react";
 import { Box, Modal, Slide, useColorModeValue } from "@chakra-ui/react";
-import Diagram from "./Diagram";
-import LoadNetworks from "./LoadNetworks";
-import Sidebar from "./Sidebar";
-import Documentation from "./Documentation";
-import Explorer from "./Explorer";
-import Logo from "./Logo";
+import { observer } from "mobx-react";
+import { useContext, useState } from "react";
 import useEventListener from "../hooks/useEventListener";
 import { StoreContext } from "../store";
+import Diagram from "./Diagram";
+import Documentation from "./Documentation";
+import Explorer from "./Explorer";
+import LoadNetworks from "./LoadNetworks";
+import Logo from "./Logo";
+import Sidebar from "./Sidebar";
 
 export const drawerWidth = 350;
 

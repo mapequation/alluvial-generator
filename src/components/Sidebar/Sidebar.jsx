@@ -22,6 +22,9 @@ import {
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { observer } from "mobx-react";
+import { useContext, useEffect, useState } from "react";
+import { IoMdColorFill } from "react-icons/io";
 import {
   MdClear,
   MdFileDownload,
@@ -35,15 +38,12 @@ import {
   MdUnfoldLess,
   MdUnfoldMore,
 } from "react-icons/md";
-import { IoMdColorFill } from "react-icons/io";
-import { observer } from "mobx-react";
-import { useContext, useEffect, useState } from "react";
-import { SCHEME_NAMES, StoreContext } from "../../store";
-import { drawerWidth } from "../App";
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
-import { Swatch } from "./Swatch";
+import { SCHEME_NAMES, StoreContext } from "../../store";
+import { drawerWidth } from "../App";
 import Logo from "../Logo";
+import { Swatch } from "./Swatch";
 
 export default observer(function Sidebar({
   onLoadClick,

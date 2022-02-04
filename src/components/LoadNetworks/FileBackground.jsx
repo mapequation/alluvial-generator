@@ -1,5 +1,5 @@
-import { normalize } from "../../utils/math";
 import { motion } from "framer-motion";
+import { normalize } from "../../utils/math";
 
 export default function FileBackground({ file, fill, ...props }) {
   const flowDistribution = file.flowDistribution ?? { 0: 1 };

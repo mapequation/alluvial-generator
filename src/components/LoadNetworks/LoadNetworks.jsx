@@ -1,9 +1,4 @@
-import {
-  extension as fileExtension,
-  parse,
-  readFile,
-} from "@mapequation/infomap/parser";
-import { MdOutlineDelete, MdUpload } from "react-icons/md";
+import { QuestionOutlineIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -22,19 +17,24 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { QuestionOutlineIcon } from "@chakra-ui/icons";
+import {
+  extension as fileExtension,
+  parse,
+  readFile,
+} from "@mapequation/infomap/parser";
 import { AnimatePresence, Reorder } from "framer-motion";
+import JSZip from "jszip";
 import { observer } from "mobx-react";
 import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { MdOutlineDelete, MdUpload } from "react-icons/md";
+import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import id from "../../utils/id";
-import "./LoadNetworks.css";
 import TreePath from "../../utils/TreePath";
-import useEventListener from "../../hooks/useEventListener";
 import Item from "./Item";
+import "./LoadNetworks.css";
 import Stepper from "./Stepper";
-import JSZip from "jszip";
 
 const acceptedFormats = [
   ".tree",

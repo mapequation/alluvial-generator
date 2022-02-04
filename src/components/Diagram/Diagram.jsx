@@ -1,15 +1,15 @@
 import * as d3 from "d3";
+import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { StoreContext } from "../../store";
-import highlightColor from "../../utils/highlight-color";
-import DropShadows from "./DropShadows";
-import "./Diagram.css";
-import Network from "./Network";
 import useEventListener from "../../hooks/useEventListener";
 import useWindowSize from "../../hooks/useWindowSize";
+import { StoreContext } from "../../store";
+import highlightColor from "../../utils/highlight-color";
 import { drawerWidth } from "../App";
+import "./Diagram.css";
+import DropShadows from "./DropShadows";
+import Network from "./Network";
 
 const zoom = d3.zoom().scaleExtent([0.1, 1000]);
 

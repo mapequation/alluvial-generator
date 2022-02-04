@@ -1,10 +1,10 @@
+import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext } from "react";
-import { motion } from "framer-motion";
 import { StoreContext } from "../../store";
 import LinearGradients from "./LinearGradients";
-import Streamline from "./Streamline";
 import Module from "./Module";
+import Streamline from "./Streamline";
 
 const Network = observer(function Network({ network, fillColor }) {
   const {

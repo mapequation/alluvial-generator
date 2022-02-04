@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { NOT_HIGHLIGHTED } from "../alluvial/HighlightGroup";
+import { NOT_HIGHLIGHTED } from "../alluvial";
 
 type Color = {
   highlightIndex: number;

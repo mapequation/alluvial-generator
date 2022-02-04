@@ -1,13 +1,13 @@
+import type { Module as InfomapModule } from "@mapequation/infomap";
+import { moveItem } from "../utils/array";
+import TreePath from "../utils/TreePath";
 import AlluvialNodeBase, { Layout } from "./AlluvialNode";
-import Diagram from "./Diagram";
 import { NETWORK } from "./Depth";
+import Diagram from "./Diagram";
 import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
-import { moveItem } from "../utils/array";
 import StreamlineNode from "./StreamlineNode";
-import type { Module as InfomapModule } from "@mapequation/infomap";
-import TreePath from "../utils/TreePath";
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
@@ -15,10 +15,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   isCustomSorted = false;
   readonly layerId: number | undefined;
   readonly codelength: number;
+  modules?: Map<string, InfomapModule> = undefined;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  modules?: Map<string, InfomapModule> = undefined;
 
   constructor(
     parent: Diagram,
@@ -220,13 +220,6 @@ class TreeNode extends Layout {
     }
   }
 
-  private updateMaxModuleLevel(moduleLevel: number) {
-    if (moduleLevel > this.maxModuleLevel) {
-      this.maxModuleLevel = moduleLevel;
-    }
-    this.parent?.updateMaxModuleLevel(moduleLevel);
-  }
-
   *visitBreadthFirst(): Iterable<TreeNode | Module> {
     let queue = this.children;
 
@@ -249,6 +242,13 @@ class TreeNode extends Layout {
 
     this.parent.updateLayout(module);
     this.children.push(module);
+  }
+
+  private updateMaxModuleLevel(moduleLevel: number) {
+    if (moduleLevel > this.maxModuleLevel) {
+      this.maxModuleLevel = moduleLevel;
+    }
+    this.parent?.updateMaxModuleLevel(moduleLevel);
   }
 
   private updateLayout(module: Module) {

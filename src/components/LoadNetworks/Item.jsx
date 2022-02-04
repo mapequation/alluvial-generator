@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { motion, Reorder, useMotionValue } from "framer-motion";
 import {
   Box,
   Button,
@@ -18,15 +16,17 @@ import {
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
-import useRaisedShadow from "../../hooks/useRaisedShadow";
-import FileBackground from "./FileBackground";
-import LayerIcon from "./LayerIcon";
-import { IoLayersOutline, IoMenu } from "react-icons/io5";
+import Infomap from "@mapequation/infomap";
+import { motion, Reorder, useMotionValue } from "framer-motion";
+import { useState } from "react";
 import { BiNetworkChart } from "react-icons/bi";
 import { GrTextAlignFull } from "react-icons/gr";
+import { IoLayersOutline, IoMenu } from "react-icons/io5";
 import { MdClear } from "react-icons/md";
+import useRaisedShadow from "../../hooks/useRaisedShadow";
 import humanFileSize from "../../utils/human-file-size";
-import Infomap from "@mapequation/infomap";
+import FileBackground from "./FileBackground";
+import LayerIcon from "./LayerIcon";
 
 export default function Item({
   file,

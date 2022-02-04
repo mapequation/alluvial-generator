@@ -1,9 +1,9 @@
+import { motion, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext, useRef } from "react";
-import { motion, useAnimation } from "framer-motion";
+import useOnClick from "../../hooks/useOnClick";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
-import useOnClick from "../../hooks/useOnClick";
 
 const Module = observer(function Module({ module, fillColor }) {
   const ref = useRef();

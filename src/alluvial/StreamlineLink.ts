@@ -99,6 +99,11 @@ export default class StreamlineLink {
     });
   }
 
+  remove() {
+    this.left.link = null;
+    this.right.link = null;
+  }
+
   /*
                     (cpx, y1) ________ (x1, y1)
                     ________/        |
@@ -127,10 +132,5 @@ export default class StreamlineLink {
       "C" + cpx + "," + y1 + "," + cpx + "," + y0 + "," + x0 + "," + y0 +
       "Z"
     );
-  }
-
-  remove() {
-    this.left.link = null;
-    this.right.link = null;
   }
 }
