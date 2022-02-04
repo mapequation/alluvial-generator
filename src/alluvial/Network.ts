@@ -18,7 +18,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  moduleLinks?: Map<string, InfomapModule> = undefined;
+  modules?: Map<string, InfomapModule> = undefined;
 
   constructor(
     parent: Diagram,
@@ -37,10 +37,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     if (modules) {
       for (const module of modules) {
         if (module.links) {
-          if (this.moduleLinks == null) {
-            this.moduleLinks = new Map();
+          if (this.modules == null) {
+            this.modules = new Map();
           }
-          this.moduleLinks.set(module.path.join(":"), module);
+          this.modules.set(module.path.join(":"), module);
         }
       }
     }

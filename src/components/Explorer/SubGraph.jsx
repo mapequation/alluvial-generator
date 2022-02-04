@@ -31,7 +31,7 @@ export default observer(function SubGraph({ selectedModule, leafNodes }) {
 
   const nodes = [...nodesByPath.values()];
 
-  const subModuleIds = [...network.moduleLinks.keys()].filter((id) =>
+  const subModuleIds = [...network.modules.keys()].filter((id) =>
     id.startsWith(selectedModule.moduleId)
   );
 
@@ -79,7 +79,7 @@ export default observer(function SubGraph({ selectedModule, leafNodes }) {
   });
 
   for (const moduleId of subModuleIds) {
-    const subModule = network.moduleLinks.get(moduleId);
+    const subModule = network.modules.get(moduleId);
     const path = subModule.path.join(":");
 
     for (const link of subModule.links) {
@@ -95,8 +95,8 @@ export default observer(function SubGraph({ selectedModule, leafNodes }) {
         // A link between sub-modules
         const sourcePath = [path, link.source].join(":");
         const targetPath = [path, link.target].join(":");
-        const sourceModule = network.moduleLinks.get(sourcePath);
-        const targetModule = network.moduleLinks.get(targetPath);
+        const sourceModule = network.modules.get(sourcePath);
+        const targetModule = network.modules.get(targetPath);
 
         if (sourceModule && targetModule) {
           if (!subModulesByPath.has(sourcePath)) {

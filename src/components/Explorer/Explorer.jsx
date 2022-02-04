@@ -79,7 +79,7 @@ export default observer(function Explorer({ onClose }) {
             </Table>
           </Box>
 
-          {selectedModule.parent.moduleLinks != null && (
+          {selectedModule.parent.modules != null && (
             <Box mx={8} mt={10} rounded="md" boxShadow="md" overflow="hidden">
               <ErrorBoundary>
                 <SubGraph selectedModule={selectedModule} leafNodes={nodes} />
