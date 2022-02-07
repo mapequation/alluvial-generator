@@ -71,13 +71,16 @@ export default observer(function Diagram() {
       xmlnsXlink={d3.namespaces.xlink}
       id="alluvialSvg"
       className={`updateFlag-${updateFlag}`}
+      data-width={diagram.width}
+      data-height={diagram.height}
     >
       <defs>
         <DropShadows maxLevel={maxDropShadowModuleLevel} />
       </defs>
-      <rect className="background" width="100%" height="100%" fill="#fff" />
+      <rect className="background" width={width} height={height} fill="#fff" />
       <g id="zoomable">
         <motion.g
+          id="translate-center"
           initial={false}
           animate={translateCenter(diagram)}
           transition={{ duration: 0.2, bounce: 0 }}
