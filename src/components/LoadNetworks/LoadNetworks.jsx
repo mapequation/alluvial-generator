@@ -1,5 +1,6 @@
 import {
   ChevronDownIcon,
+  DeleteIcon,
   QuestionOutlineIcon,
   RepeatIcon,
 } from "@chakra-ui/icons";
@@ -607,8 +608,7 @@ export default observer(function LoadNetworks({ onClose }) {
                   isLoadingFiles ||
                   infomapRunning ||
                   isLoadingFiles ||
-                  isCreatingDiagram ||
-                  localStorageFiles.length === 0
+                  isCreatingDiagram
                 }
                 as={Button}
                 variant="outline"
@@ -622,9 +622,24 @@ export default observer(function LoadNetworks({ onClose }) {
                     {file.name}
                   </MenuItem>
                 ))}
-                <MenuDivider />
-                <MenuItem icon={<RepeatIcon />} onClick={loadLocalStorage}>
+                {localStorageFiles.length !== 0 && <MenuDivider />}
+                <MenuItem
+                  icon={<RepeatIcon />}
+                  closeOnSelect={false}
+                  onClick={loadLocalStorage}
+                >
                   Refresh
+                </MenuItem>
+                <MenuDivider />
+                <MenuItem
+                  icon={<DeleteIcon />}
+                  isDisabled={localStorageFiles.length === 0}
+                  onClick={() => {
+                    setLocalStorageFiles([]);
+                    localforage.clear();
+                  }}
+                >
+                  Clear
                 </MenuItem>
               </MenuList>
             </Menu>
