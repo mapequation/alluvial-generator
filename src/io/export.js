@@ -3,10 +3,21 @@ import FileSaver from "file-saver";
 export function saveSvg(svg, filename) {
   const labels = svg.querySelectorAll(".label");
   const groups = svg.querySelectorAll(".group");
+  const superModules = svg.querySelectorAll(".super-module");
+  const offsets = svg.querySelectorAll(".super-module-offset");
+  const modules = [...groups, ...superModules];
 
-  groups.forEach((element) => {
+  modules.forEach((element) => {
     element.setAttribute("x", element.getAttribute("data-x"));
     element.setAttribute("y", element.getAttribute("data-y"));
+    element.setAttribute("data-style", element.getAttribute("style"));
+    element.removeAttribute("style");
+  });
+
+  offsets.forEach((element) => {
+    const x = element.getAttribute("data-x");
+    const y = element.getAttribute("data-y");
+    element.setAttribute("transform", `translate(${x} ${y})`);
     element.setAttribute("data-style", element.getAttribute("style"));
     element.removeAttribute("style");
   });
@@ -21,10 +32,16 @@ export function saveSvg(svg, filename) {
 
   const string = new XMLSerializer().serializeToString(svg);
 
-  groups.forEach((element) => {
+  modules.forEach((element) => {
     element.removeAttribute("x");
     element.removeAttribute("y");
     element.setAttribute("style", element.getAttribute("data-style"));
+    element.removeAttribute("data-style");
+  });
+
+  offsets.forEach((element) => {
+    element.removeAttribute("transform");
+    element.setAttribute("data-style", element.getAttribute("style"));
     element.removeAttribute("data-style");
   });
 

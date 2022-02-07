@@ -95,12 +95,15 @@ function OutlineModule({ module, transition, stroke }) {
 
   return (
     <motion.rect
+      className="super-module"
       id={module.path.toString()}
       initial={{ ...module.layout, opacity: 0 }}
       animate={{ x, y, width, height, opacity: 1 }}
       exit={{ ...module.layout, opacity: 0 }}
-      rx={offset}
       transition={transition}
+      data-x={x}
+      data-y={y}
+      rx={offset}
       fill="none"
       stroke={stroke}
       strokeWidth={2}
@@ -118,17 +121,23 @@ function ShadowModule({ module, transition, fill }) {
   return (
     <g style={{ isolation: "isolate", mixBlendMode: "difference" }}>
       <motion.g
+        className="super-module-offset"
         initial={{ x: 0, y: 0 }}
         animate={{ x: offset, y: offset }}
         exit={{ x: 0, y: 0 }}
+        data-x={offset}
+        data-y={offset}
         transition={transition}
       >
         <motion.rect
+          className="super-module"
           id={module.path.toString()}
           initial={{ ...layout, opacity: 0 }}
           animate={{ ...layout, opacity: 0.3 }}
           exit={{ ...layout, opacity: 0 }}
           transition={transition}
+          data-x={layout.x}
+          data-y={layout.y}
           fill={fill}
         />
       </motion.g>
