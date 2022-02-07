@@ -77,12 +77,16 @@ export default observer(function Diagram() {
       </defs>
       <rect className="background" width="100%" height="100%" fill="#fff" />
       <g id="zoomable">
-        <g transform={translateCenter(diagram)}>
+        <motion.g
+          initial={false}
+          animate={translateCenter(diagram)}
+          transition={{ duration: 0.2, bounce: 0 }}
+        >
           {diagram.children.map((network) => (
             <Network key={network.id} network={network} fillColor={fillColor} />
           ))}
           <SelectedModule module={store.selectedModule} />
-        </g>
+        </motion.g>
       </g>
     </svg>
   );
@@ -110,8 +114,8 @@ function translateCenter({ width, height }) {
   let { innerWidth, innerHeight } = window;
   innerWidth -= drawerWidth;
 
-  const dx = Math.max((innerWidth - width) / 2, 100);
-  const dy = Math.max((innerHeight - height) / 3, 100);
+  const x = Math.max((innerWidth - width) / 2, 100);
+  const y = Math.max((innerHeight - height) / 3, 100);
 
-  return `translate(${dx}, ${dy})`;
+  return { x, y };
 }
