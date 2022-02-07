@@ -1,9 +1,18 @@
-import { QuestionOutlineIcon } from "@chakra-ui/icons";
+import {
+  ChevronDownIcon,
+  QuestionOutlineIcon,
+  RepeatIcon,
+} from "@chakra-ui/icons";
 import {
   Box,
   Button,
   FormLabel,
   HStack,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -24,8 +33,9 @@ import {
 } from "@mapequation/infomap/parser";
 import { AnimatePresence, Reorder } from "framer-motion";
 import JSZip from "jszip";
+import localforage from "localforage";
 import { observer } from "mobx-react";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
@@ -35,6 +45,8 @@ import TreePath from "../../utils/TreePath";
 import Item from "./Item";
 import "./LoadNetworks.css";
 import Stepper from "./Stepper";
+
+localforage.config({ name: "infomap" });
 
 const acceptedFormats = [
   ".tree",
@@ -72,6 +84,7 @@ export default observer(function LoadNetworks({ onClose }) {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [infomapRunning, setInfomapRunning] = useState(false);
   const [files, setFiles] = useState(store.files);
+  const [localStorageFiles, setLocalStorageFiles] = useState([]);
   const reset = useCallback(() => setFiles([]), []);
 
   const onError = useCallback(
@@ -89,6 +102,158 @@ export default observer(function LoadNetworks({ onClose }) {
     [toast]
   );
 
+  const onDrop = async (acceptedFiles) => {
+    console.time("onDrop");
+    setIsLoadingFiles(true);
+
+    const readFiles = [];
+    const errors = [];
+
+    const accepted = acceptedFormats
+      .split(",")
+      .map((ext) => ext.slice(1))
+      .filter((ext) => ext !== "zip");
+
+    // Unzip compressed files, read uncompressed files
+    let fileIndex = 0;
+    for (const file of [...acceptedFiles]) {
+      if (file?.type === "application/zip") {
+        try {
+          // Remove the zipped file from the list of files
+          acceptedFiles.splice(fileIndex, 1);
+
+          const zipFile = await JSZip.loadAsync(file);
+
+          for (const [name, compressedFile] of Object.entries(zipFile.files)) {
+            const extension = fileExtension(name);
+
+            if (!accepted.includes(extension)) {
+              errors.push(
+                createError(
+                  { name },
+                  "unsupported-format",
+                  `Unsupported file format: ${extension}`
+                )
+              );
+              continue;
+            }
+
+            const uncompressedFile = await compressedFile.async("string");
+            readFiles.push(uncompressedFile);
+
+            // Add the decompressed file to the list of files
+            acceptedFiles.splice(fileIndex, 0, {
+              name,
+              // Hack to get the decompressed size. Uses private fields of the JSZip object
+              size: compressedFile?._data?.uncompressedSize ?? file.size,
+              lastModified: file.lastModified,
+            });
+            fileIndex++;
+          }
+        } catch (e) {
+          errors.push(createError(file, "unsupported-format", e.message));
+        }
+      } else {
+        readFiles.push(await readFile(file));
+        fileIndex++;
+      }
+    }
+
+    const newFiles = [];
+
+    // Parse files
+    for (let i = 0; i < acceptedFiles.length; ++i) {
+      const file = acceptedFiles[i];
+      const format = fileExtension(file.name);
+
+      let contents = null;
+
+      if (format === "json") {
+        try {
+          contents = JSON.parse(readFiles[i]);
+
+          if (contents.networks !== undefined) {
+            // A diagram contains several networks.
+            // Create a new file for each network.
+            const diagramFiles = createFilesFromDiagramObject(contents, file);
+
+            // If any file ids already exist, give a new id
+            for (let existingFile of [...files, ...newFiles]) {
+              for (let diagramFile of diagramFiles) {
+                if (existingFile.id === diagramFile.id) {
+                  diagramFile.id = id();
+                }
+              }
+            }
+
+            newFiles.push(...diagramFiles);
+            continue;
+          }
+        } catch (e) {
+          errors.push(createError(file, "invalid-json", e.message));
+          continue;
+        }
+      } else if (format === "net") {
+        contents = {
+          network: readFiles[i],
+          noModularResult: true,
+        };
+      } else {
+        try {
+          contents = parse(readFiles[i], null, true);
+        } catch (e) {
+          errors.push(createError(file, "parse-error", e.message));
+          continue;
+        }
+      }
+
+      if (!contents) {
+        errors.push(
+          createError(file, "invalid-format", "Could not parse file")
+        );
+        continue;
+      }
+
+      setIdentifiers(contents, format, store.identifier);
+
+      try {
+        const newFile = Object.assign(
+          {},
+          {
+            ...file,
+            fileName: file.name, // Save the original filename so we don't overwrite it
+            name: file.name,
+            lastModified: file.lastModified,
+            size: file.size,
+            id: id(),
+            format,
+            ...contents,
+          }
+        );
+
+        if (contents.noModularResult === undefined && !file.noModularResult) {
+          Object.assign(newFile, calcStatistics(contents));
+        }
+
+        newFiles.push(newFile);
+      } catch (e) {
+        errors.push(createError(file, "invalid-format", e.message));
+      }
+    }
+
+    setFiles([...files, ...newFiles]);
+
+    errors.forEach(({ file, errors }) =>
+      onError({
+        title: `Could not load ${file.name}`,
+        description: errors.map(({ message }) => message).join("\n"),
+      })
+    );
+
+    setIsLoadingFiles(false);
+    console.timeEnd("onDrop");
+  };
+
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
     accept: acceptedFormats,
@@ -101,159 +266,7 @@ export default observer(function LoadNetworks({ onClose }) {
             .join("\n"),
         })
       ),
-    onDrop: async (acceptedFiles) => {
-      console.time("onDrop");
-      setIsLoadingFiles(true);
-
-      const readFiles = [];
-      const errors = [];
-
-      const accepted = acceptedFormats
-        .split(",")
-        .map((ext) => ext.slice(1))
-        .filter((ext) => ext !== "zip");
-
-      // Unzip compressed files, read uncompressed files
-      let fileIndex = 0;
-      for (const file of [...acceptedFiles]) {
-        if (file?.type === "application/zip") {
-          try {
-            // Remove the zipped file from the list of files
-            acceptedFiles.splice(fileIndex, 1);
-
-            const zipFile = await JSZip.loadAsync(file);
-
-            for (const [name, compressedFile] of Object.entries(
-              zipFile.files
-            )) {
-              const extension = fileExtension(name);
-
-              if (!accepted.includes(extension)) {
-                errors.push(
-                  createError(
-                    { name },
-                    "unsupported-format",
-                    `Unsupported file format: ${extension}`
-                  )
-                );
-                continue;
-              }
-
-              const uncompressedFile = await compressedFile.async("string");
-              readFiles.push(uncompressedFile);
-
-              // Add the decompressed file to the list of files
-              acceptedFiles.splice(fileIndex, 0, {
-                name,
-                // Hack to get the decompressed size. Uses private fields of the JSZip object
-                size: compressedFile?._data?.uncompressedSize ?? file.size,
-                lastModified: file.lastModified,
-              });
-              fileIndex++;
-            }
-          } catch (e) {
-            errors.push(createError(file, "unsupported-format", e.message));
-          }
-        } else {
-          readFiles.push(await readFile(file));
-          fileIndex++;
-        }
-      }
-
-      const newFiles = [];
-
-      // Parse files
-      for (let i = 0; i < acceptedFiles.length; ++i) {
-        const file = acceptedFiles[i];
-        const format = fileExtension(file.name);
-
-        let contents = null;
-
-        if (format === "json") {
-          try {
-            contents = JSON.parse(readFiles[i]);
-
-            if (contents.networks !== undefined) {
-              // A diagram contains several networks.
-              // Create a new file for each network.
-              const diagramFiles = createFilesFromDiagramObject(contents, file);
-
-              // If any file ids already exist, give a new id
-              for (let existingFile of [...files, ...newFiles]) {
-                for (let diagramFile of diagramFiles) {
-                  if (existingFile.id === diagramFile.id) {
-                    diagramFile.id = id();
-                  }
-                }
-              }
-
-              newFiles.push(...diagramFiles);
-              continue;
-            }
-          } catch (e) {
-            errors.push(createError(file, "invalid-json", e.message));
-            continue;
-          }
-        } else if (format === "net") {
-          contents = {
-            network: readFiles[i],
-            noModularResult: true,
-          };
-        } else {
-          try {
-            contents = parse(readFiles[i], null, true);
-          } catch (e) {
-            errors.push(createError(file, "parse-error", e.message));
-            continue;
-          }
-        }
-
-        if (!contents) {
-          errors.push(
-            createError(file, "invalid-format", "Could not parse file")
-          );
-          continue;
-        }
-
-        setIdentifiers(contents, format, store.identifier);
-
-        try {
-          const newFile = Object.assign(
-            {},
-            {
-              ...file,
-              fileName: file.name, // Save the original filename so we don't overwrite it
-              name: file.name,
-              lastModified: file.lastModified,
-              size: file.size,
-              id: id(),
-              format,
-              ...contents,
-            }
-          );
-
-          if (contents.noModularResult === undefined && !file.noModularResult) {
-            Object.assign(newFile, calcStatistics(contents));
-          }
-
-          newFiles.push(newFile);
-        } catch (e) {
-          errors.push(createError(file, "invalid-format", e.message));
-        }
-      }
-
-      setFiles([...files, ...newFiles]);
-
-      errors.forEach(({ file, errors }) =>
-        onError({
-          title: `Could not load ${file.name}`,
-          description: errors.map(({ message }) => message).join("\n"),
-        })
-      );
-
-      setIsLoadingFiles(false);
-      console.timeEnd("onDrop");
-    },
+    onDrop,
   });
 
   const updateFileWithTree = (file, tree) => {
@@ -453,6 +466,27 @@ export default observer(function LoadNetworks({ onClose }) {
     store.setIdentifier(identifier);
   };
 
+  const loadLocalStorage = async () => {
+    setLocalStorageFiles([]);
+
+    try {
+      const ftree = await localforage.getItem("ftree");
+      if (!ftree) {
+        return;
+      }
+      const filename = "infomap-online.ftree";
+      const blob = new Blob([ftree], { type: "text/plain" });
+      const file = new File([blob], filename, { type: "text/plain" });
+      setLocalStorageFiles([file]);
+    } catch (e) {
+      console.warn(e.message);
+    }
+  };
+
+  useEffect(() => {
+    loadLocalStorage();
+  }, [setLocalStorageFiles]);
+
   let activeStep = 1;
   if (files.length > 0) {
     activeStep = files.some((f) => f.noModularResult) ? 0 : 2;
@@ -565,6 +599,35 @@ export default observer(function LoadNetworks({ onClose }) {
                 <Radio value="name">Name</Radio>
               </HStack>
             </RadioGroup>
+          </Box>
+          <Box mr={2}>
+            <Menu>
+              <MenuButton
+                disabled={
+                  isLoadingFiles ||
+                  infomapRunning ||
+                  isLoadingFiles ||
+                  isCreatingDiagram ||
+                  localStorageFiles.length === 0
+                }
+                as={Button}
+                variant="outline"
+                rightIcon={<ChevronDownIcon />}
+              >
+                Local files
+              </MenuButton>
+              <MenuList>
+                {localStorageFiles.map((file, i) => (
+                  <MenuItem key={i} onClick={() => onDrop([file])}>
+                    {file.name}
+                  </MenuItem>
+                ))}
+                <MenuDivider />
+                <MenuItem icon={<RepeatIcon />} onClick={loadLocalStorage}>
+                  Refresh
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </Box>
           <Button
             onClick={open}
