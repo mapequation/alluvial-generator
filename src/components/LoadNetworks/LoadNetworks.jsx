@@ -2,7 +2,6 @@ import {
   ChevronDownIcon,
   DeleteIcon,
   QuestionOutlineIcon,
-  RepeatIcon,
 } from "@chakra-ui/icons";
 import {
   Box,
@@ -36,7 +35,7 @@ import { AnimatePresence, Reorder } from "framer-motion";
 import JSZip from "jszip";
 import localforage from "localforage";
 import { observer } from "mobx-react";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
@@ -484,10 +483,6 @@ export default observer(function LoadNetworks({ onClose }) {
     }
   };
 
-  useEffect(() => {
-    loadLocalStorage();
-  }, [setLocalStorageFiles]);
-
   let activeStep = 1;
   if (files.length > 0) {
     activeStep = files.some((f) => f.noModularResult) ? 0 : 2;
@@ -602,7 +597,7 @@ export default observer(function LoadNetworks({ onClose }) {
             </RadioGroup>
           </Box>
           <Box mr={2}>
-            <Menu>
+            <Menu onOpen={loadLocalStorage}>
               <MenuButton
                 disabled={
                   isLoadingFiles ||
@@ -623,14 +618,6 @@ export default observer(function LoadNetworks({ onClose }) {
                   </MenuItem>
                 ))}
                 {localStorageFiles.length !== 0 && <MenuDivider />}
-                <MenuItem
-                  icon={<RepeatIcon />}
-                  closeOnSelect={false}
-                  onClick={loadLocalStorage}
-                >
-                  Refresh
-                </MenuItem>
-                <MenuDivider />
                 <MenuItem
                   icon={<DeleteIcon />}
                   isDisabled={localStorageFiles.length === 0}
