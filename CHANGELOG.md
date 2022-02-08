@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/mapequation/alluvial-generator/compare/v1.2.0...v1.3.0) (2022-02-08)
+
+
+### Features
+
+* Add clear option to "local files" menu ([40122c2](https://github.com/mapequation/alluvial-generator/commit/40122c2c140d5afab7c86f4500269dd0cc984cad))
+* Load files from Infomap Online ([cf00b2c](https://github.com/mapequation/alluvial-generator/commit/cf00b2cb3021172af3913f473d6347348ebefae2))
+
+
+### Bug Fixes
+
+* Animate diagram center translation to minimize sudden jumps ([de5dbbc](https://github.com/mapequation/alluvial-generator/commit/de5dbbcedbbc9e9e66e5ce4c4b833e44795c9532))
+* Auto-refresh from local storage when the "local files" menu is open ([4858df2](https://github.com/mapequation/alluvial-generator/commit/4858df280c179775333dc5ca842ee0bf4791d698))
+* Cleanup SVG export ([5fb1dfa](https://github.com/mapequation/alluvial-generator/commit/5fb1dfaddac7baba9df95fe8796478353d7de913))
+* Show hierarchical modules in SVG export ([47b2a07](https://github.com/mapequation/alluvial-generator/commit/47b2a07dacd04bbdb795b65d6eff3878a85dd030))
+
 ## [1.2.0](https://github.com/mapequation/alluvial-generator/compare/v1.1.0...v1.2.0) (2022-02-04)
 
 
