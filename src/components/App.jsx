@@ -74,7 +74,7 @@ export default observer(function App() {
         style={{ height: "6rem", zIndex: 1500 }}
       >
         <Box px={10} display="flex" alignItems="center" h="6rem" bg={bg}>
-          <Logo />
+          <Logo long />
         </Box>
       </Slide>
 

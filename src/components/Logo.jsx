@@ -1,7 +1,7 @@
 import { HStack, useColorModeValue } from "@chakra-ui/react";
 import ToggleColorMode from "./ToggleColorMode";
 
-export default function Logo({ showVersion }) {
+export default function Logo({ showVersion, long }) {
   const color = useColorModeValue("hsl(0, 0%, 33%)", "hsl(0, 0%, 60%)");
   const brand = useColorModeValue("hsl(0, 68%, 42%)", "hsl(0, 68%, 62%)");
   const version = useColorModeValue("hsl(0, 0%, 70%)", "hsl(0, 0%, 30%)");
@@ -25,8 +25,9 @@ export default function Logo({ showVersion }) {
               fontSize: "1.4em",
             }}
           >
-            <span style={{ color }}>Alluvial</span>{" "}
-            <span style={{ color: brand }}>Diagram</span>
+            <span style={{ color: brand }}>Alluvial</span>
+            <span style={{ color }}> Diagram</span>
+            {long && <span style={{ color }}> Generator</span>}
           </span>
           {showVersion && (
             <span style={{ color: version }}>
