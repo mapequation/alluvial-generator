@@ -4,7 +4,7 @@ export default function Stepper({ activeStep, acceptedFormats }) {
   return (
     <Steps
       activeStep={activeStep}
-      size="sm"
+      labelOrientation="vertical"
       colorScheme="blue"
       sx={{ margin: "1em auto 2em", width: "90%" }}
     >
