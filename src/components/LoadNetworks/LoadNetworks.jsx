@@ -653,7 +653,7 @@ export default observer(function LoadNetworks({ onClose }) {
                 variant="outline"
                 rightIcon={<ChevronDownIcon />}
               >
-                Local files
+                Infomap Online
               </MenuButton>
               <MenuList>
                 {localStorageFiles.map((file, i) => (
