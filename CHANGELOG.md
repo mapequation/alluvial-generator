@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/mapequation/alluvial-generator/compare/v1.3.0...v1.4.0) (2022-02-22)
+
+
+### Features
+
+* Add module tooltip ([4b1b451](https://github.com/mapequation/alluvial-generator/commit/4b1b4513a98cda354181c8c29e60fa8b376a31b5))
+* Load all Infomap Online output ([8399483](https://github.com/mapequation/alluvial-generator/commit/83994839bc842c288b6224663fac4552a87cf50b))
+
+
+### Bug Fixes
+
+* Change menu button text from "Local files" to "Infomap Online" ([fee2178](https://github.com/mapequation/alluvial-generator/commit/fee2178878c9c0b970ae56a4f72595e31e9824dc))
+* Disable strict clu/tree header parsing ([7610219](https://github.com/mapequation/alluvial-generator/commit/7610219d0520c3672e07d141891545ee4fb5049a))
+* Tweak stepper appearance ([e56e57d](https://github.com/mapequation/alluvial-generator/commit/e56e57d9a5ae316e1cc33172af430174e356f341))
+* Use long name in top header logo and title ([40221b0](https://github.com/mapequation/alluvial-generator/commit/40221b00d657b95cf26ac121f38e3b150e113077))
+
 ## [1.3.0](https://github.com/mapequation/alluvial-generator/compare/v1.2.0...v1.3.0) (2022-02-08)
 
 
