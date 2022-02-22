@@ -57,8 +57,6 @@ export default observer(function Sidebar({
   const [color, setColor] = useState(defaultHighlightColor);
   console.log("selectedModule", selectedModule);
 
-  const leafNodes = selectedModule ? selectedModule.getLeafNodes() : [];
-
   useEventListener("keydown", (e) => {
     if (store.editMode) return;
 
@@ -357,6 +355,14 @@ export default observer(function Sidebar({
               </Editable>
             </ListItem>
             <ListItem>
+              <Label>Codelength</Label>
+              {selectedModule.networkCodelength.toPrecision(3) + " bits"}
+            </ListItem>
+            <ListItem>
+              <Label>Module id</Label>
+              {selectedModule.moduleId}
+            </ListItem>
+            <ListItem>
               <Label>Module name</Label>
               <Editable
                 w="50%"
@@ -372,26 +378,6 @@ export default observer(function Sidebar({
                 <EditablePreview />
                 <EditableInput />
               </Editable>
-            </ListItem>
-            <ListItem>
-              <Label>Codelength</Label>
-              {selectedModule.networkCodelength.toPrecision(3) + " bits"}
-            </ListItem>
-            <ListItem>
-              <Label>Module id</Label>
-              {selectedModule.moduleId}
-            </ListItem>
-            <ListItem>
-              <Label>Level</Label>
-              {selectedModule.moduleLevel}
-            </ListItem>
-            <ListItem>
-              <Label>Flow</Label>
-              {selectedModule.flow.toPrecision(3)}
-            </ListItem>
-            <ListItem>
-              <Label>Nodes</Label>
-              {leafNodes.length}
             </ListItem>
           </>
         ) : (
