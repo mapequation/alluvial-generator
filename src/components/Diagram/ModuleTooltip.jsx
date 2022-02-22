@@ -1,13 +1,5 @@
-import { Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import {
-  CartesianGrid,
-  Cell,
-  Dot,
-  Scatter,
-  ScatterChart,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Box, Table, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Cell, Dot, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
 
 export default function ModuleTooltip({ module, fillColor }) {
   const leafNodes = module.getLeafNodes();
@@ -25,7 +17,7 @@ export default function ModuleTooltip({ module, fillColor }) {
 
   return (
     <>
-      <Table variant="unstyled" size="sm">
+      <Table variant="unstyled" size="sm" mt={1}>
         <Tbody>
           <Tr>
             <Td>Module</Td>
@@ -59,39 +51,42 @@ export default function ModuleTooltip({ module, fillColor }) {
         </Tbody>
       </Table>
 
-      <ScatterChart
-        width={240}
-        height={150}
-        fill="currentColor"
-        style={{ fontSize: "0.8em" }}
+      <Box
+        bg="white"
+        borderRadius="sm"
+        boxShadow="md"
+        pt={3}
+        pl={1}
+        pr={2}
+        mx={2}
+        my={4}
       >
-        <CartesianGrid fill="white" vertical={false} horizontal={false} />
-        <Scatter
-          data={data}
-          dataKey="flow"
-          isAnimationActive={false}
-          shape={<Dot r={3} />}
-        >
-          {data.map((node, index) => (
-            <Cell key={`cell-${index}`} fill={node.fill} />
-          ))}
-        </Scatter>
-        <YAxis
-          dataKey="flow"
-          type="number"
-          tickFormatter={(value) => (value === 0 ? 0 : value.toPrecision(1))}
-          tickCount={4}
-          label={{ value: "Flow", angle: -90, position: "insideLeft" }}
-          stroke="currentColor"
-        />
-        <XAxis
-          dataKey="nodeId"
-          tick={false}
-          domain={[-1, "dataMax"]}
-          label={{ value: "Nodes", position: "insideBottom" }}
-          stroke="currentColor"
-        />
-      </ScatterChart>
+        <ScatterChart width={240} height={150} style={{ fontSize: "0.8em" }}>
+          <Scatter
+            data={data}
+            dataKey="flow"
+            isAnimationActive={false}
+            shape={<Dot r={3} />}
+          >
+            {data.map((node, index) => (
+              <Cell key={`cell-${index}`} fill={node.fill} />
+            ))}
+          </Scatter>
+          <YAxis
+            dataKey="flow"
+            type="number"
+            tickFormatter={(value) => (value === 0 ? 0 : value.toPrecision(1))}
+            tickCount={4}
+            label={{ value: "Flow", angle: -90, position: "insideLeft" }}
+          />
+          <XAxis
+            dataKey="nodeId"
+            tick={false}
+            domain={[-1, "dataMax"]}
+            label={{ value: "Nodes", position: "insideBottom" }}
+          />
+        </ScatterChart>
+      </Box>
     </>
   );
 }

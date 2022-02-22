@@ -1,4 +1,4 @@
-import { Tooltip } from "@chakra-ui/react";
+import { LightMode, Tooltip } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { forwardRef, useContext } from "react";
@@ -57,27 +57,31 @@ const Module = observer(function Module({ module, fillColor }) {
   return (
     <g className="module" onClick={handler}>
       <motion.g animate={controls}>
-        <Tooltip
-          hasArrow
-          placement="top"
-          shadow="xl"
-          label={<ModuleTooltip module={module} fillColor={fillColor} />}
-        >
-          <G style={{ filter: dropShadow(module) }}>
-            {module.children.map((group) => (
-              <motion.rect
-                key={group.id}
-                className="group"
-                initial={false}
-                animate={group.layout}
-                transition={transition}
-                fill={fillColor(group)}
-                data-x={group.x}
-                data-y={group.y}
-              />
-            ))}
-          </G>
-        </Tooltip>
+        <LightMode>
+          <Tooltip
+            hasArrow
+            placement="top"
+            shadow="xl"
+            borderRadius="sm"
+            openDelay={200}
+            label={<ModuleTooltip module={module} fillColor={fillColor} />}
+          >
+            <G style={{ filter: dropShadow(module) }}>
+              {module.children.map((group) => (
+                <motion.rect
+                  key={group.id}
+                  className="group"
+                  initial={false}
+                  animate={group.layout}
+                  transition={transition}
+                  fill={fillColor(group)}
+                  data-x={group.x}
+                  data-y={group.y}
+                />
+              ))}
+            </G>
+          </Tooltip>
+        </LightMode>
       </motion.g>
 
       {showModuleId && (
