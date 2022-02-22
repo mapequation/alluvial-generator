@@ -1,5 +1,14 @@
 import { Box, Table, Tbody, Td, Tr } from "@chakra-ui/react";
-import { Cell, Dot, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
+import {
+  Cell,
+  Dot,
+  Pie,
+  PieChart,
+  Scatter,
+  ScatterChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function ModuleTooltip({ module, fillColor }) {
   const leafNodes = module.getLeafNodes();
@@ -9,11 +18,14 @@ export default function ModuleTooltip({ module, fillColor }) {
 
   const data = leafNodes
     .map((node) => ({
+      name: node.name,
       nodeId: node.nodeId,
       flow: node.flow,
       fill: fillColor(node),
     }))
     .sort((a, b) => b.flow - a.flow);
+
+  const largest = data.slice(0, 10);
 
   return (
     <>
@@ -77,15 +89,35 @@ export default function ModuleTooltip({ module, fillColor }) {
             type="number"
             tickFormatter={(value) => (value === 0 ? 0 : value.toPrecision(1))}
             tickCount={4}
-            label={{ value: "Flow", angle: -90, position: "insideLeft" }}
+            label={{
+              value: "Flow",
+              angle: -90,
+              position: "insideLeft",
+              fill: "#444",
+            }}
           />
           <XAxis
             dataKey="nodeId"
             tick={false}
             domain={[-1, "dataMax"]}
-            label={{ value: "Nodes", position: "insideBottom" }}
+            label={{ value: "Nodes", position: "insideBottom", fill: "#444" }}
           />
         </ScatterChart>
+
+        <PieChart width={240} height={140} style={{ fontSize: "0.7em" }}>
+          <Pie
+            data={largest}
+            dataKey="flow"
+            nameKey="name"
+            outerRadius={40}
+            label={(node) => node.name}
+            isAnimationActive={false}
+          >
+            {largest.map((node, index) => (
+              <Cell key={`cell-${index}`} fill={node.fill} />
+            ))}
+          </Pie>
+        </PieChart>
       </Box>
     </>
   );
