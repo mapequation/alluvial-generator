@@ -1,10 +1,11 @@
-import { Box, Table, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Box, Table, Tbody, Td, Text, Tr } from "@chakra-ui/react";
 import * as d3 from "d3";
 import React, { useMemo } from "react";
 import {
   Bar,
   BarChart,
   Cell,
+  Curve,
   Label,
   Pie,
   PieChart,
@@ -13,7 +14,7 @@ import {
 } from "recharts";
 
 const bin = d3.bin();
-bin.value((d) => d.flow);
+bin.value((d, i) => i);
 
 export default React.memo(function ModuleTooltip({ module, fillColor }) {
   const { data, bins } = useMemo(() => {
@@ -22,7 +23,6 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
   }, [module]);
 
   const highlightIndices = new Set();
-  let total = 0;
 
   const hist = bins.map((bin, i) => {
     const stacks = {
@@ -38,25 +38,16 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
       }
 
       stacks[highlightIndex] += flow;
-      total += flow;
     });
 
     return stacks;
-  });
-
-  // Normalize
-  hist.forEach((bin) => {
-    for (let index of highlightIndices) {
-      if (!bin[index]) continue;
-      bin[index] /= total;
-    }
   });
 
   const numNodes = data.length;
   const totalNumNodes = module.parent.nodesByIdentifier.size;
   const fractionNodes = (100 * numNodes) / totalNumNodes;
 
-  const largest = data.slice(0, 10);
+  const largest = bins[0].slice(0, 50);
 
   return (
     <>
@@ -112,6 +103,12 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
           fillColor={fillColor}
         />
 
+        <Text fontSize="xs" color="#444" align="center" mt={3} mb={2}>
+          {bins[0].length > 50
+            ? "Top 50 nodes in largest bin"
+            : "Nodes in largest bin"}
+        </Text>
+
         <PiePlot data={largest} fillColor={fillColor} />
       </Box>
     </>
@@ -135,10 +132,10 @@ function BarPlot({ data, indices, fillColor }) {
         />
       ))}
       <YAxis tickFormatter={(value) => value.toFixed(1)}>
-        <Label value="Fraction" angle={-90} position="insideLeft" fill="#444" />
+        <Label value="Flow" position="insideLeft" fill="#444" angle={-90} />
       </YAxis>
       <XAxis dataKey="x1">
-        <Label value="Flow" position="insideBottom" offset={0} fill="#444" />
+        <Label value="Nodes" position="insideBottom" fill="#444" offset={0} />
       </XAxis>
     </BarChart>
   );
@@ -146,13 +143,15 @@ function BarPlot({ data, indices, fillColor }) {
 
 function PiePlot({ data, fillColor }) {
   return (
-    <PieChart width={240} height={140} style={{ fontSize: "0.7em" }}>
+    <PieChart width={240} height={140} style={{ fontSize: "0.6em" }}>
       <Pie
         data={data}
         dataKey="flow"
         nameKey="name"
+        innerRadius={10}
         outerRadius={40}
         label={PieLabel}
+        labelLine={LabelLine}
         animationDuration={400}
       >
         {data.map((node, index) => (
@@ -163,10 +162,27 @@ function PiePlot({ data, fillColor }) {
   );
 }
 
-function PieLabel({ x, y, textAnchor, name }) {
+const labelThreshold = 0.03;
+
+function PieLabel({ x, y, textAnchor, name, percent }) {
+  if (percent < labelThreshold) return null;
+
   return (
     <text x={x} y={y} textAnchor={textAnchor} fill="#444">
       {name}
     </text>
+  );
+}
+
+function LabelLine({ percent, ...props }) {
+  if (percent < labelThreshold) return null;
+
+  return (
+    <Curve
+      {...props}
+      opacity={0.5}
+      type="linear"
+      className="recharts-pie-label-line"
+    />
   );
 }
