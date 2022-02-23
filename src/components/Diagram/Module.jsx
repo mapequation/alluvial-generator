@@ -63,7 +63,7 @@ const Module = observer(function Module({ module, fillColor }) {
             placement="top"
             shadow="xl"
             borderRadius="sm"
-            openDelay={200}
+            openDelay={500}
             label={<ModuleTooltip module={module} fillColor={fillColor} />}
           >
             <G style={{ filter: dropShadow(module) }}>
