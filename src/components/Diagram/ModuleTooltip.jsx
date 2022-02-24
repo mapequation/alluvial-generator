@@ -6,9 +6,12 @@ import {
   BarChart,
   Cell,
   Curve,
+  Dot,
   Label,
   Pie,
   PieChart,
+  Scatter,
+  ScatterChart,
   XAxis,
   YAxis,
 } from "recharts";
@@ -47,7 +50,8 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
   const totalNumNodes = module.parent.nodesByIdentifier.size;
   const fractionNodes = (100 * numNodes) / totalNumNodes;
 
-  const largest = bins[0].slice(0, 50);
+  const maxNodes = 50;
+  const largest = numNodes < maxNodes ? data : bins[0].slice(0, maxNodes);
 
   return (
     <>
@@ -97,15 +101,21 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
         minH={240}
         minW={240}
       >
-        <BarPlot
-          data={hist}
-          indices={Array.from(highlightIndices)}
-          fillColor={fillColor}
-        />
+        {numNodes < maxNodes ? (
+          <ScatterPlot data={data} fillColor={fillColor} />
+        ) : (
+          <BarPlot
+            data={hist}
+            indices={Array.from(highlightIndices)}
+            fillColor={fillColor}
+          />
+        )}
 
         <Text fontSize="xs" color="#444" align="center" mt={3} mb={2}>
-          {bins[0].length > 50
-            ? "Top 50 nodes in largest bin"
+          {numNodes < maxNodes
+            ? "Largest nodes"
+            : bins[0].length > maxNodes
+            ? `Top ${maxNodes} nodes in largest bin`
             : "Nodes in largest bin"}
         </Text>
 
@@ -114,6 +124,24 @@ export default React.memo(function ModuleTooltip({ module, fillColor }) {
     </>
   );
 });
+
+function ScatterPlot({ data, fillColor }) {
+  return (
+    <ScatterChart width={240} height={150} style={{ fontSize: "0.8em" }}>
+      <Scatter data={data} dataKey="flow" shape={<Dot r={3} />}>
+        {data.map((node, i) => (
+          <Cell key={`cell-${i}`} fill={fillColor(node)} />
+        ))}
+      </Scatter>
+      <YAxis dataKey="flow" tickFormatter={(value) => value.toFixed(2)}>
+        <Label value="Flow" position="insideLeft" fill="#444" angle={-90} />
+      </YAxis>
+      <XAxis tickFormatter={(value) => value + 1}>
+        <Label value="Nodes" position="insideBottom" fill="#444" offset={0} />
+      </XAxis>
+    </ScatterChart>
+  );
+}
 
 function BarPlot({ data, indices, fillColor }) {
   return (
