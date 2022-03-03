@@ -161,6 +161,28 @@ export default observer(function LoadNetworks({ onClose }) {
 
     const newFiles = [];
 
+    const createFile = (file, format, contents) => {
+      const newFile = Object.assign(
+        {},
+        {
+          ...file,
+          fileName: file.name, // Save the original filename so we don't overwrite it
+          name: file.name,
+          lastModified: file.lastModified,
+          size: file.size,
+          id: id(),
+          format,
+          ...contents,
+        }
+      );
+
+      if (contents.noModularResult === undefined && !file.noModularResult) {
+        Object.assign(newFile, calcStatistics(contents));
+      }
+
+      return newFile;
+    };
+
     // Parse files
     for (let i = 0; i < acceptedFiles.length; ++i) {
       const file = acceptedFiles[i];
@@ -214,28 +236,9 @@ export default observer(function LoadNetworks({ onClose }) {
         continue;
       }
 
-      setIdentifiers(contents, format, store.identifier);
-
       try {
-        const newFile = Object.assign(
-          {},
-          {
-            ...file,
-            fileName: file.name, // Save the original filename so we don't overwrite it
-            name: file.name,
-            lastModified: file.lastModified,
-            size: file.size,
-            id: id(),
-            format,
-            ...contents,
-          }
-        );
-
-        if (contents.noModularResult === undefined && !file.noModularResult) {
-          Object.assign(newFile, calcStatistics(contents));
-        }
-
-        newFiles.push(newFile);
+        setIdentifiers(contents, format, store.identifier);
+        newFiles.push(createFile(file, format, contents));
       } catch (e) {
         errors.push(createError(file, "invalid-format", e.message));
       }
@@ -758,11 +761,10 @@ function calcStatistics(file) {
   };
 }
 
+const stateOrNodeId = (node) => (node.stateId != null ? node.stateId : node.id);
+
 function setIdentifiers(network, format, identifier = "id") {
   const { nodes } = network;
-
-  const stateOrNodeId = (node) =>
-    node.stateId != null ? node.stateId : node.id;
 
   const getIdentifier = (node) => {
     if (identifier === "id") {
@@ -779,6 +781,7 @@ function setIdentifiers(network, format, identifier = "id") {
   } else if (format === "json") {
     nodes.forEach((node) => {
       node.identifier = node.identifier ?? getIdentifier(node);
+      // TODO: remove. Used only for example data.
       if (!Array.isArray(node.path)) {
         node.path = TreePath.toArray(node.path);
       }
