@@ -17,7 +17,7 @@ export default function highlightColor(
         : highlightColors[highlightIndex];
 
     if (insignificant) {
-      return d3.hsl(color).brighter(0.5).toString();
+      return d3.hsl(color).brighter(0.8).toString();
     }
 
     return color;
