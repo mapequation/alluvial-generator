@@ -35,7 +35,7 @@ import { AnimatePresence, Reorder } from "framer-motion";
 import JSZip from "jszip";
 import localforage from "localforage";
 import { observer } from "mobx-react";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useReducer } from "react";
 import { useDropzone } from "react-dropzone";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
@@ -72,6 +72,26 @@ function createError(file, code, message) {
   };
 }
 
+const initialState = {
+  isCreatingDiagram: false,
+  isLoadingExample: false,
+  isLoadingFiles: false,
+  infomapRunning: false,
+  files: [],
+  localStorageFiles: [],
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "set":
+      return { ...state, ...action.payload };
+    case "reset":
+      return initialState;
+    default:
+      return state;
+  }
+}
+
 export default observer(function LoadNetworks({ onClose }) {
   const store = useContext(StoreContext);
   const toast = useToast();
@@ -79,13 +99,12 @@ export default observer(function LoadNetworks({ onClose }) {
     "var(--chakra-colors-gray-50)",
     "var(--chakra-colors-gray-600)"
   );
-  const [isCreatingDiagram, setIsCreatingDiagram] = useState(false);
-  const [isLoadingExample, setIsLoadingExample] = useState(false);
-  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-  const [infomapRunning, setInfomapRunning] = useState(false);
-  const [files, setFiles] = useState(store.files);
-  const [localStorageFiles, setLocalStorageFiles] = useState([]);
-  const reset = useCallback(() => setFiles([]), []);
+  const [state, dispatch] = useReducer(reducer, initialState, (state) => ({
+    ...state,
+    files: store.files,
+  }));
+
+  const { files } = state;
 
   const onError = useCallback(
     ({ title, description, ...props }) => {
@@ -104,7 +123,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
   const onDrop = async (acceptedFiles) => {
     console.time("onDrop");
-    setIsLoadingFiles(true);
+    dispatch({ type: "set", payload: { isLoadingFiles: true } });
 
     const readFiles = [];
     const errors = [];
@@ -176,6 +195,8 @@ export default observer(function LoadNetworks({ onClose }) {
         }
       );
 
+      // .net files has noModularResult = true by default
+      // all other format lack the noModularResult property
       if (contents.noModularResult === undefined && !file.noModularResult) {
         Object.assign(newFile, calcStatistics(contents));
       }
@@ -244,8 +265,6 @@ export default observer(function LoadNetworks({ onClose }) {
       }
     }
 
-    setFiles([...files, ...newFiles]);
-
     errors.forEach(({ file, errors }) =>
       onError({
         title: `Could not load ${file.name}`,
@@ -253,7 +272,10 @@ export default observer(function LoadNetworks({ onClose }) {
       })
     );
 
-    setIsLoadingFiles(false);
+    dispatch({
+      type: "set",
+      payload: { files: [...files, ...newFiles], isLoadingFiles: false },
+    });
     console.timeEnd("onDrop");
   };
 
@@ -290,7 +312,10 @@ export default observer(function LoadNetworks({ onClose }) {
         ...calcStatistics(contents),
       });
 
-      setFiles(files.map((f) => (f.id === file.id ? file : f)));
+      dispatch({
+        type: "set",
+        payload: { files: files.map((f) => (f.id === file.id ? file : f)) },
+      });
     } catch (e) {
       onError({
         title: `Could not parse ${file.name}`,
@@ -302,23 +327,30 @@ export default observer(function LoadNetworks({ onClose }) {
   const createDiagram = useCallback(() => {
     // TODO already loaded?
     // TODO set state from json
-    setIsCreatingDiagram(true);
+    dispatch({ type: "set", payload: { isCreatingDiagram: true } });
     store.setFiles(files);
     onClose();
   }, [onClose, files, store]);
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");
-    setIsLoadingExample(true);
-    setIsLoadingFiles(true);
+    dispatch({
+      type: "set",
+      payload: { isLoadingExample: true, isLoadingFiles: true },
+    });
     try {
       const json = await fetchExampleData();
-      setIsLoadingFiles(false);
-      //setIsLoadingExample(false);
-      setIsCreatingDiagram(true);
+      dispatch({
+        type: "set",
+        payload: {
+          isCreatingDiagram: true,
+          isLoadingExample: false,
+          isLoadingFiles: false,
+        },
+      });
       const emptyFile = new File([], exampleDataFilename);
       const files = createFilesFromDiagramObject(json, emptyFile);
-      setFiles(files);
+      dispatch({ type: "set", payload: { files } });
       setTimeout(() => {
         store.setFiles(files);
         onClose();
@@ -328,16 +360,23 @@ export default observer(function LoadNetworks({ onClose }) {
         title: "Could not load example data",
         description: e.message,
       });
-      setIsLoadingFiles(false);
-      setIsLoadingExample(false);
-      setIsCreatingDiagram(false);
+      dispatch({
+        type: "set",
+        payload: {
+          isCreatingDiagram: false,
+          isLoadingExample: false,
+          isLoadingFiles: false,
+        },
+      });
     }
     console.timeEnd("loadExample");
   }, [onClose, store, onError]);
 
   const removeFileId = (id) => {
-    const newFiles = files.filter((file) => file.id !== id);
-    setFiles(newFiles);
+    dispatch({
+      type: "set",
+      payload: { files: files.filter((file) => file.id !== id) },
+    });
   };
 
   const toggleMultilayerExpanded = (file) => {
@@ -385,7 +424,7 @@ export default observer(function LoadNetworks({ onClose }) {
       const newFiles = files.filter((f) => f.originalId !== file.originalId);
       newFiles.splice(firstIndex, 0, aggregated);
 
-      setFiles(newFiles);
+      dispatch({ type: "set", payload: { files: newFiles } });
     } else {
       const layers = {};
 
@@ -433,7 +472,7 @@ export default observer(function LoadNetworks({ onClose }) {
       const index = files.indexOf(file);
       const newFiles = [...files];
       newFiles.splice(index, 1, ...Object.values(layers));
-      setFiles(newFiles);
+      dispatch({ type: "set", payload: { files: newFiles } });
 
       // Decrease flow threshold as layers contain less flow than an individual file
       // TODO: Show a minimum number of modules per level in each network?
@@ -470,7 +509,7 @@ export default observer(function LoadNetworks({ onClose }) {
   };
 
   const loadLocalStorage = async () => {
-    setLocalStorageFiles([]);
+    dispatch({ type: "set", payload: { localStorageFiles: [] } });
 
     try {
       const network = await localforage.getItem("network");
@@ -478,7 +517,7 @@ export default observer(function LoadNetworks({ onClose }) {
         return;
       }
 
-      const newFiles = [];
+      const localStorageFiles = [];
 
       const acceptedKeys = [
         "ftree",
@@ -521,10 +560,10 @@ export default observer(function LoadNetworks({ onClose }) {
           lastModified: network.timestamp,
         });
 
-        newFiles.push(file);
+        localStorageFiles.push(file);
       }
 
-      setLocalStorageFiles(newFiles);
+      dispatch({ type: "set", payload: { localStorageFiles } });
     } catch (e) {
       console.warn(e.message);
     }
@@ -534,6 +573,14 @@ export default observer(function LoadNetworks({ onClose }) {
   if (files.length > 0) {
     activeStep = files.some((f) => f.noModularResult) ? 0 : 2;
   }
+
+  const {
+    isCreatingDiagram,
+    isLoadingExample,
+    isLoadingFiles,
+    infomapRunning,
+    localStorageFiles,
+  } = state;
 
   return (
     <>
@@ -565,7 +612,9 @@ export default observer(function LoadNetworks({ onClose }) {
                 axis="x"
                 layoutScroll
                 values={files}
-                onReorder={setFiles}
+                onReorder={(files) =>
+                  dispatch({ type: "set", payload: { files } })
+                }
               >
                 <AnimatePresence>
                   {files.map((file) => (
@@ -574,7 +623,9 @@ export default observer(function LoadNetworks({ onClose }) {
                       file={file}
                       onRemove={() => removeFileId(file.id)}
                       onMultilayerClick={() => toggleMultilayerExpanded(file)}
-                      setIsRunning={setInfomapRunning}
+                      setIsRunning={(infomapRunning) =>
+                        dispatch({ type: "set", payload: { infomapRunning } })
+                      }
                       updateFile={updateFileWithTree}
                       onError={onError}
                     />
@@ -608,7 +659,7 @@ export default observer(function LoadNetworks({ onClose }) {
               isLoadingExample ||
               isCreatingDiagram
             }
-            onClick={reset}
+            onClick={() => dispatch({ type: "reset" })}
             leftIcon={<MdOutlineDelete />}
             mr={8}
             variant="outline"
@@ -669,7 +720,10 @@ export default observer(function LoadNetworks({ onClose }) {
                   icon={<DeleteIcon />}
                   isDisabled={localStorageFiles.length === 0}
                   onClick={() => {
-                    setLocalStorageFiles([]);
+                    dispatch({
+                      type: "set",
+                      payload: { localStorageFiles: [] },
+                    });
                     localforage.clear();
                   }}
                 >
