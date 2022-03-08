@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/mapequation/alluvial-generator/compare/v1.4.0...v1.5.0) (2022-03-08)
+
+
+### Features
+
+* Add node flow pie chart ([45a7180](https://github.com/mapequation/alluvial-generator/commit/45a7180cb657a3fa6896daeb934a4f6de9e87730))
+* Replace LineChart with binned BarChart for performance ([3666ba1](https://github.com/mapequation/alluvial-generator/commit/3666ba1aec6ae313a6df036d6ca13252c268171d))
+
+
+### Bug Fixes
+
+* Adjust insignificant node brightness ([b50175a](https://github.com/mapequation/alluvial-generator/commit/b50175aaae7dcab62a2c2a819c8b6a889a64ff2b))
+* Improve charts and labels ([4ec5cdf](https://github.com/mapequation/alluvial-generator/commit/4ec5cdfbbceaec36ec9e305eaee1a6ffcc9f1191))
+* Improve tooltip style ([c34201f](https://github.com/mapequation/alluvial-generator/commit/c34201faa41006d3ff3561d6d8bf4c69f52ec9c2))
+* Show tooltip scatter plot when there are less than 50 nodes in the module ([ad81bc8](https://github.com/mapequation/alluvial-generator/commit/ad81bc8aa859657df8e9921cbc4186c23004cb8e))
+
 ## [1.4.0](https://github.com/mapequation/alluvial-generator/compare/v1.3.0...v1.4.0) (2022-02-22)
 
 
