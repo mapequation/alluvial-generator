@@ -14,6 +14,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly flow: number;
   readonly nodeId: number;
   readonly stateId: number | null = null;
+  readonly layerId: number | null = null;
   readonly identifier: string;
   readonly treePath: TreePath;
   highlightIndex: number;
@@ -41,6 +42,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     this.flow = node.flow;
     this.nodeId = node.id;
     this.stateId = node.stateId != null ? node.stateId : null;
+    this.layerId = node.layerId != null ? node.layerId : null;
     this.identifier = node.identifier;
     this.treePath = new TreePath(node.path);
     this.highlightIndex =

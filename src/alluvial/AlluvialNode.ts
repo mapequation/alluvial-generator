@@ -148,7 +148,7 @@ export default abstract class AlluvialNode<
     return [...this.leafNodes()];
   }
 
-  *leafNodes(): Iterable<LeafNode> {
+  *leafNodes(): IterableIterator<LeafNode> {
     for (let child of this) {
       yield* child.leafNodes();
     }

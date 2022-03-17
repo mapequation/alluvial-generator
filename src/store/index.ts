@@ -557,6 +557,34 @@ export class Store {
     this.updateLayout();
   }
 
+  colorByLayer() {
+    const layerIdColorMap = new Map();
+
+    this.diagram.children.forEach((network) => {
+      network.children.forEach((module) => {
+        if (module.isVisible) {
+          module.getLeafNodes().forEach((node) => {
+            if (node.layerId == null) return;
+
+            if (!layerIdColorMap.has(node.layerId)) {
+              let color =
+                this.selectedScheme[
+                  layerIdColorMap.size % this.selectedScheme.length
+                ];
+              layerIdColorMap.set(node.layerId, color);
+            }
+
+            let color = layerIdColorMap.get(node.layerId);
+            node.highlightIndex = this.getHighlightIndex(color);
+            node.update();
+          });
+        }
+      });
+    });
+
+    this.updateLayout();
+  }
+
   clearColors(updateLayout = true) {
     for (let network of this.diagram) {
       const modules = [];

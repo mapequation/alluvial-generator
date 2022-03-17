@@ -264,6 +264,29 @@ export default observer(function Sidebar({
           </ButtonGroup>
         </ListItem>
 
+        {store.diagram.children.some((network) => network.isMultilayer) && (
+          <ListItem>
+            <Text
+              color={headerColor}
+              fontWeight={600}
+              textTransform="uppercase"
+              letterSpacing="tight"
+              fontSize="0.75rem"
+              pt={2}
+            >
+              By layer id
+            </Text>
+            <ButtonGroup isAttached w="100%" mt={1}>
+              <Button
+                onClick={() => store.colorByLayer()}
+                justifyContent="center"
+              >
+                Paint all
+              </Button>
+            </ButtonGroup>
+          </ListItem>
+        )}
+
         <ListItemHeader color={headerColor}>Module</ListItemHeader>
 
         {selectedModule != null ? (

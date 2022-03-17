@@ -13,7 +13,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   name: string;
   isCustomSorted = false;
-  readonly layerId: number | undefined;
+  readonly layerId: number | undefined; // When representing each layer as a network
   readonly codelength: number;
   modules?: Map<string, InfomapModule> = undefined;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
@@ -44,6 +44,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         }
       }
     }
+  }
+
+  get isMultilayer(): boolean {
+    return this.leafNodes()?.next()?.value.layerId != null;
   }
 
   get namePosition() {
