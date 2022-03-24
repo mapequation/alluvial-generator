@@ -47,8 +47,12 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
   }
 
-  get isMultilayer(): boolean {
+  get isMultilayer() {
     return this.leafNodes()?.next()?.value.layerId != null;
+  }
+
+  get isHigherOrder() {
+    return this.isMultilayer || this.leafNodes()?.next()?.value.stateId != null;
   }
 
   get namePosition() {

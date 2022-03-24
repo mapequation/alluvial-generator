@@ -287,6 +287,29 @@ export default observer(function Sidebar({
           </ListItem>
         )}
 
+        {store.diagram.children.some((network) => network.isHigherOrder) && (
+          <ListItem>
+            <Text
+              color={headerColor}
+              fontWeight={600}
+              textTransform="uppercase"
+              letterSpacing="tight"
+              fontSize="0.75rem"
+              pt={2}
+            >
+              By physical id
+            </Text>
+            <ButtonGroup isAttached w="100%" mt={1}>
+              <Button
+                onClick={() => store.colorByPhysicalId()}
+                justifyContent="center"
+              >
+                Paint all
+              </Button>
+            </ButtonGroup>
+          </ListItem>
+        )}
+
         <ListItemHeader color={headerColor}>Module</ListItemHeader>
 
         {selectedModule != null ? (
