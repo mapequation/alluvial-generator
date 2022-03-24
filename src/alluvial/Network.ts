@@ -15,7 +15,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   isCustomSorted = false;
   readonly layerId: number | undefined; // When representing each layer as a network
   readonly codelength: number;
-  modules?: Map<string, InfomapModule> = undefined;
+  modules?: Map<string, InfomapModule> = undefined; // TODO remove
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
@@ -26,7 +26,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     name: string,
     codelength: number,
     layerId?: number,
-    modules?: InfomapModule[]
+    modules?: InfomapModule[] // TODO remove
   ) {
     super(parent, networkId, networkId);
     parent.addChild(this);
@@ -34,6 +34,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     this.codelength = codelength;
     this.layerId = layerId;
 
+    // TODO remove
     if (modules) {
       for (const module of modules) {
         if (module.links) {
@@ -107,7 +108,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     name: string,
     codelength: number,
     layerId?: number,
-    modules?: InfomapModule[]
+    modules?: InfomapModule[] // TODO remove
   ) {
     return new Network(parent, networkId, name, codelength, layerId, modules);
   }
