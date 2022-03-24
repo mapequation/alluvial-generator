@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/mapequation/alluvial-generator/compare/v1.5.0...v1.6.0) (2022-03-24)
+
+
+### Features
+
+* Color modules by layer id ([bb0b87a](https://github.com/mapequation/alluvial-generator/commit/bb0b87a61c87d82e853a4539f2641b22524009b8))
+* Paint higher-order networks by physical id ([34cd604](https://github.com/mapequation/alluvial-generator/commit/34cd604352623e1735655486e7c8a2d9bb111ebb))
+
 ## [1.5.0](https://github.com/mapequation/alluvial-generator/compare/v1.4.0...v1.5.0) (2022-03-08)
 
 
