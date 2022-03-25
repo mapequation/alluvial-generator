@@ -89,6 +89,7 @@ export class Store {
   showModuleId: boolean = false;
   showModuleNames: boolean = true;
   showNetworkNames: boolean = true;
+  aggregateStateNames: boolean = false;
 
   hierarchicalModules: "none" | "outline" | "shadow" = "shadow";
   dropShadow: boolean = false;
@@ -125,6 +126,7 @@ export class Store {
       showModuleId: observable,
       showModuleNames: observable,
       showNetworkNames: observable,
+      aggregateStateNames: observable,
       hierarchicalModules: observable,
       dropShadow: observable,
       fontSize: observable,
@@ -249,6 +251,10 @@ export class Store {
 
   setShowNetworkNames = action((showNetworkNames: boolean) => {
     this.showNetworkNames = showNetworkNames;
+  });
+
+  setAggregateStateNames = action((aggregateStateNames: boolean) => {
+    this.aggregateStateNames = aggregateStateNames;
   });
 
   setHierarchicalModules = action(
@@ -592,8 +598,6 @@ export class Store {
       network.children.forEach((module) => {
         if (module.isVisible) {
           module.getLeafNodes().forEach((node) => {
-            if (node.stateId == null) return;
-
             if (!physicalIdColorMap.has(node.nodeId)) {
               let color =
                 this.selectedScheme[

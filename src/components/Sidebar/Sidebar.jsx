@@ -551,6 +551,13 @@ export default observer(function Sidebar({
           isChecked={store.showModuleNames}
           onChange={store.setShowModuleNames}
         />
+        {store.diagram.children.some((network) => network.isHigherOrder) && (
+          <Switch
+            label="Aggregate states names"
+            isChecked={store.aggregateStateNames}
+            onChange={store.setAggregateStateNames}
+          />
+        )}
         <Switch
           label="Network names"
           isChecked={store.showNetworkNames}

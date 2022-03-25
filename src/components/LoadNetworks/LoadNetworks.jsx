@@ -847,7 +847,7 @@ function setIdentifiers(network, format, identifier = "id") {
       const id = stateOrNodeId(node);
       node.path = node.moduleId.toString();
       node.identifier = id.toString();
-      node.name = id.toString();
+      node.name = node.id.toString();
     });
   }
 }

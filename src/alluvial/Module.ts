@@ -26,9 +26,28 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.index = parent.addChild(this) - 1;
   }
 
-  get largestLeafNodes() {
-    const compare = (a: LeafNode, b: LeafNode) => b.flow - a.flow;
-    return new PriorityQueue<LeafNode>(5, compare, this.leafNodes()).map(
+  getLargestLeafNodes(aggregate = false) {
+    type NodeType = { name: string; flow: number };
+    const compare = (a: NodeType, b: NodeType) => b.flow - a.flow;
+
+    const getNodes = () => {
+      if (!aggregate) {
+        return this.leafNodes();
+      }
+
+      const physicalNodes = new Map();
+
+      for (let node of this.leafNodes()) {
+        if (!physicalNodes.has(node.nodeId)) {
+          physicalNodes.set(node.nodeId, { name: node.name, flow: 0 });
+        }
+        physicalNodes.get(node.nodeId)!.flow += node.flow;
+      }
+
+      return physicalNodes.values();
+    };
+
+    return new PriorityQueue<NodeType>(5, compare, getNodes()).map(
       (node) => node.name
     );
   }

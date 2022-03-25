@@ -125,7 +125,8 @@ const Module = observer(function Module({ module, fillColor }) {
             data-x={namePosition.x}
             data-y={namePosition.y}
           >
-            {module.name || module.largestLeafNodes.join(", ")}
+            {module.name ||
+              module.getLargestLeafNodes(store.aggregateStateNames).join(", ")}
           </motion.text>
         </motion.g>
       )}
