@@ -19,8 +19,6 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import { StoreContext } from "../../store";
 import { Swatch } from "../Sidebar/Swatch";
-import SubGraph from "./SubGraph";
-import ErrorBoundary from "../ErrorBoundary";
 
 export default observer(function Explorer({ onClose }) {
   const store = useContext(StoreContext);
@@ -78,14 +76,6 @@ export default observer(function Explorer({ onClose }) {
               </Tbody>
             </Table>
           </Box>
-
-          {selectedModule.parent.modules != null && (
-            <Box mx={8} mt={10} rounded="md" boxShadow="md" overflow="hidden">
-              <ErrorBoundary>
-                <SubGraph selectedModule={selectedModule} leafNodes={nodes} />
-              </ErrorBoundary>
-            </Box>
-          )}
         </ModalBody>
         <ModalFooter>
           <Button onClick={onClose}>Close</Button>

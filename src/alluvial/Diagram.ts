@@ -94,15 +94,13 @@ export default class Diagram extends AlluvialNodeBase<Network> {
 
   addNetwork(network: any) {
     // FIXME remove any
-    const { nodes, id, codelength, name, layerId, modules } = network;
+    const { nodes, id, codelength, name, layerId } = network;
 
     if (this.children.some((network) => network.networkId === id)) {
       throw new Error(`Network with id ${id} already exists`);
     }
 
-    Network.create(this, id, name, codelength, layerId, modules).addNodes(
-      nodes
-    );
+    Network.create(this, id, name, codelength, layerId).addNodes(nodes);
   }
 
   getNetwork(networkId: string): Network | null {
