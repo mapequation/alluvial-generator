@@ -76,11 +76,11 @@ export class Store {
   streamlineOpacity: number = 0.8;
   flowThreshold: number = 5e-3;
 
-  selectedScheme: ColorScheme = COLOR_SCHEMES["Tableau10"];
-  selectedSchemeName = "Tableau10";
+  selectedScheme: ColorScheme = COLOR_SCHEMES["Sinebow"];
+  selectedSchemeName = "Sinebow";
 
   defaultHighlightColor: string = "#b6b69f";
-  highlightColors: string[] = [...COLOR_SCHEMES["Tableau10"]];
+  highlightColors: string[] = [...COLOR_SCHEMES["Sinebow"]];
 
   verticalAlign: "bottom" | "justify" = "bottom";
   moduleSize: "nodes" | "flow" = "flow";
