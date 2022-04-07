@@ -35,8 +35,8 @@ export default class LeafNode extends AlluvialNodeBase<never> {
 
   private readonly network: Network;
 
+  // FIXME use Infomap types
   constructor(node: any, network: Network) {
-    // FIXME remove any
     super(null, network.networkId, node.path);
     this.name = node.name;
     this.flow = node.flow;

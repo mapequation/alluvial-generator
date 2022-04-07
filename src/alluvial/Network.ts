@@ -1,3 +1,4 @@
+import type { Module as InfomapModule } from "@mapequation/infomap";
 import { moveItem } from "../utils/array";
 import TreePath from "../utils/TreePath";
 import AlluvialNodeBase, { Layout } from "./AlluvialNode";
@@ -8,28 +9,52 @@ import Module from "./Module";
 import type { Side } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
+// FIXME use Infomap types
+export type NetworkProps = {
+  name: string;
+  id: string;
+  codelength: number;
+  layerId?: number;
+  directed?: boolean;
+  modules?: InfomapModule[];
+};
+
+type ModuleLink = {
+  target: string;
+  flow: number;
+};
+
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   name: string;
   isCustomSorted = false;
   readonly layerId: number | undefined; // When representing each layer as a network
   readonly codelength: number;
+  readonly directed: boolean;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
+  infomapModulesByPath: Map<string, InfomapModule> = new Map();
+  moduleLinks: Map<string, ModuleLink[]> = new Map();
 
   constructor(
     parent: Diagram,
-    networkId: string,
-    name: string,
-    codelength: number,
-    layerId?: number
+    { name, id, codelength, layerId, modules, directed }: NetworkProps
   ) {
-    super(parent, networkId, networkId);
+    super(parent, id, id);
     parent.addChild(this);
     this.name = name;
     this.codelength = codelength;
     this.layerId = layerId;
+    this.directed = directed ?? false;
+
+    if (modules) {
+      this.infomapModulesByPath = new Map(
+        modules.map((module) => [module.path.join(":"), module])
+      );
+
+      this.moduleLinks = createLinkMap(modules, this.directed);
+    }
   }
 
   get isMultilayer() {
@@ -91,17 +116,12 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     return this.parent?.flowThreshold ?? 0;
   }
 
-  static create(
-    parent: Diagram,
-    networkId: string,
-    name: string,
-    codelength: number,
-    layerId?: number
-  ) {
-    return new Network(parent, networkId, name, codelength, layerId);
+  static create(parent: Diagram, network: NetworkProps) {
+    return new Network(parent, network);
   }
 
-  addNodes(nodes: Node[]) {
+  // FIXME use Infomap type
+  addNodes(nodes: any[]) {
     this.nodesByIdentifier = new Map();
 
     const leafNodes = nodes.map((node) => {
@@ -280,4 +300,33 @@ class TreeNode extends Layout {
 
     this.parent?.updateLayout(module);
   }
+}
+
+function createLinkMap(modules: InfomapModule[], directed: boolean = false) {
+  const linkMap = new Map<string, ModuleLink[]>();
+
+  const addDirectedLink = (source: string, target: string, flow: number) => {
+    if (!linkMap.has(source)) {
+      linkMap.set(source, []);
+    }
+    linkMap.get(source)?.push({ target, flow });
+  };
+
+  const addLink = (source: string, target: string, flow: number) => {
+    addDirectedLink(source, target, flow);
+    if (!directed) {
+      addDirectedLink(target, source, flow);
+    }
+  };
+
+  for (const module of modules) {
+    const moduleId = module.path.join(":");
+    const parent = module.path[0] === 0 ? "" : moduleId + ":";
+
+    module.links?.forEach(({ source, target, flow }) =>
+      addLink(parent + source, parent + target, flow)
+    );
+  }
+
+  return linkMap;
 }

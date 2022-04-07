@@ -17,6 +17,9 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   index: number;
   name: string = "";
   readonly moduleLevel: number = 1;
+  enterFlow: number = 0;
+  exitFlow: number = 0;
+  links?: Map<string, number>;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
@@ -24,6 +27,19 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     this.moduleId = moduleId;
     this.path = TreePath.toArray(moduleId);
     this.index = parent.addChild(this) - 1;
+
+    const module = this.parent.infomapModulesByPath.get(moduleId);
+
+    if (module) {
+      this.enterFlow = module.enterFlow;
+      this.exitFlow = module.exitFlow;
+    }
+
+    const links = this.parent.moduleLinks.get(moduleId);
+
+    if (links) {
+      this.links = new Map(links.map(({ target, flow }) => [target, flow]));
+    }
   }
 
   getLargestLeafNodes(aggregate = false) {
