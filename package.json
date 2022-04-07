@@ -34,7 +34,8 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "release": "standard-version",
-    "deploy": "npm run build && ssh mapequation \"rm -rf /var/www/alluvial/static\" && scp -r build/* mapequation:/var/www/alluvial"
+    "predeploy": "npm run build",
+    "deploy": "ssh mapequation \"rm -rf /var/www/alluvial/static\" && scp -r build/* mapequation:/var/www/alluvial"
   },
   "eslintConfig": {
     "extends": [
