@@ -1,6 +1,7 @@
 // @ts-nocheck
-import id from "../../utils/id";
-import { calcStatistics, setIdentifiers } from "./file-utils";
+import id from "../../../utils/id";
+import { calcStatistics } from "./calc-statistics";
+import { setIdentifiers } from "./set-identifiers";
 
 // FIXME any
 export function mergeMultilayerFiles(file: any, files: any[]) {

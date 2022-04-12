@@ -35,17 +35,18 @@ import { useDropzone } from "react-dropzone";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
+import Item from "./Item";
+import "./LoadNetworks.css";
+import Stepper from "./Stepper";
 import {
   calcStatistics,
   createFilesFromDiagramObject,
+  expandMultilayerFile,
   getLocalStorageFiles,
+  mergeMultilayerFiles,
   parseAcceptedFiles,
   setIdentifiers,
-} from "./file-utils";
-import Item from "./Item";
-import "./LoadNetworks.css";
-import { expandMultilayerFile, mergeMultilayerFiles } from "./multilayer-utils";
-import Stepper from "./Stepper";
+} from "./utils";
 
 localforage.config({ name: "infomap" });
 
