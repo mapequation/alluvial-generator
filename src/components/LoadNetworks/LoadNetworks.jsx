@@ -38,14 +38,13 @@ import { StoreContext } from "../../store";
 import {
   calcStatistics,
   createFilesFromDiagramObject,
-  expandMultilayerFile,
   getLocalStorageFiles,
-  mergeMultilayerFiles,
   parseAcceptedFiles,
   setIdentifiers,
 } from "./file-utils";
 import Item from "./Item";
 import "./LoadNetworks.css";
+import { expandMultilayerFile, mergeMultilayerFiles } from "./multilayer-utils";
 import Stepper from "./Stepper";
 
 localforage.config({ name: "infomap" });
@@ -250,19 +249,19 @@ export default observer(function LoadNetworks({ onClose }) {
       file.isExpanded = false;
     }
 
-    if (file.isExpanded) {
-      const newFiles = mergeMultilayerFiles(file, files);
-      dispatch({ type: "set", payload: { files: newFiles } });
-    } else {
-      const newFiles = expandMultilayerFile(file, files);
-      dispatch({ type: "set", payload: { files: newFiles } });
-
+    if (!file.isExpanded) {
       // Decrease flow threshold as layers contain less flow than an individual file
       // TODO: Show a minimum number of modules per level in each network?
       if (store.flowThreshold > 1e-3) {
         store.setFlowThreshold(1e-3);
       }
     }
+
+    const newFiles = file.isExpanded
+      ? mergeMultilayerFiles(file, files)
+      : expandMultilayerFile(file, files);
+
+    dispatch({ type: "set", payload: { files: newFiles } });
   };
 
   useEventListener("keydown", (event) => {
