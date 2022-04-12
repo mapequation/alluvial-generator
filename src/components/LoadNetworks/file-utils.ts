@@ -25,10 +25,7 @@ export async function parseAcceptedFiles(
   const readFiles = [];
   const errors = [];
 
-  const accepted = acceptedFormats
-    .split(",")
-    .map((ext) => ext.slice(1))
-    .filter((ext) => ext !== "zip");
+  const textFormats = acceptedFormats.filter((ext) => ext !== "zip");
 
   // Unzip compressed files, read uncompressed files
   let fileIndex = 0;
@@ -43,7 +40,7 @@ export async function parseAcceptedFiles(
         for (const [name, compressedFile] of Object.entries(zipFile.files)) {
           const extension = fileExtension(name);
 
-          if (!accepted.includes(extension)) {
+          if (!textFormats.includes(extension)) {
             errors.push(
               createError(
                 { name },

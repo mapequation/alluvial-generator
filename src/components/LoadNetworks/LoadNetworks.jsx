@@ -51,14 +51,16 @@ import Stepper from "./Stepper";
 localforage.config({ name: "infomap" });
 
 const acceptedFormats = [
-  ".tree",
-  ".ftree",
-  ".stree",
-  ".clu",
-  ".json",
-  ".net",
-  ".zip",
-].join(",");
+  "tree",
+  "ftree",
+  "stree", // Not documented
+  "clu",
+  "json",
+  "net",
+  "zip",
+];
+
+const dropzoneAccept = acceptedFormats.map((format) => `.${format}`).join(",");
 
 const exampleDataFilename = "science-1998-2001-2007.json";
 
@@ -142,7 +144,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
   const { open, getRootProps, getInputProps } = useDropzone({
     noClick: true,
-    accept: acceptedFormats,
+    accept: dropzoneAccept,
     onDropRejected: (rejectedFiles) =>
       rejectedFiles.forEach((rejectedFile) =>
         onError({
@@ -327,11 +329,7 @@ export default observer(function LoadNetworks({ onClose }) {
             activeStep={activeStep}
             acceptedFormats={
               "Formats: " +
-              acceptedFormats
-                .split(",")
-                .filter((f) => f !== ".net" && f !== ".stree")
-                .map((f) => f.slice(1))
-                .join(", ")
+              acceptedFormats.filter((f) => f !== "stree").join(", ")
             }
           />
 
