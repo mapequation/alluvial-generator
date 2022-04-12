@@ -1,16 +1,3 @@
-import * as c3 from "@mapequation/c3";
-import {
-  schemeAccent,
-  schemeCategory10,
-  schemeDark2,
-  schemePaired,
-  schemePastel1,
-  schemePastel2,
-  schemeSet1,
-  schemeSet2,
-  schemeSet3,
-  schemeTableau10,
-} from "d3";
 import { action, makeObservable, observable } from "mobx";
 import { createContext } from "react";
 import {
@@ -24,41 +11,7 @@ import {
 } from "../alluvial";
 import TreePath from "../utils/TreePath";
 import BipartiteGraph from "./BipartiteGraph";
-import { schemeTab20, schemeTab20b, schemeTab20c } from "./matplotlib-schemes";
-
-const c3options = {
-  saturation: 0.55,
-  saturationEnd: 0.8,
-  lightness: 0.5,
-  lightnessEnd: 0.9,
-  midpoint: 4.5,
-  steepness: 1,
-};
-
-export const COLOR_SCHEMES = {
-  Accent: schemeAccent,
-  Category10: schemeCategory10,
-  Dark2: schemeDark2,
-  Paired: schemePaired,
-  Pastel1: schemePastel1,
-  Pastel2: schemePastel2,
-  Set1: schemeSet1,
-  Set2: schemeSet2,
-  Set3: schemeSet3,
-  Tableau10: schemeTableau10,
-  Tableau20: schemeTab20,
-  Tableau20b: schemeTab20b,
-  Tableau20c: schemeTab20c,
-  Turbo: c3.colors(512, { scheme: "Turbo", ...c3options }),
-  Rainbow: c3.colors(512, { scheme: "Rainbow", ...c3options }),
-  Sinebow: c3.colors(512, { scheme: "Sinebow", ...c3options }),
-  Viridis: c3.colors(512, { scheme: "Viridis", ...c3options }),
-} as const;
-
-export const SCHEME_NAMES = [...Object.keys(COLOR_SCHEMES)];
-
-type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
-type SchemeName = keyof typeof COLOR_SCHEMES;
+import { COLOR_SCHEMES, ColorScheme, SchemeName } from "./schemes";
 
 export class Store {
   diagram = new Diagram();
@@ -84,7 +37,7 @@ export class Store {
   selectedSchemeName = "Sinebow";
 
   defaultHighlightColor: string = "#b6b69f";
-  highlightColors: string[] = [...COLOR_SCHEMES["Sinebow"]];
+  highlightColors: string[] = [...this.selectedScheme];
 
   verticalAlign: "bottom" | "justify" = "bottom";
   moduleSize: "nodes" | "flow" = "flow";

@@ -40,7 +40,8 @@ import {
 } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
-import { SCHEME_NAMES, StoreContext } from "../../store";
+import { StoreContext } from "../../store";
+import { SCHEME_NAMES } from "../../store/schemes";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
 import { Swatch } from "./Swatch";
