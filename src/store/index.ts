@@ -24,6 +24,7 @@ import {
 } from "../alluvial";
 import TreePath from "../utils/TreePath";
 import BipartiteGraph from "./BipartiteGraph";
+import { schemeTab20, schemeTab20b, schemeTab20c } from "./matplotlib-schemes";
 
 const c3options = {
   saturation: 0.55,
@@ -35,8 +36,8 @@ const c3options = {
 };
 
 export const COLOR_SCHEMES = {
-  Category10: schemeCategory10,
   Accent: schemeAccent,
+  Category10: schemeCategory10,
   Dark2: schemeDark2,
   Paired: schemePaired,
   Pastel1: schemePastel1,
@@ -45,6 +46,9 @@ export const COLOR_SCHEMES = {
   Set2: schemeSet2,
   Set3: schemeSet3,
   Tableau10: schemeTableau10,
+  Tableau20: schemeTab20,
+  Tableau20b: schemeTab20b,
+  Tableau20c: schemeTab20c,
   Turbo: c3.colors(512, { scheme: "Turbo", ...c3options }),
   Rainbow: c3.colors(512, { scheme: "Rainbow", ...c3options }),
   Sinebow: c3.colors(512, { scheme: "Sinebow", ...c3options }),
