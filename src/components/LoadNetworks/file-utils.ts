@@ -1,16 +1,13 @@
 // @ts-nocheck
 // FIXME enable typescript checking
-import {
-  extension as fileExtension,
-  parse,
-  readFile,
-} from "@mapequation/infomap/parser";
+import { extension as fileExtension, parse, readFile } from "@mapequation/infomap/parser";
 import JSZip from "jszip";
 import localforage from "localforage";
 import id from "../../utils/id";
 import TreePath from "../../utils/TreePath";
 
-function createError(file, code, message) {
+// FIXME any
+function createError(file: any, code: string, message: string) {
   return {
     file,
     errors: [{ code, message }],
@@ -18,9 +15,10 @@ function createError(file, code, message) {
 }
 
 export async function parseAcceptedFiles(
-  acceptedFiles,
-  acceptedFormats,
-  storeIdentifier
+  acceptedFiles: any[], // FIXME any
+  currentFiles: any[], // FIXME any
+  acceptedFormats: string[],
+  storeIdentifier: string
 ) {
   const readFiles = [];
   const errors = [];
@@ -38,7 +36,7 @@ export async function parseAcceptedFiles(
         const zipFile = await JSZip.loadAsync(file);
 
         for (const [name, compressedFile] of Object.entries(zipFile.files)) {
-          const extension = fileExtension(name);
+          const extension = fileExtension(name) ?? "";
 
           if (!textFormats.includes(extension)) {
             errors.push(
@@ -58,12 +56,13 @@ export async function parseAcceptedFiles(
           acceptedFiles.splice(fileIndex, 0, {
             name,
             // Hack to get the decompressed size. Uses private fields of the JSZip object
+            // @ts-ignore
             size: compressedFile?._data?.uncompressedSize ?? file.size,
             lastModified: file.lastModified,
           });
           fileIndex++;
         }
-      } catch (e) {
+      } catch (e: any) {
         errors.push(createError(file, "unsupported-format", e.message));
       }
     } else {
@@ -74,7 +73,8 @@ export async function parseAcceptedFiles(
 
   const newFiles = [];
 
-  const createFile = (file, format, contents) => {
+  // FIXME any
+  const createFile = (file: any, format: string, contents: any) => {
     const newFile = Object.assign(
       {},
       {
@@ -101,7 +101,7 @@ export async function parseAcceptedFiles(
   // Parse files
   for (let i = 0; i < acceptedFiles.length; ++i) {
     const file = acceptedFiles[i];
-    const format = fileExtension(file.name);
+    const format = fileExtension(file.name) ?? "";
 
     let contents = null;
 
@@ -115,7 +115,7 @@ export async function parseAcceptedFiles(
           const diagramFiles = createFilesFromDiagramObject(contents, file);
 
           // If any file ids already exist, give a new id
-          for (let existingFile of [...files, ...newFiles]) {
+          for (let existingFile of [...currentFiles, ...newFiles]) {
             for (let diagramFile of diagramFiles) {
               if (existingFile.id === diagramFile.id) {
                 diagramFile.id = id();
@@ -126,7 +126,7 @@ export async function parseAcceptedFiles(
           newFiles.push(...diagramFiles);
           continue;
         }
-      } catch (e) {
+      } catch (e: any) {
         errors.push(createError(file, "invalid-json", e.message));
         continue;
       }
@@ -137,8 +137,8 @@ export async function parseAcceptedFiles(
       };
     } else {
       try {
-        contents = parse(readFiles[i], null, true, false);
-      } catch (e) {
+        contents = parse(readFiles[i], undefined, true, false);
+      } catch (e: any) {
         errors.push(createError(file, "parse-error", e.message));
         continue;
       }
@@ -152,7 +152,7 @@ export async function parseAcceptedFiles(
     try {
       setIdentifiers(contents, format, storeIdentifier);
       newFiles.push(createFile(file, format, contents));
-    } catch (e) {
+    } catch (e: any) {
       errors.push(createError(file, "invalid-format", e.message));
     }
   }
@@ -160,7 +160,10 @@ export async function parseAcceptedFiles(
   return [newFiles, errors];
 }
 
-export function createFilesFromDiagramObject(json, file) {
+export function createFilesFromDiagramObject(
+  json: any, // FIXME any
+  file: any // FIXME any
+) {
   // to divide size between networks in file
   const totNodes =
     json.networks
@@ -175,8 +178,8 @@ export function createFilesFromDiagramObject(json, file) {
       lastModified: file.lastModified,
       size: (file.size * network.nodes.length) / totNodes,
       fileName: file.name,
-      name: network.name,
-      id: network.id,
+      name: network.name, // FIXME remove
+      id: network.id, // FIXME remove
       format: "json",
       ...calcStatistics(network),
       ...network,
@@ -184,7 +187,8 @@ export function createFilesFromDiagramObject(json, file) {
   });
 }
 
-export function calcStatistics(file) {
+// FIXME any
+export function calcStatistics(file: any) {
   const flowDistribution = {};
   const layerIds = new Set();
 
@@ -210,7 +214,7 @@ export function calcStatistics(file) {
 
 const stateOrNodeId = (node) => (node.stateId != null ? node.stateId : node.id);
 
-export function setIdentifiers(network, format, identifier = "id") {
+export function setIdentifiers(network, format: string, identifier = "id") {
   const { nodes } = network;
 
   const getIdentifier = (node) => {
