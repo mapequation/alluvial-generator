@@ -41,7 +41,7 @@ import {
 import useEventListener from "../../hooks/useEventListener";
 import { saveSvg } from "../../io/export";
 import { StoreContext } from "../../store";
-import { SCHEME_NAMES } from "../../store/schemes";
+import { SCHEME_GROUPS } from "../../store/schemes";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
 import { Swatch } from "./Swatch";
@@ -126,12 +126,21 @@ export default observer(function Sidebar({
             display="inline-block"
             value={store.selectedSchemeName}
             onChange={(event) => store.setSelectedScheme(event.target.value)}
+            sx={{
+              "> optgroup": { color: "gray.900", fontStyle: "normal" },
+            }}
           >
-            {SCHEME_NAMES.map((scheme) => (
-              <option key={scheme} value={scheme}>
-                {scheme}
-              </option>
-            ))}
+            {Array.from(Object.entries(SCHEME_GROUPS)).map(
+              ([group, schemes]) => (
+                <optgroup label={group} key={group}>
+                  {schemes.map((scheme) => (
+                    <option key={scheme} value={scheme}>
+                      {scheme}
+                    </option>
+                  ))}
+                </optgroup>
+              )
+            )}
           </Select>
 
           <Flex mt={2} gap={1} wrap="wrap">

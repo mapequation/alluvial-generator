@@ -60,7 +60,23 @@ export const COLOR_SCHEMES = {
   Viridis: c3.colors(512, { scheme: "Viridis", ...c3options }),
 } as const;
 
-export const SCHEME_NAMES = [...Object.keys(COLOR_SCHEMES)];
+export const SCHEME_GROUPS = {
+  ColorBrewer: [
+    "Accent",
+    "Category10",
+    "Dark2",
+    "Paired",
+    "Pastel1",
+    "Pastel2",
+    "Set1",
+    "Set2",
+    "Set3",
+    "Tableau10",
+  ],
+  Seaborn: ["Deep", "Muted", "Pastel", "Bright", "Dark", "Colorblind"],
+  Matplotlib: ["Tableau20", "Tableau20b", "Tableau20c"],
+  C3: ["Turbo", "Rainbow", "Sinebow", "Viridis"],
+};
 
 export type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
 
