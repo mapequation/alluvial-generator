@@ -409,7 +409,7 @@ export class Store {
 
     for (let i = 0; i < networks.length - 1; ++i) {
       const leftNetwork = networks[i];
-      const B = (bipartiteGraphs[i] = new BipartiteGraph());
+      const B = (bipartiteGraphs[i] = new BipartiteGraph<Module>());
 
       for (const module of leftNetwork) {
         module
