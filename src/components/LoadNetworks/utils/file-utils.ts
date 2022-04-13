@@ -1,6 +1,10 @@
 // @ts-nocheck
 // FIXME enable typescript checking
-import { extension as fileExtension, parse, readFile } from "@mapequation/infomap/parser";
+import {
+  extension as fileExtension,
+  parse,
+  readFile,
+} from "@mapequation/infomap-parser";
 import JSZip from "jszip";
 import id from "../../../utils/id";
 import { calcStatistics } from "./calc-statistics";

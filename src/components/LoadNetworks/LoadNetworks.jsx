@@ -26,7 +26,7 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { parse } from "@mapequation/infomap/parser";
+import { parse } from "@mapequation/infomap-parser";
 import { AnimatePresence, Reorder } from "framer-motion";
 import localforage from "localforage";
 import { observer } from "mobx-react";
