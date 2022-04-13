@@ -16,7 +16,6 @@ import {
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
-import Infomap from "@mapequation/infomap";
 import { motion, Reorder, useMotionValue } from "framer-motion";
 import { useState } from "react";
 import { BiNetworkChart } from "react-icons/bi";
@@ -27,6 +26,7 @@ import useRaisedShadow from "../../hooks/useRaisedShadow";
 import humanFileSize from "../../utils/human-file-size";
 import FileBackground from "./FileBackground";
 import LayerIcon from "./LayerIcon";
+import { useInfomap } from "./useInfomap";
 
 export default function Item({
   file,
@@ -50,9 +50,12 @@ export default function Item({
   const [directed, setDirected] = useState(file.directed ?? false);
   const [twoLevel, setTwoLevel] = useState(file.twoLevel ?? false);
 
-  // Infomap progress
-  const [progressVisible, setProgressVisible] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const { runAsync, running, progress } = useInfomap({
+    output: "ftree",
+    twoLevel,
+    directed,
+    numTrials,
+  });
 
   const [settingsVisible, setSettingsVisible] = useState(file.noModularResult);
   const toggleSettings = () => setSettingsVisible(!settingsVisible);
@@ -68,18 +71,14 @@ export default function Item({
 
   const runInfomap = async () => {
     try {
-      setProgressVisible(true);
-      setProgress(0);
-      setIsRunning(true);
+      setIsRunning(running);
 
-      const result = await new Infomap().on("progress", setProgress).runAsync({
+      const result = await runAsync({
         network: file.network,
         filename: file.name,
-        args: { output: "ftree", directed, twoLevel, numTrials },
       });
 
-      setIsRunning(false);
-      setProgressVisible(false);
+      setIsRunning(running);
 
       Object.assign(file, { numTrials, directed, twoLevel });
 
@@ -90,7 +89,6 @@ export default function Item({
       }
     } catch (e) {
       setIsRunning(false);
-      setProgressVisible(false);
       console.log(e);
 
       onError({
@@ -213,7 +211,7 @@ export default function Item({
 
             {settingsVisible && file.network && (
               <Settings
-                disabled={progressVisible}
+                disabled={running}
                 numTrials={numTrials}
                 setNumTrials={setNumTrials}
                 directed={directed}
@@ -225,9 +223,7 @@ export default function Item({
             )}
           </Box>
 
-          {progressVisible && (
-            <Progress value={progress} size="xs" mb={-2} mt={1} />
-          )}
+          {running && <Progress value={progress} size="xs" mb={-2} mt={1} />}
         </Box>
       </Box>
     </Reorder.Item>
