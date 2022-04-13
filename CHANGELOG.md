@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/mapequation/alluvial-generator/compare/v1.6.0...v1.7.0) (2022-04-13)
+
+
+### Features
+
+* Add missing matplotlib color schemes ([1e4e7c3](https://github.com/mapequation/alluvial-generator/commit/1e4e7c3f65ddd4bc50161e6376f8344d31327e44))
+* Add seaborn color schemes ([9748279](https://github.com/mapequation/alluvial-generator/commit/9748279ef4c81ebfd359c981c24957e424652c61))
+* Aggregate state node names when used as module names ([848680a](https://github.com/mapequation/alluvial-generator/commit/848680a934b03106abb5abbb0d96b962f99c7058))
+* Group color schemes ([0e2a47b](https://github.com/mapequation/alluvial-generator/commit/0e2a47ba97ff08ee7cfaf31ac9625071aedf2f06))
+* Store inter-module links ([b88159e](https://github.com/mapequation/alluvial-generator/commit/b88159e44c72e0cbffdaac2eb4cb0ed41509a85b))
+
+
+### Bug Fixes
+
+* Change default color scheme ([cec99c4](https://github.com/mapequation/alluvial-generator/commit/cec99c4ade5084be0b5f002a008059eaf4f2b2a4))
+* Pass current files to parseAcceptedFiles ([7e20b77](https://github.com/mapequation/alluvial-generator/commit/7e20b77526393a0118712bababae43081d755223))
+
 ## [1.6.0](https://github.com/mapequation/alluvial-generator/compare/v1.5.0...v1.6.0) (2022-03-24)
 
 
