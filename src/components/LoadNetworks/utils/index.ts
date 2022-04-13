@@ -1,4 +1,4 @@
-export * from "./file-utils";
+export * from "./parse-files";
 export * from "./multilayer-utils";
 export * from "./localstorage-utils";
 export * from "./set-identifiers";
