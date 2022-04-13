@@ -126,6 +126,7 @@ export default function Item({
         style={{ position: "absolute" }}
         fill={fill}
       />
+
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={2}>
           {file.isMultilayer ? (
@@ -145,6 +146,28 @@ export default function Item({
               {...iconProps}
             />
           )}
+
+          <IconButton
+            isRound
+            size="xs"
+            onClick={onRemove}
+            pos="absolute"
+            top={2}
+            right={2}
+            opacity={0}
+            transform="scale(0.9)"
+            transition="all 0.2s"
+            _groupHover={{
+              opacity: 1,
+              transform: "scale(1)",
+            }}
+            aria-label="delete"
+            color={fg}
+            bg={bg}
+            variant="ghost"
+            fontSize="1.5rem"
+            icon={<MdClear />}
+          />
 
           <Box
             bg={bg}
@@ -185,126 +208,22 @@ export default function Item({
             {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
 
             {!settingsVisible && !file.noModularResult && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {file.isMultilayer && !file.isExpanded && (
-                  <Text>{file.numLayers + " layers"}</Text>
-                )}
-                {file.isMultilayer && file.isExpanded && (
-                  <Text>{"layer " + file.layerId}</Text>
-                )}
-                {file.nodes && (
-                  <Text>
-                    {file.nodes.length +
-                      (file.isStateNetwork ? " state nodes" : " nodes")}
-                  </Text>
-                )}
-                {file.numTopModules && (
-                  <Text>
-                    {file.numTopModules +
-                      (file.numTopModules > 1 ? " top modules" : " top module")}
-                  </Text>
-                )}
-                {file.numLevels && (
-                  <Text>
-                    {file.numLevels +
-                      (file.numLevels > 1 ? " levels" : "level")}
-                  </Text>
-                )}
-                {file.codelength && (
-                  <Text>{file.codelength.toFixed(3) + " bits"}</Text>
-                )}
-              </motion.div>
+              <NetworkInfo file={file} />
             )}
 
             {settingsVisible && file.network && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <FormControl isDisabled={progressVisible}>
-                  <HStack justify="space-between">
-                    <FormLabel
-                      fontSize="sm"
-                      fontWeight={400}
-                      htmlFor="num-trials"
-                      pt={1}
-                    >
-                      Trials
-                    </FormLabel>
-                    <NumberInput
-                      id="num-trials"
-                      size="xs"
-                      value={numTrials}
-                      onChange={(value) => setNumTrials(+value)}
-                      min={1}
-                      max={100}
-                      step={1}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </HStack>
-                  <Checkbox
-                    isDisabled={progressVisible}
-                    size="sm"
-                    isChecked={directed}
-                    onChange={(e) => setDirected(e.target.checked)}
-                  >
-                    Directed
-                  </Checkbox>
-                  <Checkbox
-                    isDisabled={progressVisible}
-                    size="sm"
-                    isChecked={twoLevel}
-                    onChange={(e) => setTwoLevel(e.target.checked)}
-                  >
-                    Two-level
-                  </Checkbox>
-                  <Button
-                    mt={1}
-                    isDisabled={progressVisible}
-                    isLoading={progressVisible}
-                    size="xs"
-                    isFullWidth
-                    type="submit"
-                    onClick={runInfomap}
-                  >
-                    Run Infomap
-                  </Button>
-                </FormControl>
-              </motion.div>
+              <Settings
+                disabled={progressVisible}
+                numTrials={numTrials}
+                setNumTrials={setNumTrials}
+                directed={directed}
+                setDirected={setDirected}
+                twoLevel={twoLevel}
+                setTwoLevel={setTwoLevel}
+                run={runInfomap}
+              />
             )}
           </Box>
-
-          <IconButton
-            isRound
-            size="xs"
-            onClick={onRemove}
-            pos="absolute"
-            top={2}
-            right={2}
-            opacity={0}
-            transform="scale(0.9)"
-            transition="all 0.2s"
-            _groupHover={{
-              opacity: 1,
-              transform: "scale(1)",
-            }}
-            aria-label="delete"
-            color={fg}
-            bg={bg}
-            variant="ghost"
-            fontSize="1.5rem"
-            icon={<MdClear />}
-          />
 
           {progressVisible && (
             <Progress value={progress} size="xs" mb={-2} mt={1} />
@@ -312,5 +231,99 @@ export default function Item({
         </Box>
       </Box>
     </Reorder.Item>
+  );
+}
+
+function NetworkInfo({ file }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {file.multilayer && !file.expanded && (
+        <Text>{file.numLayers + " layers"}</Text>
+      )}
+      {file.multilayer && file.expanded && (
+        <Text>{"layer " + file.layerId}</Text>
+      )}
+      {file.nodes && (
+        <Text>
+          {file.nodes.length + (file.stateNetwork ? " state nodes" : " nodes")}
+        </Text>
+      )}
+      {file.numTopModules && (
+        <Text>
+          {file.numTopModules +
+            (file.numTopModules > 1 ? " top modules" : " top module")}
+        </Text>
+      )}
+      {file.numLevels && (
+        <Text>
+          {file.numLevels + (file.numLevels > 1 ? " levels" : "level")}
+        </Text>
+      )}
+      {file.codelength && <Text>{file.codelength.toFixed(3) + " bits"}</Text>}
+    </motion.div>
+  );
+}
+
+function Settings(props) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <FormControl isDisabled={props.disabled}>
+        <HStack justify="space-between">
+          <FormLabel fontSize="sm" fontWeight={400} htmlFor="num-trials" pt={1}>
+            Trials
+          </FormLabel>
+          <NumberInput
+            id="num-trials"
+            size="xs"
+            value={props.numTrials}
+            onChange={(value) => props.setNumTrials(+value)}
+            min={1}
+            max={100}
+            step={1}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </HStack>
+        <Checkbox
+          isDisabled={props.disabled}
+          size="sm"
+          isChecked={props.directed}
+          onChange={(e) => props.setDirected(e.target.checked)}
+        >
+          Directed
+        </Checkbox>
+        <Checkbox
+          isDisabled={props.disabled}
+          size="sm"
+          isChecked={props.twoLevel}
+          onChange={(e) => props.setTwoLevel(e.target.checked)}
+        >
+          Two-level
+        </Checkbox>
+        <Button
+          mt={1}
+          isDisabled={props.disabled}
+          isLoading={props.disabled}
+          size="xs"
+          isFullWidth
+          type="submit"
+          onClick={props.run}
+        >
+          Run Infomap
+        </Button>
+      </FormControl>
+    </motion.div>
   );
 }
