@@ -24,6 +24,16 @@ type ModuleLink = {
   flow: number;
 };
 
+export type Categorical = {
+  kind: "categorical";
+  counts: { category: string; count: number }[];
+};
+
+export type Real = {
+  kind: "real";
+  values: { node: string; value: number }[];
+};
+
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   name: string;
@@ -63,6 +73,55 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   get isHigherOrder() {
     return this.isMultilayer || this.leafNodes()?.next()?.value.stateId != null;
+  }
+
+  get haveMetadata() {
+    return this.leafNodes()?.next()?.value.metadata != null;
+  }
+
+  get metadata() {
+    const meta: { [key: string]: Categorical | Real } = {};
+
+    if (!this.haveMetadata) {
+      return meta;
+    }
+
+    for (const node of this.leafNodes()) {
+      for (const [key, value] of Object.entries(node.metadata!)) {
+        if (!(key in meta)) {
+          if (typeof value === "number") {
+            meta[key] = {
+              kind: "real",
+              values: [],
+            };
+          } else {
+            meta[key] = {
+              kind: "categorical",
+              counts: [],
+            };
+          }
+        }
+        if (typeof value === "number") {
+          const entry = meta[key] as Real;
+          entry.values.push({ node: node.id, value });
+        } else {
+          const entry = meta[key] as Categorical;
+          if (!entry.counts.some((c) => c.category === value)) {
+            entry.counts.push({ category: value, count: 0 });
+          }
+          entry.counts.find((c) => c.category === value)!.count++;
+        }
+      }
+    }
+
+    for (const value of Object.values(meta)) {
+      if (value.kind === "real") {
+        const entry = value as Real;
+        entry.values.sort((a, b) => b.value - a.value);
+      }
+    }
+
+    return meta;
   }
 
   get namePosition() {
@@ -201,7 +260,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       );
   }
 
-  private *rightStreamlines() {
+  private* rightStreamlines() {
     for (let module of this) {
       // Skip if left module is below threshold
       if (!module.isVisible) {
@@ -248,7 +307,7 @@ class TreeNode extends Layout {
     return new TreeNode(path, moduleLevel, isLeaf, this);
   }
 
-  *visitBreadthFirst(): Iterable<TreeNode | Module> {
+  * visitBreadthFirst(): Iterable<TreeNode | Module> {
     let queue = this.children;
 
     while (queue.length) {

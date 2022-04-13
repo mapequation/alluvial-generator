@@ -44,6 +44,7 @@ import { StoreContext } from "../../store";
 import { SCHEME_GROUPS } from "../../store/schemes";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
+import { MetadataView } from "./Metadata";
 import { Swatch } from "./Swatch";
 
 export default observer(function Sidebar({
@@ -318,6 +319,25 @@ export default observer(function Sidebar({
               </Button>
             </ButtonGroup>
           </ListItem>
+        )}
+
+        {store.diagram.children.some((network) => network.haveMetadata) && (
+          <>
+            <ListItemHeader color={headerColor}>Metadata</ListItemHeader>
+
+            <ListItem>
+              {selectedModule == null && "Select a module to see metadata"}
+              {selectedModule != null &&
+                !selectedModule.parent.haveMetadata &&
+                "No metadata"}
+              {selectedModule != null && selectedModule.parent.haveMetadata && (
+                <>
+                  <Label>{selectedModule.parent?.name ?? "Network"}</Label>
+                  <MetadataView metadata={selectedModule.parent.metadata} />
+                </>
+              )}
+            </ListItem>
+          </>
         )}
 
         <ListItemHeader color={headerColor}>Module</ListItemHeader>
