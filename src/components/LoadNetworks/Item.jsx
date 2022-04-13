@@ -60,15 +60,6 @@ export default function Item({
   const [settingsVisible, setSettingsVisible] = useState(file.noModularResult);
   const toggleSettings = () => setSettingsVisible(!settingsVisible);
 
-  const truncatedName = ((name) => {
-    const maxLength = 5;
-    const nameParts = name.split(".");
-    if (nameParts[0].length < maxLength) {
-      return name;
-    }
-    return nameParts[0].slice(0, maxLength) + "..." + nameParts[1];
-  })(file.fileName);
-
   const runInfomap = async () => {
     try {
       setIsRunning(running);
@@ -117,7 +108,7 @@ export default function Item({
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8, y: -100 }}
-      transition={{ duration: 0.15 }}
+      transition={{ duration: 0.1 }}
     >
       <FileBackground
         file={file}
@@ -193,15 +184,7 @@ export default function Item({
               />
             )}
 
-            <Text fontWeight={600} overflowWrap="anyhwere">
-              {truncatedName.length === file.fileName.length ? (
-                file.fileName
-              ) : (
-                <Tooltip label={file.fileName} aria-label={file.fileName}>
-                  {truncatedName}
-                </Tooltip>
-              )}
-            </Text>
+            <TruncatedFileName name={file.fileName} maxLength={10} />
 
             {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
 
@@ -227,6 +210,31 @@ export default function Item({
         </Box>
       </Box>
     </Reorder.Item>
+  );
+}
+
+function TruncatedFileName({ name, maxLength }) {
+  const truncatedName = ((name) => {
+    const split = name.split(".");
+    const ext = split.pop();
+    const base = split.join(".");
+
+    if (base.length < maxLength) return name;
+
+    const hellip = String.fromCharCode(8230);
+    return base.slice(0, maxLength) + hellip + ext;
+  })(name);
+
+  return (
+    <Text fontWeight={600} overflowWrap="anyhwere">
+      {truncatedName.length === name.length ? (
+        name
+      ) : (
+        <Tooltip label={name} aria-label={name}>
+          {truncatedName}
+        </Tooltip>
+      )}
+    </Text>
   );
 }
 
