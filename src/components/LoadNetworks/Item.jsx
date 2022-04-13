@@ -16,6 +16,7 @@ import {
   Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useInfomap } from "@mapequation/infomap-react";
 import { motion, Reorder, useMotionValue } from "framer-motion";
 import { useState } from "react";
 import { BiNetworkChart } from "react-icons/bi";
@@ -26,7 +27,6 @@ import useRaisedShadow from "../../hooks/useRaisedShadow";
 import humanFileSize from "../../utils/human-file-size";
 import FileBackground from "./FileBackground";
 import LayerIcon from "./LayerIcon";
-import { useInfomap } from "./useInfomap";
 
 export default function Item({
   file,
