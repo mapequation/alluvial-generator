@@ -8,9 +8,13 @@ import MetadataCollection from "./MetadataCollection";
 
 interface MetadataProps {
   headerColor: string;
+  color: string;
 }
 
-export default observer(function Metadata({ headerColor }: MetadataProps) {
+export default observer(function Metadata({
+  headerColor,
+  color,
+}: MetadataProps) {
   const store = useContext(StoreContext);
   const { selectedModule } = store;
 
@@ -29,7 +33,10 @@ export default observer(function Metadata({ headerColor }: MetadataProps) {
           selectedHasMeta ? (
             <>
               <Label>{selectedModule.parent?.name ?? "Network"}</Label>
-              <MetadataCollection metadata={selectedModule.parent.metadata} />
+              <MetadataCollection
+                metadata={selectedModule.parent.metadata}
+                color={color}
+              />
             </>
           ) : (
             "No metadata in network"

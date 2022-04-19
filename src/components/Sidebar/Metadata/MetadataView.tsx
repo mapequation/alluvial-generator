@@ -1,56 +1,82 @@
-import { ButtonGroup, ListItem, Text } from "@chakra-ui/react";
-import { Bar, BarChart, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
+import { ButtonGroup } from "@chakra-ui/react";
+import { observer } from "mobx-react";
+import { useContext } from "react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  Scatter,
+  ScatterChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import type {
   Categorical as CategoricalData,
   Real as RealData,
 } from "../../../alluvial/Network";
+import useMap from "../../../hooks/useMap";
+import { StoreContext } from "../../../store";
 import { Button } from "../utils";
 
 interface CategoricalProps {
   data: CategoricalData;
+  color: string;
 }
 
-export function Categorical({ data }: CategoricalProps) {
+export const Categorical = observer(function Categorical({
+  data,
+  color,
+}: CategoricalProps) {
+  const store = useContext(StoreContext);
+  const { selectedScheme } = store;
+
+  const [map, actions] = useMap(
+    data.counts.map(({ category }, i) => [
+      category,
+      selectedScheme[i % selectedScheme.length],
+    ])
+  );
+
   return (
     <>
-      <BarChart width={300} height={200} data={data.counts}>
+      <BarChart
+        width={300}
+        height={200}
+        data={data.counts}
+        style={{ color: "#333" }}
+        onClick={({ activeLabel }) => {
+          console.log(activeLabel, color);
+          if (activeLabel) actions.set(activeLabel, color);
+        }}
+      >
         <XAxis dataKey="category" />
         <YAxis />
-        <Bar dataKey="count" fill="#8884d8" />
+        <Tooltip />
+        <Bar dataKey="count">
+          {data.counts.map((entry, i) => (
+            <Cell
+              cursor="pointer"
+              fill={map.get(entry.category)}
+              key={`cell-${i}`}
+            />
+          ))}
+        </Bar>
       </BarChart>
 
-      <ListItem>
-        <Text
-          //color={headerColor}
-          fontWeight={600}
-          textTransform="uppercase"
-          letterSpacing="tight"
-          fontSize="0.75rem"
-          pt={2}
+      <ButtonGroup isAttached w="100%" mt={1}>
+        <Button
+          onClick={() =>
+            store.colorCategoricalMetadata(map as Map<string, string>)
+          }
+          justifyContent="center"
         >
-          By module id
-        </Text>
-        <ButtonGroup isAttached w="100%" mt={1}>
-          <Button
-            // onClick={() => store.colorModuleIds(selectedModule, color)}
-            // isDisabled={store.selectedModule === null}
-            justifyContent="center"
-          >
-            Paint modules
-          </Button>
-          <Button
-            // onClick={() => {
-            //   store.colorModuleIdsInAllNetworks();
-            //}}
-            justifyContent="center"
-          >
-            Paint all
-          </Button>
-        </ButtonGroup>
-      </ListItem>
+          Paint metadata
+        </Button>
+      </ButtonGroup>
     </>
   );
-}
+});
 
 interface RealProps {
   data: RealData;

@@ -574,6 +574,28 @@ export class Store {
     this.updateLayout();
   }
 
+  colorCategoricalMetadata(colors: Map<string, string>) {
+    this.diagram.children.forEach((network) => {
+      if (!network.haveMetadata) return;
+
+      network.children.forEach((module) => {
+        if (!module.isVisible) return;
+
+        module.getLeafNodes().forEach((node) => {
+          for (const meta of Object.values(node.metadata ?? {})) {
+            if (typeof meta === "string" && colors.has(meta)) {
+              node.highlightIndex = this.getHighlightIndex(colors.get(meta)!);
+              node.update();
+              break;
+            }
+          }
+        });
+      });
+    });
+
+    this.updateLayout();
+  }
+
   clearColors(updateLayout = true) {
     for (let network of this.diagram) {
       const modules = [];

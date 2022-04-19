@@ -83,7 +83,7 @@ export default observer(function Sidebar({
         </ListItemButton>
 
         <Colors headerColor={headerColor} color={color} setColor={setColor} />
-        <Metadata headerColor={headerColor} />
+        <Metadata headerColor={headerColor} color={color} />
         <Module
           headerColor={headerColor}
           onModuleViewClick={onModuleViewClick}

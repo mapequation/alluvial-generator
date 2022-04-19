@@ -15,7 +15,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly nodeId: number;
   readonly stateId?: number | null = null;
   readonly layerId?: number | null = null;
-  readonly metadata?: { [key: string]: any };
+  readonly metadata?: { [key: string]: string | number };
   readonly identifier: string;
   readonly treePath: TreePath;
   highlightIndex: number;

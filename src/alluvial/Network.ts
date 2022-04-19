@@ -93,7 +93,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
 
     for (const node of this.leafNodes()) {
-      for (const [key, value] of Object.entries(node.metadata!)) {
+      for (const [key, value] of Object.entries(node.metadata ?? {})) {
         if (!(key in meta)) {
           if (typeof value === "number") {
             meta[key] = {
@@ -112,6 +112,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
             };
           }
         }
+
         if (typeof value === "number") {
           const entry = meta[key] as Real;
           entry.values.push({ node: node.id, value });
@@ -139,10 +140,13 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         const variance = entry.stddev / N - entry.mean * entry.mean;
         entry.stddev = Math.sqrt(variance);
         entry.quartiles = [
-          d3.quantileSorted(entry.values, 0.25, (d) => d.value)!,
-          d3.quantileSorted(entry.values, 0.5, (d) => d.value)!,
-          d3.quantileSorted(entry.values, 0.75, (d) => d.value)!,
+          d3.quantileSorted(entry.values, 0.25, (d) => d.value) ?? 0,
+          d3.quantileSorted(entry.values, 0.5, (d) => d.value) ?? 0,
+          d3.quantileSorted(entry.values, 0.75, (d) => d.value) ?? 0,
         ];
+      } else if (value.kind === "categorical") {
+        const entry = value as Categorical;
+        entry.counts.sort((a, b) => b.count - a.count);
       }
     }
 
