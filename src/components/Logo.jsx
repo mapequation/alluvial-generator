@@ -1,7 +1,7 @@
 import { HStack, useColorModeValue } from "@chakra-ui/react";
 import ToggleColorMode from "./ToggleColorMode";
 
-export default function Logo({ showVersion, long }) {
+export default function Logo({ showVersion = false, long = false }) {
   const color = useColorModeValue("hsl(0, 0%, 33%)", "hsl(0, 0%, 60%)");
   const brand = useColorModeValue("hsl(0, 68%, 42%)", "hsl(0, 68%, 62%)");
   const version = useColorModeValue("hsl(0, 0%, 70%)", "hsl(0, 0%, 30%)");

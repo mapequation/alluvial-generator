@@ -6,10 +6,10 @@ import { StoreContext } from "../../store";
 import { ListItemButton, ListItemHeader } from "./utils";
 
 interface ExportProps {
-  color: string;
+  headerColor: string;
 }
 
-export default observer(function Export({ color }: ExportProps) {
+export default observer(function Export({ headerColor }: ExportProps) {
   const store = useContext(StoreContext);
   const downloadSvg = () => {
     store.setSelectedModule(null);
@@ -22,7 +22,7 @@ export default observer(function Export({ color }: ExportProps) {
 
   return (
     <>
-      <ListItemHeader color={color}>Export</ListItemHeader>
+      <ListItemHeader color={headerColor}>Export</ListItemHeader>
 
       <ListItemButton
         onClick={downloadSvg}

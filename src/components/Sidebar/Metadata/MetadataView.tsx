@@ -1,46 +1,16 @@
-import { Button, ButtonGroup, ListItem, Select, Text } from "@chakra-ui/react";
-import { useState } from "react";
+import { ButtonGroup, ListItem, Text } from "@chakra-ui/react";
 import { Bar, BarChart, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
+import type {
+  Categorical as CategoricalData,
+  Real as RealData,
+} from "../../../alluvial/Network";
+import { Button } from "../utils";
 
-export function MetadataView({ metadata }) {
-  const options = Array.from(Object.keys(metadata));
-  const [selectedMeta, setSelectedMeta] = useState(options[0]);
-  const data = metadata[selectedMeta];
-  const MetaView = data.kind === "categorical" ? Categorical : Real;
-
-  return (
-    <>
-      <MetaSelect
-        selectedMeta={selectedMeta}
-        setSelectedMeta={setSelectedMeta}
-        options={options}
-      />
-
-      <MetaView data={data} />
-    </>
-  );
+interface CategoricalProps {
+  data: CategoricalData;
 }
 
-function MetaSelect({ selectedMeta, setSelectedMeta, options }) {
-  return (
-    <Select
-      size="sm"
-      w="50%"
-      variant="flushed"
-      display="inline-block"
-      value={selectedMeta}
-      onChange={(event) => setSelectedMeta(event.target.value)}
-    >
-      {options.map((name) => (
-        <option key={name} value={name}>
-          {name}
-        </option>
-      ))}
-    </Select>
-  );
-}
-
-function Categorical({ data }) {
+export function Categorical({ data }: CategoricalProps) {
   return (
     <>
       <BarChart width={300} height={200} data={data.counts}>
@@ -82,7 +52,11 @@ function Categorical({ data }) {
   );
 }
 
-function Real({ data }) {
+interface RealProps {
+  data: RealData;
+}
+
+export function Real({ data }: RealProps) {
   return (
     <>
       <ScatterChart width={300} height={200} data={data.values}>

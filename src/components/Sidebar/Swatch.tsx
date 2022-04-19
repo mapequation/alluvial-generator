@@ -1,11 +1,26 @@
 import { Box, useColorModeValue } from "@chakra-ui/react";
+import { PropsWithChildren } from "react";
 
-export function Swatch({ color, isSelected, onClick }) {
+interface SwatchProps {
+  color: string;
+  isSelected?: boolean;
+  onClick: () => void;
+}
+
+export function Swatch({
+  color,
+  isSelected,
+  onClick,
+  children,
+}: PropsWithChildren<SwatchProps>) {
   const border = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
 
   return (
     <Box
       as="button"
+      textAlign="center"
+      fontSize="xs"
+      fontWeight="bold"
       bg={color}
       h="24px"
       w="24px"
@@ -19,6 +34,8 @@ export function Swatch({ color, isSelected, onClick }) {
         borderColor: color,
       }}
       onClick={onClick}
-    />
+    >
+      {children}
+    </Box>
   );
 }

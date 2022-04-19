@@ -10,12 +10,16 @@ import {
   Switch,
 } from "./utils";
 
-export default observer(function Layout(props) {
+interface LayoutProps {
+  headerColor: string;
+}
+
+export default observer(function Layout({ headerColor }: LayoutProps) {
   const store = useContext(StoreContext);
 
   return (
     <>
-      <ListItemHeader color={props.color}>Layout</ListItemHeader>
+      <ListItemHeader color={headerColor}>Layout</ListItemHeader>
 
       <ListItemButton
         onClick={() => store.resetLayout()}
@@ -31,6 +35,7 @@ export default observer(function Layout(props) {
         max={2000}
         step={10}
         onChange={store.setHeight}
+        valueLabelFormat={undefined}
       />
       <Slider
         label="Module width"
@@ -39,6 +44,7 @@ export default observer(function Layout(props) {
         max={200}
         step={10}
         onChange={store.setModuleWidth}
+        valueLabelFormat={undefined}
       />
       <Slider
         label="Streamline width"
@@ -46,7 +52,7 @@ export default observer(function Layout(props) {
         min={0}
         max={10}
         step={0.1}
-        valueLabelFormat={(value) => Math.round(value * 100) + "%"}
+        valueLabelFormat={(value: number) => Math.round(value * 100) + "%"}
         onChange={store.setStreamlineFraction}
       />
       <Slider
@@ -54,7 +60,7 @@ export default observer(function Layout(props) {
         value={store.marginExponent}
         min={1}
         max={6}
-        valueLabelFormat={(value) => 2 ** (value - 1)}
+        valueLabelFormat={(value: number) => 2 ** (value - 1)}
         onChange={store.setMarginExponent}
       />
       <Slider
@@ -63,8 +69,8 @@ export default observer(function Layout(props) {
         min={95}
         max={100}
         step={0.1}
-        valueLabelFormat={(value) => value + "%"}
-        onChange={(value) => store.setFlowThreshold(1 - value / 100)}
+        valueLabelFormat={(value: number) => value + "%"}
+        onChange={(value: number) => store.setFlowThreshold(1 - value / 100)}
       />
       <Slider
         label="Streamline filter"
@@ -73,6 +79,7 @@ export default observer(function Layout(props) {
         max={5}
         step={0.01}
         onChange={store.setStreamlineThreshold}
+        valueLabelFormat={undefined}
       />
       <Slider
         label="Transparency"
@@ -80,8 +87,10 @@ export default observer(function Layout(props) {
         min={0}
         max={1}
         step={0.01}
-        valueLabelFormat={(value) => Math.round((1 - value) * 100) + "%"}
-        onChange={(value) => store.setStreamlineOpacity(1 - value)}
+        valueLabelFormat={(value: number) =>
+          Math.round((1 - value) * 100) + "%"
+        }
+        onChange={(value: number) => store.setStreamlineOpacity(1 - value)}
       />
       <Slider
         label="Module font size"
@@ -89,6 +98,7 @@ export default observer(function Layout(props) {
         min={2}
         max={20}
         onChange={store.setFontSize}
+        valueLabelFormat={undefined}
       />
       <Slider
         label="Network font size"
@@ -96,6 +106,7 @@ export default observer(function Layout(props) {
         min={5}
         max={40}
         onChange={store.setNetworkFontSize}
+        valueLabelFormat={undefined}
       />
 
       <RadioGroup
@@ -122,7 +133,7 @@ export default observer(function Layout(props) {
       <Switch
         label="Bottom align"
         isChecked={store.verticalAlign === "bottom"}
-        onChange={(value) =>
+        onChange={(value: boolean) =>
           store.setVerticalAlign(value ? "bottom" : "justify")
         }
       />

@@ -1,1 +1,1 @@
-export * from "./MetadataView";
+export { default } from "./Metadata";
