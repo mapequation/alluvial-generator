@@ -1,51 +1,41 @@
 import {
   Box,
-  Button as CkButton,
   ButtonGroup,
   Editable,
   EditableInput,
   EditablePreview,
   Flex,
-  HStack,
   Kbd,
   List,
   ListItem,
-  Radio,
-  RadioGroup as CkRadioGroup,
   Select,
-  Slider as CkSlider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
-  Switch as CkSwitch,
   Text,
-  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { observer } from "mobx-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { IoMdColorFill } from "react-icons/io";
 import {
   MdClear,
-  MdFileDownload,
   MdFileUpload,
   MdHelp,
   MdOutlineArrowBack,
   MdOutlineArrowDownward,
   MdOutlineArrowForward,
   MdOutlineArrowUpward,
-  MdRestartAlt,
   MdUnfoldLess,
   MdUnfoldMore,
 } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
-import { saveSvg } from "../../io/export";
 import { StoreContext } from "../../store";
 import { SCHEME_GROUPS } from "../../store/schemes";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
+import Export from "./Export";
+import Layout from "./Layout";
 import { MetadataView } from "./Metadata";
 import { Swatch } from "./Swatch";
+import { Button, Label, ListItemButton, ListItemHeader } from "./utils";
 
 export default observer(function Sidebar({
   onLoadClick,
@@ -78,15 +68,6 @@ export default observer(function Sidebar({
       }
     }
   });
-
-  const downloadSvg = () => {
-    store.setSelectedModule(null);
-    const svg = document.getElementById("alluvialSvg");
-    const filename =
-      store.diagram.children.map((n) => n.name).join("-") + ".svg";
-
-    setTimeout(() => saveSvg(svg, filename), 500);
-  };
 
   return (
     <Box
@@ -460,275 +441,10 @@ export default observer(function Sidebar({
           <ListItem>No module selected. Click on any module.</ListItem>
         )}
 
-        <ListItemHeader color={headerColor}>Layout</ListItemHeader>
+        <Layout color={headerColor} />
 
-        <ListItemButton
-          onClick={() => store.resetLayout()}
-          leftIcon={<MdRestartAlt />}
-        >
-          Sort modules
-        </ListItemButton>
-
-        <Slider
-          label="Height"
-          value={store.height}
-          min={400}
-          max={2000}
-          step={10}
-          onChange={store.setHeight}
-        />
-        <Slider
-          label="Module width"
-          value={store.moduleWidth}
-          min={10}
-          max={200}
-          step={10}
-          onChange={store.setModuleWidth}
-        />
-        <Slider
-          label="Streamline width"
-          value={store.streamlineFraction}
-          min={0}
-          max={10}
-          step={0.1}
-          valueLabelFormat={(value) => Math.round(value * 100) + "%"}
-          onChange={store.setStreamlineFraction}
-        />
-        <Slider
-          label="Module top margin"
-          value={store.marginExponent}
-          min={1}
-          max={6}
-          valueLabelFormat={(value) => 2 ** (value - 1)}
-          onChange={store.setMarginExponent}
-        />
-        <Slider
-          label="Visible flow"
-          value={(1 - store.flowThreshold) * 100}
-          min={95}
-          max={100}
-          step={0.1}
-          valueLabelFormat={(value) => value + "%"}
-          onChange={(value) => store.setFlowThreshold(1 - value / 100)}
-        />
-        <Slider
-          label="Streamline filter"
-          value={store.streamlineThreshold}
-          min={0}
-          max={5}
-          step={0.01}
-          onChange={store.setStreamlineThreshold}
-        />
-        <Slider
-          label="Transparency"
-          value={1 - store.streamlineOpacity}
-          min={0}
-          max={1}
-          step={0.01}
-          valueLabelFormat={(value) => Math.round((1 - value) * 100) + "%"}
-          onChange={(value) => store.setStreamlineOpacity(1 - value)}
-        />
-        <Slider
-          label="Module font size"
-          value={store.fontSize}
-          min={2}
-          max={20}
-          onChange={store.setFontSize}
-        />
-        <Slider
-          label="Network font size"
-          value={store.networkFontSize}
-          min={5}
-          max={40}
-          onChange={store.setNetworkFontSize}
-        />
-
-        <RadioGroup
-          legend="Hierarchical modules"
-          value={store.hierarchicalModules}
-          onChange={store.setHierarchicalModules}
-          options={["none", "shadow", "outline"]}
-        />
-
-        <RadioGroup
-          legend="Module size"
-          value={store.moduleSize}
-          onChange={store.setModuleSize}
-          options={["flow", "nodes"]}
-        />
-
-        <RadioGroup
-          legend="Module order"
-          value={store.sortModulesBy}
-          onChange={store.setSortModulesBy}
-          options={["flow", "nodes"]}
-        />
-
-        <Switch
-          label="Bottom align"
-          isChecked={store.verticalAlign === "bottom"}
-          onChange={(value) =>
-            store.setVerticalAlign(value ? "bottom" : "justify")
-          }
-        />
-        <Switch
-          label="Module ids"
-          isChecked={store.showModuleId}
-          onChange={store.setShowModuleId}
-        />
-        <Switch
-          label="Module names"
-          isChecked={store.showModuleNames}
-          onChange={store.setShowModuleNames}
-        />
-        {store.diagram.children.some((network) => network.isHigherOrder) && (
-          <Switch
-            label="Aggregate states names"
-            isChecked={store.aggregateStateNames}
-            onChange={store.setAggregateStateNames}
-          />
-        )}
-        <Switch
-          label="Network names"
-          isChecked={store.showNetworkNames}
-          onChange={store.setShowNetworkNames}
-        />
-        <Switch
-          label="Adaptive font size"
-          isChecked={store.adaptiveFontSize}
-          onChange={store.setAdaptiveFontSize}
-        />
-        <Switch
-          label="Drop shadow"
-          isChecked={store.dropShadow}
-          onChange={store.setDropShadow}
-        />
-
-        <ListItemHeader color={headerColor}>Export</ListItemHeader>
-
-        <ListItemButton
-          onClick={downloadSvg}
-          variant="link"
-          leftIcon={<MdFileDownload />}
-        >
-          Download SVG
-        </ListItemButton>
+        <Export color={headerColor} />
       </List>
     </Box>
   );
 });
-
-function Button(props) {
-  return (
-    <CkButton
-      isFullWidth
-      variant="outline"
-      size="sm"
-      justifyContent="flex-start"
-      fontWeight={500}
-      {...props}
-    />
-  );
-}
-
-function ListItemButton(props) {
-  return (
-    <ListItem>
-      <Button {...props} />
-    </ListItem>
-  );
-}
-
-function ListItemHeader(props) {
-  return (
-    <ListItem
-      fontWeight={700}
-      textTransform="uppercase"
-      letterSpacing="tight"
-      fontSize="0.8rem"
-      pt={6}
-      {...props}
-    />
-  );
-}
-
-function Label({ children, ...props }) {
-  return (
-    <span style={{ display: "inline-block", width: "50%" }} {...props}>
-      {children}
-    </span>
-  );
-}
-
-function Slider({ label, value, onChange, valueLabelFormat, ...props }) {
-  const [currentValue, setCurrentValue] = useState(value);
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => setCurrentValue(value), [value, setCurrentValue]);
-
-  return (
-    <ListItem>
-      <Label>{label}</Label>
-      <CkSlider
-        defaultValue={value}
-        value={currentValue}
-        w="50%"
-        size="sm"
-        onChange={setCurrentValue}
-        onChangeEnd={onChange}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-        {...props}
-      >
-        <SliderTrack>
-          <SliderFilledTrack />
-        </SliderTrack>
-        <Tooltip
-          hasArrow
-          placement="top"
-          bg="blue.600"
-          isOpen={isOpen}
-          label={
-            valueLabelFormat != null
-              ? valueLabelFormat(currentValue)
-              : currentValue
-          }
-        >
-          <SliderThumb />
-        </Tooltip>
-      </CkSlider>
-    </ListItem>
-  );
-}
-
-function RadioGroup({ legend, value, onChange, options }) {
-  return (
-    <ListItem>
-      <HStack>
-        <Label>{legend}</Label>
-        <CkRadioGroup value={value} onChange={onChange} size="sm">
-          <HStack>
-            {options.map((value) => (
-              <Radio value={value} key={value}>
-                {value}
-              </Radio>
-            ))}
-          </HStack>
-        </CkRadioGroup>
-      </HStack>
-    </ListItem>
-  );
-}
-
-function Switch({ onChange, label, ...props }) {
-  return (
-    <ListItem>
-      <Label>{label}</Label>
-      <CkSwitch
-        size="sm"
-        onChange={(event) => onChange(event.target.checked)}
-        {...props}
-      />
-    </ListItem>
-  );
-}

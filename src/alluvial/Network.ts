@@ -1,4 +1,5 @@
 import type { Module as InfomapModule } from "@mapequation/infomap";
+import * as d3 from "d3";
 import { moveItem } from "../utils/array";
 import TreePath from "../utils/TreePath";
 import AlluvialNodeBase, { Layout } from "./AlluvialNode";
@@ -32,6 +33,11 @@ export type Categorical = {
 export type Real = {
   kind: "real";
   values: { node: string; value: number }[];
+  min: number;
+  max: number;
+  mean: number;
+  stddev: number;
+  quartiles: [number, number, number];
 };
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
@@ -93,6 +99,11 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
             meta[key] = {
               kind: "real",
               values: [],
+              min: Infinity,
+              max: -Infinity,
+              mean: 0,
+              stddev: 0,
+              quartiles: [0, 0, 0],
             };
           } else {
             meta[key] = {
@@ -104,6 +115,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         if (typeof value === "number") {
           const entry = meta[key] as Real;
           entry.values.push({ node: node.id, value });
+          entry.mean += value;
+          entry.stddev += value * value; // Placeholder for variance
+          entry.min = Math.min(entry.min, value);
+          entry.max = Math.max(entry.max, value);
         } else {
           const entry = meta[key] as Categorical;
           if (!entry.counts.some((c) => c.category === value)) {
@@ -117,7 +132,17 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     for (const value of Object.values(meta)) {
       if (value.kind === "real") {
         const entry = value as Real;
-        entry.values.sort((a, b) => b.value - a.value);
+        entry.values.sort((a, b) => a.value - b.value);
+        const N = entry.values.length || 1;
+        entry.mean /= N;
+        // Var(X) = E[X^2] - E[X]^2
+        const variance = entry.stddev / N - entry.mean * entry.mean;
+        entry.stddev = Math.sqrt(variance);
+        entry.quartiles = [
+          d3.quantileSorted(entry.values, 0.25, (d) => d.value)!,
+          d3.quantileSorted(entry.values, 0.5, (d) => d.value)!,
+          d3.quantileSorted(entry.values, 0.75, (d) => d.value)!,
+        ];
       }
     }
 
@@ -260,7 +285,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       );
   }
 
-  private* rightStreamlines() {
+  private *rightStreamlines() {
     for (let module of this) {
       // Skip if left module is below threshold
       if (!module.isVisible) {
@@ -307,7 +332,7 @@ class TreeNode extends Layout {
     return new TreeNode(path, moduleLevel, isLeaf, this);
   }
 
-  * visitBreadthFirst(): Iterable<TreeNode | Module> {
+  *visitBreadthFirst(): Iterable<TreeNode | Module> {
     let queue = this.children;
 
     while (queue.length) {
