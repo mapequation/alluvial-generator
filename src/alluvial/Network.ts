@@ -35,9 +35,11 @@ export type Real = {
   values: { node: string; value: number }[];
   min: number;
   max: number;
+  median: number;
   mean: number;
   variance: number;
-  quartiles: [number, number, number];
+  boxBounds: number[];
+  pdfBounds: number[];
 };
 
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
@@ -101,9 +103,11 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
               values: [],
               min: Infinity,
               max: -Infinity,
+              median: 0,
               mean: 0,
               variance: 0,
-              quartiles: [0, 0, 0],
+              boxBounds: [],
+              pdfBounds: [],
             };
           } else {
             meta[key] = {
@@ -139,10 +143,29 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         // Var(X) = E[X^2] - E[X]^2
         entry.variance =
           entry.variance / Math.max(N - 1, 1) - entry.mean * entry.mean;
-        entry.quartiles = [
-          d3.quantileSorted(entry.values, 0.25, (d) => d.value) ?? 0,
-          d3.quantileSorted(entry.values, 0.5, (d) => d.value) ?? 0,
-          d3.quantileSorted(entry.values, 0.75, (d) => d.value) ?? 0,
+
+        entry.pdfBounds = [
+          entry.min,
+          entry.mean - 2 * entry.variance,
+          entry.mean - entry.variance,
+          entry.mean + entry.variance,
+          entry.mean + 2 * entry.variance,
+          entry.max,
+        ];
+
+        entry.median =
+          d3.quantileSorted(entry.values, 0.5, (d) => d.value) ?? 0;
+
+        const q1 = d3.quantileSorted(entry.values, 0.25, (d) => d.value) ?? 0;
+        const q3 = d3.quantileSorted(entry.values, 0.75, (d) => d.value) ?? 0;
+        const iqr = q3 - q1;
+        entry.boxBounds = [
+          entry.min,
+          q1 - 1.5 * iqr,
+          q1,
+          q3,
+          q3 + 1.5 * iqr,
+          entry.max,
         ];
       } else if (value.kind === "categorical") {
         const entry = value as Categorical;

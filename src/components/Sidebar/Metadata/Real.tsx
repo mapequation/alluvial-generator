@@ -117,6 +117,29 @@ export default observer(function Real({ name, data, color }: RealProps) {
     store.colorRealMetadata(name, hist);
   };
 
+  const paintIntervals = (bounds: number[], showQuartiles: boolean) => () => {
+    setShowQuartiles(showQuartiles);
+
+    function intervalCenter(i: number) {
+      return (bounds[i] + bounds[i + 1]) / 2;
+    }
+
+    function getInterval(meta: number) {
+      if (meta < bounds[1]) return intervalCenter(0);
+      if (meta >= bounds[4]) return intervalCenter(4);
+      if (meta >= bounds[3]) return intervalCenter(3);
+      if (meta >= bounds[2]) return intervalCenter(2);
+      return intervalCenter(1);
+    }
+
+    store.colorRealIntervals(
+      name,
+      data,
+      (meta: number): string => selectedScheme[scale(getInterval(meta))],
+      [0, 1, 2, 3, 4].map(intervalCenter)
+    );
+  };
+
   return (
     <>
       <Chart
@@ -127,18 +150,32 @@ export default observer(function Real({ name, data, color }: RealProps) {
         color={color}
       />
 
-      <StatisticSelector
-        showQuartiles={showQuartiles}
-        setShowQuartiles={() => setShowQuartiles(true)}
-        setShowMean={() => setShowQuartiles(false)}
-      />
-
       <BinInput
         length={bins.length}
         numBins={numBins}
         setNumBins={setNumBins}
       />
 
+      <StatisticSelector
+        showQuartiles={showQuartiles}
+        setShowQuartiles={() => setShowQuartiles(true)}
+        setShowMean={() => setShowQuartiles(false)}
+      />
+
+      <ButtonGroup isAttached w="100%" mt={1}>
+        <Button
+          onClick={paintIntervals(data.boxBounds, true)}
+          justifyContent="center"
+        >
+          Paint quartiles
+        </Button>
+        <Button
+          onClick={paintIntervals(data.pdfBounds, false)}
+          justifyContent="center"
+        >
+          Paint mean
+        </Button>
+      </ButtonGroup>
       <ButtonGroup isAttached w="100%" mt={1}>
         <Button
           onClick={() => store.colorRealMetadata(name, hist)}
@@ -193,15 +230,21 @@ function Chart({
           <Cell cursor="pointer" fill={color} key={`cell-${i}`} />
         ))}
       </Bar>
-      {showQuartiles &&
-        data.quartiles.map((q, i) => (
+      {showQuartiles && (
+        <>
+          <ReferenceLine x={data.median} xAxisId="real" />
           <ReferenceLine
-            key={i}
-            x={q}
+            x={data.boxBounds[2]}
             xAxisId="real"
-            strokeDasharray={i % 2 === 0 ? "3 3" : "0"}
+            strokeDasharray="3 3"
           />
-        ))}
+          <ReferenceLine
+            x={data.boxBounds[3]}
+            xAxisId="real"
+            strokeDasharray="3 3"
+          />
+        </>
+      )}
       {!showQuartiles && (
         <>
           <ReferenceLine x={data.mean} xAxisId="real" />

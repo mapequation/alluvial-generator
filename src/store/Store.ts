@@ -9,6 +9,7 @@ import {
   RIGHT,
   Side,
 } from "../alluvial";
+import type { Real } from "../alluvial/Network";
 import type { Histogram } from "../components/Sidebar/Metadata/Real";
 import TreePath from "../utils/TreePath";
 import BipartiteGraph from "./BipartiteGraph";
@@ -641,6 +642,44 @@ export class Store {
               break;
             }
           }
+        });
+      });
+    });
+
+    this.updateLayout();
+  }
+
+  colorRealIntervals(
+    name: string,
+    data: Real,
+    getColor: (meta: number) => string,
+    centers: number[]
+  ) {
+    this.clearColors(false);
+
+    for (const c of centers) {
+      // FIXME This is used to get the highlight indices sorted as the color scheme.
+      this.getHighlightIndex(getColor(c));
+    }
+
+    this.diagram.children.forEach((network) => {
+      if (!network.haveMetadata) return;
+
+      network.children.forEach((module) => {
+        if (!module.isVisible) return;
+
+        module.getLeafNodes().forEach((node) => {
+          if (
+            !node.metadata ||
+            !(name in node.metadata) ||
+            typeof node.metadata[name] !== "number"
+          )
+            return;
+
+          const meta = node.metadata[name] as number;
+
+          node.highlightIndex = this.getHighlightIndex(getColor(meta));
+          node.update();
         });
       });
     });
