@@ -34,8 +34,8 @@ export class Store {
   streamlineOpacity: number = 0.8;
   flowThreshold: number = 5e-3;
 
-  selectedScheme: ColorScheme = COLOR_SCHEMES["Sinebow"];
-  selectedSchemeName = "Sinebow";
+  selectedScheme: ColorScheme = COLOR_SCHEMES["C3 Sinebow"];
+  selectedSchemeName: SchemeName = "C3 Sinebow";
 
   defaultHighlightColor: string = "#b6b69f";
   highlightColors: string[] = [...this.selectedScheme];

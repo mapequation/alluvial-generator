@@ -69,7 +69,7 @@ export default observer(function Colors({
           </Swatch>
           {store.selectedScheme.slice(0, 21).map((schemeColor, i) => (
             <Swatch
-              key={schemeColor}
+              key={`${i}-${schemeColor}`}
               color={schemeColor}
               isSelected={color === schemeColor}
               onClick={() => setColor(schemeColor)}
