@@ -71,15 +71,14 @@ export default observer(function Real({ name, data, color }: RealProps) {
     }
 
     return binner(data.values);
-  }, [numBins, data]);
+  }, [numBins, data.values]);
 
   const defaultValues = useMemo(
     () =>
-      bins.map((_, i) => [i, defaultHighlightColor]) as MapOrEntries<
-        number,
-        string
-      >,
-    [bins, defaultHighlightColor]
+      d3
+        .range(bins.length)
+        .map((i) => [i, defaultHighlightColor]) as MapOrEntries<number, string>,
+    [bins.length, defaultHighlightColor]
   );
 
   const [colors, actions] = useMap(defaultValues);
@@ -94,15 +93,21 @@ export default observer(function Real({ name, data, color }: RealProps) {
 
   const hist = createHistogram(bins, data, colors, defaultHighlightColor);
 
-  const paintWithScheme = () => {
-    const scale = d3
-      .scaleQuantize()
-      .domain([data.min, data.max])
-      .range(d3.range(selectedScheme.length));
+  const scale = useMemo(
+    () =>
+      d3
+        .scaleQuantize()
+        .domain([data.min, data.max])
+        .range(d3.range(selectedScheme.length)),
+    [data.min, data.max, selectedScheme.length]
+  );
 
+  const paintWithScheme = () => {
+    const { min, max } = data;
     const newColors = new Map(
-      bins.map((bin, binIndex) => {
-        const schemeIndex = scale(bin.x1 ?? data.max);
+      bins.map(({ x0, x1 }, binIndex) => {
+        const midPoint = ((x0 ?? min) + (x1 ?? max)) / 2;
+        const schemeIndex = scale(midPoint);
         return [binIndex, selectedScheme[schemeIndex]];
       })
     );
