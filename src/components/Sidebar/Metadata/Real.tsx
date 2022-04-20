@@ -44,7 +44,7 @@ function createHistogram(
   bins: d3.Bin<BinValue, number>[],
   data: RealData,
   colors: Map<number, string>,
-  defaultColor = "#8884d8"
+  defaultColor: string
 ) {
   return bins.map((bin, i) => ({
     ...bin,
@@ -57,7 +57,7 @@ function createHistogram(
 
 export default observer(function Real({ name, data, color }: RealProps) {
   const store = useContext(StoreContext);
-  const { selectedScheme } = store;
+  const { selectedScheme, defaultHighlightColor } = store;
 
   const [numBins, _setNumBins] = useState<number | null>(null);
   const [showQuartiles, setShowQuartiles] = useState(false);
@@ -75,11 +75,11 @@ export default observer(function Real({ name, data, color }: RealProps) {
 
   const defaultValues = useMemo(
     () =>
-      bins.map((_, i) => [i, selectedScheme[0]]) as MapOrEntries<
+      bins.map((_, i) => [i, defaultHighlightColor]) as MapOrEntries<
         number,
         string
       >,
-    [bins, selectedScheme]
+    [bins, defaultHighlightColor]
   );
 
   const [colors, actions] = useMap(defaultValues);
@@ -92,10 +92,21 @@ export default observer(function Real({ name, data, color }: RealProps) {
     [actions, defaultValues]
   );
 
-  const hist = createHistogram(bins, data, colors, selectedScheme[0]);
+  const hist = createHistogram(bins, data, colors, defaultHighlightColor);
 
   const paintWithScheme = () => {
-    const newColors = new Map(selectedScheme.map((color, i) => [i, color]));
+    const scale = d3
+      .scaleQuantize()
+      .domain([data.min, data.max])
+      .range(d3.range(selectedScheme.length));
+
+    const newColors = new Map(
+      bins.map((bin, binIndex) => {
+        const schemeIndex = scale(bin.x1 ?? data.max);
+        return [binIndex, selectedScheme[schemeIndex]];
+      })
+    );
+
     const hist = createHistogram(bins, data, newColors, selectedScheme[0]);
     actions.setAll(newColors);
     store.colorRealMetadata(name, hist);
