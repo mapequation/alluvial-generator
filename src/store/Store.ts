@@ -662,7 +662,7 @@ export class Store {
       modules.forEach((module) => module.removeColors());
     }
 
-    this.highlightColors = [];
+    this.setHighlightColors([]);
 
     if (updateLayout) this.updateLayout();
   }
