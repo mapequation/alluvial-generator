@@ -576,6 +576,13 @@ export class Store {
   }
 
   colorCategoricalMetadata(name: string, colors: Map<string, string>) {
+    this.clearColors(false);
+
+    for (const color of colors.values()) {
+      // FIXME This is used to get the highlight indices sorted as the color scheme.
+      this.getHighlightIndex(color);
+    }
+
     this.diagram.children.forEach((network) => {
       if (!network.haveMetadata) return;
 
@@ -604,6 +611,13 @@ export class Store {
   }
 
   colorRealMetadata(name: string, bins: Histogram) {
+    this.clearColors(false);
+
+    for (const bin of bins) {
+      // FIXME This is used to get the highlight indices sorted as the color scheme.
+      this.getHighlightIndex(bin.color);
+    }
+
     this.diagram.children.forEach((network) => {
       if (!network.haveMetadata) return;
 
