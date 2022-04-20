@@ -167,8 +167,6 @@ function Chart({
   setColor: (index: number, color: string) => void;
   color: string;
 }) {
-  const usableSpace = 300 - 75; // Diagram width - margin
-
   return (
     <BarChart
       width={300}
@@ -185,19 +183,14 @@ function Chart({
       <XAxis
         xAxisId="real"
         type="number"
-        domain={["dataMin", "dataMax"]}
-        tickCount={hist.length}
+        domain={[data.min, data.max]}
+        tickFormatter={(d) => d.toFixed(2)}
       />
       <YAxis type="number" domain={["auto", "dataMax"]} />
       <Tooltip />
       <Bar dataKey="count" fill="#8884d8" xAxisId="hidden">
         {hist.map(({ x0, x1, color }, i) => (
-          <Cell
-            cursor="pointer"
-            width={(x1 - x0) * usableSpace}
-            fill={color}
-            key={`cell-${i}`}
-          />
+          <Cell cursor="pointer" fill={color} key={`cell-${i}`} />
         ))}
       </Bar>
       {showQuartiles &&
