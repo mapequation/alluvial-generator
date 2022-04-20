@@ -1,30 +1,20 @@
 import { ButtonGroup } from "@chakra-ui/react";
 import { observer } from "mobx-react";
-import { useContext } from "react";
-import {
-  Bar,
-  BarChart,
-  Cell,
-  Scatter,
-  ScatterChart,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import type {
-  Categorical as CategoricalData,
-  Real as RealData,
-} from "../../../alluvial/Network";
+import React, { useContext } from "react";
+import { Bar, BarChart, Cell, Tooltip, XAxis, YAxis } from "recharts";
+import { Categorical as CategoricalData } from "../../../alluvial/Network";
 import useMap from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
 import { Button } from "../utils";
 
 interface CategoricalProps {
+  name: string;
   data: CategoricalData;
   color: string;
 }
 
-export const Categorical = observer(function Categorical({
+export default observer(function Categorical({
+  name,
   data,
   color,
 }: CategoricalProps) {
@@ -46,7 +36,6 @@ export const Categorical = observer(function Categorical({
         data={data.counts}
         style={{ color: "#333" }}
         onClick={({ activeLabel }) => {
-          console.log(activeLabel, color);
           if (activeLabel) actions.set(activeLabel, color);
         }}
       >
@@ -66,36 +55,12 @@ export const Categorical = observer(function Categorical({
 
       <ButtonGroup isAttached w="100%" mt={1}>
         <Button
-          onClick={() =>
-            store.colorCategoricalMetadata(map as Map<string, string>)
-          }
+          onClick={() => store.colorCategoricalMetadata(name, map)}
           justifyContent="center"
         >
-          Paint metadata
+          Paint current colors
         </Button>
       </ButtonGroup>
     </>
   );
 });
-
-interface RealProps {
-  data: RealData;
-}
-
-export function Real({ data }: RealProps) {
-  return (
-    <>
-      <ScatterChart width={300} height={200} data={data.values}>
-        <XAxis dataKey="node" />
-        <YAxis />
-        <Scatter type="monotone" dataKey="value" fill="#8884d8" />
-      </ScatterChart>
-      Stddev: {data.stddev}
-      <br />
-      Mean: {data.mean}
-      <br />
-      Quartiles: {data.quartiles.join(" - ")}
-      <br />
-    </>
-  );
-}

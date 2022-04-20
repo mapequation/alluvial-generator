@@ -3,8 +3,9 @@ import type {
   Categorical as CategoricalData,
   Real as RealData,
 } from "../../../alluvial/Network";
+import Categorical from "./Categorical";
 import MetadataSelect from "./MetadataSelect";
-import { Categorical, Real } from "./MetadataView";
+import Real from "./Real";
 
 interface MetadataCollectionProps {
   metadata: { [key: string]: CategoricalData | RealData };
@@ -27,8 +28,12 @@ export default function MetadataCollection({
         options={options}
       />
 
-      {data.kind === "categorical" && <Categorical data={data} color={color} />}
-      {data.kind === "real" && <Real data={data} />}
+      {data.kind === "categorical" && (
+        <Categorical name={selectedMeta} data={data} color={color} />
+      )}
+      {data.kind === "real" && (
+        <Real name={selectedMeta} data={data} color={color} />
+      )}
     </>
   );
 }

@@ -9,6 +9,7 @@ import {
   RIGHT,
   Side,
 } from "../alluvial";
+import type { Histogram } from "../components/Sidebar/Metadata/Real";
 import TreePath from "../utils/TreePath";
 import BipartiteGraph from "./BipartiteGraph";
 import { COLOR_SCHEMES, ColorScheme, SchemeName } from "./schemes";
@@ -574,7 +575,7 @@ export class Store {
     this.updateLayout();
   }
 
-  colorCategoricalMetadata(colors: Map<string, string>) {
+  colorCategoricalMetadata(name: string, colors: Map<string, string>) {
     this.diagram.children.forEach((network) => {
       if (!network.haveMetadata) return;
 
@@ -582,9 +583,46 @@ export class Store {
         if (!module.isVisible) return;
 
         module.getLeafNodes().forEach((node) => {
-          for (const meta of Object.values(node.metadata ?? {})) {
-            if (typeof meta === "string" && colors.has(meta)) {
-              node.highlightIndex = this.getHighlightIndex(colors.get(meta)!);
+          if (
+            !node.metadata ||
+            !(name in node.metadata) ||
+            typeof node.metadata[name] !== "string"
+          )
+            return;
+
+          const meta = node.metadata[name] as string;
+
+          if (colors.has(meta)) {
+            node.highlightIndex = this.getHighlightIndex(colors.get(meta)!);
+            node.update();
+          }
+        });
+      });
+    });
+
+    this.updateLayout();
+  }
+
+  colorRealMetadata(name: string, bins: Histogram) {
+    this.diagram.children.forEach((network) => {
+      if (!network.haveMetadata) return;
+
+      network.children.forEach((module) => {
+        if (!module.isVisible) return;
+
+        module.getLeafNodes().forEach((node) => {
+          if (
+            !node.metadata ||
+            !(name in node.metadata) ||
+            typeof node.metadata[name] !== "number"
+          )
+            return;
+
+          const meta = node.metadata[name] as number;
+
+          for (const bin of bins) {
+            if (meta >= bin.x0 && meta < bin.x1) {
+              node.highlightIndex = this.getHighlightIndex(bin.color);
               node.update();
               break;
             }

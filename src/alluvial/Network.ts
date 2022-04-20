@@ -36,7 +36,7 @@ export type Real = {
   min: number;
   max: number;
   mean: number;
-  stddev: number;
+  variance: number;
   quartiles: [number, number, number];
 };
 
@@ -102,7 +102,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
               min: Infinity,
               max: -Infinity,
               mean: 0,
-              stddev: 0,
+              variance: 0,
               quartiles: [0, 0, 0],
             };
           } else {
@@ -117,7 +117,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
           const entry = meta[key] as Real;
           entry.values.push({ node: node.id, value });
           entry.mean += value;
-          entry.stddev += value * value; // Placeholder for variance
+          entry.variance += value * value; // Placeholder for variance
           entry.min = Math.min(entry.min, value);
           entry.max = Math.max(entry.max, value);
         } else {
@@ -137,8 +137,8 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         const N = entry.values.length || 1;
         entry.mean /= N;
         // Var(X) = E[X^2] - E[X]^2
-        const variance = entry.stddev / N - entry.mean * entry.mean;
-        entry.stddev = Math.sqrt(variance);
+        entry.variance =
+          entry.variance / Math.max(N - 1, 1) - entry.mean * entry.mean;
         entry.quartiles = [
           d3.quantileSorted(entry.values, 0.25, (d) => d.value) ?? 0,
           d3.quantileSorted(entry.values, 0.5, (d) => d.value) ?? 0,

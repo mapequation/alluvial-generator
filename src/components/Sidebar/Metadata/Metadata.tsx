@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import type { Network } from "../../../alluvial";
 import { StoreContext } from "../../../store";
+import ErrorBoundary from "../../ErrorBoundary";
 import { Label, ListItemHeader } from "../utils";
 import MetadataCollection from "./MetadataCollection";
 
@@ -33,10 +34,12 @@ export default observer(function Metadata({
           selectedHasMeta ? (
             <>
               <Label>{selectedModule.parent?.name ?? "Network"}</Label>
-              <MetadataCollection
-                metadata={selectedModule.parent.metadata}
-                color={color}
-              />
+              <ErrorBoundary>
+                <MetadataCollection
+                  metadata={selectedModule.parent.metadata}
+                  color={color}
+                />
+              </ErrorBoundary>
             </>
           ) : (
             "No metadata in network"
