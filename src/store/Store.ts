@@ -479,8 +479,8 @@ export class Store {
     const setModuleColor = (module: Module) => {
       const color = moduleIdColorMap.get(module.moduleId);
       if (color) {
-        const highligtIndex = this.getHighlightIndex(color);
-        module.setColor(highligtIndex);
+        const highlightIndex = this.getHighlightIndex(color);
+        module.setColor(highlightIndex);
       } else {
         const color =
           this.selectedScheme[
