@@ -20,6 +20,8 @@ export default function MetadataCollection({
   const [selectedMeta, setSelectedMeta] = useState(options[0]);
   const data = metadata[selectedMeta];
 
+  if (!data) return null;
+
   return (
     <>
       <MetadataSelect
