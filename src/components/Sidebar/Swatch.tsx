@@ -21,6 +21,8 @@ export function Swatch({
       textAlign="center"
       fontSize="xs"
       fontWeight="bold"
+      color="#000"
+      textShadow="-0.6px -0.6px 0 #fff, 0.6px -0.6px 0 #fff, -0.6px 0.6px 0 #fff, 1px 1px 0 #fff"
       bg={color}
       h="24px"
       w="24px"
