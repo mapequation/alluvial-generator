@@ -648,6 +648,8 @@ export class Store {
       modules.forEach((module) => module.removeColors());
     }
 
+    this.highlightColors = [];
+
     if (updateLayout) this.updateLayout();
   }
 
