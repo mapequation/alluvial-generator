@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/mapequation/alluvial-generator/compare/v1.7.0...v1.8.0) (2022-04-20)
+
+
+### Features
+
+* Color nodes by categorical metadata ([6bd7a28](https://github.com/mapequation/alluvial-generator/commit/6bd7a289c2c67fbcf8231245eede37c3dab80c81))
+* Color nodes by real-valued metadata ([392cdab](https://github.com/mapequation/alluvial-generator/commit/392cdab6064ec5ad6fb57f79d78de1f31b940bfa))
+* Show metadata imported from json files ([841deb8](https://github.com/mapequation/alluvial-generator/commit/841deb89b4777dc0019ada0afdf919c7ce9e7373))
+
 ## [1.7.0](https://github.com/mapequation/alluvial-generator/compare/v1.6.0...v1.7.0) (2022-04-13)
 
 
