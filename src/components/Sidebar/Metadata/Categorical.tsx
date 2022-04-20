@@ -19,13 +19,10 @@ export default observer(function Categorical({
   color,
 }: CategoricalProps) {
   const store = useContext(StoreContext);
-  const { selectedScheme } = store;
+  const { defaultHighlightColor } = store;
 
   const [map, actions] = useMap(
-    data.counts.map(({ category }, i) => [
-      category,
-      selectedScheme[i % selectedScheme.length],
-    ])
+    data.counts.map(({ category }, i) => [category, defaultHighlightColor])
   );
 
   return (
