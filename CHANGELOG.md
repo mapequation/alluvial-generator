@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/mapequation/alluvial-generator/compare/v1.8.0...v1.9.0) (2022-04-21)
+
+
+### Features
+
+* Add more color schemes ([996aa49](https://github.com/mapequation/alluvial-generator/commit/996aa494a475c6ffe8b3ec6829b7bc4626b7915f))
+* Paint metadata pdf and box intervals ([4685a07](https://github.com/mapequation/alluvial-generator/commit/4685a07ac8774b5d0b262541660230c95ed3384e))
+
+
+### Bug Fixes
+
+* Add text shadow to color palette ([e48fcce](https://github.com/mapequation/alluvial-generator/commit/e48fcce971826615a17dc733065cec5521792793))
+* Clear saved highlightColors when clearing all colors ([67c00e3](https://github.com/mapequation/alluvial-generator/commit/67c00e3b9873a4858db021b8915b33762c23d93f))
+* Don't mutate observable outside action ([414d7ab](https://github.com/mapequation/alluvial-generator/commit/414d7ab835154ac484b32f4de57d82bbeb834c6b))
+* Don't render meta collection if metadata is null ([fc0d75d](https://github.com/mapequation/alluvial-generator/commit/fc0d75d43727bb0a67d7cb0cfb3f7b4f535b1f31))
+* Map scalar metadata colors to domain of data ([630cc98](https://github.com/mapequation/alluvial-generator/commit/630cc989941625bcb63ba2453eec58e19b82106c))
+* Real-valued metadata x-axis should span the data domain ([70527d4](https://github.com/mapequation/alluvial-generator/commit/70527d47eb8532a7aecfa2aac61b30cc7eef2a5e))
+* Show metadata colors in sorted order ([0f7dd60](https://github.com/mapequation/alluvial-generator/commit/0f7dd60d1c3d3f9ca399174e4e7aa114a820b7e0))
+* Use default highlight color for categorical metadata ([415e8fb](https://github.com/mapequation/alluvial-generator/commit/415e8fb3772aaa1f205bc3b6169b521db16188c9))
+* Use metadata bin midpoint when choosing color ([08b66e7](https://github.com/mapequation/alluvial-generator/commit/08b66e7b1b83a0b9a4d859989299aab860d96eba))
+
 ## [1.8.0](https://github.com/mapequation/alluvial-generator/compare/v1.7.0...v1.8.0) (2022-04-20)
 
 
