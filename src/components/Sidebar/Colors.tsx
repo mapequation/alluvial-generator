@@ -10,6 +10,7 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import { IoMdColorFill } from "react-icons/io";
 import { MdClear } from "react-icons/md";
+import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
 import { Button, Label, ListItemHeader } from "./Components";
@@ -28,6 +29,29 @@ export default observer(function Colors({
 }: ColorsProps) {
   const store = useContext(StoreContext);
   const { selectedModule, defaultHighlightColor } = store;
+
+  useEventListener("keydown", (e) => {
+    if (store.editMode) return;
+
+    const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"] as const;
+
+    // @ts-ignore
+    const key = e?.key;
+
+    if (key === "p" && store.selectedModule != null) {
+      store.colorModule(store.selectedModule, color);
+    } else if (numbers.includes(key)) {
+      let index = parseInt(key);
+      if (index === 0) index = 10;
+      index -= 2;
+
+      if (index === -1) {
+        setColor(defaultHighlightColor);
+      } else if (index < store.selectedScheme.length - 1) {
+        setColor(store.selectedScheme[index]);
+      }
+    }
+  });
 
   return (
     <>
