@@ -23,7 +23,7 @@ import {
 import type { Real as RealData } from "../../../alluvial/Network";
 import useMap, { MapOrEntries } from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
-import { Button } from "../utils";
+import { Button } from "../Components";
 
 interface RealProps {
   name: string;

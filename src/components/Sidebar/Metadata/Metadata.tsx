@@ -4,7 +4,7 @@ import { useContext } from "react";
 import type { Network } from "../../../alluvial";
 import { StoreContext } from "../../../store";
 import ErrorBoundary from "../../ErrorBoundary";
-import { Label, ListItemHeader } from "../utils";
+import { Label, ListItemHeader } from "../Components";
 import MetadataCollection from "./MetadataCollection";
 
 interface MetadataProps {
@@ -23,9 +23,11 @@ export default observer(function Metadata({
     (network: Network) => network.haveMetadata
   );
 
+  if (!diagramHasMeta) return null;
+
   const selectedHasMeta = selectedModule?.parent.haveMetadata ?? false;
 
-  return diagramHasMeta ? (
+  return (
     <>
       <ListItemHeader color={headerColor}>Network metadata</ListItemHeader>
 
@@ -49,5 +51,5 @@ export default observer(function Metadata({
         )}
       </ListItem>
     </>
-  ) : null;
+  );
 });

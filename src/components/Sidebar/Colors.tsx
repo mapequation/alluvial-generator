@@ -12,8 +12,8 @@ import { IoMdColorFill } from "react-icons/io";
 import { MdClear } from "react-icons/md";
 import { StoreContext } from "../../store";
 import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
+import { Button, Label, ListItemHeader } from "./Components";
 import { Swatch } from "./Swatch";
-import { Button, Label, ListItemHeader } from "./utils";
 
 interface ColorsProps {
   headerColor: string;

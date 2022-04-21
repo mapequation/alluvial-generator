@@ -1,19 +1,23 @@
 import {
   Button as CkButton,
+  ButtonProps,
   HStack,
   ListItem,
+  ListItemProps,
   Radio,
   RadioGroup as CkRadioGroup,
   Slider as CkSlider,
   SliderFilledTrack,
+  SliderProps,
   SliderThumb,
   SliderTrack,
   Switch as CkSwitch,
+  SwitchProps,
   Tooltip,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-export function Button(props) {
+export function Button(props: ButtonProps) {
   return (
     <CkButton
       isFullWidth
@@ -26,7 +30,7 @@ export function Button(props) {
   );
 }
 
-export function ListItemButton(props) {
+export function ListItemButton(props: ButtonProps) {
   return (
     <ListItem>
       <Button {...props} />
@@ -34,7 +38,7 @@ export function ListItemButton(props) {
   );
 }
 
-export function ListItemHeader(props) {
+export function ListItemHeader(props: ListItemProps) {
   return (
     <ListItem
       fontWeight={700}
@@ -47,7 +51,7 @@ export function ListItemHeader(props) {
   );
 }
 
-export function Label({ children, ...props }) {
+export function Label({ children, ...props }: any) {
   return (
     <span style={{ display: "inline-block", width: "50%" }} {...props}>
       {children}
@@ -55,7 +59,18 @@ export function Label({ children, ...props }) {
   );
 }
 
-export function Slider({ label, value, onChange, valueLabelFormat, ...props }) {
+export function Slider({
+  label,
+  value,
+  onChange,
+  valueLabelFormat,
+  ...props
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  valueLabelFormat?: (value: number) => string | number;
+} & SliderProps) {
   const [currentValue, setCurrentValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -96,7 +111,17 @@ export function Slider({ label, value, onChange, valueLabelFormat, ...props }) {
   );
 }
 
-export function RadioGroup({ legend, value, onChange, options }) {
+export function RadioGroup<T extends string>({
+  legend,
+  value,
+  onChange,
+  options,
+}: {
+  legend: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: T[];
+}) {
   return (
     <ListItem>
       <HStack>
@@ -115,7 +140,14 @@ export function RadioGroup({ legend, value, onChange, options }) {
   );
 }
 
-export function Switch({ onChange, label, ...props }) {
+export function Switch({
+  label,
+  onChange,
+  ...props
+}: {
+  label: string;
+  onChange: (value: boolean) => void;
+} & Omit<SwitchProps, "onChange">) {
   return (
     <ListItem>
       <Label>{label}</Label>

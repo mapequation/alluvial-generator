@@ -8,7 +8,7 @@ import {
   RadioGroup,
   Slider,
   Switch,
-} from "./utils";
+} from "./Components";
 
 interface LayoutProps {
   headerColor: string;

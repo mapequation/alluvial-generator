@@ -7,11 +7,11 @@ import { StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
 import Colors from "./Colors";
+import { ListItemButton } from "./Components";
 import Export from "./Export";
 import Layout from "./Layout";
 import Metadata from "./Metadata";
 import Module from "./Module";
-import { ListItemButton } from "./utils";
 
 interface SidebarProps {
   onLoadClick: () => void;
