@@ -13,8 +13,7 @@ import { MdClear } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
-import { Button, Label, ListItemHeader } from "./Components";
-import { Swatch } from "./Swatch";
+import { Button, Label, ListItemHeader, Swatch } from "./Components";
 
 interface ColorsProps {
   headerColor: string;
