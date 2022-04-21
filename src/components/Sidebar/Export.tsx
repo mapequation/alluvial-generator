@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { MdFileDownload } from "react-icons/md";
-import { saveSvg } from "../../io/export";
+import { saveSvg } from "../../io/save-svg";
 import { StoreContext } from "../../store";
 import { ListItemButton, ListItemHeader } from "./Components";
 
@@ -13,7 +13,9 @@ export default observer(function Export({ headerColor }: ExportProps) {
   const store = useContext(StoreContext);
   const downloadSvg = () => {
     store.setSelectedModule(null);
-    const svg = document.getElementById("alluvialSvg");
+    const svg = document.getElementById("alluvialSvg") as SVGSVGElement | null;
+    if (!svg) return;
+
     const filename =
       store.diagram.children.map((n) => n.name).join("-") + ".svg";
 
