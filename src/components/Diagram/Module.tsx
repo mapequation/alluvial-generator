@@ -2,16 +2,23 @@ import { LightMode, Tooltip } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { forwardRef, useContext } from "react";
+import type { HighlightGroup, Module as ModuleType } from "../../alluvial";
 import useOnClick from "../../hooks/useOnClick";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
 import ModuleTooltip from "./ModuleTooltip";
 
-const G = forwardRef(function Group(props, ref) {
+const G = forwardRef<SVGGElement, any>(function Group(props, ref) {
   return <g ref={ref} {...props} />;
 });
 
-const Module = observer(function Module({ module, fillColor }) {
+const Module = observer(function Module({
+  module,
+  fillColor,
+}: {
+  module: ModuleType;
+  fillColor: (_: HighlightGroup) => string;
+}) {
   const store = useContext(StoreContext);
   const controls = useAnimation();
   const { fontSize, adaptiveFontSize, showModuleId, showModuleNames } = store;
@@ -64,6 +71,7 @@ const Module = observer(function Module({ module, fillColor }) {
             shadow="xl"
             borderRadius="sm"
             openDelay={500}
+            // @ts-ignore
             label={<ModuleTooltip module={module} fillColor={fillColor} />}
           >
             <G style={{ filter: dropShadow(module) }}>

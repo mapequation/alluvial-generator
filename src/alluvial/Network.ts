@@ -324,8 +324,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   }
 }
 
+export type HierarchicalModule = TreeNode | Module;
+
 class TreeNode extends Layout {
-  children: (TreeNode | Module)[] = [];
+  children: HierarchicalModule[] = [];
   childPathMap = new Map<string, TreeNode>();
   maxModuleLevel: number = 1;
   y = Infinity;
@@ -359,7 +361,7 @@ class TreeNode extends Layout {
     return new TreeNode(path, moduleLevel, isLeaf, this);
   }
 
-  *visitBreadthFirst(): Iterable<TreeNode | Module> {
+  *visitBreadthFirst(): Iterable<HierarchicalModule> {
     let queue = this.children;
 
     while (queue.length) {

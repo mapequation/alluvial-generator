@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 interface SwatchProps {
   color: string;
   isSelected?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export function Swatch({

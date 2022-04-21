@@ -4,12 +4,17 @@ import { Fragment, useContext } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 
-const id = (left, right, leftInsignificant, rightInsignificant) =>
+const id = (
+  left: number,
+  right: number,
+  leftInsignificant: boolean,
+  rightInsignificant: boolean
+) =>
   `gradient_${left}${leftInsignificant ? "i" : ""}_${right}${
     rightInsignificant ? "i" : ""
   }`;
 
-function LinearGradients({ activeIndices }) {
+function LinearGradients({ activeIndices }: { activeIndices: number[][] }) {
   const { defaultHighlightColor: defaultColor, highlightColors } =
     useContext(StoreContext);
 
@@ -56,7 +61,12 @@ function LinearGradients({ activeIndices }) {
   );
 }
 
-LinearGradients.fill = (d) =>
+LinearGradients.fill = (d: {
+  leftHighlightIndex: number;
+  rightHighlightIndex: number;
+  leftInsignificant: boolean;
+  rightInsignificant: boolean;
+}) =>
   `url(#${id(
     d.leftHighlightIndex,
     d.rightHighlightIndex,

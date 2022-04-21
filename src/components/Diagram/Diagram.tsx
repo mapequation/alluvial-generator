@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext, useEffect, useRef } from "react";
+import type { Module } from "../../alluvial";
 import useEventListener from "../../hooks/useEventListener";
 import useWindowSize from "../../hooks/useWindowSize";
 import { StoreContext } from "../../store";
@@ -11,10 +12,10 @@ import "./Diagram.css";
 import DropShadows from "./DropShadows";
 import Network from "./Network";
 
-const zoom = d3.zoom().scaleExtent([0.1, 1000]);
+const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 1000]);
 
 export default observer(function Diagram() {
-  const ref = useRef();
+  const ref = useRef<SVGSVGElement>(null);
   const { width, height } = useWindowSize();
   const store = useContext(StoreContext);
   const { diagram, defaultHighlightColor, highlightColors, updateFlag } = store;
@@ -24,6 +25,7 @@ export default observer(function Diagram() {
 
   useEffect(() => {
     const currentRef = ref?.current;
+    if (!currentRef) return;
 
     d3.select(currentRef).call(zoom).on("dblclick.zoom", null);
 
@@ -37,24 +39,27 @@ export default observer(function Diagram() {
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
 
-    if (event?.key === "w") {
+    // @ts-ignore
+    const key = event?.key;
+
+    if (key === "w") {
       store.moveSelectedModule("up");
-    } else if (event?.key === "s") {
+    } else if (key === "s") {
       store.moveSelectedModule("down");
-    } else if (event?.key === "a") {
+    } else if (key === "a") {
       store.moveNetwork("left");
-    } else if (event?.key === "d") {
+    } else if (key === "d") {
       store.moveNetwork("right");
-    } else if (event?.key === "e" && store.selectedModule != null) {
+    } else if (key === "e" && store.selectedModule != null) {
       store.expand(store.selectedModule);
-    } else if (event?.key === "c" && store.selectedModule != null) {
+    } else if (key === "c" && store.selectedModule != null) {
       store.regroup(store.selectedModule);
     } else if (
-      ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event?.key)
+      ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)
     ) {
       event.preventDefault();
 
-      const direction = event?.key.replace("Arrow", "").toLowerCase() ?? "";
+      const direction = key.replace("Arrow", "").toLowerCase() ?? "";
       store.selectModule(direction);
     }
   });
@@ -95,7 +100,7 @@ export default observer(function Diagram() {
   );
 });
 
-function SelectedModule({ module }) {
+function SelectedModule({ module }: { module: Module | null }) {
   if (module == null) {
     return null;
   }
@@ -113,7 +118,7 @@ function SelectedModule({ module }) {
   );
 }
 
-function translateCenter({ width, height }) {
+function translateCenter({ width, height }: { width: number; height: number }) {
   let { innerWidth, innerHeight } = window;
   innerWidth -= drawerWidth;
 

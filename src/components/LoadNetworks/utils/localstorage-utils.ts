@@ -3,9 +3,7 @@ import localforage from "localforage";
 
 export async function getLocalStorageFiles() {
   const network = await localforage.getItem("network");
-  if (!network) {
-    return;
-  }
+  if (!network) return [];
 
   const localStorageFiles = [];
 

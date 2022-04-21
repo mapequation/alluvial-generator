@@ -1,13 +1,23 @@
 import { motion } from "framer-motion";
+import { SVGProps } from "react";
 import { normalize } from "../../utils/math";
 
-export default function FileBackground({ file, fill, ...props }) {
-  const flowDistribution = file.flowDistribution ?? { 0: 1 };
+export default function FileBackground({
+  file: { flowDistribution },
+  fill,
+  ...props
+}: {
+  file: {
+    flowDistribution?: { [key: number]: number };
+  };
+  fill: string;
+} & SVGProps<SVGSVGElement>) {
+  const flow = flowDistribution ?? { 0: 1 };
 
   const minFlow = 1e-4;
 
   const values = normalize(
-    Array.from(Object.values(flowDistribution))
+    Array.from(Object.values(flow))
       .filter((flow) => flow > minFlow)
       .sort()
   );

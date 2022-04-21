@@ -146,7 +146,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     return this.largestGroup.highlightIndex;
   }
 
-  private get maxModuleLevel() {
+  get maxModuleLevel() {
     // FIXME optimize
     let maxModuleLevel = this.moduleLevel;
     for (const node of this.leafNodes()) {

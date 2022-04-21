@@ -1,9 +1,9 @@
-import { animate, useMotionValue } from "framer-motion";
+import { animate, MotionValue, useMotionValue } from "framer-motion";
 import { useEffect } from "react";
 
 const inactiveShadow = "0px 1px 4px rgba(0, 0, 0, 0.16)";
 
-export default function useRaisedShadow(value) {
+export default function useRaisedShadow(value: MotionValue) {
   const boxShadow = useMotionValue(inactiveShadow);
 
   useEffect(() => {

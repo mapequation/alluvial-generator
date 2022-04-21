@@ -1,12 +1,25 @@
-import { motion } from "framer-motion";
+import { motion, MotionProps } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext } from "react";
+import { SVGProps, useContext } from "react";
+import type {
+  HighlightGroup,
+  Module as ModuleType,
+  Network as NetworkType,
+} from "../../alluvial";
+import { StreamlineLink } from "../../alluvial";
+import { HierarchicalModule } from "../../alluvial/Network";
 import { StoreContext } from "../../store";
 import LinearGradients from "./LinearGradients";
 import Module from "./Module";
 import Streamline from "./Streamline";
 
-const Network = observer(function Network({ network, fillColor }) {
+const Network = observer(function Network({
+  network,
+  fillColor,
+}: {
+  network: NetworkType;
+  fillColor: (_: HighlightGroup) => string;
+}) {
   const {
     defaultHighlightColor,
     streamlineThreshold,
@@ -53,9 +66,8 @@ const Network = observer(function Network({ network, fillColor }) {
 
       {modules.map((module) => {
         if (hierarchicalModules === "none" || !("isLeaf" in module)) {
-          return (
-            <Module key={module.id} module={module} fillColor={fillColor} />
-          );
+          const m = module as ModuleType;
+          return <Module key={m.id} module={m} fillColor={fillColor} />;
         } else if (hierarchicalModules === "shadow") {
           return (
             <ShadowModule
@@ -84,7 +96,11 @@ const Network = observer(function Network({ network, fillColor }) {
   );
 });
 
-function OutlineModule({ module, transition, stroke }) {
+function OutlineModule({
+  module,
+  transition,
+  stroke,
+}: { module: HierarchicalModule } & MotionProps & SVGProps<SVGRectElement>) {
   let { x, y, width, height, maxModuleLevel, moduleLevel } = module;
   const offset = 1 + 2.5 * (maxModuleLevel - moduleLevel);
 
@@ -114,7 +130,14 @@ function OutlineModule({ module, transition, stroke }) {
   );
 }
 
-function ShadowModule({ module, transition, fill }) {
+function ShadowModule({
+  module,
+  transition,
+  fill,
+}: {
+  module: HierarchicalModule;
+} & MotionProps &
+  SVGProps<SVGRectElement>) {
   const offset = 5 * (module.maxModuleLevel - module.moduleLevel);
   const { layout } = module;
 
@@ -145,8 +168,8 @@ function ShadowModule({ module, transition, fill }) {
   );
 }
 
-function activeHighlightIndices(links) {
-  const uniqueIndices = new Set();
+function activeHighlightIndices(links: Iterable<StreamlineLink>) {
+  const uniqueIndices = new Set<string>();
 
   for (const { leftHighlightIndex, rightHighlightIndex } of links) {
     uniqueIndices.add(`${leftHighlightIndex}_${rightHighlightIndex}`);

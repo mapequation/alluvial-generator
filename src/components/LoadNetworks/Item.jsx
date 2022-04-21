@@ -98,6 +98,13 @@ export default function Item({
     boxShadow: "md",
   };
 
+  const Icon = (() => {
+    if (file.isMultilayer) {
+      return file.isExpanded ? <LayerIcon /> : <IoLayersOutline />;
+    }
+    return file.noModularResult ? <GrTextAlignFull /> : <BiNetworkChart />;
+  })();
+
   return (
     <Reorder.Item
       id={file.id}
@@ -118,23 +125,13 @@ export default function Item({
 
       <Box maxW="100%" h="100%" pos="relative" bg="transparent">
         <Box p={2}>
-          {file.isMultilayer ? (
-            <IconButton
-              onClick={onMultilayerClick}
-              aria-label="expand"
-              icon={file.isExpanded ? <LayerIcon /> : <IoLayersOutline />}
-              {...iconProps}
-            />
-          ) : (
-            <IconButton
-              aria-label="graph"
-              icon={
-                file.noModularResult ? <GrTextAlignFull /> : <BiNetworkChart />
-              }
-              pointerEvents="none"
-              {...iconProps}
-            />
-          )}
+          <IconButton
+            aria-label={file.isMultilayer ? "multilayer" : "network"}
+            onClick={file.isMultilayer ? onMultilayerClick : undefined}
+            pointerEvents={file.isMultilayer ? "auto" : "none"}
+            icon={Icon}
+            {...iconProps}
+          />
 
           <IconButton
             isRound

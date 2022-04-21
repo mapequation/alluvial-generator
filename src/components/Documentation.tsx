@@ -16,7 +16,9 @@ import {
 } from "@chakra-ui/react";
 import { FaGithub } from "react-icons/fa";
 import compareSvg from "../images/compare.svg";
+// @ts-ignore
 import expandModuleMov from "../images/expand.mov";
+// @ts-ignore
 import regroupModuleMov from "../images/regroup.mov";
 
 const videoProps = {
@@ -27,7 +29,7 @@ const videoProps = {
   height: 225,
 };
 
-const Documentation = ({ onClose }) => (
+const Documentation = ({ onClose }: { onClose: () => void }) => (
   <>
     <ModalOverlay />
     <ModalContent>

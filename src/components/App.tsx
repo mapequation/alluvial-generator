@@ -42,7 +42,9 @@ export default observer(function App() {
   };
 
   useEventListener("keydown", (event) => {
-    if (!store.editMode && event?.key === "l") {
+    // @ts-ignore
+    const key = event?.key;
+    if (!store.editMode && key === "l") {
       openLoad();
     }
   });
@@ -80,7 +82,6 @@ export default observer(function App() {
 
       <Slide in={!isLoadOpen} style={{ width: drawerWidth }}>
         <Sidebar
-          in={!isLoadOpen}
           onLoadClick={openLoad}
           onAboutClick={openHelp}
           onModuleViewClick={openExplorer}

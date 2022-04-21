@@ -1,6 +1,6 @@
 import { RefObject, useEffect, useRef } from "react";
 
-function useEventListener<T extends HTMLElement = HTMLDivElement>(
+function useEventListener<T extends Element = HTMLDivElement>(
   eventName: keyof WindowEventMap | string, // string to allow custom event
   handler: (event: Event) => void,
   element?: RefObject<T>

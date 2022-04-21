@@ -20,7 +20,11 @@ import { useContext } from "react";
 import { StoreContext } from "../../store";
 import { Swatch } from "../Sidebar/Swatch";
 
-export default observer(function Explorer({ onClose }) {
+export default observer(function Explorer({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
   const store = useContext(StoreContext);
   const bg = useColorModeValue("white", "gray.700");
 

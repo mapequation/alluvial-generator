@@ -1,7 +1,14 @@
 import { motion } from "framer-motion";
+import type { StreamlineLink } from "../../alluvial";
 import LinearGradients from "./LinearGradients";
 
-export default function Streamline({ link, opacity }) {
+export default function Streamline({
+  link,
+  opacity,
+}: {
+  link: StreamlineLink;
+  opacity: number;
+}) {
   const { path, transitionPath } = link;
   return (
     <motion.path
