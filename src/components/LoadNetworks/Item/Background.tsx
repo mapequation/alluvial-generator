@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { SVGProps } from "react";
-import { normalize } from "../../utils/math";
+import { normalize } from "../../../utils/math";
 
-export default function FileBackground({
+export default function Background({
   file: { flowDistribution },
   fill,
   ...props
