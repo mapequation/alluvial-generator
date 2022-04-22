@@ -1,4 +1,5 @@
 import { Box, Progress, Text, useColorModeValue } from "@chakra-ui/react";
+import { parse } from "@mapequation/infomap-parser";
 import { useInfomap } from "@mapequation/infomap-react";
 import { useState } from "react";
 import humanFileSize from "../../../utils/human-file-size";
@@ -57,7 +58,8 @@ export default function Item({
 
       const tree = result.ftree_states || result.ftree;
       if (tree) {
-        updateFile(file, tree);
+        const contents = parse(tree, null, true);
+        updateFile(file, contents);
         setShowInfomap(false);
       }
     } catch (e) {

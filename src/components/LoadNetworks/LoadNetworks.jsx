@@ -26,7 +26,6 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { parse } from "@mapequation/infomap-parser";
 import { AnimatePresence, Reorder } from "framer-motion";
 import localforage from "localforage";
 import { observer } from "mobx-react";
@@ -140,34 +139,25 @@ export default observer(function LoadNetworks({ onClose }) {
     onDrop,
   });
 
-  const updateFileWithTree = (file, tree) => {
+  const updateFileWithTree = (file, contents) => {
     const index = files.findIndex((f) => f.id === file.id);
 
     if (index === -1) {
       return;
     }
 
-    try {
-      const contents = parse(tree, null, true);
+    setIdentifiers(contents, "ftree", store.identifier);
 
-      setIdentifiers(contents, "ftree", store.identifier);
+    Object.assign(file, {
+      noModularResult: false,
+      ...contents,
+      ...calcStatistics(contents),
+    });
 
-      Object.assign(file, {
-        noModularResult: false,
-        ...contents,
-        ...calcStatistics(contents),
-      });
-
-      dispatch({
-        type: "set",
-        payload: { files: files.map((f) => (f.id === file.id ? file : f)) },
-      });
-    } catch (e) {
-      onError({
-        title: `Could not parse ${file.name}`,
-        description: e.message,
-      });
-    }
+    dispatch({
+      type: "set",
+      payload: { files: files.map((f) => (f.id === file.id ? file : f)) },
+    });
   };
 
   const createDiagram = useCallback(() => {

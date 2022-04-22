@@ -1,5 +1,3 @@
-// @ts-nocheck
-// FIXME enable typescript checking
 import { extension as fileExtension, parse, readFile } from "@mapequation/infomap-parser";
 import JSZip from "jszip";
 import id from "../../../utils/id";
@@ -63,7 +61,7 @@ export async function parseAcceptedFiles(
     } else if (format === "net") {
       contents = {
         network: readFiles[i],
-        noModularResul: true,
+        noModularResult: true,
       };
     } else {
       try {
@@ -80,6 +78,7 @@ export async function parseAcceptedFiles(
     }
 
     try {
+      // @ts-ignore
       setIdentifiers(contents, format, storeIdentifier);
       newFiles.push(createFile(file, format, contents));
     } catch (e: any) {
