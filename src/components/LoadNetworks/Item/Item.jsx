@@ -45,14 +45,14 @@ export default function Item({
 
   const runInfomap = async () => {
     try {
-      setIsRunning(running);
+      setIsRunning(true);
 
       const result = await runAsync({
         network: file.network,
         filename: file.name,
       });
 
-      setIsRunning(running);
+      setIsRunning(false);
 
       Object.assign(file, { numTrials, directed, twoLevel });
 
