@@ -271,7 +271,7 @@ export default observer(function LoadNetworks({ onClose }) {
     if (event?.key === "c" && files.length > 0) {
       createDiagram();
     } else if (event?.key === "e") {
-      loadExample();
+      void loadExample();
     }
   });
 
@@ -457,7 +457,7 @@ export default observer(function LoadNetworks({ onClose }) {
                       type: "set",
                       payload: { localStorageFiles: [] },
                     });
-                    localforage.clear();
+                    void localforage.clear();
                   }}
                 >
                   Clear

@@ -33,7 +33,7 @@ const Module = observer(function Module({
         ? store.regroup(module)
         : store.expand(module);
       if (!success) {
-        controls.start({
+        void controls.start({
           x: [null, 5, -5, 4, -4, 0],
           scale: [null, 1.01, 1],
           opacity: [1, 0.8, 1, 0.8, 1],
