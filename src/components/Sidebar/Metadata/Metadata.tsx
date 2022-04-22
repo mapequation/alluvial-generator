@@ -7,25 +7,27 @@ import ErrorBoundary from "../../ErrorBoundary";
 import { Label, ListItemHeader } from "../Components";
 import MetadataCollection from "./MetadataCollection";
 
-interface MetadataProps {
-  headerColor: string;
-  color: string;
-}
-
 export default observer(function Metadata({
   headerColor,
   color,
-}: MetadataProps) {
+}: {
+  headerColor: string;
+  color: string;
+}) {
   const store = useContext(StoreContext);
   const { selectedModule } = store;
 
-  const diagramHasMeta = store.diagram.children.some(
+  const diagramHaveMeta = store.diagram.children.some(
     (network: Network) => network.haveMetadata
   );
 
-  if (!diagramHasMeta) return null;
+  if (!diagramHaveMeta) return null;
 
-  const selectedHasMeta = selectedModule?.parent.haveMetadata ?? false;
+  const network = selectedModule?.parent;
+
+  const diagramMeta = store.diagram.children
+    .filter((net) => net.haveMetadata && net !== network)
+    .map((net) => net.metadata);
 
   return (
     <>
@@ -33,12 +35,13 @@ export default observer(function Metadata({
 
       <ListItem>
         {selectedModule != null ? (
-          selectedHasMeta ? (
+          network?.haveMetadata ? (
             <>
-              <Label>{selectedModule.parent?.name ?? "Network"}</Label>
+              <Label>{network.name ?? "Network"}</Label>
               <ErrorBoundary>
                 <MetadataCollection
-                  metadata={selectedModule.parent.metadata}
+                  networkMeta={network.metadata}
+                  diagramMeta={diagramMeta}
                   color={color}
                 />
               </ErrorBoundary>

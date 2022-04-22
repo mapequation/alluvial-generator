@@ -7,6 +7,7 @@ import {
   ListItemProps,
   Radio,
   RadioGroup as CkRadioGroup,
+  Select as CkSelect,
   Slider as CkSlider,
   SliderFilledTrack,
   SliderProps,
@@ -162,18 +163,16 @@ export function Switch({
   );
 }
 
-interface SwatchProps {
-  color: string;
-  isSelected?: boolean;
-  onClick?: () => void;
-}
-
 export function Swatch({
   color,
   isSelected,
   onClick,
   children,
-}: PropsWithChildren<SwatchProps>) {
+}: PropsWithChildren<{
+  color: string;
+  isSelected?: boolean;
+  onClick?: () => void;
+}>) {
   const border = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
 
   return (
@@ -200,5 +199,32 @@ export function Swatch({
     >
       {children}
     </Box>
+  );
+}
+
+export function Select({
+  value,
+  setValue,
+  options,
+}: {
+  value: string;
+  setValue: (value: string) => void;
+  options: string[];
+}) {
+  return (
+    <CkSelect
+      size="sm"
+      w="50%"
+      variant="flushed"
+      display="inline-block"
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+    >
+      {options.map((name) => (
+        <option key={name} value={name}>
+          {name}
+        </option>
+      ))}
+    </CkSelect>
   );
 }

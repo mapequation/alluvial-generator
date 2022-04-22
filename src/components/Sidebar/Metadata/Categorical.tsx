@@ -6,23 +6,18 @@ import { Categorical as CategoricalData } from "../../../alluvial/Network";
 import useMap from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
 import { Button } from "../Components";
-
-interface CategoricalProps {
-  name: string;
-  data: CategoricalData;
-  color: string;
-}
+import type { MetadataKindProps } from "./MetadataCollection";
 
 export default observer(function Categorical({
   name,
   data,
   color,
-}: CategoricalProps) {
+}: MetadataKindProps<CategoricalData>) {
   const store = useContext(StoreContext);
   const { defaultHighlightColor } = store;
 
   const [map, actions] = useMap(
-    data.counts.map(({ category }, i) => [category, defaultHighlightColor])
+    data.counts.map(({ category }) => [category, defaultHighlightColor])
   );
 
   return (
