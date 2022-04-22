@@ -43,8 +43,10 @@ import {
   createFilesFromDiagramObject,
   expandMultilayerFile,
   getLocalStorageFiles,
+  initialState,
   mergeMultilayerFiles,
   parseAcceptedFiles,
+  reducer,
   setIdentifiers,
 } from "./utils";
 
@@ -67,26 +69,6 @@ const exampleDataFilename = "science-1998-2001-2007.json";
 async function fetchExampleData(filename = exampleDataFilename) {
   const res = await fetch(`/alluvial/data/${filename}`);
   return await res.json();
-}
-
-const initialState = {
-  isCreatingDiagram: false,
-  isLoadingExample: false,
-  isLoadingFiles: false,
-  infomapRunning: false,
-  files: [],
-  localStorageFiles: [],
-};
-
-function reducer(state, action) {
-  switch (action.type) {
-    case "set":
-      return { ...state, ...action.payload };
-    case "reset":
-      return initialState;
-    default:
-      return state;
-  }
 }
 
 export default observer(function LoadNetworks({ onClose }) {
