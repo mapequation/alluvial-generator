@@ -44,7 +44,7 @@ export async function getLocalStorageFiles() {
 
     const contents =
       key === "json" || key === "json_states"
-        ? JSON.stringify(network[key]) // TODO dan't stringify and then parse again
+        ? JSON.stringify(network[key]) // TODO don't stringify and then parse again
         : network[key];
 
     // @ts-ignore

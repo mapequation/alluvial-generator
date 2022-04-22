@@ -3,7 +3,7 @@ import type {
   Categorical as CategoricalData,
   Real as RealData,
 } from "../../../alluvial/Network";
-import { Select } from "../Components";
+import { Select } from "../components";
 import Categorical from "./Categorical";
 import Real from "./Real";
 

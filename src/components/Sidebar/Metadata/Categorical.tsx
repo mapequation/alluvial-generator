@@ -5,7 +5,7 @@ import { Bar, BarChart, Cell, Tooltip, XAxis, YAxis } from "recharts";
 import { Categorical as CategoricalData } from "../../../alluvial/Network";
 import useMap from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
-import { Button } from "../Components";
+import { Button } from "../components";
 import type { MetadataKindProps } from "./MetadataCollection";
 
 export default observer(function Categorical({

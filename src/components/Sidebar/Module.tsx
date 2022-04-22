@@ -18,7 +18,7 @@ import {
   MdUnfoldMore,
 } from "react-icons/md";
 import { StoreContext } from "../../store";
-import { Button, Label, ListItemButton, ListItemHeader } from "./Components";
+import { Button, Label, ListItemButton, ListItemHeader } from "./components";
 
 export default observer(function Module({
   headerColor,

@@ -1,15 +1,10 @@
+import { Identifier } from "../../../alluvial";
 import TreePath from "../../../utils/TreePath";
+import type { Format, Node as NodeType } from "../types";
 
-type Node = {
-  id: number;
-  stateId?: number;
-  name?: string;
-  identifier?: string;
-  path: string | number[];
-  moduleId?: number;
-};
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
-type Identifier = "id" | "name";
+type Node = Optional<NodeType, "path" | "moduleId" | "flow">;
 
 function stateOrNodeId(node: Node): number {
   return node.stateId != null ? node.stateId : node.id;
@@ -25,17 +20,11 @@ function getIdentifier(identifier: Identifier) {
   };
 }
 
-type InfomapOutput = "json" | "clu" | "tree" | "ftree" | "stree";
-type MultilayerExpanded = "multilayer-expanded";
-type Network = "net"; // Ignored
-
 export function setIdentifiers(
-  network: { nodes: Node[] },
-  format: InfomapOutput | MultilayerExpanded | Network,
+  nodes: Node[],
+  format: Format,
   identifier: Identifier = "id"
 ) {
-  const { nodes } = network;
-
   const id = getIdentifier(identifier);
 
   if (format === "multilayer-expanded") {
@@ -49,7 +38,7 @@ export function setIdentifiers(
       node.identifier = node.identifier ?? id(node);
       // TODO: remove. Used only for example data.
       if (!Array.isArray(node.path)) {
-        node.path = TreePath.toArray(node.path);
+        node.path = TreePath.toArray(node.path!);
       }
     });
   } else if (format === "tree" || format === "ftree" || format === "stree") {

@@ -9,3 +9,4 @@ export { default as StreamlineLink } from "./StreamlineLink";
 export { default as LeafNode } from "./LeafNode";
 export * from "./Side";
 export * from "./Depth";
+export type { Identifier } from "./LeafNode";

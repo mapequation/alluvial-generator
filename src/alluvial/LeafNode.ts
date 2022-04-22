@@ -8,6 +8,8 @@ import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
+export type Identifier = "id" | "name";
+
 export default class LeafNode extends AlluvialNodeBase<never> {
   readonly depth = LEAF_NODE;
   readonly name: string;
@@ -16,7 +18,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly stateId?: number | null = null;
   readonly layerId?: number | null = null;
   readonly metadata?: { [key: string]: string | number };
-  readonly identifier: string;
+  readonly identifier: Identifier;
   readonly treePath: TreePath;
   highlightIndex: number;
   moduleLevel: number;

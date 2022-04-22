@@ -4,7 +4,7 @@ import { useContext } from "react";
 import type { Network } from "../../../alluvial";
 import { StoreContext } from "../../../store";
 import ErrorBoundary from "../../ErrorBoundary";
-import { Label, ListItemHeader } from "../Components";
+import { Label, ListItemHeader } from "../components";
 import MetadataCollection from "./MetadataCollection";
 
 export default observer(function Metadata({

@@ -1,3 +1,4 @@
+import type { NetworkFile } from "../components/LoadNetworks";
 import differenceIndex from "../utils/difference-index";
 import Tree from "../utils/Tree";
 import AlluvialNodeBase from "./AlluvialNode";
@@ -84,7 +85,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
   readonly depth = ROOT;
   flowThreshold: number = 0;
 
-  constructor(networks: any[] = []) {
+  constructor(networks: NetworkFile[] = []) {
     super(null, "", "root");
 
     for (let network of networks) {
@@ -92,8 +93,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     }
   }
 
-  // FIXME remove any
-  addNetwork(network: any) {
+  addNetwork(network: NetworkFile) {
     const { nodes, id } = network;
 
     if (this.children.some((network) => network.networkId === id)) {

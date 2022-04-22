@@ -24,7 +24,6 @@ import {
   Skeleton,
   Tooltip,
   useColorModeValue,
-  useToast,
 } from "@chakra-ui/react";
 import { AnimatePresence, Reorder } from "framer-motion";
 import localforage from "localforage";
@@ -32,13 +31,15 @@ import { observer } from "mobx-react";
 import { useCallback, useContext, useReducer } from "react";
 import { useDropzone } from "react-dropzone";
 import { MdOutlineDelete, MdUpload } from "react-icons/md";
+import type { Identifier } from "../../alluvial";
+import { useError } from "../../hooks/useError";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import Item from "./Item";
 import "./LoadNetworks.css";
 import Stepper from "./Stepper";
+import type { NetworkFile } from "./types";
 import {
-  calcStatistics,
   createFilesFromDiagramObject,
   expandMultilayerFile,
   getLocalStorageFiles,
@@ -59,20 +60,24 @@ const acceptedFormats = [
   "json",
   "net",
   "zip",
-];
+] as const;
 
 const dropzoneAccept = acceptedFormats.map((format) => `.${format}`).join(",");
 
-const exampleDataFilename = "science-1998-2001-2007.json";
+const exampleDataFilename = "science-1998-2001-2007.json" as const;
 
 async function fetchExampleData(filename = exampleDataFilename) {
   const res = await fetch(`/alluvial/data/${filename}`);
   return await res.json();
 }
 
-export default observer(function LoadNetworks({ onClose }) {
+export default observer(function LoadNetworks({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
   const store = useContext(StoreContext);
-  const toast = useToast();
+  const onError = useError();
   const dropzoneBg = useColorModeValue(
     "var(--chakra-colors-gray-50)",
     "var(--chakra-colors-gray-600)"
@@ -84,22 +89,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
   const { files } = state;
 
-  const onError = useCallback(
-    ({ title, description, ...props }) => {
-      console.warn(description);
-      toast({
-        title,
-        description,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        ...props,
-      });
-    },
-    [toast]
-  );
-
-  const onDrop = async (acceptedFiles) => {
+  const onDrop = async (acceptedFiles: File[]) => {
     console.time("onDrop");
     dispatch({ type: "set", payload: { isLoadingFiles: true } });
 
@@ -139,20 +129,9 @@ export default observer(function LoadNetworks({ onClose }) {
     onDrop,
   });
 
-  const updateFileWithTree = (file, contents) => {
+  const updateFile = (file: NetworkFile) => {
     const index = files.findIndex((f) => f.id === file.id);
-
-    if (index === -1) {
-      return;
-    }
-
-    setIdentifiers(contents, "ftree", store.identifier);
-
-    Object.assign(file, {
-      noModularResult: false,
-      ...contents,
-      ...calcStatistics(contents),
-    });
+    if (index === -1) return;
 
     dispatch({
       type: "set",
@@ -161,8 +140,6 @@ export default observer(function LoadNetworks({ onClose }) {
   };
 
   const createDiagram = useCallback(() => {
-    // TODO already loaded?
-    // TODO set state from json
     dispatch({ type: "set", payload: { isCreatingDiagram: true } });
     store.setFiles(files);
     onClose();
@@ -191,7 +168,7 @@ export default observer(function LoadNetworks({ onClose }) {
         store.setFiles(files);
         onClose();
       }, 200);
-    } catch (e) {
+    } catch (e: any) {
       onError({
         title: "Could not load example data",
         description: e.message,
@@ -208,14 +185,14 @@ export default observer(function LoadNetworks({ onClose }) {
     console.timeEnd("loadExample");
   }, [onClose, store, onError]);
 
-  const removeFileId = (id) => {
+  const removeFileId = (id: string) => {
     dispatch({
       type: "set",
       payload: { files: files.filter((file) => file.id !== id) },
     });
   };
 
-  const toggleMultilayerExpanded = (file) => {
+  const toggleMultilayerExpanded = (file: NetworkFile) => {
     if (!file.isMultilayer) return;
 
     if (file.isExpanded === undefined) {
@@ -240,29 +217,33 @@ export default observer(function LoadNetworks({ onClose }) {
   useEventListener("keydown", (event) => {
     if (store.editMode) return;
 
-    if (event?.key === "c" && files.length > 0) {
+    // @ts-ignore
+    const key = event?.key;
+
+    if (key === "c" && files.length > 0) {
       createDiagram();
-    } else if (event?.key === "e") {
+    } else if (key === "e") {
       void loadExample();
     }
   });
 
-  const updateIdentifiers = (identifier) => {
+  const updateIdentifiers = (identifier: Identifier) => {
     files.forEach((file) => {
       if (file.isExpanded) {
-        // No need to do anything
+        // No need to do anything: using node ids as identifier in an expanded
+        // multilayer file is always correct.
         //setIdentifiers(file, "multilayer-expanded");
         return;
       }
 
       if (file.format === "net") {
-        if (!file.noModularResult) {
-          setIdentifiers(file, "ftree", identifier);
+        if (file.haveModules) {
+          setIdentifiers(file.nodes, "ftree", identifier);
         }
         return;
       }
 
-      setIdentifiers(file, file.format, identifier);
+      setIdentifiers(file.nodes, file.format, identifier);
     });
     store.setIdentifier(identifier);
   };
@@ -273,23 +254,27 @@ export default observer(function LoadNetworks({ onClose }) {
     try {
       const localStorageFiles = await getLocalStorageFiles();
       dispatch({ type: "set", payload: { localStorageFiles } });
-    } catch (e) {
+    } catch (e: any) {
       console.warn(e.message);
     }
   };
 
-  let activeStep = 1;
-  if (files.length > 0) {
-    activeStep = files.some((f) => f.noModularResult) ? 0 : 2;
-  }
+  const activeStep = (() => {
+    if (files.length === 0) return 1;
+
+    return files.some((f) => !f.haveModules) ? 0 : 2;
+  })();
 
   const {
-    isCreatingDiagram,
     isLoadingExample,
     isLoadingFiles,
     infomapRunning,
+    isCreatingDiagram,
     localStorageFiles,
   } = state;
+
+  const buttonsDisabled =
+    isLoadingFiles || isLoadingExample || infomapRunning || isCreatingDiagram;
 
   return (
     <>
@@ -326,12 +311,13 @@ export default observer(function LoadNetworks({ onClose }) {
                     <Item
                       key={file.id}
                       file={file}
+                      identifier={store.identifier}
                       onRemove={() => removeFileId(file.id)}
                       onMultilayerClick={() => toggleMultilayerExpanded(file)}
-                      setIsRunning={(infomapRunning) =>
+                      setIsRunning={(infomapRunning: boolean) =>
                         dispatch({ type: "set", payload: { infomapRunning } })
                       }
-                      updateFile={updateFileWithTree}
+                      updateFile={updateFile}
                       onError={onError}
                     />
                   ))}
@@ -344,12 +330,7 @@ export default observer(function LoadNetworks({ onClose }) {
 
         <ModalFooter>
           <Button
-            disabled={
-              isLoadingFiles ||
-              infomapRunning ||
-              isLoadingExample ||
-              isCreatingDiagram
-            }
+            disabled={buttonsDisabled}
             mr={2}
             onClick={loadExample}
             variant="outline"
@@ -358,12 +339,7 @@ export default observer(function LoadNetworks({ onClose }) {
             Load Example
           </Button>
           <Button
-            disabled={
-              files.length === 0 ||
-              infomapRunning ||
-              isLoadingExample ||
-              isCreatingDiagram
-            }
+            disabled={files.length === 0 || buttonsDisabled}
             onClick={() => dispatch({ type: "reset" })}
             leftIcon={<MdOutlineDelete />}
             mr={8}
@@ -372,42 +348,16 @@ export default observer(function LoadNetworks({ onClose }) {
             Clear
           </Button>
           <Box mr="auto">
-            <FormLabel fontSize="sm" htmlFor="identifier" mr={0} mb={0}>
-              Node Identifier{" "}
-              <Tooltip
-                hasArrow
-                placement="top"
-                label="Node identifiers are used to match nodes across different networks. Choose between matching nodes by node id or node name."
-              >
-                <QuestionOutlineIcon />
-              </Tooltip>
-            </FormLabel>
-            <RadioGroup
-              isDisabled={
-                files.length === 0 ||
-                isLoadingExample ||
-                infomapRunning ||
-                isCreatingDiagram
-              }
+            <NodeIdentifier
+              isDisabled={files.length === 0 || buttonsDisabled}
               onChange={updateIdentifiers}
-              value={store.identifier}
-              size="sm"
-            >
-              <HStack spacing={2}>
-                <Radio value="id">Id</Radio>
-                <Radio value="name">Name</Radio>
-              </HStack>
-            </RadioGroup>
+              identifier={store.identifier}
+            />
           </Box>
           <Box mr={2}>
             <Menu onOpen={loadLocalStorage}>
               <MenuButton
-                disabled={
-                  isLoadingFiles ||
-                  infomapRunning ||
-                  isLoadingFiles ||
-                  isCreatingDiagram
-                }
+                disabled={buttonsDisabled}
                 as={Button}
                 variant="outline"
                 rightIcon={<ChevronDownIcon />}
@@ -439,12 +389,7 @@ export default observer(function LoadNetworks({ onClose }) {
           </Box>
           <Button
             onClick={open}
-            disabled={
-              isLoadingFiles ||
-              infomapRunning ||
-              isLoadingExample ||
-              isCreatingDiagram
-            }
+            disabled={buttonsDisabled}
             mr={2}
             variant="outline"
             isActive={files.length === 0}
@@ -456,7 +401,7 @@ export default observer(function LoadNetworks({ onClose }) {
             variant="outline"
             disabled={
               files.length === 0 ||
-              files.some((f) => f.noModularResult) ||
+              files.some((f) => !f.haveModules) ||
               infomapRunning ||
               isLoadingExample
             }
@@ -471,3 +416,47 @@ export default observer(function LoadNetworks({ onClose }) {
     </>
   );
 });
+
+function NodeIdentifier({
+  isDisabled,
+  onChange,
+  identifier,
+}: {
+  isDisabled: boolean;
+  onChange: (identifier: Identifier) => void;
+  identifier: Identifier;
+}) {
+  const tooltip = (
+    <>
+      Node identifiers are used to match nodes across different networks.
+      <br />
+      Choose between matching nodes by <strong>node id</strong> or{" "}
+      <strong>node name</strong>.
+      <br />
+      When matching by name, the node names in each network{" "}
+      <strong>must be unique</strong>.
+    </>
+  );
+
+  return (
+    <>
+      <FormLabel fontSize="sm" htmlFor="identifier" mr={0} mb={0}>
+        Node Identifier{" "}
+        <Tooltip hasArrow placement="top" label={tooltip}>
+          <QuestionOutlineIcon />
+        </Tooltip>
+      </FormLabel>
+      <RadioGroup
+        isDisabled={isDisabled}
+        onChange={onChange}
+        value={identifier}
+        size="sm"
+      >
+        <HStack spacing={2}>
+          <Radio value="id">Id</Radio>
+          <Radio value="name">Name</Radio>
+        </HStack>
+      </RadioGroup>
+    </>
+  );
+}

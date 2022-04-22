@@ -5,3 +5,4 @@ export * from "./set-identifiers";
 export * from "./calc-statistics";
 export * from "./from-diagram";
 export * from "./reducer";
+export * from "./create-file";

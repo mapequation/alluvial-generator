@@ -1,10 +1,12 @@
+import type { NetworkFile } from "../types";
+
 type State = {
   isCreatingDiagram: boolean;
   isLoadingExample: boolean;
   isLoadingFiles: boolean;
   infomapRunning: boolean;
-  files: readonly any[]; // FIXME any
-  localStorageFiles: readonly any[]; // FIXME any
+  files: NetworkFile[];
+  localStorageFiles: File[];
 };
 
 type Action = {
@@ -19,7 +21,7 @@ export const initialState = {
   infomapRunning: false,
   files: [],
   localStorageFiles: [],
-} as const;
+};
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {

@@ -1,5 +1,6 @@
 import type { Module as InfomapModule } from "@mapequation/infomap";
 import * as d3 from "d3";
+import type { NetworkFile } from "../components/LoadNetworks";
 import { moveItem } from "../utils/array";
 import TreePath from "../utils/TreePath";
 import AlluvialNodeBase, { Layout } from "./AlluvialNode";
@@ -9,16 +10,6 @@ import LeafNode from "./LeafNode";
 import Module from "./Module";
 import type { Side } from "./Side";
 import StreamlineNode from "./StreamlineNode";
-
-// FIXME use Infomap types
-export type NetworkProps = {
-  name: string;
-  id: string;
-  codelength: number;
-  layerId?: number;
-  directed?: boolean;
-  modules?: InfomapModule[];
-};
 
 type ModuleLink = {
   target: string;
@@ -57,12 +48,12 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   constructor(
     parent: Diagram,
-    { name, id, codelength, layerId, modules, directed }: NetworkProps
+    { name, id, codelength, layerId, modules, directed }: NetworkFile
   ) {
     super(parent, id, id);
     parent.addChild(this);
     this.name = name;
-    this.codelength = codelength;
+    this.codelength = codelength ?? 0;
     this.layerId = layerId;
     this.directed = directed ?? false;
 
@@ -161,10 +152,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         const iqr = q3 - q1;
         entry.boxBounds = [
           entry.min,
-          q1 - 1.5 * iqr,
+          Math.max(q1 - 1.5 * iqr, entry.min),
           q1,
           q3,
-          q3 + 1.5 * iqr,
+          Math.min(q3 + 1.5 * iqr, entry.max),
           entry.max,
         ];
       } else if (value.kind === "categorical") {
@@ -227,7 +218,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     return this.parent?.flowThreshold ?? 0;
   }
 
-  static create(parent: Diagram, network: NetworkProps) {
+  static create(parent: Diagram, network: NetworkFile) {
     return new Network(parent, network);
   }
 

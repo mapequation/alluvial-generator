@@ -6,7 +6,7 @@ import { StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
 import Colors from "./Colors";
-import { ListItemButton } from "./Components";
+import { ListItemButton } from "./components";
 import Export from "./Export";
 import Layout from "./Layout";
 import Metadata from "./Metadata";

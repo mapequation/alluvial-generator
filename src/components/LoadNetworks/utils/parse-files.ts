@@ -1,12 +1,22 @@
-import { extension as fileExtension, parse, readFile } from "@mapequation/infomap-parser";
+import {
+  extension as fileExtension,
+  parse,
+  readFile,
+} from "@mapequation/infomap-parser";
 import JSZip from "jszip";
+import { Identifier } from "../../../alluvial";
 import id from "../../../utils/id";
-import { calcStatistics } from "./calc-statistics";
+import type { Format, NetworkFile } from "../types";
+import { createFile } from "./create-file";
 import { createFilesFromDiagramObject } from "./from-diagram";
 import { setIdentifiers } from "./set-identifiers";
 
-// FIXME any
-function createError(file: any, code: string, message: string) {
+export type ErrorType = {
+  file: File;
+  errors: { code: string; message: string }[];
+};
+
+function createError(file: File, code: string, message: string): ErrorType {
   return {
     file,
     errors: [{ code, message }],
@@ -14,11 +24,11 @@ function createError(file: any, code: string, message: string) {
 }
 
 export async function parseAcceptedFiles(
-  acceptedFiles: any[], // FIXME any
-  currentFiles: any[], // FIXME any
-  acceptedFormats: string[],
-  storeIdentifier: string
-) {
+  acceptedFiles: File[],
+  currentFiles: NetworkFile[],
+  acceptedFormats: readonly string[],
+  identifier: Identifier
+): Promise<[NetworkFile[], ErrorType[]]> {
   const { readFiles, errors } = await readAcceptedFiles(
     acceptedFiles,
     acceptedFormats
@@ -61,7 +71,7 @@ export async function parseAcceptedFiles(
     } else if (format === "net") {
       contents = {
         network: readFiles[i],
-        noModularResult: true,
+        haveModules: false,
       };
     } else {
       try {
@@ -78,8 +88,7 @@ export async function parseAcceptedFiles(
     }
 
     try {
-      // @ts-ignore
-      setIdentifiers(contents, format, storeIdentifier);
+      setIdentifiers(contents.nodes, format as Format, identifier);
       newFiles.push(createFile(file, format, contents));
     } catch (e: any) {
       errors.push(createError(file, "invalid-format", e.message));
@@ -90,9 +99,9 @@ export async function parseAcceptedFiles(
 }
 
 async function readAcceptedFiles(
-  acceptedFiles: any[],
-  acceptedFormats: string[]
-) {
+  acceptedFiles: File[],
+  acceptedFormats: readonly string[]
+): Promise<{ readFiles: string[]; errors: ErrorType[] }> {
   const readFiles = [];
   const errors = [];
 
@@ -114,7 +123,7 @@ async function readAcceptedFiles(
           if (!textFormats.includes(extension)) {
             errors.push(
               createError(
-                { name },
+                { name } as File,
                 "unsupported-format",
                 `Unsupported file format: ${extension}`
               )
@@ -132,7 +141,7 @@ async function readAcceptedFiles(
             // @ts-ignore
             size: compressedFile?._data?.uncompressedSize ?? file.size,
             lastModified: file.lastModified,
-          });
+          } as File);
           fileIndex++;
         }
       } catch (e: any) {
@@ -145,29 +154,4 @@ async function readAcceptedFiles(
   }
 
   return { readFiles, errors };
-}
-
-// FIXME any
-function createFile(file: any, format: string, contents: any) {
-  const newFile = Object.assign(
-    {},
-    {
-      ...file,
-      fileName: file.name, // Save the original filename so we don't overwrite it
-      name: file.name,
-      lastModified: file.lastModified,
-      size: file.size,
-      id: id(),
-      format,
-      ...contents,
-    }
-  );
-
-  // .net files has noModularResult = true by default
-  // all other format lack the noModularResult property
-  if (contents.noModularResult === undefined && !file.noModularResult) {
-    Object.assign(newFile, calcStatistics(contents));
-  }
-
-  return newFile;
 }

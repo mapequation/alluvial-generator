@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { MdFileDownload } from "react-icons/md";
 import { saveSvg } from "../../io/save-svg";
 import { StoreContext } from "../../store";
-import { ListItemButton, ListItemHeader } from "./Components";
+import { ListItemButton, ListItemHeader } from "./components";
 
 export default observer(function Export({
   headerColor,

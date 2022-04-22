@@ -2,6 +2,7 @@ import { action, makeObservable, observable } from "mobx";
 import { createContext } from "react";
 import {
   Diagram,
+  Identifier,
   LeafNode,
   LEFT,
   Module,
@@ -10,6 +11,7 @@ import {
   Side,
 } from "../alluvial";
 import type { Real } from "../alluvial/Network";
+import type { NetworkFile } from "../components/LoadNetworks";
 import type { Histogram } from "../components/Sidebar/Metadata/Real";
 import TreePath from "../utils/TreePath";
 import BipartiteGraph from "./BipartiteGraph";
@@ -18,8 +20,8 @@ import { COLOR_SCHEMES, ColorScheme, SchemeName } from "./schemes";
 export class Store {
   diagram = new Diagram();
 
-  files: any[] = [];
-  identifier: "id" | "name" = "id";
+  files: NetworkFile[] = [];
+  identifier: Identifier = "id";
 
   // hack to force updates when we call updateLayout
   updateFlag = true;
@@ -111,7 +113,7 @@ export class Store {
     console.timeEnd("Store.setNetworks");
   });
 
-  setFiles = action((files: any[], selectLargest = true) => {
+  setFiles = action((files: NetworkFile[], selectLargest = true) => {
     this.files = files;
     this.setNetworks(files, selectLargest);
   });
@@ -754,7 +756,7 @@ export class Store {
       file.name = network.name;
 
       for (const node of file.nodes) {
-        const leafNode = network.getLeafNode(node.identifier)!;
+        const leafNode = network.getLeafNode(node.identifier!)!;
         node.highlightIndex = leafNode.highlightIndex;
         node.moduleLevel = leafNode.moduleLevel;
       }

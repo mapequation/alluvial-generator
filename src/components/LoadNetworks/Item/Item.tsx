@@ -1,14 +1,18 @@
 import { Box, Progress, Text, useColorModeValue } from "@chakra-ui/react";
-import { parse } from "@mapequation/infomap-parser";
+import { parseTree } from "@mapequation/infomap-parser";
 import { useInfomap } from "@mapequation/infomap-react";
 import { useState } from "react";
+import type { Identifier } from "../../../alluvial";
+import type { OnError } from "../../../hooks/useError";
 import humanFileSize from "../../../utils/human-file-size";
+import type { NetworkFile } from "../types";
+import { calcStatistics, setIdentifiers } from "../utils";
 import Background from "./Background";
 import {
+  InfomapToggleButton,
   NetworkIcon,
   RemoveButton,
   ReorderItem,
-  SettingsButton,
   TruncatedFilename,
 } from "./components";
 import Infomap from "./Infomap";
@@ -16,11 +20,20 @@ import NetworkInfo from "./NetworkInfo";
 
 export default function Item({
   file,
+  identifier,
   onRemove,
   onMultilayerClick,
   setIsRunning,
   updateFile,
   onError,
+}: {
+  file: NetworkFile;
+  identifier: Identifier;
+  onRemove: () => void;
+  onMultilayerClick: () => void;
+  setIsRunning: (value: boolean) => void;
+  updateFile: (file: NetworkFile) => void;
+  onError: OnError;
 }) {
   const bg = useColorModeValue("white", "gray.600");
   const fg = useColorModeValue("gray.800", "whiteAlpha.900");
@@ -41,41 +54,44 @@ export default function Item({
     numTrials,
   });
 
-  const [showInfomap, setShowInfomap] = useState(file.noModularResult);
+  const [showInfomap, setShowInfomap] = useState(!file.haveModules);
+  const showInfomapButton =
+    file.haveModules && file.network && !file.isExpanded;
 
   const runInfomap = async () => {
+    setIsRunning(true);
     try {
-      setIsRunning(true);
-
       const result = await runAsync({
         network: file.network,
         filename: file.name,
       });
 
-      setIsRunning(false);
-
-      Object.assign(file, { numTrials, directed, twoLevel });
-
       const tree = result.ftree_states || result.ftree;
+
       if (tree) {
-        const contents = parse(tree, null, true);
-        updateFile(file, contents);
+        const contents = parseTree(tree, undefined, true, true);
+        setIdentifiers(contents.nodes, "ftree", identifier);
+
+        Object.assign(file, {
+          numTrials,
+          directed,
+          twoLevel,
+          haveModules: true,
+          ...contents,
+          ...calcStatistics(contents.nodes),
+        });
+
+        updateFile(file);
         setShowInfomap(false);
       }
-    } catch (e) {
-      setIsRunning(false);
-      console.log(e);
-
+    } catch (e: any) {
       onError({
         title: `Error running Infomap on ${file.name}`,
         description: e.toString(),
       });
     }
+    setIsRunning(false);
   };
-
-  const showInfomapButton =
-    file.network && !file.noModularResult && !file.isExpanded;
-  const showNetworkInfo = !showInfomap && !file.noModularResult;
 
   return (
     <ReorderItem id={file.id} value={file}>
@@ -102,16 +118,16 @@ export default function Item({
             pos="relative"
           >
             {showInfomapButton && (
-              <SettingsButton onClick={() => setShowInfomap(!showInfomap)} />
+              <InfomapToggleButton
+                onClick={() => setShowInfomap(!showInfomap)}
+              />
             )}
 
-            <TruncatedFilename name={file.fileName} maxLength={10} />
+            <TruncatedFilename name={file.filename} maxLength={10} />
 
             {file.size > 0 && <Text>{humanFileSize(file.size)}</Text>}
 
-            {showNetworkInfo && <NetworkInfo file={file} />}
-
-            {showInfomap && file.network && (
+            {showInfomap && file.network ? (
               <Infomap
                 disabled={running}
                 numTrials={numTrials}
@@ -122,6 +138,8 @@ export default function Item({
                 setTwoLevel={setTwoLevel}
                 run={runInfomap}
               />
+            ) : (
+              <NetworkInfo file={file} />
             )}
           </Box>
 

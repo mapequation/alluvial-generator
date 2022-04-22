@@ -1,11 +1,12 @@
 import { IconButton, Text, Tooltip } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { PropsWithChildren } from "react";
-import { BiNetworkChart } from "react-icons/bi";
-import { GrTextAlignFull } from "react-icons/gr";
-import { IoLayersOutline, IoMenu } from "react-icons/io5";
+import { BiNetworkChart as GraphIcon } from "react-icons/bi";
+import { GrTextAlignFull as TextIcon } from "react-icons/gr";
+import { IoLayersOutline as MultilayerIcon, IoMenu } from "react-icons/io5";
 import { MdClear } from "react-icons/md";
 import useRaisedShadow from "../../../hooks/useRaisedShadow";
+import type { NetworkFile } from "../types";
 
 export function LayerIcon() {
   return (
@@ -59,27 +60,29 @@ export function NetworkIcon({
   color,
   bg,
 }: {
-  file: {
-    isMultilayer?: boolean;
-    isExpanded?: boolean;
-    noModularResult?: boolean;
-  };
+  file: NetworkFile;
   onClick: () => void;
   color: string;
   bg: string;
 }) {
   const Icon = (() => {
     if (file.isMultilayer) {
-      return file.isExpanded ? <LayerIcon /> : <IoLayersOutline />;
+      return file.isExpanded || file.numLayers === 1 ? (
+        <LayerIcon />
+      ) : (
+        <MultilayerIcon />
+      );
     }
-    return file.noModularResult ? <GrTextAlignFull /> : <BiNetworkChart />;
+    return file.haveModules ? <GraphIcon /> : <TextIcon />;
   })();
+
+  const isSingleLayer = file.numLayers === 1 && file.isExpanded !== true;
 
   return (
     <IconButton
       aria-label={file.isMultilayer ? "multilayer" : "network"}
-      onClick={file.isMultilayer ? onClick : undefined}
-      pointerEvents={file.isMultilayer ? "auto" : "none"}
+      onClick={file.isMultilayer && !isSingleLayer ? onClick : undefined}
+      pointerEvents={file.isMultilayer && !isSingleLayer ? "auto" : "none"}
       icon={Icon}
       color={color}
       bg={bg}
@@ -125,7 +128,7 @@ export function RemoveButton({
   );
 }
 
-export function SettingsButton({ onClick }: { onClick: () => void }) {
+export function InfomapToggleButton({ onClick }: { onClick: () => void }) {
   return (
     <IconButton
       aria-label="settings"
@@ -151,20 +154,12 @@ export function TruncatedFilename({
   name: string;
   maxLength: number;
 }) {
-  const truncatedName = ((name) => {
-    const split = name.split(".");
-    const ext = split.pop();
-    const base = split.join(".");
-
-    if (base.length < maxLength) return name;
-
-    const hellip = String.fromCharCode(8230);
-    return base.slice(0, maxLength) + hellip + ext;
-  })(name);
+  const truncatedName = truncateBasename(name, maxLength);
+  const sameLength = truncatedName.length === name.length;
 
   return (
     <Text fontWeight={600} overflowWrap="anywhere">
-      {truncatedName.length === name.length ? (
+      {sameLength ? (
         name
       ) : (
         <Tooltip label={name} aria-label={name}>
@@ -173,4 +168,15 @@ export function TruncatedFilename({
       )}
     </Text>
   );
+}
+
+function truncateBasename(name: string, maxLength = 20) {
+  const split = name.split(".");
+  const ext = split.pop();
+  const base = split.join(".");
+
+  if (base.length < maxLength) return name;
+
+  const hellip = String.fromCharCode(8230); // ...
+  return base.slice(0, maxLength) + hellip + ext;
 }

@@ -8,7 +8,7 @@ import {
   RadioGroup,
   Slider,
   Switch,
-} from "./Components";
+} from "./components";
 
 export default observer(function Layout({
   headerColor,

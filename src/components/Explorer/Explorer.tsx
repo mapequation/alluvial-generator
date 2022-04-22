@@ -18,7 +18,7 @@ import {
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { StoreContext } from "../../store";
-import { Swatch } from "../Sidebar/Components";
+import { Swatch } from "../Sidebar/components";
 
 export default observer(function Explorer({
   onClose,

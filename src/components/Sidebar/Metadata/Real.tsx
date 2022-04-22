@@ -23,7 +23,7 @@ import {
 import type { Real as RealData } from "../../../alluvial/Network";
 import useMap, { MapOrEntries } from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
-import { Button } from "../Components";
+import { Button } from "../components";
 import type { MetadataKindProps } from "./MetadataCollection";
 
 type BinValue = RealData["values"][number];

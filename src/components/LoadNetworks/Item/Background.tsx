@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
 import { SVGProps } from "react";
 import { normalize } from "../../../utils/math";
+import type { NetworkFile } from "../types";
 
 export default function Background({
   file: { flowDistribution },
   fill,
   ...props
 }: {
-  file: {
-    flowDistribution?: { [key: number]: number };
-  };
+  file: NetworkFile;
   fill: string;
 } & SVGProps<SVGSVGElement>) {
   const flow = flowDistribution ?? { 0: 1 };

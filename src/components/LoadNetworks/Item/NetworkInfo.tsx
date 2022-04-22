@@ -1,34 +1,24 @@
 import { Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import type { NetworkFile } from "../types";
 
-type File = {
-  multilayer?: boolean;
-  expanded?: boolean;
-  numLayers?: number;
-  layerId?: number;
-  nodes?: any[]; // FIXME any
-  stateNetwork?: boolean;
-  numTopModules?: number;
-  numLevels?: number;
-  codelength?: number;
-};
-
-export default function NetworkInfo({ file }: { file: File }) {
+export default function NetworkInfo({ file }: { file: NetworkFile }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {file.multilayer && !file.expanded && (
+      {file.isMultilayer && !file.isExpanded && (
         <Text>{file.numLayers + " layers"}</Text>
       )}
-      {file.multilayer && file.expanded && (
+      {file.isMultilayer && file.isExpanded && (
         <Text>{"layer " + file.layerId}</Text>
       )}
       {file.nodes && (
         <Text>
-          {file.nodes.length + (file.stateNetwork ? " state nodes" : " nodes")}
+          {file.nodes.length +
+            (file.isStateNetwork ? " state nodes" : " nodes")}
         </Text>
       )}
       {file.numTopModules && (
@@ -39,7 +29,7 @@ export default function NetworkInfo({ file }: { file: File }) {
       )}
       {file.numLevels && (
         <Text>
-          {file.numLevels + (file.numLevels > 1 ? " levels" : "level")}
+          {file.numLevels + (file.numLevels > 1 ? " levels" : " level")}
         </Text>
       )}
       {file.codelength && <Text>{file.codelength.toFixed(3) + " bits"}</Text>}

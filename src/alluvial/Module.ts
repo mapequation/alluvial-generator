@@ -303,7 +303,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       (a: Item, b: Item) => b.similarity - a.similarity
     );
 
-    type NodeId = LeafNode["identifier"];
+    type NodeId = string;
     type NodeDistribution = { [nodeId: NodeId]: number };
     const getNodeDistribution = (
       module: Module
