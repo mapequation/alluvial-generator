@@ -10,11 +10,11 @@ import {
   Switch,
 } from "./Components";
 
-interface LayoutProps {
+export default observer(function Layout({
+  headerColor,
+}: {
   headerColor: string;
-}
-
-export default observer(function Layout({ headerColor }: LayoutProps) {
+}) {
   const store = useContext(StoreContext);
 
   return (

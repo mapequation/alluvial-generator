@@ -20,15 +20,13 @@ import {
 import { StoreContext } from "../../store";
 import { Button, Label, ListItemButton, ListItemHeader } from "./Components";
 
-interface ModuleProps {
-  headerColor: string;
-  onModuleViewClick: () => void;
-}
-
 export default observer(function Module({
   headerColor,
   onModuleViewClick,
-}: ModuleProps) {
+}: {
+  headerColor: string;
+  onModuleViewClick: () => void;
+}) {
   const store = useContext(StoreContext);
   const { selectedModule } = store;
   return (

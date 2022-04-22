@@ -15,17 +15,15 @@ import { StoreContext } from "../../store";
 import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
 import { Button, Label, ListItemHeader, Swatch } from "./Components";
 
-interface ColorsProps {
-  headerColor: string;
-  color: string;
-  setColor: (color: string) => void;
-}
-
 export default observer(function Colors({
   headerColor,
   color,
   setColor,
-}: ColorsProps) {
+}: {
+  headerColor: string;
+  color: string;
+  setColor: (color: string) => void;
+}) {
   const store = useContext(StoreContext);
   const { selectedModule, defaultHighlightColor } = store;
 

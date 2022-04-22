@@ -5,11 +5,11 @@ import { saveSvg } from "../../io/save-svg";
 import { StoreContext } from "../../store";
 import { ListItemButton, ListItemHeader } from "./Components";
 
-interface ExportProps {
+export default observer(function Export({
+  headerColor,
+}: {
   headerColor: string;
-}
-
-export default observer(function Export({ headerColor }: ExportProps) {
+}) {
   const store = useContext(StoreContext);
   const downloadSvg = () => {
     store.setSelectedModule(null);

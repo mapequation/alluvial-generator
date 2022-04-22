@@ -12,17 +12,15 @@ import Layout from "./Layout";
 import Metadata from "./Metadata";
 import Module from "./Module";
 
-interface SidebarProps {
-  onLoadClick: () => void;
-  onAboutClick: () => void;
-  onModuleViewClick: () => void;
-}
-
 export default observer(function Sidebar({
   onLoadClick,
   onAboutClick,
   onModuleViewClick,
-}: SidebarProps) {
+}: {
+  onLoadClick: () => void;
+  onAboutClick: () => void;
+  onModuleViewClick: () => void;
+}) {
   const store = useContext(StoreContext);
   const { defaultHighlightColor } = store;
   const bg = useColorModeValue("white", "gray.800");
