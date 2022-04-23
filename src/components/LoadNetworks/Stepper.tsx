@@ -27,7 +27,9 @@ export default function Stepper({
         label="Load network partitions"
         // @ts-ignore
         description={
-          <a href="//mapequation.org/infomap/#Output">{acceptedFormats}</a>
+          <a href="//mapequation.org/infomap/#Output">
+            Formats: {acceptedFormats}
+          </a>
         }
       />
       <Step

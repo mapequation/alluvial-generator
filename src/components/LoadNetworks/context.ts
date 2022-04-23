@@ -1,4 +1,5 @@
-import type { NetworkFile } from "../types";
+import { createContext, Dispatch } from "react";
+import type { NetworkFile } from "./types";
 
 type State = {
   isCreatingDiagram: boolean;
@@ -33,3 +34,11 @@ export function reducer(state: State, action: Action): State {
       return state;
   }
 }
+
+export const Context = createContext<{
+  state: State;
+  dispatch: Dispatch<Action>;
+}>({
+  state: initialState,
+  dispatch: () => {},
+});

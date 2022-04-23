@@ -1,12 +1,19 @@
 import { Box, Progress, Text, useColorModeValue } from "@chakra-ui/react";
 import { parseTree } from "@mapequation/infomap-parser";
 import { useInfomap } from "@mapequation/infomap-react";
-import { useState } from "react";
-import type { Identifier } from "../../../alluvial";
-import type { OnError } from "../../../hooks/useError";
+import { observer } from "mobx-react";
+import { useContext, useState } from "react";
+import { useError } from "../../../hooks/useError";
+import { StoreContext } from "../../../store";
 import humanFileSize from "../../../utils/human-file-size";
+import { Context } from "../context";
 import type { NetworkFile } from "../types";
-import { calcStatistics, setIdentifiers } from "../utils";
+import {
+  calcStatistics,
+  expandMultilayerFile,
+  mergeMultilayerFiles,
+  setIdentifiers,
+} from "../utils";
 import Background from "./Background";
 import {
   InfomapToggleButton,
@@ -18,29 +25,16 @@ import {
 import Infomap from "./Infomap";
 import NetworkInfo from "./NetworkInfo";
 
-export default function Item({
-  file,
-  identifier,
-  onRemove,
-  onMultilayerClick,
-  setIsRunning,
-  updateFile,
-  onError,
-}: {
-  file: NetworkFile;
-  identifier: Identifier;
-  onRemove: () => void;
-  onMultilayerClick: () => void;
-  setIsRunning: (value: boolean) => void;
-  updateFile: (file: NetworkFile) => void;
-  onError: OnError;
-}) {
+export default observer(function Item({ file }: { file: NetworkFile }) {
   const bg = useColorModeValue("white", "gray.600");
   const fg = useColorModeValue("gray.800", "whiteAlpha.900");
   const fill = useColorModeValue(
     "var(--chakra-colors-blackAlpha-400)",
     "var(--chakra-colors-whiteAlpha-400)"
   );
+  const { state, dispatch } = useContext(Context);
+  const { identifier } = useContext(StoreContext);
+  const onError = useError();
 
   // Infomap args
   const [numTrials, setNumTrials] = useState(file.numTrials ?? 5);
@@ -59,7 +53,8 @@ export default function Item({
     file.haveModules && file.network && !file.isExpanded;
 
   const runInfomap = async () => {
-    setIsRunning(true);
+    dispatch({ type: "set", payload: { infomapRunning: true } });
+
     try {
       const result = await runAsync({
         network: file.network,
@@ -81,8 +76,14 @@ export default function Item({
           ...calcStatistics(contents.nodes),
         });
 
-        updateFile(file);
         setShowInfomap(false);
+
+        dispatch({
+          type: "set",
+          payload: {
+            files: state.files.map((f) => (f.id === file.id ? file : f)),
+          },
+        });
       }
     } catch (e: any) {
       onError({
@@ -90,7 +91,22 @@ export default function Item({
         description: e.toString(),
       });
     }
-    setIsRunning(false);
+
+    dispatch({ type: "set", payload: { infomapRunning: false } });
+  };
+
+  const toggleMultilayerExpanded = () => {
+    if (!file.isMultilayer) return;
+
+    if (file.isExpanded === undefined) {
+      file.isExpanded = false;
+    }
+
+    const files = file.isExpanded
+      ? mergeMultilayerFiles(file, state.files)
+      : expandMultilayerFile(file, state.files);
+
+    dispatch({ type: "set", payload: { files } });
   };
 
   return (
@@ -101,12 +117,23 @@ export default function Item({
         <Box p={2}>
           <NetworkIcon
             file={file}
-            onClick={onMultilayerClick}
+            onClick={toggleMultilayerExpanded}
             color={fg}
             bg={bg}
           />
 
-          <RemoveButton onClick={onRemove} color={fg} bg={bg} />
+          <RemoveButton
+            onClick={() =>
+              dispatch({
+                type: "set",
+                payload: {
+                  files: state.files.filter((f) => f.id !== file.id),
+                },
+              })
+            }
+            color={fg}
+            bg={bg}
+          />
 
           <Box
             bg={bg}
@@ -148,4 +175,4 @@ export default function Item({
       </Box>
     </ReorderItem>
   );
-}
+});
