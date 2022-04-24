@@ -7,11 +7,11 @@ import JSZip from "jszip";
 import { Identifier } from "../../../alluvial";
 import id from "../../../utils/id";
 import type { Format, NetworkFile } from "../types";
-import { createFile } from "./create-file";
+import { calcStatistics } from "./calc-statistics";
 import { createFilesFromDiagramObject } from "./from-diagram";
 import { setIdentifiers } from "./set-identifiers";
 
-export type ErrorType = {
+type ErrorType = {
   file: File;
   errors: { code: string; message: string }[];
 };
@@ -39,18 +39,25 @@ export async function parseAcceptedFiles(
   // Parse files
   for (let i = 0; i < acceptedFiles.length; ++i) {
     const file = acceptedFiles[i];
-    const format = fileExtension(file.name) ?? "";
+    const fileContents = readFiles[i];
+    const format = fileExtension(file.name) as Format | undefined;
 
-    let contents = null;
+    if (!format) {
+      errors.push(createError(file, "invalid-format", "No format found"));
+      continue;
+    }
+
+    let parsedFile = null;
 
     if (format === "json") {
       try {
-        contents = JSON.parse(readFiles[i]);
+        parsedFile = JSON.parse(fileContents);
 
-        if (contents.networks !== undefined) {
+        // TODO remove
+        if (parsedFile.networks !== undefined) {
           // A diagram contains several networks.
           // Create a new file for each network.
-          const diagramFiles = createFilesFromDiagramObject(contents, file);
+          const diagramFiles = createFilesFromDiagramObject(parsedFile, file);
 
           // If any file ids already exist, give a new id
           for (let existingFile of [...currentFiles, ...newFiles]) {
@@ -69,27 +76,27 @@ export async function parseAcceptedFiles(
         continue;
       }
     } else if (format === "net") {
-      contents = {
-        network: readFiles[i],
+      parsedFile = {
+        network: fileContents,
         haveModules: false,
       };
     } else {
       try {
-        contents = parse(readFiles[i], undefined, true, false);
+        parsedFile = parse(fileContents, undefined, true, false);
       } catch (e: any) {
         errors.push(createError(file, "parse-error", e.message));
         continue;
       }
     }
 
-    if (!contents) {
+    if (!parsedFile) {
       errors.push(createError(file, "invalid-format", "Could not parse file"));
       continue;
     }
 
     try {
-      setIdentifiers(contents.nodes, format as Format, identifier);
-      newFiles.push(createFile(file, format, contents));
+      setIdentifiers(parsedFile.nodes, format, identifier);
+      newFiles.push(createFile(file, format, parsedFile));
     } catch (e: any) {
       errors.push(createError(file, "invalid-format", e.message));
     }
@@ -154,4 +161,31 @@ async function readAcceptedFiles(
   }
 
   return { readFiles, errors };
+}
+
+function createFile(
+  file: File,
+  format: Format,
+  contents: any // FIXME any
+): NetworkFile {
+  const newFile = Object.assign(
+    {},
+    {
+      ...file,
+      filename: file.name, // Save the original filename so we don't overwrite it
+      name: file.name,
+      lastModified: file.lastModified,
+      size: file.size,
+      id: id(),
+      haveModules: true,
+      format,
+      ...contents,
+    }
+  );
+
+  if (newFile.haveModules) {
+    Object.assign(newFile, calcStatistics(newFile.nodes));
+  }
+
+  return newFile;
 }

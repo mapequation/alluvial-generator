@@ -2,6 +2,7 @@ import type { NetworkFile, Node } from "../types";
 import { calcStatistics } from "./calc-statistics";
 import { setIdentifiers } from "./set-identifiers";
 
+// TODO remove
 export function createFilesFromDiagramObject(
   json: any, // FIXME any
   file: File
