@@ -46,7 +46,7 @@ export default function Infomap({
             id="num-trials"
             size="xs"
             value={numTrials}
-            onChange={(value) => setNumTrials(+value)}
+            onChange={(value) => setNumTrials(Math.max(1, +value))}
             min={1}
             max={100}
             step={1}
