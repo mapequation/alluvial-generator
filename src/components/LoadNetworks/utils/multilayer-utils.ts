@@ -4,12 +4,15 @@ import { calcStatistics } from "./calc-statistics";
 import { setIdentifiers } from "./set-identifiers";
 
 export function mergeMultilayerFiles(file: NetworkFile, files: NetworkFile[]) {
+  if (!file.isMultilayer) {
+    throw new Error("File is not multilayer");
+  }
+
   const aggregated = Object.assign({}, file);
   aggregated.name = file.filename;
   aggregated.id = file.originalId!;
   aggregated.originalId = undefined;
   aggregated.nodes = [];
-  aggregated.isExpanded = false;
   aggregated.layerId = undefined;
 
   let firstIndex = files.length;
@@ -26,7 +29,11 @@ export function mergeMultilayerFiles(file: NetworkFile, files: NetworkFile[]) {
     aggregated.nodes.push(...part.nodes!);
   }
 
-  Object.assign(aggregated, calcStatistics(aggregated.nodes));
+  Object.assign(aggregated, {
+    ...calcStatistics(aggregated.nodes),
+    isExpanded: false,
+  });
+
   setIdentifiers(aggregated.nodes, "tree");
 
   const newFiles = files.filter((f) => f.originalId !== file.originalId);
@@ -36,6 +43,10 @@ export function mergeMultilayerFiles(file: NetworkFile, files: NetworkFile[]) {
 }
 
 export function expandMultilayerFile(file: NetworkFile, files: NetworkFile[]) {
+  if (!file.isMultilayer) {
+    throw new Error("File is not multilayer");
+  }
+
   const layers: { [key: number]: NetworkFile } = {};
 
   setIdentifiers(file.nodes, "multilayer-expanded");
@@ -53,7 +64,6 @@ export function expandMultilayerFile(file: NetworkFile, files: NetworkFile[]) {
       layer.layerId = layerId;
       layer.size = file.size;
       layer.nodes = [];
-      layer.isExpanded = true;
 
       layer.name = (() => {
         // FIXME where is this used?
@@ -69,7 +79,10 @@ export function expandMultilayerFile(file: NetworkFile, files: NetworkFile[]) {
 
   for (const layer of Object.values(layers)) {
     // @ts-ignore
-    Object.assign(layer, calcStatistics(layer.nodes));
+    Object.assign(layer, {
+      ...calcStatistics(layer.nodes),
+      isExpanded: true,
+    });
   }
 
   const index = files.indexOf(file);

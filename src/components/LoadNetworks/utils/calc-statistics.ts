@@ -34,6 +34,7 @@ export function calcStatistics(
     flowDistribution,
     isMultilayer,
     isStateNetwork,
+    isExpanded: isMultilayer ? false : undefined,
     numLayers,
     numTopModules: topModules.size,
     numLevels,

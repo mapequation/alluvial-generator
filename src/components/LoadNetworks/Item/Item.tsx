@@ -95,20 +95,6 @@ export default observer(function Item({ file }: { file: NetworkFile }) {
     dispatch({ type: "set", payload: { infomapRunning: false } });
   };
 
-  const toggleMultilayerExpanded = () => {
-    if (!file.isMultilayer) return;
-
-    if (file.isExpanded === undefined) {
-      file.isExpanded = false;
-    }
-
-    const files = file.isExpanded
-      ? mergeMultilayerFiles(file, state.files)
-      : expandMultilayerFile(file, state.files);
-
-    dispatch({ type: "set", payload: { files } });
-  };
-
   return (
     <ReorderItem id={file.id} value={file}>
       <Background file={file} style={{ position: "absolute" }} fill={fill} />
@@ -117,7 +103,16 @@ export default observer(function Item({ file }: { file: NetworkFile }) {
         <Box p={2}>
           <NetworkIcon
             file={file}
-            onClick={toggleMultilayerExpanded}
+            onClick={() => {
+              dispatch({
+                type: "set",
+                payload: {
+                  files: file.isExpanded
+                    ? mergeMultilayerFiles(file, state.files)
+                    : expandMultilayerFile(file, state.files),
+                },
+              });
+            }}
             color={fg}
             bg={bg}
           />

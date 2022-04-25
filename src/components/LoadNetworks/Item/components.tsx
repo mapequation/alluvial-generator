@@ -76,7 +76,7 @@ export function NetworkIcon({
     return file.haveModules ? <GraphIcon /> : <TextIcon />;
   })();
 
-  const isSingleLayer = file.numLayers === 1 && file.isExpanded !== true;
+  const isSingleLayer = !file.isExpanded && file.numLayers === 1;
 
   return (
     <IconButton

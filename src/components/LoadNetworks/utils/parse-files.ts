@@ -47,7 +47,7 @@ export async function parseAcceptedFiles(
       continue;
     }
 
-    let parsedFile = null;
+    let parsedFile: any;
 
     if (format === "json") {
       try {
