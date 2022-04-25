@@ -36,6 +36,7 @@ export type NetworkFile = {
   isStateNetwork?: boolean;
   numTopModules?: number;
   numLevels?: number;
+  cluLevel?: number;
   codelength?: number;
   // Infomap
   network?: string;

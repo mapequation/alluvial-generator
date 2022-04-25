@@ -26,7 +26,10 @@ export default function NetworkInfo({ file }: { file: NetworkFile }) {
       {file.numTopModules && (
         <Text>{pluralize(file.numTopModules, "top module")}</Text>
       )}
-      {file.numLevels && <Text>{pluralize(file.numLevels, "level")}</Text>}
+      {file.cluLevel && <Text>level {file.cluLevel}</Text>}
+      {!file.cluLevel && file.numLevels && (
+        <Text>{pluralize(file.numLevels, "level")}</Text>
+      )}
       {file.codelength && <Text>{file.codelength.toFixed(3) + " bits"}</Text>}
     </motion.div>
   );
