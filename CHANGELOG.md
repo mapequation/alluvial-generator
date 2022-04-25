@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.1](https://github.com/mapequation/alluvial-generator/compare/v1.9.0...v1.9.1) (2022-04-25)
+
+
+### Bug Fixes
+
+* Disable LoadNetworks dialog actions when running Infomap ([71538ca](https://github.com/mapequation/alluvial-generator/commit/71538ca860110174fefaf837bbb2021645799bb6))
+* Num trials should be at least 1 ([2802e61](https://github.com/mapequation/alluvial-generator/commit/2802e6173b34a6ac9fe9fb2359e5f2dc945331f2))
+* Parse .net files ([8a65ce1](https://github.com/mapequation/alluvial-generator/commit/8a65ce1bed6d3262e0aacc0f9017fee35d57a50b))
+
 ## [1.9.0](https://github.com/mapequation/alluvial-generator/compare/v1.8.0...v1.9.0) (2022-04-21)
 
 
