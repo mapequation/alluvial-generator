@@ -9,30 +9,29 @@ export default function NetworkInfo({ file }: { file: NetworkFile }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {file.isMultilayer && !file.isExpanded && (
-        <Text>{file.numLayers + " layers"}</Text>
-      )}
-      {file.isMultilayer && file.isExpanded && (
-        <Text>{"layer " + file.layerId}</Text>
+      {file.isMultilayer && (
+        <Text>
+          {!file.isExpanded
+            ? pluralize(file.numLayers!, "layer")
+            : "layer " + file.layerId}
+        </Text>
       )}
       {file.nodes && (
         <Text>
-          {file.nodes.length +
-            (file.isStateNetwork ? " state nodes" : " nodes")}
+          {`${file.nodes.length} ${
+            file.isStateNetwork ? "state nodes" : "nodes"
+          }`}
         </Text>
       )}
       {file.numTopModules && (
-        <Text>
-          {file.numTopModules +
-            (file.numTopModules > 1 ? " top modules" : " top module")}
-        </Text>
+        <Text>{pluralize(file.numTopModules, "top module")}</Text>
       )}
-      {file.numLevels && (
-        <Text>
-          {file.numLevels + (file.numLevels > 1 ? " levels" : " level")}
-        </Text>
-      )}
+      {file.numLevels && <Text>{pluralize(file.numLevels, "level")}</Text>}
       {file.codelength && <Text>{file.codelength.toFixed(3) + " bits"}</Text>}
     </motion.div>
   );
+}
+
+function pluralize(num: number, noun: string) {
+  return `${num} ${num !== 1 ? noun + "s" : noun}`;
 }
