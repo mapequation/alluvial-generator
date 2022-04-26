@@ -19,16 +19,17 @@ import {
 } from "react-icons/md";
 import { StoreContext } from "../../store";
 import { Button, Label, ListItemButton, ListItemHeader } from "./components";
+import { SidebarContext } from "./Sidebar";
 
 export default observer(function Module({
-  headerColor,
   onModuleViewClick,
 }: {
-  headerColor: string;
   onModuleViewClick: () => void;
 }) {
   const store = useContext(StoreContext);
+  const { headerColor } = useContext(SidebarContext);
   const { selectedModule } = store;
+
   return (
     <>
       <ListItemHeader color={headerColor}>Module</ListItemHeader>

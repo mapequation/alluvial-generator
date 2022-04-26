@@ -5,16 +5,12 @@ import type { Network } from "../../../alluvial";
 import { StoreContext } from "../../../store";
 import ErrorBoundary from "../../ErrorBoundary";
 import { Label, ListItemHeader } from "../components";
+import { SidebarContext } from "../Sidebar";
 import MetadataCollection from "./MetadataCollection";
 
-export default observer(function Metadata({
-  headerColor,
-  color,
-}: {
-  headerColor: string;
-  color: string;
-}) {
+export default observer(function Metadata() {
   const store = useContext(StoreContext);
+  const { headerColor } = useContext(SidebarContext);
   const { selectedModule } = store;
 
   const diagramHaveMeta = store.diagram.children.some(
@@ -42,7 +38,6 @@ export default observer(function Metadata({
                 <MetadataCollection
                   networkMeta={network.metadata}
                   diagramMeta={diagramMeta}
-                  color={color}
                 />
               </ErrorBoundary>
             </>

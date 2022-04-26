@@ -4,13 +4,12 @@ import { MdFileDownload } from "react-icons/md";
 import { saveSvg } from "../../io/save-svg";
 import { StoreContext } from "../../store";
 import { ListItemButton, ListItemHeader } from "./components";
+import { SidebarContext } from "./Sidebar";
 
-export default observer(function Export({
-  headerColor,
-}: {
-  headerColor: string;
-}) {
+export default observer(function Export() {
   const store = useContext(StoreContext);
+  const { headerColor } = useContext(SidebarContext);
+
   const downloadSvg = () => {
     store.setSelectedModule(null);
     const svg = document.getElementById("alluvialSvg") as SVGSVGElement | null;

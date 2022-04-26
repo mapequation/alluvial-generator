@@ -1,6 +1,12 @@
 import { Box, Kbd, List, ListItem, useColorModeValue } from "@chakra-ui/react";
 import { observer } from "mobx-react";
-import { useContext, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import { MdFileUpload, MdHelp } from "react-icons/md";
 import { StoreContext } from "../../store";
 import { drawerWidth } from "../App";
@@ -11,6 +17,16 @@ import Export from "./Export";
 import Layout from "./Layout";
 import Metadata from "./Metadata";
 import Module from "./Module";
+
+export const SidebarContext = createContext<{
+  color: string;
+  setColor: Dispatch<SetStateAction<string>>;
+  headerColor: string;
+}>({
+  color: "white",
+  setColor: () => {},
+  headerColor: "blue.600",
+});
 
 export default observer(function Sidebar({
   onLoadClick,
@@ -55,14 +71,13 @@ export default observer(function Sidebar({
           Help
         </ListItemButton>
 
-        <Colors headerColor={headerColor} color={color} setColor={setColor} />
-        <Metadata headerColor={headerColor} color={color} />
-        <Module
-          headerColor={headerColor}
-          onModuleViewClick={onModuleViewClick}
-        />
-        <Layout headerColor={headerColor} />
-        <Export headerColor={headerColor} />
+        <SidebarContext.Provider value={{ color, setColor, headerColor }}>
+          <Colors />
+          <Metadata />
+          <Module onModuleViewClick={onModuleViewClick} />
+          <Layout />
+          <Export />
+        </SidebarContext.Provider>
       </List>
     </Box>
   );

@@ -14,17 +14,11 @@ import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
 import { Button, Label, ListItemHeader, Swatch } from "./components";
+import { SidebarContext } from "./Sidebar";
 
-export default observer(function Colors({
-  headerColor,
-  color,
-  setColor,
-}: {
-  headerColor: string;
-  color: string;
-  setColor: (color: string) => void;
-}) {
+export default observer(function Colors() {
   const store = useContext(StoreContext);
+  const { color, setColor, headerColor } = useContext(SidebarContext);
   const { selectedModule, defaultHighlightColor } = store;
 
   useEventListener("keydown", (e) => {

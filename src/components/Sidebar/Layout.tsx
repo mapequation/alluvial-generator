@@ -9,13 +9,11 @@ import {
   Slider,
   Switch,
 } from "./components";
+import { SidebarContext } from "./Sidebar";
 
-export default observer(function Layout({
-  headerColor,
-}: {
-  headerColor: string;
-}) {
+export default observer(function Layout() {
   const store = useContext(StoreContext);
+  const { headerColor } = useContext(SidebarContext);
 
   return (
     <>

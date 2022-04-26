@@ -13,17 +13,14 @@ export interface MetadataKindProps<DataType> {
   name: string;
   data: DataType;
   diagramData: DataType[];
-  color: string;
 }
 
 export default function MetadataCollection({
   networkMeta,
   diagramMeta,
-  color,
 }: {
   networkMeta: Metadata;
   diagramMeta: Metadata[];
-  color: string;
 }) {
   const options = Array.from(Object.keys(networkMeta));
   const [name, setName] = useState(options[0]);
@@ -44,16 +41,10 @@ export default function MetadataCollection({
           name={name}
           data={data}
           diagramData={diagramData as CategoricalData[]}
-          color={color}
         />
       )}
       {data.kind === "real" && (
-        <Real
-          name={name}
-          data={data}
-          diagramData={diagramData as RealData[]}
-          color={color}
-        />
+        <Real name={name} data={data} diagramData={diagramData as RealData[]} />
       )}
     </>
   );

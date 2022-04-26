@@ -24,6 +24,7 @@ import type { Real as RealData } from "../../../alluvial/Network";
 import useMap, { MapOrEntries } from "../../../hooks/useMap";
 import { StoreContext } from "../../../store";
 import { Button } from "../components";
+import { SidebarContext } from "../Sidebar";
 import type { MetadataKindProps } from "./MetadataCollection";
 
 type BinValue = RealData["values"][number];
@@ -53,9 +54,9 @@ function createHistogram(
 export default observer(function Real({
   name,
   data,
-  color,
 }: MetadataKindProps<RealData>) {
   const store = useContext(StoreContext);
+  const { color } = useContext(SidebarContext);
   const { selectedScheme, defaultHighlightColor } = store;
 
   const [numBins, _setNumBins] = useState<number | null>(null);
