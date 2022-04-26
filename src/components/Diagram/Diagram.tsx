@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { observer } from "mobx-react";
-import { useContext, useEffect, useRef } from "react";
-import type { Module } from "../../alluvial";
+import { createContext, useContext, useEffect, useRef } from "react";
+import type { HighlightGroup, Module } from "../../alluvial";
 import useEventListener from "../../hooks/useEventListener";
 import useWindowSize from "../../hooks/useWindowSize";
 import { StoreContext } from "../../store";
@@ -13,6 +13,10 @@ import DropShadows from "./DropShadows";
 import Network from "./Network";
 
 const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 1000]);
+
+export const DiagramContext = createContext<{
+  fillColor: (g: HighlightGroup) => string;
+}>({ fillColor: (_) => "black" });
 
 export default observer(function Diagram() {
   const ref = useRef<SVGSVGElement>(null);
@@ -90,9 +94,11 @@ export default observer(function Diagram() {
           animate={translateCenter(diagram)}
           transition={{ duration: 0.2, bounce: 0 }}
         >
-          {diagram.children.map((network) => (
-            <Network key={network.id} network={network} fillColor={fillColor} />
-          ))}
+          <DiagramContext.Provider value={{ fillColor }}>
+            {diagram.children.map((network) => (
+              <Network key={network.id} network={network} />
+            ))}
+          </DiagramContext.Provider>
           <SelectedModule module={store.selectedModule} />
         </motion.g>
       </g>
