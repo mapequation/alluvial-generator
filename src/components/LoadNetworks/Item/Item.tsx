@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 import { useError } from "../../../hooks/useError";
 import { StoreContext } from "../../../store";
 import humanFileSize from "../../../utils/human-file-size";
-import { Context } from "../context";
+import { LoadContext } from "../context";
 import type { NetworkFile } from "../types";
 import {
   calcStatistics,
@@ -32,7 +32,7 @@ export default observer(function Item({ file }: { file: NetworkFile }) {
     "var(--chakra-colors-blackAlpha-400)",
     "var(--chakra-colors-whiteAlpha-400)"
   );
-  const { state, dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(LoadContext);
   const { identifier } = useContext(StoreContext);
   const onError = useError();
 

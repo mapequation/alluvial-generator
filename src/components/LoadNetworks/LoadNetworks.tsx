@@ -18,7 +18,7 @@ import { MdOutlineDelete, MdUpload } from "react-icons/md";
 import { useError } from "../../hooks/useError";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
-import { Context, initialState, reducer } from "./context";
+import { initialState, LoadContext, reducer } from "./context";
 import InfomapOnline from "./InfomapOnline";
 import Item from "./Item";
 import "./LoadNetworks.css";
@@ -178,7 +178,7 @@ export default observer(function LoadNetworks({ onClose }: Props) {
       <ModalContent>
         <ModalHeader>Load network partitions</ModalHeader>
         <ModalCloseButton />
-        <Context.Provider value={{ state, dispatch }}>
+        <LoadContext.Provider value={{ state, dispatch }}>
           <ModalBody>
             <Stepper
               activeStep={(() => {
@@ -271,7 +271,7 @@ export default observer(function LoadNetworks({ onClose }: Props) {
               Create Diagram
             </Button>
           </ModalFooter>
-        </Context.Provider>
+        </LoadContext.Provider>
       </ModalContent>
     </>
   );

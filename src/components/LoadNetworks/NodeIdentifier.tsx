@@ -10,7 +10,7 @@ import { observer } from "mobx-react";
 import { useContext } from "react";
 import type { Identifier } from "../../alluvial";
 import { StoreContext } from "../../store";
-import { Context } from "./context";
+import { LoadContext } from "./context";
 import { setIdentifiers } from "./utils";
 
 export default observer(function NodeIdentifier({
@@ -19,7 +19,7 @@ export default observer(function NodeIdentifier({
   isDisabled: boolean;
 }) {
   const { identifier, setIdentifier } = useContext(StoreContext);
-  const { state } = useContext(Context);
+  const { state } = useContext(LoadContext);
 
   const updateIdentifiers = (identifier: Identifier) => {
     state.files.forEach((file) => {

@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import localforage from "localforage";
 import { useContext } from "react";
-import { Context } from "./context";
+import { LoadContext } from "./context";
 import { getLocalStorageFiles } from "./utils";
 
 localforage.config({ name: "infomap" });
@@ -21,7 +21,7 @@ export default function InfomapOnline({
   isDisabled: boolean;
   onFileClick: (file: File) => void;
 }) {
-  const { state, dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(LoadContext);
   const { localStorageFiles } = state;
 
   const loadLocalStorage = async () => {

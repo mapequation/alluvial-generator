@@ -35,7 +35,7 @@ export function reducer(state: State, action: Action): State {
   }
 }
 
-export const Context = createContext<{
+export const LoadContext = createContext<{
   state: State;
   dispatch: Dispatch<Action>;
 }>({
