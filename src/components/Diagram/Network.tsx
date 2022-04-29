@@ -2,6 +2,7 @@ import { motion, MotionProps } from "framer-motion";
 import { observer } from "mobx-react";
 import { SVGProps, useContext } from "react";
 import type {
+  HighlightGroup,
   Module as ModuleType,
   Network as NetworkType,
 } from "../../alluvial";
@@ -14,8 +15,10 @@ import Streamline from "./Streamline";
 
 const Network = observer(function Network({
   network,
+  fillColor,
 }: {
   network: NetworkType;
+  fillColor: (_: HighlightGroup) => string;
 }) {
   const {
     defaultHighlightColor,
@@ -64,7 +67,7 @@ const Network = observer(function Network({
       {modules.map((module) => {
         if (hierarchicalModules === "none" || !("isLeaf" in module)) {
           const m = module as ModuleType;
-          return <Module key={m.id} module={m} />;
+          return <Module key={m.id} module={m} fillColor={fillColor} />;
         } else if (hierarchicalModules === "shadow") {
           return (
             <ShadowModule
