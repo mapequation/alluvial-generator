@@ -1,6 +1,13 @@
-import { Component, ErrorInfo } from "react";
+import { Component, ErrorInfo, PropsWithChildren } from "react";
 
-export default class ErrorBoundary extends Component {
+type State = {
+  hasError: boolean;
+};
+
+export default class ErrorBoundary extends Component<
+  PropsWithChildren<{}>,
+  State
+> {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false };
@@ -13,7 +20,6 @@ export default class ErrorBoundary extends Component {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {}
 
   render() {
-    // @ts-ignore
     if (this.state.hasError) {
       return <>Something went wrong</>;
     }

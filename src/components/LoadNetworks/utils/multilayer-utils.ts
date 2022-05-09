@@ -78,7 +78,6 @@ export function expandMultilayerFile(file: NetworkFile, files: NetworkFile[]) {
   });
 
   for (const layer of Object.values(layers)) {
-    // @ts-ignore
     Object.assign(layer, {
       ...calcStatistics(layer.nodes),
       isExpanded: true,

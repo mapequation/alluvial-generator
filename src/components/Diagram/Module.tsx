@@ -64,6 +64,7 @@ const Module = observer(function Module({
   return (
     <g className="module" onClick={handler}>
       <motion.g animate={controls}>
+        {/* @ts-ignore */}
         <LightMode>
           <Tooltip
             hasArrow
