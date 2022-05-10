@@ -11,7 +11,7 @@ export default function Logo({ showVersion = false, long = false }) {
       <HStack justify="flex-start" align="center" spacing={3}>
         <a href="//mapequation.org">
           <img
-            alt="MapEquation"
+            alt=""
             width="32px"
             height="32px"
             src="//www.mapequation.org/assets/img/twocolormapicon_whiteboarder.svg"
