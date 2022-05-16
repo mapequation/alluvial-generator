@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/mapequation/alluvial-generator/compare/v1.9.1...v1.10.0) (2022-05-16)
+
+
+### Features
+
+* Adjustable hierarchical module offset and opacity ([f4783f7](https://github.com/mapequation/alluvial-generator/commit/f4783f74952ec9868e01ca81a40da8a78cec2a72))
+
+
+### Bug Fixes
+
+* Improve tooltip pie chart labels ([b4292aa](https://github.com/mapequation/alluvial-generator/commit/b4292aa64b75b8c3b63b231598ddbd62bce56578))
+* Show module level from clu files ([74f0c65](https://github.com/mapequation/alluvial-generator/commit/74f0c6584d8ab6a7c8a104caf4cff2db4da19e1b))
+
 ### [1.9.1](https://github.com/mapequation/alluvial-generator/compare/v1.9.0...v1.9.1) (2022-04-25)
 
 
