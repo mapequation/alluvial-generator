@@ -1,16 +1,11 @@
-import { LightMode, Tooltip } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
-import { forwardRef, useContext } from "react";
+import { useContext } from "react";
 import type { HighlightGroup, Module as ModuleType } from "../../alluvial";
 import useOnClick from "../../hooks/useOnClick";
 import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
-import ModuleTooltip from "./ModuleTooltip";
-
-const G = forwardRef<SVGGElement, any>(function Group(props, ref) {
-  return <g ref={ref} {...props} />;
-});
+import Tooltip from "./Tooltip";
 
 const Module = observer(function Module({
   module,
@@ -63,35 +58,27 @@ const Module = observer(function Module({
 
   return (
     <g className="module" onClick={handler}>
-      <motion.g animate={controls}>
-        {/* @ts-ignore */}
-        <LightMode>
-          <Tooltip
-            hasArrow
-            placement="top"
-            shadow="xl"
-            borderRadius="sm"
-            openDelay={500}
-            // @ts-ignore
-            label={<ModuleTooltip module={module} fillColor={fillColor} />}
+      <Tooltip module={module} fillColor={fillColor}>
+        <motion.g animate={controls}>
+          <g
+            // move this to the parent g when/if framer motion supports css filter
+            style={{ filter: dropShadow(module) }}
           >
-            <G style={{ filter: dropShadow(module) }}>
-              {module.children.map((group) => (
-                <motion.rect
-                  key={group.id}
-                  className="group"
-                  initial={false}
-                  animate={group.layout}
-                  transition={transition}
-                  fill={fillColor(group)}
-                  data-x={group.x}
-                  data-y={group.y}
-                />
-              ))}
-            </G>
-          </Tooltip>
-        </LightMode>
-      </motion.g>
+            {module.children.map((group) => (
+              <motion.rect
+                key={group.id}
+                className="group"
+                initial={false}
+                animate={group.layout}
+                transition={transition}
+                fill={fillColor(group)}
+                data-x={group.x}
+                data-y={group.y}
+              />
+            ))}
+          </g>
+        </motion.g>
+      </Tooltip>
 
       {showModuleId && (
         <motion.g
