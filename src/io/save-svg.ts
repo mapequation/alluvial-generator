@@ -48,6 +48,10 @@ export function saveSvg(svg: SVGSVGElement, filename: string) {
     maxLabelWidth = Math.max(maxLabelWidth, bbox?.width || 0);
     text?.setAttribute("x", text.getAttribute("data-x")!);
     text?.setAttribute("y", text.getAttribute("data-y")!);
+    text?.querySelectorAll("tspan")?.forEach((tspan) => {
+      maxLabelWidth = Math.max(maxLabelWidth, tspan.getBBox()?.width ?? 0);
+      tspan.setAttribute("x", text?.getAttribute("x")!);
+    });
     element.setAttribute("data-style", element.getAttribute("style")!);
     element.removeAttribute("style");
   });
@@ -98,6 +102,9 @@ export function saveSvg(svg: SVGSVGElement, filename: string) {
     const text = element.querySelector("text");
     text?.removeAttribute("x");
     text?.removeAttribute("y");
+    text
+      ?.querySelectorAll("tspan")
+      ?.forEach((tspan) => tspan.setAttribute("x", "0"));
     element.setAttribute("style", element.getAttribute("data-style")!);
     element.removeAttribute("data-style");
   });

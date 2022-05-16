@@ -49,6 +49,7 @@ export class Store {
 
   showModuleId: boolean = false;
   showModuleNames: boolean = true;
+  multilineModuleNames: boolean = true;
   showNetworkNames: boolean = true;
   aggregateStateNames: boolean = false;
 
@@ -89,6 +90,7 @@ export class Store {
       sortModulesBy: observable,
       showModuleId: observable,
       showModuleNames: observable,
+      multilineModuleNames: observable,
       showNetworkNames: observable,
       aggregateStateNames: observable,
       hierarchicalModules: observable,
@@ -213,6 +215,10 @@ export class Store {
 
   setShowModuleNames = action((showModuleNames: boolean) => {
     this.showModuleNames = showModuleNames;
+  });
+
+  setMultilineModuleNames = action((multilineModuleNames: boolean) => {
+    this.multilineModuleNames = multilineModuleNames;
   });
 
   setShowNetworkNames = action((showNetworkNames: boolean) => {

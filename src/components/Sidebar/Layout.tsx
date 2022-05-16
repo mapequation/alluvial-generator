@@ -165,6 +165,11 @@ export default observer(function Layout() {
         isChecked={store.showModuleNames}
         onChange={store.setShowModuleNames}
       />
+      <Switch
+        label="Multiline module names"
+        isChecked={store.multilineModuleNames}
+        onChange={store.setMultilineModuleNames}
+      />
       {store.diagram.children.some((network) => network.isHigherOrder) && (
         <Switch
           label="Aggregate states names"

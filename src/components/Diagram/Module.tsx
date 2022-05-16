@@ -19,7 +19,13 @@ const Module = observer(function Module({
 }: ModuleProps) {
   const store = useContext(StoreContext);
   const controls = useAnimation();
-  const { fontSize, adaptiveFontSize, showModuleId, showModuleNames } = store;
+  const {
+    fontSize,
+    adaptiveFontSize,
+    showModuleId,
+    showModuleNames,
+    multilineModuleNames,
+  } = store;
   const dropShadow = DropShadows.filter(store.dropShadow);
 
   const isSelected = store.selectedModule === module;
@@ -114,21 +120,84 @@ const Module = observer(function Module({
           transition={transition}
         >
           <motion.text
-            animate={{ fontSize: actualFontSize, dy }}
+            animate={{ fontSize: actualFontSize }}
             transition={transition}
             textAnchor={module.textAnchor}
             strokeWidth={0}
             fill={isSelected ? "#f00" : "#000"}
             data-x={namePosition.x}
             data-y={namePosition.y}
+            dominantBaseline="middle"
           >
-            {module.name ||
-              module.getLargestLeafNodes(store.aggregateStateNames).join(", ")}
+            {module.name || (
+              <LargestLeafNames
+                module={module}
+                fontSize={actualFontSize}
+                aggregateStates={store.aggregateStateNames}
+                multiLine={multilineModuleNames}
+              />
+            )}
           </motion.text>
         </motion.g>
       )}
     </g>
   );
 });
+
+function LargestLeafNames({
+  module,
+  fontSize,
+  aggregateStates,
+  multiLine,
+}: {
+  module: ModuleType;
+  fontSize: number;
+  aggregateStates: boolean;
+  multiLine: boolean;
+}) {
+  if (!multiLine) {
+    return <>{module.getLargestLeafNodes(5, aggregateStates).join(", ")}</>;
+  }
+
+  // Current y is at y + height / 2
+  // We want to center the middle line at this y.
+  // Furthermore, we don't want to show more lines than can
+  // fit in the module height.
+  const heightPerLine = fontSize * 1.8;
+  let maxLines = Math.ceil(module.height / heightPerLine);
+
+  if (maxLines === 0) {
+    // Shouldn't happen, but just in case
+    return null;
+  }
+
+  if (maxLines % 2 === 0) {
+    // Easier to center the middle line if it's odd
+    maxLines--;
+  }
+
+  const names = module.getLargestLeafNodes(maxLines, aggregateStates);
+  const mid = Math.ceil(names.length / 2);
+
+  // "Middle out!"
+  // https://youtu.be/Ex1JuIN0eaA
+  return (
+    <>
+      {names
+        .slice(0, mid)
+        .reverse()
+        .map((name, i) => (
+          <tspan key={name} x={0} dy={i === 0 ? 0 : "-1.2em"}>
+            {name}
+          </tspan>
+        ))}
+      {names.slice(mid).map((name, i) => (
+        <tspan key={name} x={0} dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}>
+          {name}
+        </tspan>
+      ))}
+    </>
+  );
+}
 
 export default Module;
