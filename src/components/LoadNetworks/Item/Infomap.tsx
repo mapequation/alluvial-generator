@@ -11,6 +11,7 @@ import {
   NumberInputStepper,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { useId } from "react";
 
 export default function Infomap({
   disabled,
@@ -31,6 +32,8 @@ export default function Infomap({
   setTwoLevel: (twoLevel: boolean) => void;
   run: () => void;
 }) {
+  const id = useId();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -39,11 +42,11 @@ export default function Infomap({
     >
       <FormControl isDisabled={disabled}>
         <HStack justify="space-between">
-          <FormLabel fontSize="sm" fontWeight={400} htmlFor="num-trials" pt={1}>
+          <FormLabel fontSize="sm" fontWeight={400} htmlFor={id} pt={1}>
             Trials
           </FormLabel>
           <NumberInput
-            id="num-trials"
+            id={id}
             size="xs"
             value={numTrials}
             onChange={(value) => setNumTrials(Math.max(1, +value))}

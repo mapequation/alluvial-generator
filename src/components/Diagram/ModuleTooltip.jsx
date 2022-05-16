@@ -15,6 +15,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { clamp } from "../../utils/math";
 
 const bin = d3.bin();
 bin.value((d, i) => i);
@@ -176,7 +177,7 @@ function PiePlot({ data, fillColor }) {
         data={data}
         dataKey="flow"
         nameKey="name"
-        innerRadius={10}
+        innerRadius={30}
         outerRadius={40}
         label={PieLabel}
         labelLine={LabelLine}
@@ -190,21 +191,21 @@ function PiePlot({ data, fillColor }) {
   );
 }
 
-const labelThreshold = 0.03;
-
 function PieLabel({ x, y, textAnchor, name, percent }) {
-  if (percent < labelThreshold) return null;
-
   return (
-    <text x={x} y={y} textAnchor={textAnchor} fill="#444">
+    <text
+      x={x}
+      y={y}
+      textAnchor={textAnchor}
+      fill="#444"
+      fontSize={clamp(3 + percent * 100, 3, 10)}
+    >
       {name}
     </text>
   );
 }
 
 function LabelLine({ percent, ...props }) {
-  if (percent < labelThreshold) return null;
-
   return (
     <Curve
       {...props}
