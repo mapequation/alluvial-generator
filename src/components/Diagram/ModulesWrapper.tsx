@@ -14,8 +14,12 @@ const ModulesWrapper = observer(function ModulesWrapper({
   transition,
   ...props
 }: ModulesWrapperProps) {
-  const { hierarchicalModules, defaultHighlightColor } =
-    useContext(StoreContext);
+  const {
+    defaultHighlightColor,
+    hierarchicalModules,
+    hierarchicalModuleOffset,
+    hierarchicalModuleOpacity,
+  } = useContext(StoreContext);
 
   const modules =
     hierarchicalModules === "none"
@@ -37,6 +41,8 @@ const ModulesWrapper = observer(function ModulesWrapper({
               module={module}
               transition={transition}
               fill={defaultHighlightColor}
+              offset={hierarchicalModuleOffset}
+              opacity={hierarchicalModuleOpacity}
             />
           );
         } else {
@@ -46,6 +52,7 @@ const ModulesWrapper = observer(function ModulesWrapper({
               module={module}
               transition={transition}
               stroke={defaultHighlightColor}
+              opacity={hierarchicalModuleOpacity}
             />
           );
         }

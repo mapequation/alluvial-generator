@@ -4,6 +4,7 @@ import { HierarchicalModule } from "../../alluvial/Network";
 
 export function OutlineModule({
   module,
+  opacity,
   transition,
   stroke,
 }: { module: HierarchicalModule } & MotionProps & SVGProps<SVGRectElement>) {
@@ -20,7 +21,7 @@ export function OutlineModule({
       className="super-module"
       id={module.path.toString()}
       initial={{ ...module.layout, opacity: 0 }}
-      animate={{ x, y, width, height, opacity: 1 }}
+      animate={{ x, y, width, height, opacity }}
       exit={{ ...module.layout, opacity: 0 }}
       transition={transition}
       data-x={x}
@@ -38,13 +39,16 @@ export function OutlineModule({
 
 export function ShadowModule({
   module,
+  opacity,
+  offset,
   transition,
   fill,
 }: {
   module: HierarchicalModule;
+  offset: number;
 } & MotionProps &
   SVGProps<SVGRectElement>) {
-  const offset = 5 * (module.maxModuleLevel - module.moduleLevel);
+  const offsetBy = offset * (module.maxModuleLevel - module.moduleLevel);
   const { layout } = module;
 
   return (
@@ -52,17 +56,17 @@ export function ShadowModule({
       <motion.g
         className="super-module-offset"
         initial={{ x: 0, y: 0 }}
-        animate={{ x: offset, y: offset }}
+        animate={{ x: offsetBy, y: offsetBy }}
         exit={{ x: 0, y: 0 }}
-        data-x={offset}
-        data-y={offset}
+        data-x={offsetBy}
+        data-y={offsetBy}
         transition={transition}
       >
         <motion.rect
           className="super-module"
           id={module.path.toString()}
           initial={{ ...layout, opacity: 0 }}
-          animate={{ ...layout, opacity: 0.3 }}
+          animate={{ ...layout, opacity }}
           exit={{ ...layout, opacity: 0 }}
           transition={transition}
           data-x={layout.x}

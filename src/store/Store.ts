@@ -53,6 +53,9 @@ export class Store {
   aggregateStateNames: boolean = false;
 
   hierarchicalModules: "none" | "outline" | "shadow" = "shadow";
+  hierarchicalModuleOffset: number = 5;
+  hierarchicalModuleOpacity: number = 0.5;
+
   dropShadow: boolean = false;
   fontSize: number = 8;
   networkFontSize: number = 10;
@@ -89,6 +92,8 @@ export class Store {
       showNetworkNames: observable,
       aggregateStateNames: observable,
       hierarchicalModules: observable,
+      hierarchicalModuleOffset: observable,
+      hierarchicalModuleOpacity: observable,
       dropShadow: observable,
       fontSize: observable,
       networkFontSize: observable,
@@ -223,6 +228,14 @@ export class Store {
       this.hierarchicalModules = hierarchicalModules;
     }
   );
+
+  setHierarchicalModuleOffset = action((hierarchicalModuleOffset: number) => {
+    this.hierarchicalModuleOffset = hierarchicalModuleOffset;
+  });
+
+  setHierarchicalModuleOpacity = action((hierarchicalModuleOpacity: number) => {
+    this.hierarchicalModuleOpacity = hierarchicalModuleOpacity;
+  });
 
   setDropShadow = action((dropShadow: boolean) => {
     this.dropShadow = dropShadow;
