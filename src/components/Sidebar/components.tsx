@@ -23,7 +23,7 @@ import { PropsWithChildren, useEffect, useState } from "react";
 export function Button(props: ButtonProps) {
   return (
     <CkButton
-      isFullWidth
+      width="full"
       variant="outline"
       size="sm"
       justifyContent="flex-start"

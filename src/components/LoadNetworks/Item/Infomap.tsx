@@ -79,7 +79,7 @@ export default function Infomap({
           isDisabled={disabled}
           isLoading={disabled}
           size="xs"
-          isFullWidth
+          width="full"
           type="submit"
           onClick={run}
         >
