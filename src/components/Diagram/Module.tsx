@@ -1,4 +1,4 @@
-import { motion, useAnimation } from "framer-motion";
+import { motion, MotionProps, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import type { HighlightGroup, Module as ModuleType } from "../../alluvial";
@@ -7,13 +7,16 @@ import { StoreContext } from "../../store";
 import DropShadows from "./DropShadows";
 import Tooltip from "./Tooltip";
 
+export type ModuleProps = {
+  module: ModuleType;
+  fillColor: (_: HighlightGroup) => string;
+} & MotionProps;
+
 const Module = observer(function Module({
   module,
   fillColor,
-}: {
-  module: ModuleType;
-  fillColor: (_: HighlightGroup) => string;
-}) {
+  transition,
+}: ModuleProps) {
   const store = useContext(StoreContext);
   const controls = useAnimation();
   const { fontSize, adaptiveFontSize, showModuleId, showModuleNames } = store;
@@ -42,8 +45,6 @@ const Module = observer(function Module({
       }
     },
   });
-
-  const transition = { bounce: 0, duration: 0.2 };
 
   // Rounding because fractional font sizes causes Google Chrome
   // to stutter when zooming.

@@ -2,7 +2,6 @@ import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext, useEffect, useRef } from "react";
-import type { Module } from "../../alluvial";
 import useEventListener from "../../hooks/useEventListener";
 import useWindowSize from "../../hooks/useWindowSize";
 import { StoreContext } from "../../store";
@@ -11,6 +10,7 @@ import { drawerWidth } from "../App";
 import "./Diagram.css";
 import DropShadows from "./DropShadows";
 import Network from "./Network";
+import SelectedModule from "./SelectedModule";
 
 const zoom = d3.zoom<SVGSVGElement, unknown>().scaleExtent([0.1, 1000]);
 
@@ -99,24 +99,6 @@ export default observer(function Diagram() {
     </svg>
   );
 });
-
-function SelectedModule({ module }: { module: Module | null }) {
-  if (module == null) {
-    return null;
-  }
-
-  return (
-    <motion.rect
-      initial={false}
-      animate={module.layout}
-      transition={{ bounce: 0, duration: 0.2 }}
-      stroke="#f00"
-      strokeWidth="1"
-      pointerEvents="none"
-      fill="none"
-    />
-  );
-}
 
 function translateCenter({ width, height }: { width: number; height: number }) {
   let { innerWidth, innerHeight } = window;
