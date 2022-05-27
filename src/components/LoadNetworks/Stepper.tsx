@@ -10,7 +10,8 @@ export default function Stepper({
   return (
     <Steps
       activeStep={activeStep}
-      labelOrientation="vertical"
+      // Uncomment this when chakra-ui-steps is updated to chakra-ui v2
+      //labelOrientation="vertical"
       colorScheme="blue"
       sx={{ margin: "1em auto 2em", width: "90%" }}
     >
