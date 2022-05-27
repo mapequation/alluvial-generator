@@ -40,9 +40,12 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
           New version since January 2022
         </Heading>
         <Text mt={4}>
-          Some features are still missing, but we are working on it.
+          Most of the features are now available in the new version. One
+          exception is the "module filter" feature, which won't be implemented.
+          If you want to filter modules, you need to preprocess the input files
+          and remove the modules you don't want.
           <br />
-          If you desperately miss the old version, its available at <br />
+          If you miss the old version, it's available at <br />
           <a href="//mapequation.org/alluvial/old">
             mapequation.org/alluvial/old
           </a>
