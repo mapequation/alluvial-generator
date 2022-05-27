@@ -1,4 +1,12 @@
-import { Box, Kbd, List, ListItem, useColorModeValue } from "@chakra-ui/react";
+import {
+  Box,
+  Kbd,
+  List,
+  ListItem,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import Infomap from "@mapequation/infomap";
 import { observer } from "mobx-react";
 import {
   createContext,
@@ -60,6 +68,9 @@ export default observer(function Sidebar({
       <List spacing={2} fontSize="0.9rem">
         <ListItem mb={5}>
           <Logo showVersion />
+          <Text ml="3.6em" mt={-1} fontSize="xs">
+            Powered by Infomap v{Infomap.__version__}
+          </Text>
         </ListItem>
 
         <ListItemButton onClick={onLoadClick} leftIcon={<MdFileUpload />}>
