@@ -12,9 +12,12 @@ export function calcStatistics(
   let numLevels = 0;
 
   nodes.forEach((node) => {
-    const topModule = Number(node.path[0]);
+    const path = Array.isArray(node.path)
+      ? node.path
+      : node.path?.split(":") ?? [];
+    const topModule = Number(path[0]);
     topModules.add(topModule);
-    numLevels = Math.max(numLevels, node.path.length);
+    numLevels = Math.max(numLevels, path.length);
 
     if (!flowDistribution[topModule]) {
       flowDistribution[topModule] = 0;
