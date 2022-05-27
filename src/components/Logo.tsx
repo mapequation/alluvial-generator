@@ -4,7 +4,6 @@ import ToggleColorMode from "./ToggleColorMode";
 export default function Logo({ showVersion = false, long = false }) {
   const color = useColorModeValue("hsl(0, 0%, 33%)", "hsl(0, 0%, 60%)");
   const brand = useColorModeValue("hsl(0, 68%, 42%)", "hsl(0, 68%, 62%)");
-  const version = useColorModeValue("hsl(0, 0%, 70%)", "hsl(0, 0%, 30%)");
 
   return (
     <HStack w="100%" justify="space-between" align="center">
@@ -30,7 +29,7 @@ export default function Logo({ showVersion = false, long = false }) {
             {long && <span style={{ color }}> Generator</span>}
           </span>
           {showVersion && (
-            <span style={{ color: version }}>
+            <span style={{ color }}>
               {" v" + process.env.REACT_APP_VERSION}
             </span>
           )}
