@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/mapequation/alluvial-generator/compare/v1.10.0...v1.11.0) (2022-05-27)
+
+
+### Features
+
+* Break largest leaf nodes list into multiple lines ([5af333d](https://github.com/mapequation/alluvial-generator/commit/5af333ded133deb9fe08b29b4b41db25f2597864))
+
+
+### Bug Fixes
+
+* Brighter version color ([b9415aa](https://github.com/mapequation/alluvial-generator/commit/b9415aa69fde424a3f155b9f5e14a8d99a784a8d))
+* Show Infomap version ([0431c71](https://github.com/mapequation/alluvial-generator/commit/0431c716fa2f2c2c4a8be113282c28f90aa65030))
+* Use horizontal stepper labels ([6056d84](https://github.com/mapequation/alluvial-generator/commit/6056d84126d276514a09a24f0bebc29fbb24afac))
+
 ## [1.10.0](https://github.com/mapequation/alluvial-generator/compare/v1.9.1...v1.10.0) (2022-05-16)
 
 
