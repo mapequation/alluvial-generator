@@ -1,15 +1,21 @@
 import { motion, MotionProps, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext } from "react";
-import type { HighlightGroup, Module as ModuleType } from "../../alluvial";
+import type { Module as ModuleType } from "../../alluvial";
 import useOnClick from "../../hooks/useOnClick";
 import { StoreContext } from "../../store";
+import highlightColor from "../../utils/highlight-color";
 import DropShadows from "./DropShadows";
 import Tooltip from "./Tooltip";
 
+type FillColor = (_: {
+  highlightIndex: number;
+  insignificant: boolean;
+}) => string;
+
 export type ModuleProps = {
   module: ModuleType;
-  fillColor: (_: HighlightGroup) => string;
+  fillColor: FillColor;
 } & MotionProps;
 
 const Module = observer(function Module({
@@ -62,6 +68,8 @@ const Module = observer(function Module({
   const strokeWidth = Math.max(actualFontSize / 5, 1);
 
   const { idPosition, namePosition } = module;
+
+  const textFill = highlightColor("#000", store.highlightColors);
 
   return (
     <g className="module" onClick={handler}>
@@ -135,6 +143,7 @@ const Module = observer(function Module({
                 fontSize={actualFontSize}
                 aggregateStates={store.aggregateStateNames}
                 multiLine={multilineModuleNames}
+                fillColor={textFill}
               />
             )}
           </motion.text>
@@ -149,11 +158,13 @@ function LargestLeafNames({
   fontSize,
   aggregateStates,
   multiLine,
+  fillColor,
 }: {
   module: ModuleType;
   fontSize: number;
   aggregateStates: boolean;
   multiLine: boolean;
+  fillColor: FillColor;
 }) {
   if (!multiLine) {
     return (
@@ -193,12 +204,22 @@ function LargestLeafNames({
         .slice(0, mid)
         .reverse()
         .map((node, i) => (
-          <tspan key={node.id} x={0} dy={i === 0 ? 0 : "-1.2em"}>
+          <tspan
+            key={aggregateStates ? node.nodeId : node.stateId}
+            x={0}
+            dy={i === 0 ? 0 : "-1.2em"}
+            fill={fillColor(node)}
+          >
             {node.name}
           </tspan>
         ))}
       {names.slice(mid).map((node, i) => (
-        <tspan key={node.id} x={0} dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}>
+        <tspan
+          key={aggregateStates ? node.nodeId : node.stateId}
+          x={0}
+          dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}
+          fill={fillColor(node)}
+        >
           {node.name}
         </tspan>
       ))}
