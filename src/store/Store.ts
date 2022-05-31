@@ -181,6 +181,10 @@ export class Store {
   });
 
   getHighlightIndex = action((highlightColor: string) => {
+    if (highlightColor === this.defaultHighlightColor) {
+      return -1;
+    }
+
     const colors = this.highlightColors;
 
     if (colors.includes(highlightColor)) {
