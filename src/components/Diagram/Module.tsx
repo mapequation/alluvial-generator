@@ -156,9 +156,15 @@ function LargestLeafNames({
   multiLine: boolean;
 }) {
   if (!multiLine) {
-    return <>{module.getLargestLeafNodes(5, aggregateStates).join(", ")}</>;
+    return (
+      <>
+        {module
+          .getLargestLeafNodes(5, aggregateStates)
+          .map((node) => node.name)
+          .join(", ")}
+      </>
+    );
   }
-
   // Current y is at y + height / 2
   // We want to center the middle line at this y.
   // Furthermore, we don't want to show more lines than can
@@ -186,14 +192,14 @@ function LargestLeafNames({
       {names
         .slice(0, mid)
         .reverse()
-        .map((name, i) => (
-          <tspan key={name} x={0} dy={i === 0 ? 0 : "-1.2em"}>
-            {name}
+        .map((node, i) => (
+          <tspan key={node.id} x={0} dy={i === 0 ? 0 : "-1.2em"}>
+            {node.name}
           </tspan>
         ))}
-      {names.slice(mid).map((name, i) => (
-        <tspan key={name} x={0} dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}>
-          {name}
+      {names.slice(mid).map((node, i) => (
+        <tspan key={node.id} x={0} dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}>
+          {node.name}
         </tspan>
       ))}
     </>

@@ -42,11 +42,14 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     }
   }
 
-  getLargestLeafNodes(numValues: number = 5, aggregate = false): string[] {
-    type NodeType = { name: string; flow: number };
+  getLargestLeafNodes(
+    numValues: number = 5,
+    aggregate = false
+  ): { name: string; id: number }[] {
+    type NodeType = { name: string; flow: number; id: number };
     const compare = (a: NodeType, b: NodeType) => b.flow - a.flow;
 
-    const getNodes = () => {
+    const nodes = (() => {
       if (!aggregate) {
         return this.leafNodes();
       }
@@ -55,17 +58,19 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
       for (let node of this.leafNodes()) {
         if (!physicalNodes.has(node.nodeId)) {
-          physicalNodes.set(node.nodeId, { name: node.name, flow: 0 });
+          physicalNodes.set(node.nodeId, {
+            name: node.name,
+            flow: 0,
+            id: node.nodeId,
+          });
         }
         physicalNodes.get(node.nodeId)!.flow += node.flow;
       }
 
       return physicalNodes.values();
-    };
+    })();
 
-    return new PriorityQueue<NodeType>(numValues, compare, getNodes()).map(
-      (node) => node.name
-    ) as string[];
+    return new PriorityQueue<NodeType>(numValues, compare, nodes).toArray();
   }
 
   get x1() {

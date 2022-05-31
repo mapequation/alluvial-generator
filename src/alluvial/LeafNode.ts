@@ -8,7 +8,7 @@ import type { Side } from "./Side";
 import { LEFT, opposite, RIGHT, sideToString } from "./Side";
 import StreamlineNode from "./StreamlineNode";
 
-export type Identifier = "id" | "name";
+export type Identifier = "id" | "name"; // FIXME
 
 export default class LeafNode extends AlluvialNodeBase<never> {
   readonly depth = LEAF_NODE;
@@ -18,7 +18,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly stateId?: number | null = null;
   readonly layerId?: number | null = null;
   readonly metadata?: { [key: string]: string | number };
-  readonly identifier: Identifier;
+  readonly identifier: string;
   readonly treePath: TreePath;
   highlightIndex: number;
   moduleLevel: number;
