@@ -205,7 +205,11 @@ function LargestLeafNames({
         .reverse()
         .map((node, i) => (
           <tspan
-            key={aggregateStates ? node.nodeId : node.stateId}
+            key={
+              !aggregateStates && node.stateId != null
+                ? node.stateId
+                : node.nodeId
+            }
             x={0}
             dy={i === 0 ? 0 : "-1.2em"}
             fill={fillColor(node)}
@@ -215,7 +219,11 @@ function LargestLeafNames({
         ))}
       {names.slice(mid).map((node, i) => (
         <tspan
-          key={aggregateStates ? node.nodeId : node.stateId}
+          key={
+            !aggregateStates && node.stateId != null
+              ? node.stateId
+              : node.nodeId
+          }
           x={0}
           dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}
           fill={fillColor(node)}
