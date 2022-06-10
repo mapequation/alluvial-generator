@@ -37,6 +37,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   name: string;
   isCustomSorted = false;
+  readonly originalId: string | undefined;
   readonly layerId: number | undefined; // When representing each layer as a network
   readonly codelength: number;
   readonly directed: boolean;
@@ -48,7 +49,15 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   constructor(
     parent: Diagram,
-    { name, id, codelength, layerId, modules, directed }: NetworkFile
+    {
+      name,
+      id,
+      codelength,
+      layerId,
+      modules,
+      directed,
+      originalId,
+    }: NetworkFile
   ) {
     super(parent, id, id);
     parent.addChild(this);
@@ -56,6 +65,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     this.codelength = codelength ?? 0;
     this.layerId = layerId;
     this.directed = directed ?? false;
+    this.originalId = originalId;
 
     if (modules) {
       this.infomapModulesByPath = new Map(

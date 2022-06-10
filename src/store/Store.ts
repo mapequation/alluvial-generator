@@ -520,20 +520,32 @@ export class Store {
 
     // If we only have one expanded multilayer network,
     // sort all modules and assign "higher" colors to the largest modules.
-    // FIXME Assumes only one expanded multilayer network.
-    if (this.diagram.children.every((network) => network.layerId != null)) {
-      const modules: Module[] = [];
+    const multilayerNetworkId = this.diagram.children[0]?.originalId;
+    if (
+      this.diagram.children.every(
+        (network) =>
+          network.layerId != null && network.originalId === multilayerNetworkId
+      )
+    ) {
+      const modulesById: {
+        [moduleId: string]: { flow: number; modules: Module[] };
+      } = {};
 
       this.diagram.children.forEach((network) =>
         network.children.forEach((module) => {
           if (module.isVisible) {
-            modules.push(module);
+            if (!modulesById[module.moduleId]) {
+              modulesById[module.moduleId] = { flow: 0, modules: [] };
+            }
+            modulesById[module.moduleId].flow += module.flow;
+            modulesById[module.moduleId].modules.push(module);
           }
         })
       );
 
+      const modules = Array.from(Object.values(modulesById));
       modules.sort((a, b) => b.flow - a.flow);
-      modules.forEach(setModuleColor);
+      modules.forEach(({ modules }) => modules.forEach(setModuleColor));
     } else {
       this.diagram.children.forEach((network) =>
         network.children.forEach((module) => {
