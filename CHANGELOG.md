@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/mapequation/alluvial-generator/compare/v1.11.0...v1.12.0) (2022-06-10)
+
+
+### Features
+
+* Color nodes by highlight color ([8299dfd](https://github.com/mapequation/alluvial-generator/commit/8299dfdb7d941344b137c3ec6c341112ac465bb2))
+
+
+### Bug Fixes
+
+* Check if state id is null to avoid duplicated node name react keys ([04bd150](https://github.com/mapequation/alluvial-generator/commit/04bd150e0c70920a8c14f70ded22f16a34780bf6))
+* Color expanded multilayer networks by id using aggregated module flows ([465b9fe](https://github.com/mapequation/alluvial-generator/commit/465b9fe2efaacafc10d9359858466603f7288a9a))
+* Incorrect network levels statistics ([ab5cd3b](https://github.com/mapequation/alluvial-generator/commit/ab5cd3b5770acf3fae9ea7cb530fccc7aa3d23ae))
+* Multiline largest node names for state networks ([591b696](https://github.com/mapequation/alluvial-generator/commit/591b69666914a69134c664a56a51552a2c6d135f))
+* Return default highlight index for default color ([2755ea9](https://github.com/mapequation/alluvial-generator/commit/2755ea9d073c43e7ecbf8ac8e0c0e7f3db378783))
+
 ## [1.11.0](https://github.com/mapequation/alluvial-generator/compare/v1.10.0...v1.11.0) (2022-05-27)
 
 
