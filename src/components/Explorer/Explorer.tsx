@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Checkbox,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -18,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import FileSaver from "file-saver";
 import { observer } from "mobx-react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import { Swatch } from "../Sidebar/components";
@@ -31,6 +32,7 @@ export default observer(function Explorer({
   const toast = useToast();
   const store = useContext(StoreContext);
   const bg = useColorModeValue("white", "gray.700");
+  const [includeInsignificant, setIncludeInsignificant] = useState(true);
 
   const { selectedModule, defaultHighlightColor, highlightColors } = store;
   const fillColor = highlightColor(defaultHighlightColor, highlightColors);
@@ -40,7 +42,11 @@ export default observer(function Explorer({
     return null;
   }
 
-  const nodes = selectedModule.getLeafNodes().sort((a, b) => b.flow - a.flow);
+  let nodes = selectedModule.getLeafNodes();
+  if (!includeInsignificant) {
+    nodes = nodes.filter((node) => !node.insignificant);
+  }
+  nodes.sort((a, b) => b.flow - a.flow);
 
   const downloadNames = () => {
     const names = nodes.map((node) => node.name).join("\n");
@@ -67,7 +73,7 @@ export default observer(function Explorer({
         <ModalHeader>{"Module " + selectedModule.moduleId}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Box maxH="20em" overflowY="scroll">
+          <Box maxH="40em" overflowY="scroll">
             <Table variant="striped" size="sm" colorScheme="gray">
               <Thead position="sticky" top={0} bg={bg}>
                 <Tr>
@@ -99,14 +105,21 @@ export default observer(function Explorer({
           </Box>
         </ModalBody>
         <ModalFooter>
+          <Button mr={2} onClick={downloadNames}>
+            Download names
+          </Button>
           {navigator.clipboard != null && (
-            <Button mr="2" onClick={copyNames}>
+            <Button mr={2} onClick={copyNames}>
               Copy names to clipboard
             </Button>
           )}
-          <Button mr="auto" onClick={downloadNames}>
-            Download names
-          </Button>
+          <Checkbox
+            isChecked={includeInsignificant}
+            onChange={(event) => setIncludeInsignificant(event.target?.checked)}
+            mr="auto"
+          >
+            Include insignificant
+          </Checkbox>
           <Button isActive onClick={onClose}>
             Close
           </Button>

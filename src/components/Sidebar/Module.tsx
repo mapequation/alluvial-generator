@@ -9,11 +9,11 @@ import {
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import {
-  MdFileUpload,
   MdOutlineArrowBack,
   MdOutlineArrowDownward,
   MdOutlineArrowForward,
   MdOutlineArrowUpward,
+  MdTableRows,
   MdUnfoldLess,
   MdUnfoldMore,
 } from "react-icons/md";
@@ -99,9 +99,9 @@ export default observer(function Module({
 
           <ListItemButton
             onClick={onModuleViewClick}
-            leftIcon={<MdFileUpload />}
+            leftIcon={<MdTableRows />}
           >
-            Open module
+            Show node list
           </ListItemButton>
 
           <ListItem>
