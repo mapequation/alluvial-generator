@@ -196,11 +196,11 @@ export default class Diagram extends AlluvialNodeBase<Network> {
           y = height;
         } else if (node instanceof Module && getNodeSize) {
           node.children.sort((a: HighlightGroup, b: HighlightGroup) => {
+            // Insignificant nodes always at the top
+            if (a.insignificant !== b.insignificant)
+              return Number(a.insignificant) - Number(b.insignificant);
             // FIXME highlight indices might not be sorted
-            const byHighlightIndex = a.highlightIndex - b.highlightIndex;
-            if (byHighlightIndex !== 0) return byHighlightIndex;
-            if (!a.insignificant && !b.insignificant) return 0;
-            return a.insignificant ? 1 : -1;
+            return a.highlightIndex - b.highlightIndex;
           });
           const margin =
             i + 1 < nodes.length
