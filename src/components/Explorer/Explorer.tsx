@@ -26,7 +26,7 @@ import {
 } from "@chakra-ui/react";
 import FileSaver from "file-saver";
 import { observer } from "mobx-react";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
 import { Swatch } from "../Sidebar/components";
@@ -44,16 +44,20 @@ export default observer(function Explorer({
   const { selectedModule, defaultHighlightColor, highlightColors } = store;
   const fillColor = highlightColor(defaultHighlightColor, highlightColors);
 
+  const nodes = useMemo(() => {
+    if (selectedModule == null) return [];
+    let nodes = selectedModule.getLeafNodes();
+    if (!includeInsignificant) {
+      nodes = nodes.filter((node) => !node.insignificant);
+    }
+    nodes.sort((a, b) => b.flow - a.flow);
+    return nodes;
+  }, [selectedModule, includeInsignificant]);
+
   if (selectedModule == null) {
     onClose();
     return null;
   }
-
-  let nodes = selectedModule.getLeafNodes();
-  if (!includeInsignificant) {
-    nodes = nodes.filter((node) => !node.insignificant);
-  }
-  nodes.sort((a, b) => b.flow - a.flow);
 
   const downloadNames = () => {
     const names = nodes.map((node) => node.name).join("\n");
