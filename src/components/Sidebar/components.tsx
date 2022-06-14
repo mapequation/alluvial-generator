@@ -2,6 +2,7 @@ import {
   Box,
   Button as CkButton,
   ButtonProps,
+  forwardRef,
   HStack,
   ListItem,
   ListItemProps,
@@ -163,20 +164,21 @@ export function Switch({
   );
 }
 
-export function Swatch({
-  color,
-  isSelected,
-  onClick,
-  children,
-}: PropsWithChildren<{
+type SwatchProps = PropsWithChildren<{
   color: string;
   isSelected?: boolean;
   onClick?: () => void;
-}>) {
+}>;
+
+export const Swatch = forwardRef<SwatchProps, "div">(function Swatch(
+  { color, isSelected, onClick, children },
+  ref
+) {
   const border = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
 
   return (
     <Box
+      ref={ref}
       as="button"
       textAlign="center"
       fontSize="xs"
@@ -200,7 +202,7 @@ export function Swatch({
       {children}
     </Box>
   );
-}
+});
 
 export function Select({
   value,
