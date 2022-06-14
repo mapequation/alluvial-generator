@@ -51,7 +51,7 @@ export class Store {
   showModuleNames: boolean = true;
   multilineModuleNames: boolean = true;
   showNetworkNames: boolean = true;
-  aggregateStateNames: boolean = false;
+  aggregateStateNames: boolean = true;
 
   hierarchicalModules: "none" | "outline" | "shadow" = "shadow";
   hierarchicalModuleOffset: number = 5;
