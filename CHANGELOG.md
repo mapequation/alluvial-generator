@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/mapequation/alluvial-generator/compare/v1.12.0...v1.13.0) (2022-06-14)
+
+
+### Features
+
+* Color individual nodes in node list ([2a45aaf](https://github.com/mapequation/alluvial-generator/commit/2a45aaf81c7157b2c71e507d33cc08eca16b3e21))
+* Download list of nodes in sub-modules ([e2d9115](https://github.com/mapequation/alluvial-generator/commit/e2d91158214654bfb60e0a6b5ffcc4a4c0ed17d2))
+* Toggle to exclude insignificant nodes from node list ([a93c230](https://github.com/mapequation/alluvial-generator/commit/a93c230fbb9a1905035ca386c23926fde1854525))
+
+
+### Bug Fixes
+
+* Aggregate state names by default ([394ea9f](https://github.com/mapequation/alluvial-generator/commit/394ea9f8ca7d3cde1db4dd41093555a5dfb7d3e8))
+* Wrap Swatch in forwardRef ([3247e45](https://github.com/mapequation/alluvial-generator/commit/3247e451cbbaf0a3f5c3b4019fa8120778061f80))
+
 ## [1.12.0](https://github.com/mapequation/alluvial-generator/compare/v1.11.0...v1.12.0) (2022-06-10)
 
 
