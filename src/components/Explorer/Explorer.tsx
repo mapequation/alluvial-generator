@@ -2,12 +2,19 @@ import {
   Box,
   Button,
   Checkbox,
+  Flex,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   Tbody,
   Td,
@@ -74,7 +81,12 @@ export default observer(function Explorer({
         <ModalCloseButton />
         <ModalBody>
           <Box maxH="40em" overflowY="scroll">
-            <Table variant="striped" size="sm" colorScheme="gray">
+            <Table
+              variant="striped"
+              size="sm"
+              colorScheme="gray"
+              id={`table-update-${store.updateFlag}`}
+            >
               <Thead position="sticky" top={0} bg={bg}>
                 <Tr>
                   <Th>Color</Th>
@@ -88,18 +100,60 @@ export default observer(function Explorer({
                 </Tr>
               </Thead>
               <Tbody>
-                {nodes.map((node) => (
-                  <Tr key={node.nodeId}>
-                    <Td>
-                      <Swatch color={fillColor(node)} />
-                    </Td>
-                    <Td>{node.name}</Td>
-                    <Td>{node.treePath.toString()}</Td>
-                    <Td isNumeric>{node.nodeId}</Td>
-                    {node.stateId != null && <Td isNumeric>{node.stateId}</Td>}
-                    <Td isNumeric>{node.flow.toFixed(6)}</Td>
-                  </Tr>
-                ))}
+                {nodes.map((node) => {
+                  const color = fillColor(node);
+                  return (
+                    <Tr key={node.nodeId}>
+                      <Td>
+                        <Popover isLazy placement="top">
+                          <PopoverTrigger>
+                            <Swatch color={color} />
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <PopoverArrow />
+                            <PopoverCloseButton />
+                            <PopoverBody>
+                              <Flex mt={2} gap={1} wrap="wrap">
+                                <Swatch
+                                  color={defaultHighlightColor}
+                                  isSelected={color === defaultHighlightColor}
+                                  onClick={() =>
+                                    store.colorPhysicalNodeInAllNetworks(
+                                      node.nodeId,
+                                      defaultHighlightColor
+                                    )
+                                  }
+                                />
+                                {store.selectedScheme
+                                  .slice(0, 21)
+                                  .map((schemeColor, i) => (
+                                    <Swatch
+                                      key={`${i}-${schemeColor}`}
+                                      color={schemeColor}
+                                      isSelected={color === schemeColor}
+                                      onClick={() =>
+                                        store.colorPhysicalNodeInAllNetworks(
+                                          node.nodeId,
+                                          schemeColor
+                                        )
+                                      }
+                                    />
+                                  ))}
+                              </Flex>
+                            </PopoverBody>
+                          </PopoverContent>
+                        </Popover>
+                      </Td>
+                      <Td>{node.name}</Td>
+                      <Td>{node.treePath.toString()}</Td>
+                      <Td isNumeric>{node.nodeId}</Td>
+                      {node.stateId != null && (
+                        <Td isNumeric>{node.stateId}</Td>
+                      )}
+                      <Td isNumeric>{node.flow.toFixed(6)}</Td>
+                    </Tr>
+                  );
+                })}
               </Tbody>
             </Table>
           </Box>

@@ -481,6 +481,19 @@ export class Store {
     this.updateLayout();
   }
 
+  colorPhysicalNodeInAllNetworks(physicalId: number, color: string) {
+    const highlightIndex = this.getHighlightIndex(color);
+    this.diagram.children.forEach((network) => {
+      network.getLeafNodes().forEach((node) => {
+        if (node.nodeId === physicalId) {
+          node.highlightIndex = highlightIndex;
+          node.update();
+        }
+      });
+    });
+    this.updateLayout();
+  }
+
   colorModuleIds(module: Module, color: string) {
     const highlightIndex = this.getHighlightIndex(color);
     module.setColor(highlightIndex);
