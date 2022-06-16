@@ -1,7 +1,8 @@
 import { motion, MotionProps, useAnimation } from "framer-motion";
 import { observer } from "mobx-react";
 import { useContext } from "react";
-import type { Module as ModuleType } from "../../alluvial";
+import { titleCase } from "title-case";
+import type { LeafNode, Module as ModuleType } from "../../alluvial";
 import useOnClick from "../../hooks/useOnClick";
 import { StoreContext } from "../../store";
 import highlightColor from "../../utils/highlight-color";
@@ -142,6 +143,7 @@ const Module = observer(function Module({
                 module={module}
                 fontSize={actualFontSize}
                 aggregateStates={store.aggregateStateNames}
+                titleCaseNames={store.titleCaseModuleNames}
                 multiLine={multilineModuleNames}
                 fillColor={textFill}
               />
@@ -157,21 +159,26 @@ function LargestLeafNames({
   module,
   fontSize,
   aggregateStates,
+  titleCaseNames,
   multiLine,
   fillColor,
 }: {
   module: ModuleType;
   fontSize: number;
   aggregateStates: boolean;
+  titleCaseNames: boolean;
   multiLine: boolean;
   fillColor: FillColor;
 }) {
+  const nodeName = (node: LeafNode) =>
+    titleCaseNames ? titleCase(node.name.toLowerCase()) : node.name;
+
   if (!multiLine) {
     return (
       <>
         {module
           .getLargestLeafNodes(5, aggregateStates)
-          .map((node) => node.name)
+          .map(nodeName)
           .join(", ")}
       </>
     );
@@ -214,7 +221,7 @@ function LargestLeafNames({
             dy={i === 0 ? 0 : "-1.2em"}
             fill={fillColor(node)}
           >
-            {node.name}
+            {nodeName(node)}
           </tspan>
         ))}
       {names.slice(mid).map((node, i) => (
@@ -228,7 +235,7 @@ function LargestLeafNames({
           dy={i === 0 ? `${mid * 1.2}em` : "1.2em"}
           fill={fillColor(node)}
         >
-          {node.name}
+          {nodeName(node)}
         </tspan>
       ))}
     </>

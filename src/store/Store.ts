@@ -52,6 +52,7 @@ export class Store {
   multilineModuleNames: boolean = true;
   showNetworkNames: boolean = true;
   aggregateStateNames: boolean = true;
+  titleCaseModuleNames: boolean = false;
 
   hierarchicalModules: "none" | "outline" | "shadow" = "shadow";
   hierarchicalModuleOffset: number = 5;
@@ -93,6 +94,7 @@ export class Store {
       multilineModuleNames: observable,
       showNetworkNames: observable,
       aggregateStateNames: observable,
+      titleCaseModuleNames: observable,
       hierarchicalModules: observable,
       hierarchicalModuleOffset: observable,
       hierarchicalModuleOpacity: observable,
@@ -231,6 +233,10 @@ export class Store {
 
   setAggregateStateNames = action((aggregateStateNames: boolean) => {
     this.aggregateStateNames = aggregateStateNames;
+  });
+
+  setTitleCaseModuleNames = action((titleCaseModuleNames: boolean) => {
+    this.titleCaseModuleNames = titleCaseModuleNames;
   });
 
   setHierarchicalModules = action(

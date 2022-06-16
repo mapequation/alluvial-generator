@@ -172,11 +172,16 @@ export default observer(function Layout() {
       />
       {store.diagram.children.some((network) => network.isHigherOrder) && (
         <Switch
-          label="Aggregate states names"
+          label="Aggregate state names"
           isChecked={store.aggregateStateNames}
           onChange={store.setAggregateStateNames}
         />
       )}
+      <Switch
+        label="Title-case module names"
+        isChecked={store.titleCaseModuleNames}
+        onChange={store.setTitleCaseModuleNames}
+      />
       <Switch
         label="Network names"
         isChecked={store.showNetworkNames}
