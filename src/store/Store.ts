@@ -487,14 +487,17 @@ export class Store {
     this.updateLayout();
   }
 
-  colorPhysicalNodeInAllNetworks(physicalId: number, color: string) {
+  colorSelectedNodes(nodes: LeafNode[], color: string) {
     const highlightIndex = this.getHighlightIndex(color);
-    this.diagram.children.forEach((network) => {
-      network.getLeafNodes().forEach((node) => {
-        if (node.nodeId === physicalId) {
-          node.highlightIndex = highlightIndex;
-          node.update();
-        }
+    nodes.forEach((node) => {
+      node.highlightIndex = highlightIndex;
+      node.update();
+      this.diagram.children.forEach((network) => {
+        if (network.networkId === node.networkId) return;
+        const other = network.getLeafNode(node.identifier);
+        if (!other) return;
+        other.highlightIndex = highlightIndex;
+        other.update();
       });
     });
     this.updateLayout();

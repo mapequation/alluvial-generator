@@ -5,9 +5,9 @@ import useEventListener from "../hooks/useEventListener";
 import { StoreContext } from "../store";
 import Diagram from "./Diagram";
 import Documentation from "./Documentation";
-import Explorer from "./Explorer";
 import LoadNetworks from "./LoadNetworks";
 import Logo from "./Logo";
+import NodeList from "./NodeList";
 import Sidebar from "./Sidebar";
 
 export const drawerWidth = 350;
@@ -65,7 +65,7 @@ export default observer(function App() {
       </Modal>
 
       <Modal size="4xl" isOpen={isExplorerOpen} onClose={onExplorerClose}>
-        <Explorer onClose={onExplorerClose} />
+        {isExplorerOpen && <NodeList onClose={onExplorerClose} />}
       </Modal>
 
       <Diagram />

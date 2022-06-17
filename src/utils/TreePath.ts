@@ -34,6 +34,8 @@ export default class TreePath {
         this.pathArr.push(Number(match[1]));
         this.insignificant.push(match[2] === ";");
       }
+
+      this.path = this.pathArr.join(":");
     } else {
       if (lastChar === ":") {
         // remove last colon if we have stree path
