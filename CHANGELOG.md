@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/mapequation/alluvial-generator/compare/v1.13.0...v1.14.0) (2022-06-20)
+
+
+### Features
+
+* Faster node list ([55025d3](https://github.com/mapequation/alluvial-generator/commit/55025d38eb1ffb412883588da746d579535f6048))
+* Select color scheme in node list ([891d1ab](https://github.com/mapequation/alluvial-generator/commit/891d1ab8be5daa2539cab6b52996ed2d698b54a9))
+* Title case node names ([1c0753d](https://github.com/mapequation/alluvial-generator/commit/1c0753d67432d3bd1f664adc76b1d53d6ef348a4))
+
+
+### Bug Fixes
+
+* Always put insignificant nodes at the top ([ce9b0cc](https://github.com/mapequation/alluvial-generator/commit/ce9b0ccb866154fe069a2e51f489e903e4e254bc))
+* Explicit node list search function ([8e7636f](https://github.com/mapequation/alluvial-generator/commit/8e7636f73a0bc27dfd3e17b97a43bcd3f309a3f6))
+* Focus node list search input on open ([26e9a48](https://github.com/mapequation/alluvial-generator/commit/26e9a48bb3c26da1e609a0681f0a8a09cb53a19e))
+
 ## [1.13.0](https://github.com/mapequation/alluvial-generator/compare/v1.12.0...v1.13.0) (2022-06-14)
 
 
