@@ -2,7 +2,7 @@ import { chakra } from "@chakra-ui/react";
 import { Fragment } from "react";
 import TreePath from "../../utils/TreePath";
 
-export function Path({ path }: { path: TreePath }) {
+export default function Path({ path }: { path: TreePath }) {
   const pathArr = path.toArray();
   return (
     <>

@@ -64,7 +64,7 @@ export default observer(function App() {
         <Documentation onClose={onHelpClose} />
       </Modal>
 
-      <Modal size="4xl" isOpen={isExplorerOpen} onClose={onExplorerClose}>
+      <Modal size="5xl" isOpen={isExplorerOpen} onClose={onExplorerClose}>
         {isExplorerOpen && <NodeList onClose={onExplorerClose} />}
       </Modal>
 

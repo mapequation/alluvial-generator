@@ -53,7 +53,7 @@ export default observer(function NodeList({
   const { selectedModule, defaultHighlightColor } = store;
 
   const data = useMemo(
-    () => (selectedModule == null ? [] : selectedModule.getLeafNodes()),
+    () => selectedModule?.getLeafNodes() ?? [],
     [selectedModule]
   );
 
@@ -185,7 +185,7 @@ export default observer(function NodeList({
                 </Tr>
               ))}
             </Thead>
-            <Tbody>
+            <Tbody className={`table-update-${store.updateFlag}`}>
               {instance.getRowModel().rows.map((row) => (
                 <Tr key={row.id} w="100%">
                   {row.getVisibleCells().map((cell) => (

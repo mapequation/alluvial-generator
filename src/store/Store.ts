@@ -200,6 +200,17 @@ export class Store {
     return index;
   });
 
+  getHighlightColor(highlightIndex?: number, defaultHighlightColor?: string) {
+    if (
+      highlightIndex == null ||
+      highlightIndex > this.highlightColors.length - 1
+    )
+      return undefined;
+    if (highlightIndex === -1)
+      return defaultHighlightColor ?? this.defaultHighlightColor;
+    return this.highlightColors[highlightIndex];
+  }
+
   setVerticalAlign = action((verticalAlign: "bottom" | "justify") => {
     this.verticalAlign = verticalAlign;
     this.updateLayout();

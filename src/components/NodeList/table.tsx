@@ -1,7 +1,8 @@
 import { Checkbox } from "@chakra-ui/react";
 import { createTable } from "@tanstack/react-table";
 import type { LeafNode } from "../../alluvial";
-import { Path } from "./Path";
+import Name from "./Name";
+import Path from "./Path";
 
 export const table = createTable().setRowType<LeafNode>();
 
@@ -30,6 +31,12 @@ export const columns = [
   table.createDataColumn("name", {
     header: "Name",
     filterFn: "includesString",
+    cell: (props) => (
+      <Name
+        name={props.getValue()}
+        highlightIndex={props.row.original?.highlightIndex}
+      />
+    ),
   }),
   table.createDataColumn("treePath", {
     header: "Path",
