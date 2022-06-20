@@ -18,7 +18,7 @@ export default function NetworkInfo({ file }: { file: NetworkFile }) {
       )}
       {file.nodes && (
         <Text>
-          {`${file.nodes.length} ${
+          {`${file.nodes.length.toLocaleString()} ${
             file.isStateNetwork ? "state nodes" : "nodes"
           }`}
         </Text>
