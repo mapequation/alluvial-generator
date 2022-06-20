@@ -35,8 +35,9 @@ import { observer } from "mobx-react";
 import { useContext, useMemo, useState } from "react";
 import type { LeafNode } from "../../alluvial";
 import { StoreContext } from "../../store";
-import { Swatch } from "../Sidebar/components";
-import { Pagination } from "./Pagination";
+import ColorSchemeSelect from "../Sidebar/ColorSchemeSelect";
+import Swatch from "../Sidebar/Swatch";
+import Pagination from "./Pagination";
 import { columns, table } from "./table";
 
 export default observer(function NodeList({
@@ -128,6 +129,7 @@ export default observer(function NodeList({
 
   const nameColumn = instance.getColumn("name");
   const numericColumns = ["nodeId", "stateId", "layerId", "flow"];
+  const noNodesSelected = instance.getSelectedRowModel().flatRows.length === 0;
 
   return (
     <>
@@ -194,20 +196,15 @@ export default observer(function NodeList({
             </Tbody>
           </Table>
           <Pagination instance={instance} />
+
+          <ColorSchemeSelect w="300px" mt={4} />
+
           <Flex
             mt={4}
             gap={1}
             wrap="wrap"
-            pointerEvents={
-              instance.getSelectedRowModel().flatRows.length === 0
-                ? "none"
-                : undefined
-            }
-            filter={
-              instance.getSelectedRowModel().flatRows.length === 0
-                ? "grayscale(100%)"
-                : undefined
-            }
+            pointerEvents={noNodesSelected ? "none" : undefined}
+            filter={noNodesSelected ? "grayscale(80%)" : undefined}
           >
             <Swatch
               color={defaultHighlightColor}

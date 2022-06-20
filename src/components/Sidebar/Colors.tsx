@@ -1,20 +1,14 @@
-import {
-  ButtonGroup,
-  Flex,
-  Kbd,
-  ListItem,
-  Select,
-  Text,
-} from "@chakra-ui/react";
+import { ButtonGroup, Flex, Kbd, ListItem, Text } from "@chakra-ui/react";
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { IoMdColorFill } from "react-icons/io";
 import { MdClear } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
-import { SCHEME_GROUPS, SchemeName } from "../../store/schemes";
-import { Button, Label, ListItemHeader, Swatch } from "./components";
+import ColorSchemeSelect from "./ColorSchemeSelect";
+import { Button, Label, ListItemHeader } from "./components";
 import { SidebarContext } from "./Sidebar";
+import Swatch from "./Swatch";
 
 export default observer(function Colors() {
   const store = useContext(StoreContext);
@@ -50,29 +44,7 @@ export default observer(function Colors() {
 
       <ListItem>
         <Label>Color scheme</Label>
-        <Select
-          size="sm"
-          w="50%"
-          variant="flushed"
-          display="inline-block"
-          value={store.selectedSchemeName}
-          onChange={(event) =>
-            store.setSelectedScheme(event.target.value as SchemeName)
-          }
-          sx={{
-            "> optgroup": { color: "gray.900", fontStyle: "normal" },
-          }}
-        >
-          {Array.from(Object.entries(SCHEME_GROUPS)).map(([group, schemes]) => (
-            <optgroup label={group} key={group}>
-              {schemes.map((scheme) => (
-                <option key={scheme} value={scheme}>
-                  {scheme}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </Select>
+        <ColorSchemeSelect />
 
         <Flex mt={2} gap={1} wrap="wrap">
           <Swatch

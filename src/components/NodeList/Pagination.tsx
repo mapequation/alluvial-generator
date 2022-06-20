@@ -7,7 +7,11 @@ import {
   HiOutlineChevronRight,
 } from "react-icons/hi";
 
-export function Pagination({ instance }: { instance: TableInstance<any> }) {
+export default function Pagination({
+  instance,
+}: {
+  instance: TableInstance<any>;
+}) {
   return (
     <Flex align="center" mt={4}>
       <ButtonGroup isAttached mr={4} size="sm">
