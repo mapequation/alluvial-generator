@@ -141,6 +141,8 @@ export default observer(function NodeList({
           <Input
             placeholder="Search names..."
             maxW="50%"
+            autoFocus
+            tabIndex={0}
             onFocus={() => store.setEditMode(true)}
             onBlur={() => store.setEditMode(false)}
             value={(nameColumn.getFilterValue() ?? "") as string}
