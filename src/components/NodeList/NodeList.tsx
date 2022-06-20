@@ -32,8 +32,9 @@ import {
 } from "@tanstack/react-table";
 import FileSaver from "file-saver";
 import { observer } from "mobx-react";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import type { LeafNode } from "../../alluvial";
+import useDebounce from "../../hooks/useDebounce";
 import { StoreContext } from "../../store";
 import ColorSchemeSelect from "../Sidebar/ColorSchemeSelect";
 import Swatch from "../Sidebar/Swatch";
@@ -91,6 +92,16 @@ export default observer(function NodeList({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 100);
+
+  const nameColumn = useMemo(() => instance.getColumn("name"), [instance]);
+
+  useEffect(
+    () => nameColumn.setFilterValue(debouncedSearch),
+    [nameColumn, debouncedSearch]
+  );
+
   if (selectedModule == null) {
     onClose();
     return null;
@@ -127,7 +138,6 @@ export default observer(function NodeList({
     });
   };
 
-  const nameColumn = instance.getColumn("name");
   const numericColumns = ["nodeId", "stateId", "layerId", "flow"];
   const noNodesSelected = instance.getSelectedRowModel().flatRows.length === 0;
 
@@ -145,8 +155,8 @@ export default observer(function NodeList({
             tabIndex={0}
             onFocus={() => store.setEditMode(true)}
             onBlur={() => store.setEditMode(false)}
-            value={(nameColumn.getFilterValue() ?? "") as string}
-            onChange={(e) => nameColumn.setFilterValue(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
           <Table variant="striped" size="sm" colorScheme="gray" mt={4}>
             <Thead bg={bg}>
