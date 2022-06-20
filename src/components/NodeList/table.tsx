@@ -27,7 +27,10 @@ export const columns = [
       />
     ),
   }),
-  table.createDataColumn("name", { header: "Name" }),
+  table.createDataColumn("name", {
+    header: "Name",
+    filterFn: "includesString",
+  }),
   table.createDataColumn("treePath", {
     header: "Path",
     cell: (props) => <Path path={props.getValue()} />,
