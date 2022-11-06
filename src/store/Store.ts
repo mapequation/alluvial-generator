@@ -72,6 +72,8 @@ export class Store {
 
   editMode: boolean = false;
 
+  showBipartiteNodes = true;
+
   constructor() {
     makeObservable(this, {
       diagram: observable.ref,
@@ -109,6 +111,7 @@ export class Store {
       adaptiveFontSize: observable,
       selectedModule: observable,
       editMode: observable,
+      showBipartiteNodes: observable,
     });
   }
 
@@ -304,6 +307,17 @@ export class Store {
       network.name = name;
       this.toggleUpdate();
     }
+  });
+
+  setShowBipartiteNodes = action((showBipartiteNodes: boolean) => {
+    this.showBipartiteNodes = showBipartiteNodes;
+    this.diagram.children.forEach((network) => {
+      if (!network.isBipartite) return;
+
+      network.toggleShowBipartiteNodes(showBipartiteNodes);
+    });
+
+    this.updateLayout();
   });
 
   toggleUpdate = action(() => {

@@ -33,6 +33,8 @@ export type Real = {
   pdfBounds: number[];
 };
 
+export const NOT_BIPARTITE = -1;
+
 export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly depth = NETWORK;
   name: string;
@@ -41,6 +43,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly layerId: number | undefined; // When representing each layer as a network
   readonly codelength: number;
   readonly directed: boolean;
+  readonly bipartiteStartId: number = NOT_BIPARTITE;
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
@@ -57,6 +60,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       modules,
       directed,
       originalId,
+      bipartiteStartId,
     }: NetworkFile
   ) {
     super(parent, id, id);
@@ -66,6 +70,10 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     this.layerId = layerId;
     this.directed = directed ?? false;
     this.originalId = originalId;
+
+    if (bipartiteStartId !== undefined) {
+      this.bipartiteStartId = bipartiteStartId;
+    }
 
     if (modules) {
       this.infomapModulesByPath = new Map(
@@ -82,6 +90,18 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   get isHigherOrder() {
     return this.isMultilayer || this.leafNodes()?.next()?.value.stateId != null;
+  }
+
+  get isBipartite() {
+    return this.bipartiteStartId !== NOT_BIPARTITE;
+  }
+
+  toggleShowBipartiteNodes(show: boolean) {
+    if (!this.isBipartite) return;
+
+    for (let node of this.leafNodes()) {
+      node.visible = node.nodeId >= this.bipartiteStartId ? show : true;
+    }
   }
 
   get haveMetadata() {

@@ -48,6 +48,7 @@ export type NetworkFile = {
   // Multilayer
   isExpanded?: boolean;
   isMultilayer?: boolean;
+  bipartiteStartId?: number;
   numLayers?: number;
   layerId?: number;
   originalId?: string;

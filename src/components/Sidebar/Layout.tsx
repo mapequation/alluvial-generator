@@ -149,6 +149,13 @@ export default observer(function Layout() {
         options={["flow", "nodes", "highlightIndex", "nodeId"]}
       />
 
+      {store.diagram.children.some((network) => network.isBipartite) && (
+        <Switch
+          label="Show bipartite nodes"
+          isChecked={store.showBipartiteNodes}
+          onChange={store.setShowBipartiteNodes}
+        />
+      )}
       <Switch
         label="Bottom align"
         isChecked={store.verticalAlign === "bottom"}
