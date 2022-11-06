@@ -139,13 +139,14 @@ export default observer(function Layout() {
         value={store.moduleSize}
         onChange={store.setModuleSize}
         options={["flow", "nodes"]}
+        hstack
       />
 
       <RadioGroup
         legend="Module order"
         value={store.sortModulesBy}
         onChange={store.setSortModulesBy}
-        options={["flow", "nodes"]}
+        options={["flow", "nodes", "highlightIndex", "nodeId"]}
       />
 
       <Switch
@@ -166,7 +167,7 @@ export default observer(function Layout() {
         onChange={store.setShowModuleNames}
       />
       <Switch
-        label="Multiline module names"
+        label="Multi-line module names"
         isChecked={store.multilineModuleNames}
         onChange={store.setMultilineModuleNames}
       />

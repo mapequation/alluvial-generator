@@ -15,6 +15,7 @@ import {
   Switch as CkSwitch,
   SwitchProps,
   Tooltip,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -117,24 +118,28 @@ export function RadioGroup<T extends string>({
   value,
   onChange,
   options,
+  hstack = false,
 }: {
   legend: string;
   value: T;
   onChange: (value: T) => void;
   options: T[];
+  hstack?: boolean;
 }) {
+  const Wrapper = hstack ? HStack : VStack;
+
+  const opts = options.map((value) => (
+    <Radio value={value} key={value}>
+      {value}
+    </Radio>
+  ));
+
   return (
     <ListItem>
       <HStack>
         <Label>{legend}</Label>
         <CkRadioGroup value={value} onChange={onChange} size="sm">
-          <HStack>
-            {options.map((value) => (
-              <Radio value={value} key={value}>
-                {value}
-              </Radio>
-            ))}
-          </HStack>
+          <Wrapper align="left" children={opts} />
         </CkRadioGroup>
       </HStack>
     </ListItem>
@@ -174,7 +179,7 @@ export function Select({
     <CkSelect
       size="sm"
       w="50%"
-      variant="flushed"
+      variant="flused"
       display="inline-block"
       value={value}
       onChange={(event) => setValue(event.target.value)}

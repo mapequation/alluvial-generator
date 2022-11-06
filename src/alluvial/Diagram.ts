@@ -12,6 +12,7 @@ import StreamlineNode from "./StreamlineNode";
 export type VerticalAlign = "bottom" | "justify" | "top";
 
 export type ModuleSize = "flow" | "nodes";
+export type ModuleOrder = ModuleSize | "highlightIndex" | "nodeId";
 
 export interface LayoutOpts {
   height: number;
@@ -21,10 +22,16 @@ export interface LayoutOpts {
   verticalAlign: VerticalAlign;
   marginExponent: number;
   moduleSize: ModuleSize;
-  sortModulesBy: ModuleSize;
+  sortModulesBy: ModuleOrder;
 }
 
-type NodeProps = { flow: number; numLeafNodes: number };
+type NodeProps = {
+  flow: number;
+  numLeafNodes: number;
+  highlightIndex?: number;
+  largestNodeId?: number;
+  meanNodeId?: number;
+};
 type GetNodeSize = (node: NodeProps) => number;
 
 /*
@@ -181,7 +188,10 @@ export default class Diagram extends AlluvialNodeBase<Network> {
           );
 
           if (!node.isCustomSorted) {
-            new Tree(visibleModules, getNodeSizeByProp(sortModulesBy))
+            new Tree(
+              visibleModules,
+              getNodeOrderByPropForNetwork(node, maxNetworkFlow)(sortModulesBy)
+            )
               .sort()
               .flatten()
               .forEach(
@@ -234,7 +244,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     const maxTotalMargin = Math.max(...totalMargins);
     let usableHeight = height - maxTotalMargin;
 
-    const maxMarginFractionOfHeight = 0.5;
+    const maxMarginFractionOfHeight = 0.2;
     const marginFractionOfHeight = maxTotalMargin / height;
 
     if (marginFractionOfHeight > maxMarginFractionOfHeight) {
@@ -362,12 +372,32 @@ function getNodeSizeByPropForNetwork(
   { numLeafNodes }: Network,
   maxFlow: number
 ) {
-  return (property: string): GetNodeSize => {
+  return (property: ModuleSize): GetNodeSize => {
     if (property === "flow") {
       return (node) => node.flow / maxFlow;
     } else if (property === "nodes") {
       return (node) => node.numLeafNodes / numLeafNodes;
     }
-    return () => 0;
+    throw new Error("Module size must be either 'flow' or 'nodes'.");
+  };
+}
+
+function getNodeOrderByPropForNetwork(
+  { numLeafNodes }: Network,
+  maxFlow: number
+) {
+  return (property: ModuleOrder): GetNodeSize => {
+    if (property === "flow") {
+      return (node) => node.flow / maxFlow;
+    } else if (property === "nodes") {
+      return (node) => node.numLeafNodes / numLeafNodes;
+    } else if (property === "highlightIndex") {
+      return (node) => -node.highlightIndex!;
+    } else if (property === "nodeId") {
+      return (node) => node.meanNodeId!;
+    }
+    throw new Error(
+      "Module order must be either 'flow', 'nodes' or 'highlightIndex'."
+    );
   };
 }

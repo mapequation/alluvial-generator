@@ -10,6 +10,11 @@ import {
   RIGHT,
   Side,
 } from "../alluvial";
+import type {
+  ModuleOrder,
+  ModuleSize,
+  VerticalAlign,
+} from "../alluvial/Diagram";
 import type { Real } from "../alluvial/Network";
 import type { NetworkFile } from "../components/LoadNetworks";
 import type { Histogram } from "../components/Sidebar/Metadata/Real";
@@ -43,9 +48,9 @@ export class Store {
   defaultHighlightColor: string = "#b6b69f";
   highlightColors: string[] = [...this.selectedScheme];
 
-  verticalAlign: "bottom" | "justify" = "bottom";
-  moduleSize: "nodes" | "flow" = "flow";
-  sortModulesBy: "nodes" | "flow" = "flow";
+  verticalAlign: VerticalAlign = "bottom";
+  moduleSize: ModuleSize = "flow";
+  sortModulesBy: ModuleOrder = "flow";
 
   showModuleId: boolean = false;
   showModuleNames: boolean = true;
@@ -206,22 +211,22 @@ export class Store {
       highlightIndex > this.highlightColors.length - 1
     )
       return undefined;
-    if (highlightIndex === -1)
+    if (highlightIndex === NOT_HIGHLIGHTED)
       return defaultHighlightColor ?? this.defaultHighlightColor;
     return this.highlightColors[highlightIndex];
   }
 
-  setVerticalAlign = action((verticalAlign: "bottom" | "justify") => {
+  setVerticalAlign = action((verticalAlign: VerticalAlign) => {
     this.verticalAlign = verticalAlign;
     this.updateLayout();
   });
 
-  setModuleSize = action((moduleSize: "nodes" | "flow") => {
+  setModuleSize = action((moduleSize: ModuleSize) => {
     this.moduleSize = moduleSize;
     this.updateLayout();
   });
 
-  setSortModulesBy = action((sortModulesBy: "nodes" | "flow") => {
+  setSortModulesBy = action((sortModulesBy: ModuleOrder) => {
     this.sortModulesBy = sortModulesBy;
     this.updateLayout();
   });
