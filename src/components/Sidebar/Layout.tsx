@@ -56,7 +56,7 @@ export default observer(function Layout() {
       <Slider
         label="Module top margin"
         value={store.marginExponent}
-        min={1}
+        min={-1}
         max={6}
         valueLabelFormat={(value: number) => 2 ** (value - 1)}
         onChange={store.setMarginExponent}
