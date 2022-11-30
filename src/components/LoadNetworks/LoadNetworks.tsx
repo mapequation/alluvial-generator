@@ -24,7 +24,7 @@ import Item from "./Item";
 import "./LoadNetworks.css";
 import NodeIdentifier from "./NodeIdentifier";
 import Stepper from "./Stepper";
-import { createFilesFromDiagramObject, parseAcceptedFiles } from "./utils";
+import { parseAcceptedFiles, fetchScienceData } from "./utils";
 
 const acceptedFormats = [
   "tree",
@@ -37,13 +37,6 @@ const acceptedFormats = [
 ] as const;
 
 const dropzoneAccept = acceptedFormats.map((format) => `.${format}`).join(",");
-
-const exampleDataFilename = "science-1998-2001-2007.json" as const;
-
-async function fetchExampleData(filename: string = exampleDataFilename) {
-  const res = await fetch(`/alluvial/data/${filename}`);
-  return await res.json();
-}
 
 type Props = {
   onClose: () => void;
@@ -116,7 +109,7 @@ export default observer(function LoadNetworks({ onClose }: Props) {
       payload: { isLoadingExample: true, isLoadingFiles: true },
     });
     try {
-      const json = await fetchExampleData();
+      const files = await fetchScienceData();
       dispatch({
         type: "set",
         payload: {
@@ -125,8 +118,6 @@ export default observer(function LoadNetworks({ onClose }: Props) {
           isLoadingFiles: false,
         },
       });
-      const emptyFile = new File([], exampleDataFilename);
-      const files = createFilesFromDiagramObject(json, emptyFile);
       dispatch({ type: "set", payload: { files } });
       setTimeout(() => {
         store.setFiles(files);

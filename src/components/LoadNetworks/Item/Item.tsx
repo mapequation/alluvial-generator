@@ -42,7 +42,7 @@ export default observer(function Item({ file }: { file: NetworkFile }) {
   const [twoLevel, setTwoLevel] = useState(file.twoLevel ?? false);
 
   const { runAsync, running, progress } = useInfomap({
-    output: "ftree",
+    output: "ftree", // FIXME should be "tree"?
     twoLevel,
     directed,
     numTrials,

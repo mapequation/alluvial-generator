@@ -8,7 +8,6 @@ import { Identifier } from "../../../alluvial";
 import id from "../../../utils/id";
 import type { Format, NetworkFile } from "../types";
 import { calcStatistics } from "./calc-statistics";
-import { createFilesFromDiagramObject } from "./from-diagram";
 import { setIdentifiers } from "./set-identifiers";
 
 type ErrorType = {
@@ -52,25 +51,6 @@ export async function parseAcceptedFiles(
     if (format === "json") {
       try {
         parsedFile = JSON.parse(fileContents);
-
-        // TODO remove
-        if (parsedFile.networks !== undefined) {
-          // A diagram contains several networks.
-          // Create a new file for each network.
-          const diagramFiles = createFilesFromDiagramObject(parsedFile, file);
-
-          // If any file ids already exist, give a new id
-          for (let existingFile of [...currentFiles, ...newFiles]) {
-            for (let diagramFile of diagramFiles) {
-              if (existingFile.id === diagramFile.id) {
-                diagramFile.id = id();
-              }
-            }
-          }
-
-          newFiles.push(...diagramFiles);
-          continue;
-        }
       } catch (e: any) {
         errors.push(createError(file, "invalid-json", e.message));
         continue;
@@ -163,7 +143,7 @@ async function readAcceptedFiles(
   return { readFiles, errors };
 }
 
-function createFile(
+export function createFile(
   file: File,
   format: Format,
   contents: any // FIXME any
