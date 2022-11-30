@@ -115,8 +115,43 @@ export class Store {
     });
   }
 
+  private checkColors(networks: any[]) {
+    let colors: string[] = [];
+    const colorIndices = new Map();
+
+    for (let network of networks) {
+      if (Array.isArray(network?.colors)) {
+        // Colors are specified on the top level, nodes have highlightIndex.
+        network.colors?.forEach((color: string) => {
+          if (!colorIndices.has(color)) {
+            colors.push(color);
+            const dummyIndex = 0;
+            colorIndices.set(color, dummyIndex);
+          }
+        });
+      } else if (network?.colors === true) {
+        // Colors are specified on the nodes, need to set highlightIndex.
+        network.nodes?.forEach((node: any) => {
+          if (node?.color != null) {
+            if (!colorIndices.has(node.color)) {
+              node.highlightIndex = colors.push(node.color) - 1;
+              colorIndices.set(node.color, node.highlightIndex);
+            } else {
+              node.highlightIndex = colorIndices.get(node.color);
+            }
+          }
+        });
+      }
+    }
+
+    this.setHighlightColors(colors);
+  }
+
   setNetworks = action((networks: any[], selectLargest = true) => {
     console.time("Store.setNetworks");
+
+    this.checkColors(networks);
+
     this.setSelectedModule(null);
     this.diagram = new Diagram(networks);
     this.numNetworks = networks.length;
