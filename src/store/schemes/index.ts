@@ -57,6 +57,8 @@ import {
   deep,
   muted,
   pastel,
+  flare,
+  crest
 } from "./seaborn-schemes";
 
 const c3options = {
@@ -107,6 +109,9 @@ export const COLOR_SCHEMES = {
   "C3 Rainbow": c3.colors(512, { scheme: "Rainbow", ...c3options }),
   "C3 Sinebow": c3.colors(512, { scheme: "Sinebow", ...c3options }),
   "C3 Viridis": c3.colors(512, { scheme: "Viridis", ...c3options }),
+  // uniform
+  Flare: flare,
+  Crest: crest,
   // diverging
   "Brown-Green": scheme(interpolateBrBG),
   "Purple-Green": scheme(interpolatePRGn),
@@ -172,6 +177,10 @@ export const SCHEME_GROUPS: { [key: string]: SchemeName[] } = {
   Seaborn: ["Deep", "Muted", "Pastel", "Bright", "Dark", "Colorblind"],
   Matplotlib: ["Tableau20", "Tableau20b", "Tableau20c"],
   C3: ["C3 Turbo", "C3 Rainbow", "C3 Sinebow", "C3 Viridis"],
+  Uniform: [
+    "Flare",
+    "Crest"
+  ],
   Diverging: [
     "Brown-Green",
     "Purple-Green",
