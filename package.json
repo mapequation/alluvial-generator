@@ -36,8 +36,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "release": "standard-version",
-    "predeploy": "npm run build",
-    "deploy": "ssh mapequation \"rm -rf /var/www/alluvial/static\" && scp -r build/* mapequation:/var/www/alluvial"
+    "deployclean": "ssh mapequation \"rm -rf /var/www/alluvial/static/*\"",
+    "predeploy": "npm run build && npm run deployclean",
+    "deploy": "scp -r build/* mapequation:/var/www/alluvial"
   },
   "eslintConfig": {
     "extends": [
