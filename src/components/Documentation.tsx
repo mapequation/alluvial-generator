@@ -166,23 +166,6 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
           </a>
           .
         </Text>
-
-        <Heading as="h2" size="md" my={8}>
-          References
-        </Heading>
-        <Text mt={4}>
-          If you are using the software at mapequation.org in one of your
-          research articles or otherwise want to refer to it, please cite{" "}
-          <a href="https://www.mapequation.org/publications.html">
-            relevant publication
-          </a>{" "}
-          or use the following format:
-        </Text>
-        <Text mt={4} mx={4} py={4} px={6}>
-          D. Edler, A. Eriksson and M. Rosvall, The MapEquation software
-          package, available online at{" "}
-          <a href="https://www.mapequation.org">mapequation.org</a>.
-        </Text>
       </ModalBody>
       <ModalFooter>
         <Button

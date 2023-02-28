@@ -4,4 +4,4 @@ Visualize Infomap partition differences.
 
 ## Authors
 
-Anton Eriksson, Daniel Edler
+Anton Holmgren, Daniel Edler

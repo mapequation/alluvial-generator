@@ -19,6 +19,7 @@ import { MdFileUpload, MdHelp } from "react-icons/md";
 import { StoreContext } from "../../store";
 import { drawerWidth } from "../App";
 import Logo from "../Logo";
+import Cite, { CiteIcon } from "./Cite";
 import Colors from "./Colors";
 import { ListItemButton } from "./components";
 import Export from "./Export";
@@ -77,6 +78,10 @@ export default observer(function Sidebar({
           Load or arrange
           <Kbd ml="auto">L</Kbd>
         </ListItemButton>
+
+        <Cite>
+          <ListItemButton leftIcon={<CiteIcon />}>How to cite</ListItemButton>
+        </Cite>
 
         <ListItemButton onClick={onAboutClick} leftIcon={<MdHelp />}>
           Help
