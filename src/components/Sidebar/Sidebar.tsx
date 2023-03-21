@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Kbd,
   List,
   ListItem,
@@ -79,9 +80,20 @@ export default observer(function Sidebar({
           <Kbd ml="auto">L</Kbd>
         </ListItemButton>
 
-        <Cite>
-          <ListItemButton leftIcon={<CiteIcon />}>How to cite</ListItemButton>
-        </Cite>
+        <ListItem>
+          <Cite>
+            <Button
+              width="full"
+              variant="outline"
+              size="sm"
+              justifyContent="flex-start"
+              fontWeight={500}
+              leftIcon={<CiteIcon />}
+            >
+              How to cite
+            </Button>
+          </Cite>
+        </ListItem>
 
         <ListItemButton onClick={onAboutClick} leftIcon={<MdHelp />}>
           Help

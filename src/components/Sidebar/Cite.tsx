@@ -7,11 +7,20 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Portal,
   Text,
 } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 
-const citation = `@software{mapequation2022alluvial,
+const citeMappingChange = `@misc{holmgren2023mapping,
+  title={Mapping change in higher-order networks with multilevel and overlapping communities}, 
+  author={Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
+  year={2023},
+  eprint={2303.00622},
+  archivePrefix={arXiv},
+}`;
+
+const citeAlluvial = `@software{mapequation2022alluvial,
   author = {Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
   title = {{The MapEquation Alluvial Diagram Generator}},
   url = {https://mapequation.org/alluvial},
@@ -23,28 +32,30 @@ const citation = `@software{mapequation2022alluvial,
 
 export default function Cite({ children }: PropsWithChildren<any>) {
   return (
-    <Popover placement="bottom">
+    <Popover placement="auto-start">
       <PopoverTrigger>{children}</PopoverTrigger>
-      <PopoverContent>
-        <PopoverHeader fontWeight="bold" border="0">
-          BibTeX
-        </PopoverHeader>
-        <PopoverArrow />
-        <PopoverCloseButton />
-        <PopoverBody>
-          <Text my="1em">
-            Please cite{" "}
-            <a href="//www.mapequation.org/publications.html">
-              relevant publication
-            </a>{" "}
-            or this software using:
-          </Text>
+      <Portal>
+        <PopoverContent>
+          <PopoverHeader fontWeight="bold" border="0">
+            BibTeX
+          </PopoverHeader>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverBody>
+            <Text my="1em">Please cite</Text>
 
-          <Code fontSize="xs" whiteSpace="pre-wrap" display="block">
-            {citation}
-          </Code>
-        </PopoverBody>
-      </PopoverContent>
+            <Code fontSize="xs" whiteSpace="pre-wrap" display="block">
+              {citeMappingChange}
+            </Code>
+
+            <Text my="1em">and</Text>
+
+            <Code fontSize="xs" whiteSpace="pre-wrap" display="block">
+              {citeAlluvial}
+            </Code>
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
     </Popover>
   );
 }
