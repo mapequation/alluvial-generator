@@ -11,24 +11,21 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+import MapEquationBibTeX from "./MapEquationBibTeX";
 
 const citeMappingChange = `@misc{holmgren2023mapping,
-  title={Mapping change in higher-order networks with multilevel and overlapping communities}, 
-  author={Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
-  year={2023},
-  eprint={2303.00622},
-  archivePrefix={arXiv},
-}`;
-
-const citeAlluvial = `@software{mapequation2022alluvial,
-  author = {Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
-  title = {{The MapEquation Alluvial Diagram Generator}},
-  url = {https://mapequation.org/alluvial},
-  license = {MIT},
-  version = {${process.env.REACT_APP_VERSION}},
-  month = {6},
-  year = {2022}
-}`;
+    title = {Mapping change in higher-order networks with multilevel and overlapping communities},
+    author = {Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
+    year = 2023,
+    month = 3,
+    publisher = {arXiv},
+    doi = {10.48550/arXiv.2303.00622},
+    url = {https://doi.org/10.48550/arXiv.2303.00622},
+    eprint = {2303.00622},
+    archivePrefix = {arXiv},
+    howpublished = {\\href{https://doi.org/10.48550/arXiv.2303.00622}{arXiv:~2303.00622}}
+}
+`;
 
 export default function Cite({ children }: PropsWithChildren<any>) {
   return (
@@ -44,14 +41,26 @@ export default function Cite({ children }: PropsWithChildren<any>) {
           <PopoverBody>
             <Text my="1em">Please cite</Text>
 
-            <Code fontSize="xs" whiteSpace="pre-wrap" display="block">
+            <Code
+              fontSize="xs"
+              whiteSpace="pre-wrap"
+              display="block"
+              p={2}
+              lineHeight={1.5}
+            >
               {citeMappingChange}
             </Code>
 
             <Text my="1em">and</Text>
 
-            <Code fontSize="xs" whiteSpace="pre-wrap" display="block">
-              {citeAlluvial}
+            <Code
+              fontSize="xs"
+              whiteSpace="pre-wrap"
+              display="block"
+              p={2}
+              lineHeight={1.5}
+            >
+              <MapEquationBibTeX />
             </Code>
           </PopoverBody>
         </PopoverContent>
