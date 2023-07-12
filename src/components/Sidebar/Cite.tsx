@@ -8,24 +8,23 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Portal,
-  Text,
+  Text
 } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import MapEquationBibTeX from "./MapEquationBibTeX";
 
-const citeMappingChange = `@misc{holmgren2023mapping,
-    title = {Mapping change in higher-order networks with multilevel and overlapping communities},
+const mappingChangeBibTeX = `@article{holmgren2023mapping,
+    title = {Mapping Change in Higher-Order Networks with Multilevel and Overlapping Communities},
     author = {Holmgren, Anton and Edler, Daniel and Rosvall, Martin},
-    year = 2023,
-    month = 3,
-    publisher = {arXiv},
-    doi = {10.48550/arXiv.2303.00622},
-    url = {https://doi.org/10.48550/arXiv.2303.00622},
-    eprint = {2303.00622},
-    archivePrefix = {arXiv},
-    howpublished = {\\href{https://doi.org/10.48550/arXiv.2303.00622}{arXiv:~2303.00622}}
-}
-`;
+    year = {2023},
+    month = {7},
+    journal = {Applied Network Science},
+    volume = {8},
+    number = {1},
+    pages = {42},
+    issn = {2364-8228},
+    doi = {10.1007/s41109-023-00572-5}
+}`;
 
 export default function Cite({ children }: PropsWithChildren<any>) {
   return (
@@ -48,7 +47,7 @@ export default function Cite({ children }: PropsWithChildren<any>) {
               p={2}
               lineHeight={1.5}
             >
-              {citeMappingChange}
+              {mappingChangeBibTeX}
             </Code>
 
             <Text my="1em">and</Text>
