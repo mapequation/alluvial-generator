@@ -41,7 +41,8 @@ function createHistogram(
   data: RealData,
   colors: Map<number, string>,
   defaultColor: string
-) {
+): Histogram {
+  // @ts-ignore FIXME
   return bins.map((bin, i) => ({
     ...bin,
     x0: bin.x0 ?? data.min,
