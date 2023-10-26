@@ -49,17 +49,24 @@ export default function InfomapOnline({
             {file.name}
           </MenuItem>
         ))}
-        {localStorage.length !== 0 && <MenuDivider />}
-        <MenuItem
-          icon={<DeleteIcon />}
-          isDisabled={localStorage.length === 0}
-          onClick={() => {
-            dispatch({ type: "set", payload: { localStorageFiles: [] } });
-            void localforage.clear();
-          }}
-        >
-          Clear
-        </MenuItem>
+        {localStorageFiles.length !== 0 && (
+          <>
+            <MenuDivider />
+            <MenuItem
+              icon={<DeleteIcon />}
+              isDisabled={localStorageFiles.length === 0}
+              onClick={() => {
+                dispatch({ type: "set", payload: { localStorageFiles: [] } });
+                void localforage.clear();
+              }}
+            >
+              Clear
+            </MenuItem>
+          </>
+        )}
+        {localStorageFiles.length === 0 && (
+          <MenuItem isDisabled>No files found</MenuItem>
+        )}
       </MenuList>
     </Menu>
   );
