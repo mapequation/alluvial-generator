@@ -207,6 +207,7 @@ export default observer(function NodeList({
               ))}
             </Tbody>
           </Table>
+          {/* @ts-ignore */}
           <Pagination instance={instance} />
 
           <ColorSchemeSelect w="300px" mt={4} />

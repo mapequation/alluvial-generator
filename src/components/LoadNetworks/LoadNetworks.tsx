@@ -36,7 +36,9 @@ const acceptedFormats = [
   "zip",
 ] as const;
 
-const dropzoneAccept = acceptedFormats.map((format) => `.${format}`).join(",");
+const dropzoneAccept = {
+  "text/plain": acceptedFormats.map((format) => `.${format}`),
+};
 
 type Props = {
   onClose: () => void;
