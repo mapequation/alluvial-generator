@@ -179,6 +179,27 @@ export default observer(function Colors() {
         </ButtonGroup>
       </List.Item>
 
+      <List.Item>
+        <Text
+          color={headerColor}
+          fontWeight={600}
+          textTransform="uppercase"
+          letterSpacing="tight"
+          fontSize="0.75rem"
+          pt={2}
+        >
+          By module hierarchy
+        </Text>
+        <ButtonGroup attached w="100%" mt={1}>
+          <Button
+            onClick={() => store.colorModuleHierarchyInAllNetworks()}
+            justifyContent="center"
+          >
+            Paint all
+          </Button>
+        </ButtonGroup>
+      </List.Item>
+
       {store.diagram.children.some((network) => network.isMultilayer) && (
         <List.Item>
           <Text

@@ -1,4 +1,4 @@
-import * as c3 from "@mapequation/c3";
+import { palette, type HierarchyOptions, type PaletteOptions } from "@mapequation/c3";
 import {
   interpolateBlues,
   interpolateBrBG,
@@ -115,14 +115,14 @@ const mural_colors = [
   "#9a9a61",
 ]
 
-const c3options = {
-  saturation: 0.55,
-  saturationEnd: 0.8,
-  lightness: 0.5,
-  lightnessEnd: 0.9,
-  midpoint: 4.5,
-  steepness: 1,
-};
+// Shared by the C3 schemes and hierarchy coloring, so both start from the same hues.
+// Later colors get darker, so they don't compete with the first ones.
+const C3_OPTIONS = {
+  "C3 Turbo": { hue: "Turbo", end: "darker" },
+  "C3 Rainbow": { hue: "Rainbow", end: "darker" },
+  "C3 Sinebow": { hue: "Sinebow", end: "darker" },
+  "C3 Viridis": { hue: "Viridis", end: "darker" },
+} satisfies Record<string, PaletteOptions>;
 
 const scheme = (
   (n: number) =>
@@ -159,10 +159,10 @@ export const COLOR_SCHEMES = {
   Tableau20b: schemeTab20b,
   Tableau20c: schemeTab20c,
   // c3
-  "C3 Turbo": c3.colors(512, { scheme: "Turbo", ...c3options }),
-  "C3 Rainbow": c3.colors(512, { scheme: "Rainbow", ...c3options }),
-  "C3 Sinebow": c3.colors(512, { scheme: "Sinebow", ...c3options }),
-  "C3 Viridis": c3.colors(512, { scheme: "Viridis", ...c3options }),
+  "C3 Turbo": palette(512, C3_OPTIONS["C3 Turbo"]),
+  "C3 Rainbow": palette(512, C3_OPTIONS["C3 Rainbow"]),
+  "C3 Sinebow": palette(512, C3_OPTIONS["C3 Sinebow"]),
+  "C3 Viridis": palette(512, C3_OPTIONS["C3 Viridis"]),
   // natural
   "Mural": mural_colors,
   // uniform
@@ -216,6 +216,16 @@ export const COLOR_SCHEMES = {
 export type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
 
 export type SchemeName = keyof typeof COLOR_SCHEMES;
+
+/**
+ * Options for c3's `hierarchy()` that make top modules follow a scheme: the C3
+ * schemes give their hues, so flows can weigh the colors, and other schemes
+ * give their colors as seeds.
+ */
+export function hierarchyOptions(name: SchemeName): HierarchyOptions {
+  if (name in C3_OPTIONS) return C3_OPTIONS[name as keyof typeof C3_OPTIONS];
+  return { seeds: COLOR_SCHEMES[name] };
+}
 
 export const SCHEME_GROUPS: { [key: string]: SchemeName[] } = {
   ColorBrewer: [

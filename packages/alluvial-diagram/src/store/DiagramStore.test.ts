@@ -23,6 +23,19 @@ function network(id: string, moduleFlows: number[]): NetworkFile {
   };
 }
 
+function hierarchicalNetwork(id: string, paths: string[]): NetworkFile {
+  return {
+    ...network(id, []),
+    nodes: paths.map((path, i) => ({
+      id: i + 1,
+      name: `${i + 1}`,
+      identifier: `${i + 1}`,
+      path,
+      flow: 1 / paths.length,
+    })),
+  };
+}
+
 describe("DiagramStore", () => {
   it("has usable defaults without any setup", () => {
     const store = new DiagramStore();
@@ -76,6 +89,30 @@ describe("DiagramStore", () => {
     expect(store.highlightColors).toEqual(
       COLOR_SCHEMES["C3 Sinebow"].slice(0, 2)
     );
+  });
+
+  it("colors modules by the module hierarchy, alike for the same path in all networks", () => {
+    const store = new DiagramStore();
+    store.setNetworks([
+      hierarchicalNetwork("a", ["1:1:1", "1:2:1", "2:1:1"]),
+      hierarchicalNetwork("b", ["1:1:1", "2:1:1", "2:2:1"]),
+    ]);
+    const [a, b] = store.diagram.children;
+    const module = (network: typeof a, moduleId: string) =>
+      network.children.find((m) => m.isVisible && m.moduleId === moduleId)!;
+    const color = (network: typeof a, moduleId: string) =>
+      store.getHighlightColor(module(network, moduleId).highlightIndex);
+
+    store.colorModuleHierarchyInAllNetworks();
+    expect(color(a, "1")).toBe(color(b, "1"));
+    expect(color(a, "2")).toBe(color(b, "2"));
+    expect(color(a, "1")).not.toBe(color(a, "2"));
+
+    store.expand(module(a, "1"));
+    store.colorModuleHierarchyInAllNetworks();
+    const children = [color(a, "1:1"), color(a, "1:2")];
+    expect(new Set([...children, color(a, "2")]).size).toBe(3);
+    expect(children).not.toContain(color(b, "1"));
   });
 
   it("moveNetwork rebuilds the diagram in the new order", () => {
