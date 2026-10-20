@@ -22,15 +22,16 @@ jobs:
 
       - uses: actions/configure-pages@v5
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: npm
+          cache: pnpm
 
-      - run: npm install --package-lock-only
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
-      - run: npm run build
+      - run: pnpm build
 
       - run: touch apps/web/build/.nojekyll
 

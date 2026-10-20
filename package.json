@@ -3,18 +3,15 @@
   "version": "1.16.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
-    "dev": "npm run dev -w apps/web",
-    "build:lib": "npm run build -w @mapequation/alluvial-diagram",
-    "build:app": "npm run build -w apps/web",
-    "build": "npm run build:lib && npm run build:app",
-    "preview": "npm run preview -w apps/web",
-    "test": "npm run test -w @mapequation/alluvial-diagram && npm run test -w apps/web",
-    "test:watch": "npm run test:watch -w apps/web"
+    "dev": "pnpm --filter alluvial-app dev",
+    "build:lib": "pnpm --filter @mapequation/alluvial-diagram build",
+    "build:app": "pnpm --filter alluvial-app build",
+    "build": "pnpm build:lib && pnpm build:app",
+    "preview": "pnpm --filter alluvial-app preview",
+    "test": "pnpm --filter @mapequation/alluvial-diagram test && pnpm --filter alluvial-app test",
+    "test:watch": "pnpm --filter alluvial-app test:watch"
   },
   "devDependencies": {
     "prettier": "^3.9.9",

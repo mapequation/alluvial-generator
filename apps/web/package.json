@@ -7,7 +7,7 @@
     "@chakra-ui/react": "^3.37.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mapequation/alluvial-diagram": "*",
+    "@mapequation/alluvial-diagram": "workspace:*",
     "@mapequation/c3": "^2.0.1",
     "@mapequation/infomap": "^2.15.1",
     "@mapequation/infomap-parser": "^1.0.2",
