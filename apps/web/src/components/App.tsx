@@ -63,7 +63,7 @@ export default observer(function App() {
         open={isLoadOpen}
         onOpenChange={(e) => !e.open && onLoadClose()}
       >
-        <LoadNetworks onClose={onLoadClose} />
+        <LoadNetworks isOpen={isLoadOpen} onClose={onLoadClose} />
       </DialogRoot>
 
       <DialogRoot

@@ -16,7 +16,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   readonly nodeId: number;
   readonly stateId?: number | null = null;
   readonly layerId?: number | null = null;
-  readonly metadata?: { [key: string]: string | number };
+  readonly #metadata?: { [key: string]: string | number };
   readonly identifier: string;
   readonly treePath: TreePath;
   highlightIndex: number;
@@ -29,12 +29,8 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   private leftParent: StreamlineNode | null = null;
   private rightParent: StreamlineNode | null = null;
 
-  private oppositeNodes: {
-    [side: number]: LeafNode | null;
-  } = {
-    [LEFT]: null,
-    [RIGHT]: null,
-  };
+  private leftOpposite: LeafNode | null = null;
+  private rightOpposite: LeafNode | null = null;
 
   private readonly network: Network;
 
@@ -46,7 +42,7 @@ export default class LeafNode extends AlluvialNodeBase<never> {
     this.nodeId = node.id;
     this.stateId = node.stateId != null ? node.stateId : null;
     this.layerId = node.layerId != null ? node.layerId : null;
-    this.metadata = node.metadata != null ? node.metadata : null;
+    this.#metadata = node.metadata != null ? node.metadata : null;
     this.identifier = node.identifier;
     this.treePath = new TreePath(node.path);
     this.highlightIndex =
@@ -60,6 +56,10 @@ export default class LeafNode extends AlluvialNodeBase<never> {
         ? node.moduleLevel!
         : 1;
     this.network = network;
+  }
+
+  get metadata(): { [key: string]: string | number } | undefined {
+    return this.#metadata;
   }
 
   get insignificant(): boolean {
@@ -117,11 +117,15 @@ export default class LeafNode extends AlluvialNodeBase<never> {
   }
 
   getOpposite(side: Side): LeafNode | null {
-    return this.oppositeNodes[side];
+    return side === LEFT ? this.leftOpposite : this.rightOpposite;
   }
 
   setOpposite(node: LeafNode | null, side: Side) {
-    this.oppositeNodes[side] = node;
+    if (side === LEFT) {
+      this.leftOpposite = node;
+    } else {
+      this.rightOpposite = node;
+    }
   }
 
   add() {

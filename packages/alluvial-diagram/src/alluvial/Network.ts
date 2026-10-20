@@ -51,12 +51,12 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly bipartiteStartId: number = NOT_BIPARTITE;
   // The leaf built from each input node, in input order (also the duplicates
   // that are not registered by identifier). Read by serializeDiagram.
-  inputLeafNodes: LeafNode[] = [];
-  private nodesByIdentifier: Map<string, LeafNode> = new Map();
-  private readonly modulesById: Map<string, Module> = new Map();
-  private streamlineNodesById: Map<string, StreamlineNode> = new Map();
-  infomapModulesByPath: Map<string, InfomapModule> = new Map();
-  moduleLinks: Map<string, ModuleLink[]> = new Map();
+  #inputLeafNodes: LeafNode[] = [];
+  #nodesByIdentifier: Map<string, LeafNode> = new Map();
+  readonly #modulesById: Map<string, Module> = new Map();
+  #streamlineNodesById: Map<string, StreamlineNode> = new Map();
+  #infomapModulesByPath: Map<string, InfomapModule> = new Map();
+  #moduleLinks: Map<string, ModuleLink[]> = new Map();
 
   constructor(
     parent: Diagram,
@@ -85,12 +85,24 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
 
     if (modules) {
-      this.infomapModulesByPath = new Map(
+      this.#infomapModulesByPath = new Map(
         modules.map((module) => [module.path.join(":"), module])
       );
 
-      this.moduleLinks = createLinkMap(modules, this.directed);
+      this.#moduleLinks = createLinkMap(modules, this.directed);
     }
+  }
+
+  get inputLeafNodes(): LeafNode[] {
+    return this.#inputLeafNodes;
+  }
+
+  get infomapModulesByPath(): Map<string, InfomapModule> {
+    return this.#infomapModulesByPath;
+  }
+
+  get moduleLinks(): Map<string, ModuleLink[]> {
+    return this.#moduleLinks;
   }
 
   // The first leaf decides (a network is multilayer or higher-order as a
@@ -296,32 +308,32 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   // FIXME use Infomap type
   addNodes(nodes: any[]) {
-    this.nodesByIdentifier = new Map();
+    this.#nodesByIdentifier = new Map();
 
     const leafNodes = nodes.map((node) => {
       const leafNode = new LeafNode(node, this);
-      this.nodesByIdentifier.set(leafNode.identifier, leafNode);
+      this.#nodesByIdentifier.set(leafNode.identifier, leafNode);
       return leafNode;
     });
 
-    this.inputLeafNodes = leafNodes;
+    this.#inputLeafNodes = leafNodes;
     leafNodes.forEach((node) => node.add());
   }
 
   addChild(module: Module) {
     const length = super.addChild(module);
-    this.modulesById.set(module.moduleId, module);
+    this.#modulesById.set(module.moduleId, module);
     return length;
   }
 
   removeChild(module: Module) {
     const found = super.removeChild(module);
-    this.modulesById.delete(module.moduleId);
+    this.#modulesById.delete(module.moduleId);
     return found;
   }
 
   getModule(moduleId: string): Module | null {
-    return this.modulesById.get(moduleId) ?? null;
+    return this.#modulesById.get(moduleId) ?? null;
   }
 
   getNeighbor(side: Side): Network | null {
@@ -347,19 +359,19 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   }
 
   getLeafNode(identifier: string): LeafNode | null {
-    return this.nodesByIdentifier.get(identifier) ?? null;
+    return this.#nodesByIdentifier.get(identifier) ?? null;
   }
 
   getStreamlineNode(id: string) {
-    return this.streamlineNodesById.get(id);
+    return this.#streamlineNodesById.get(id);
   }
 
   setStreamlineNode(id: string, node: StreamlineNode) {
-    this.streamlineNodesById.set(id, node);
+    this.#streamlineNodesById.set(id, node);
   }
 
   removeStreamlineNode(id: string) {
-    this.streamlineNodesById.delete(id);
+    this.#streamlineNodesById.delete(id);
   }
 
   moveToIndex(fromIndex: number, toIndex: number) {

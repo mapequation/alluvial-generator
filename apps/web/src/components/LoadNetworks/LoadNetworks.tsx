@@ -44,10 +44,11 @@ const dropzoneAccept: Record<string, string[]> = {
 };
 
 type Props = {
+  isOpen: boolean;
   onClose: () => void;
 };
 
-export default observer(function LoadNetworks({ onClose }: Props) {
+export default observer(function LoadNetworks({ isOpen, onClose }: Props) {
   const store = useContext(StoreContext);
   const onError = useError();
   const dropzoneBg = useColorModeValue(
@@ -158,7 +159,9 @@ export default observer(function LoadNetworks({ onClose }: Props) {
   }, [onClose, store, onError]);
 
   useEventListener("keydown", (event) => {
-    if (store.editMode) return;
+    // The dialog stays mounted while closed, and C and E are also the
+    // diagram's contract and expand shortcuts.
+    if (!isOpen || store.editMode) return;
 
     // @ts-ignore
     const key = event?.key;

@@ -99,7 +99,17 @@ export default abstract class AlluvialNode<
     this._flow = value;
   }
 
-  children: ChildType[] = [];
+  // Containers are kept in private fields, out of reach of code that copies
+  // and freezes diagram objects (see frozen-copies.test.ts).
+  #children: ChildType[] = [];
+
+  get children(): ChildType[] {
+    return this.#children;
+  }
+
+  set children(children: ChildType[]) {
+    this.#children = children;
+  }
 
   protected constructor(
     public parent: ParentType,

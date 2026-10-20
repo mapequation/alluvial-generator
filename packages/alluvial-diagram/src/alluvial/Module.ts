@@ -11,7 +11,7 @@ import { LEFT, Side } from "./Side";
 
 export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   readonly depth = MODULE;
-  readonly path: number[] = [];
+  readonly #path: number[];
   readonly moduleId: string;
   margin: number = 0;
   index: number;
@@ -19,13 +19,13 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
   readonly moduleLevel: number = 1;
   enterFlow: number = 0;
   exitFlow: number = 0;
-  links?: Map<string, number>;
+  #links?: Map<string, number>;
 
   constructor(parent: Network, moduleId: string, moduleLevel: number = 1) {
     super(parent, parent.networkId, `${parent.networkId}_module${moduleId}`);
     this.moduleLevel = moduleLevel;
     this.moduleId = moduleId;
-    this.path = TreePath.toArray(moduleId);
+    this.#path = TreePath.toArray(moduleId);
     this.index = parent.addChild(this) - 1;
 
     const module = this.parent.infomapModulesByPath.get(moduleId);
@@ -38,8 +38,16 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     const links = this.parent.moduleLinks.get(moduleId);
 
     if (links) {
-      this.links = new Map(links.map(({ target, flow }) => [target, flow]));
+      this.#links = new Map(links.map(({ target, flow }) => [target, flow]));
     }
+  }
+
+  get path(): number[] {
+    return this.#path;
+  }
+
+  get links(): Map<string, number> | undefined {
+    return this.#links;
   }
 
   getLargestLeafNodes(numValues: number = 5, aggregate = false): LeafNode[] {

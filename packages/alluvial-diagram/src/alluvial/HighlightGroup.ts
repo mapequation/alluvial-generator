@@ -8,10 +8,6 @@ export const NOT_HIGHLIGHTED = -1;
 
 export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
   readonly depth = HIGHLIGHT_GROUP;
-  readonly children: Branch[] = [
-    new Branch(this, LEFT),
-    new Branch(this, RIGHT),
-  ];
   readonly highlightIndex: number;
   readonly insignificant: boolean;
 
@@ -25,6 +21,7 @@ export default class HighlightGroup extends AlluvialNodeBase<Branch, Module> {
       parent.networkId,
       `${parent.id}_group${insignificant ? "i" : ""}${highlightIndex}`
     );
+    this.children = [new Branch(this, LEFT), new Branch(this, RIGHT)];
     parent.addChild(this);
     this.highlightIndex = highlightIndex;
     this.insignificant = insignificant;

@@ -55,6 +55,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "framer-motion": "^14.0.0",
+    "immer": "^11.1.21",
     "localforage": "^1.10.0",
     "mobx": "^7.0.6",
     "mobx-react": "^10.0.2",

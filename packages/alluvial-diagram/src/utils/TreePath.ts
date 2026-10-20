@@ -7,9 +7,9 @@ const insignificantPathRexeg = /(\d+)([:;])+/g;
  */
 export default class TreePath {
   private readonly path: string;
-  private readonly pathArr: number[];
-  private readonly insignificant: boolean[] = [];
-  private readonly ancestorPaths: Map<number, string> = new Map();
+  readonly #pathArr: number[];
+  readonly #insignificant: boolean[] = [];
+  readonly #ancestorPaths: Map<number, string> = new Map();
 
   /**
    * Construct a new TreePath
@@ -19,31 +19,31 @@ export default class TreePath {
 
     if (str.includes(";")) {
       // node is insignificant at some level
-      this.pathArr = [];
+      this.#pathArr = [];
       const matches = str.matchAll(insignificantPathRexeg);
 
       for (let match of matches) {
-        this.pathArr.push(Number(match[1]));
-        this.insignificant.push(match[2] === ";");
+        this.#pathArr.push(Number(match[1]));
+        this.#insignificant.push(match[2] === ";");
       }
 
-      this.path = this.pathArr.join(":");
+      this.path = this.#pathArr.join(":");
     } else {
       // remove the trailing colon of stree paths before splitting,
       // so that it does not add an extra level
       this.path = str.endsWith(":") ? str.slice(0, -1) : str;
-      this.pathArr = Array.isArray(path) ? path : TreePath.toArray(this.path);
-      this.insignificant = this.pathArr.map(() => false);
+      this.#pathArr = Array.isArray(path) ? path : TreePath.toArray(this.path);
+      this.#insignificant = this.#pathArr.map(() => false);
     }
 
-    this.ancestorPaths.set(0, "root");
-    for (let level = 1; level < this.pathArr.length; level++) {
-      this.ancestorPaths.set(level, this.pathArr.slice(0, level).join(":"));
+    this.#ancestorPaths.set(0, "root");
+    for (let level = 1; level < this.#pathArr.length; level++) {
+      this.#ancestorPaths.set(level, this.#pathArr.slice(0, level).join(":"));
     }
   }
 
   get level() {
-    return this.isRoot() ? 0 : this.pathArr.length;
+    return this.isRoot() ? 0 : this.#pathArr.length;
   }
 
   get rank() {
@@ -187,7 +187,7 @@ export default class TreePath {
   }
 
   ancestorAtLevelAsString(level: number) {
-    return this.ancestorPaths.get(level) || this.path;
+    return this.#ancestorPaths.get(level) || this.path;
   }
 
   isParentOf(child: Path) {
@@ -195,11 +195,11 @@ export default class TreePath {
   }
 
   isSignificant(level: number) {
-    if (level < 0 || level >= this.insignificant.length) {
+    if (level < 0 || level >= this.#insignificant.length) {
       return false;
     }
 
-    return !this.insignificant[level];
+    return !this.#insignificant[level];
   }
 
   /**
@@ -209,11 +209,11 @@ export default class TreePath {
    * the same path and insignificance.
    */
   toSavedPath(): number[] | string {
-    if (!this.insignificant.some(Boolean)) {
-      return [...this.pathArr];
+    if (!this.#insignificant.some(Boolean)) {
+      return [...this.#pathArr];
     }
-    return this.pathArr
-      .map((n, i) => `${n}${this.insignificant[i] ? ";" : ":"}`)
+    return this.#pathArr
+      .map((n, i) => `${n}${this.#insignificant[i] ? ";" : ":"}`)
       .join("");
   }
 
