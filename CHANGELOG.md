@@ -4,8 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## Unreleased (branch `py-parity-fixes`)
 
-Fix round done together with the Python port (alluvial-py 0.5.0); `CHANGES-py-parity.md` has the details and the
-reasons per work package. The version is left at 1.16.0; the API change below is breaking.
+Fix round done together with the Python port (alluvial-py 0.5.0); [#55](https://github.com/mapequation/alluvial/pull/55)
+has the details and the reasons per work package. The version is left at 1.16.0; the API change below is breaking.
 
 ### ⚠ BREAKING CHANGES
 
