@@ -73,7 +73,7 @@ export default observer(function Module({
             <ButtonGroup attached w="100%">
               <Button
                 onClick={() => store.expand(selectedModule)}
-                disabled={selectedModule.isLeafModule}
+                disabled={!selectedModule.canExpand}
               >
                 <MdUnfoldMore />
                 Expand

@@ -15,20 +15,12 @@ export default class TreePath {
    * Construct a new TreePath
    */
   constructor(path: Path) {
-    if (Array.isArray(path)) {
-      this.path = path.join(":");
-      this.pathArr = path;
-    } else {
-      this.path = path.toString();
-      this.pathArr = TreePath.toArray(path);
-    }
+    const str = Array.isArray(path) ? path.join(":") : path.toString();
 
-    const lastChar = this.path.slice(-1);
-
-    if (lastChar === ";") {
+    if (str.includes(";")) {
       // node is insignificant at some level
       this.pathArr = [];
-      const matches = this.path.matchAll(insignificantPathRexeg);
+      const matches = str.matchAll(insignificantPathRexeg);
 
       for (let match of matches) {
         this.pathArr.push(Number(match[1]));
@@ -37,11 +29,10 @@ export default class TreePath {
 
       this.path = this.pathArr.join(":");
     } else {
-      if (lastChar === ":") {
-        // remove last colon if we have stree path
-        this.path = this.path.slice(0, -1);
-      }
-
+      // remove the trailing colon of stree paths before splitting,
+      // so that it does not add an extra level
+      this.path = str.endsWith(":") ? str.slice(0, -1) : str;
+      this.pathArr = Array.isArray(path) ? path : TreePath.toArray(this.path);
       this.insignificant = this.pathArr.map(() => false);
     }
 
@@ -101,7 +92,7 @@ export default class TreePath {
 
     if (p.length >= c.length) return false;
 
-    return c.startsWith(p);
+    return c.startsWith(p + ":");
   }
 
   static level(treePath: Path) {
@@ -209,6 +200,21 @@ export default class TreePath {
     }
 
     return !this.insignificant[level];
+  }
+
+  /**
+   * The path as a saved network file stores it: the path array (as given, or
+   * parsed) when every level is significant, otherwise the stree form with a
+   * ";" after each insignificant level, e.g. "1:1;63;". Both parse back to
+   * the same path and insignificance.
+   */
+  toSavedPath(): number[] | string {
+    if (!this.insignificant.some(Boolean)) {
+      return [...this.pathArr];
+    }
+    return this.pathArr
+      .map((n, i) => `${n}${this.insignificant[i] ? ";" : ":"}`)
+      .join("");
   }
 
   /**

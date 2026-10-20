@@ -1,4 +1,5 @@
 import { Module } from "@mapequation/infomap";
+import type { AlluvialMetadata } from "./alluvial-format";
 
 export type Format =
   | "json"
@@ -38,6 +39,15 @@ export type NetworkFile = {
   numLevels?: number;
   cluLevel?: number;
   codelength?: number;
+  // Infomap header (tree files and JSON), passed through by serializeDiagram
+  version?: string;
+  args?: string;
+  startedAt?: string;
+  completedIn?: number;
+  relativeCodelengthSavings?: number;
+  flowModel?: string;
+  higherOrder?: boolean;
+  stateLevel?: boolean;
   // Infomap
   network?: string;
   modules?: Module[];
@@ -53,4 +63,10 @@ export type NetworkFile = {
   layerId?: number;
   originalId?: string;
   layers?: { id: number; name: string }[]; // FIXME
+  // Highlight colors: a palette that the nodes' highlightIndex refers to, or
+  // true when each node has a color (see DiagramStore.checkColors).
+  colors?: string[] | boolean;
+  // The metadata block of a saved diagram (see alluvial-format.ts); unknown
+  // shapes are checked by readAlluvialMetadata.
+  alluvial?: AlluvialMetadata;
 };

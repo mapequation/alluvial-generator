@@ -209,25 +209,33 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     );
   }
 
-  expand(): boolean {
+  // expand() succeeds: the module has leaf nodes and all of them lie deeper than the next module level.
+  // (isLeafModule looks at the deepest leaf only, so a module with a shallow leaf can be neither.)
+  get canExpand() {
     const leafNodes = this.getLeafNodes();
-    if (!leafNodes.length) {
-      console.warn("No leaf nodes found");
-      return false;
-    }
+    const newModuleLevel = this.moduleLevel + 1;
+    return (
+      leafNodes.length > 0 &&
+      !leafNodes.some((node) => node.level <= newModuleLevel)
+    );
+  }
 
+  expand(): boolean {
     const newModuleLevel = this.moduleLevel + 1;
 
-    const alreadyExpanded = leafNodes.some(
-      (node) => node.level <= newModuleLevel
-    );
-    if (alreadyExpanded) {
-      console.warn(
-        `Module can't be expanded to level ${newModuleLevel} ` +
-          `because some nodes are at level ${newModuleLevel - 1}`
-      );
+    if (!this.canExpand) {
+      if (this.getLeafNodes().length === 0) {
+        console.warn("No leaf nodes found");
+      } else {
+        console.warn(
+          `Module can't be expanded to level ${newModuleLevel} ` +
+            `because some nodes are at level ${newModuleLevel - 1}`
+        );
+      }
       return false;
     }
+
+    const leafNodes = this.getLeafNodes();
 
     const network = this.parent;
     if (!network) {
@@ -282,6 +290,7 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
   setColor(highlightIndex: number) {
     this.getLeafNodes().forEach((node) => {
+      if (node.highlightIndex === highlightIndex) return;
       node.highlightIndex = highlightIndex;
       node.update();
     });
@@ -299,9 +308,14 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
       throw new Error("No parent network found");
     }
 
-    const indexBoundary = direction === "up" ? network.children.length - 1 : 0;
+    // H1: the top boundary is the top visible module (children are [...visible, ...hidden] after a layout), so a
+    // move up never swaps with a hidden module.
+    const atBoundary =
+      direction === "up"
+        ? index >= network.visibleChildren.length - 1
+        : index === 0;
 
-    if (index === indexBoundary) {
+    if (atBoundary) {
       console.warn(
         `Can't move module ${direction} because it is already at the ${
           direction === "down" ? "bottom" : "top"
@@ -326,15 +340,17 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
     );
 
     type NodeId = string;
-    type NodeDistribution = { [nodeId: NodeId]: number };
+    // A Map keeps insertion order for every identifier (an object would put
+    // integer-like keys first and break on keys like "constructor").
+    type NodeDistribution = Map<NodeId, number>;
     const getNodeDistribution = (
       module: Module
     ): [NodeDistribution, Set<NodeId>] => {
-      const nodes: { [nodeId: string]: number } = {};
+      const nodes: NodeDistribution = new Map();
       for (const node of module.leafNodes()) {
-        nodes[node.identifier] = node.flow;
+        nodes.set(node.identifier, node.flow);
       }
-      return [nodes, new Set(Object.keys(nodes))];
+      return [nodes, new Set(nodes.keys())];
     };
 
     const [thisNodes, thisIds] = getNodeDistribution(this);
@@ -350,8 +366,8 @@ export default class Module extends AlluvialNodeBase<HighlightGroup, Network> {
 
       let i = 0;
       for (const id of ids) {
-        X[0][i] = thisNodes[id] ?? 0;
-        X[1][i] = otherNodes[id] ?? 0;
+        X[0][i] = thisNodes.get(id) ?? 0;
+        X[1][i] = otherNodes.get(id) ?? 0;
         ++i;
       }
 

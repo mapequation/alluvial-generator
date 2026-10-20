@@ -165,6 +165,53 @@ store.setNetworks([...store.networks, ...uploaded]);
 
 Supported input formats: `tree`, `ftree`, `stree`, `clu`, `net`, `json`, and `zip` of any of the above.
 
+## Saving and opening diagrams
+
+`serializeDiagram(store)` saves the current diagram as **alluvial network files**, `formatVersion` 1: one
+Infomap-JSON text per network, named `NN_<network name>.json` in diagram order. `zipFiles(files)` packs them into a
+zip (the web app's "Download diagram"). Opening them restores the diagram:
+
+```ts
+import {
+  serializeDiagram,
+  zipFiles,
+  parseAcceptedFiles,
+} from "@mapequation/alluvial-diagram";
+
+const files = serializeDiagram(store, { generator: "my-app 1.0" }); // [{ name, text }]
+const blob = await zipFiles(files);
+
+// later: the zip (or all loose files) from <input type="file">
+const [opened, errors] = await parseAcceptedFiles(fileList, [], ["json", "zip"], "id");
+store.openNetworks(opened); // like setNetworks, then restores options, scheme, module orders and names
+```
+
+The contract of `formatVersion` 1:
+
+- Each file is plain `infomap -o json` output plus a few keys, so any Infomap-JSON reader can load it. Infomap's
+  top-level keys (`version`, `args`, `codelength`, `directed`, `flowModel`, `bipartiteStartId`, `modules`,
+  `layers`, ...) are passed through unchanged. The file adds `name` (the network name), `colors` (the palette;
+  omitted when empty) and, per node in input order, `identifier`, `highlightIndex` and `moduleLevel` next to
+  Infomap's `path`, `flow`, `name`, `id`, `stateId`, `layerId` and `metadata`. A path is Infomap's integer array,
+  or the stree string (e.g. `"1;1;63;"`) when a level is insignificant.
+- Everything else is in one block that other readers ignore:
+  `"alluvial": { "format": "alluvial-network", "formatVersion": 1, "generator", "diagram": { "saveId", "position",
+  "numNetworks", "colorScheme", "options" }, "network": { "moduleNames", "moduleOrder" } }`. `diagram` is the same
+  in every file of one save (`saveId` ties them together, `position` orders them); `options` holds every saved
+  store option (`SAVED_OPTION_KEYS`). `network.moduleOrder` lists every module, hidden ones included, and is
+  written only for a custom order.
+- `parseAcceptedFiles` sorts the files of one save into saved order. `openNetworks` applies each file's `network`
+  part, and the `diagram` part only when every file has a valid version-1 block of the same save and the positions
+  are complete. Anything else warns and loads what it can: a block with a newer `formatVersion` or an invalid block
+  is ignored, files from different saves or an incomplete save keep their module names and orders but not the
+  options, and an invalid option value or an unknown scheme is skipped. The networks always load with their
+  colours and module levels.
+- Readers ignore unknown keys, so new optional keys do not change the version. Only an incompatible change to the
+  block bumps `formatVersion`.
+
+The Python package `alluvial` (alluvial-py) writes and reads the same files byte for byte. The 2019 single-JSON
+format (`createFilesFromDiagramObject`) is no longer read.
+
 ## Custom tooltip
 
 The renderer ships **no tooltip styling** — it exposes a render-prop slot so consumers stay framework-agnostic. Wrap the hovered module trigger in whatever component library you use:

@@ -4,6 +4,7 @@ import Branch from "./Branch";
 import { NETWORK } from "./Depth";
 import Diagram from "./Diagram";
 import type Network from "./Network";
+import { LEFT, RIGHT } from "./Side";
 
 function node(name: string, path: string, flow: number): Node {
   return { id: name.charCodeAt(0), name, identifier: name, path, flow };
@@ -124,5 +125,107 @@ describe("dangling streamline nodes", () => {
     expectNoDuplicateStreamlineNodes(diagram);
 
     expect(danglingLeafNames(diagram, "A")).toEqual(before);
+  });
+});
+
+describe("recolouring a single-leaf module", () => {
+  // Module 2 of A holds the single leaf e
+  const createDiagram = () => {
+    const diagram = new Diagram([
+      network("A", [
+        node("a", "1:1", 0.3),
+        node("b", "1:2", 0.3),
+        node("e", "2:1", 0.4),
+      ]),
+      network("B", [node("a", "1:1", 0.5), node("e", "1:2", 0.5)]),
+    ]);
+    diagram.calcFlow();
+    return diagram;
+  };
+
+  it("keeps the module object, its name, position and flow", () => {
+    const diagram = createDiagram();
+    const networkA = diagram.getNetwork("A")!;
+    const single = networkA.getModule("2")!;
+    single.name = "solo";
+    networkA.children.reverse();
+    const order = [...networkA.children];
+    const flow = single.flow;
+
+    single.setColor(1);
+    expectNoDuplicateStreamlineNodes(diagram);
+
+    expect(networkA.getModule("2")).toBe(single);
+    expect(single.name).toBe("solo");
+    expect(networkA.children).toEqual(order);
+    expect(single.flow).toBe(flow);
+    expect(single.getLeafNodes().map((leaf) => leaf.highlightIndex)).toEqual([
+      1,
+    ]);
+
+    single.removeColors();
+    expectNoDuplicateStreamlineNodes(diagram);
+    expect(networkA.getModule("2")).toBe(single);
+    expect(networkA.children).toEqual(order);
+  });
+
+  it("does not touch leaves whose colour does not change", () => {
+    const diagram = createDiagram();
+    const single = diagram.getNetwork("A")!.getModule("2")!;
+    single.setColor(1);
+    const [leaf] = single.getLeafNodes();
+    const parents = [leaf.getParent(LEFT), leaf.getParent(RIGHT)];
+
+    single.setColor(1);
+    expectNoDuplicateStreamlineNodes(diagram);
+    expect([leaf.getParent(LEFT), leaf.getParent(RIGHT)]).toEqual(parents);
+  });
+});
+
+describe("duplicate identifiers", () => {
+  // B has two leaves named y; only the last one is registered
+  const createDiagram = () =>
+    new Diagram([
+      network("A", [node("x", "1:1", 0.5), node("y", "1:2", 0.5)]),
+      network("B", [
+        node("x", "1:1", 0.3),
+        node("y", "1:2", 0.3),
+        node("y", "2:1", 0.4),
+      ]),
+    ]);
+
+  function streamlineIds(diagram: Diagram) {
+    return branches(diagram)
+      .flatMap((branch) => branch.children.map((node) => node.currentId))
+      .sort();
+  }
+
+  it("links only the registered duplicate and leaves no NULL-- id", () => {
+    const diagram = createDiagram();
+    expectNoDuplicateStreamlineNodes(diagram);
+    const ids = streamlineIds(diagram);
+    expect(ids.filter((id) => id.startsWith("NULL--"))).toEqual([]);
+
+    const networkB = diagram.getNetwork("B")!;
+    const registered = networkB.getLeafNode("y")!;
+    expect(registered.moduleId).toBe("2");
+    expect(registered.getOpposite(LEFT)).toBe(
+      diagram.getNetwork("A")!.getLeafNode("y")
+    );
+    const other = networkB
+      .getModule("1")!
+      .getLeafNodes()
+      .find((leaf) => leaf.identifier === "y")!;
+    expect(other.getOpposite(LEFT)).toBeNull();
+    expect(other.getParent(LEFT)!.isDangling).toBe(true);
+
+    // Updating every leaf (the old re-steal path) changes nothing
+    for (const net of diagram.children) {
+      for (const module of net.children) {
+        module.getLeafNodes().forEach((leaf) => leaf.update());
+      }
+    }
+    expectNoDuplicateStreamlineNodes(diagram);
+    expect(streamlineIds(diagram)).toEqual(ids);
   });
 });

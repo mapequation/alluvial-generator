@@ -1,6 +1,7 @@
 import type { Module as InfomapModule } from "@mapequation/infomap";
 import * as d3 from "d3";
 import type { NetworkFile } from "../parsers/types";
+import { validateNetworkNodes } from "../parsers/validate-nodes";
 import { moveItem } from "../utils/array";
 import TreePath from "../utils/TreePath";
 import AlluvialNodeBase, { Layout } from "./AlluvialNode";
@@ -28,7 +29,10 @@ export type Real = {
   max: number;
   median: number;
   mean: number;
+  // Sample variance and standard deviation (N - 1 in the denominator; 0 for
+  // a single value).
   variance: number;
+  standardDeviation: number;
   boxBounds: number[];
   pdfBounds: number[];
 };
@@ -45,6 +49,9 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   readonly codelength: number;
   readonly directed: boolean;
   readonly bipartiteStartId: number = NOT_BIPARTITE;
+  // The leaf built from each input node, in input order (also the duplicates
+  // that are not registered by identifier). Read by serializeDiagram.
+  inputLeafNodes: LeafNode[] = [];
   private nodesByIdentifier: Map<string, LeafNode> = new Map();
   private readonly modulesById: Map<string, Module> = new Map();
   private streamlineNodesById: Map<string, StreamlineNode> = new Map();
@@ -72,7 +79,8 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     this.directed = directed ?? false;
     this.originalId = originalId;
 
-    if (bipartiteStartId !== undefined) {
+    // null (hand-made JSON) means not bipartite, like undefined
+    if (bipartiteStartId != null) {
       this.bipartiteStartId = bipartiteStartId;
     }
 
@@ -85,12 +93,14 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
   }
 
+  // The first leaf decides (a network is multilayer or higher-order as a
+  // whole); an empty network is neither.
   get isMultilayer() {
-    return this.leafNodes()?.next()?.value.layerId != null;
+    return this.leafNodes().next().value?.layerId != null;
   }
 
   get isHigherOrder() {
-    return this.isMultilayer || this.leafNodes()?.next()?.value.stateId != null;
+    return this.isMultilayer || this.leafNodes().next().value?.stateId != null;
   }
 
   get isBipartite() {
@@ -105,8 +115,12 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
     }
   }
 
+  // True when some leaf has metadata (not only the first one).
   get haveMetadata() {
-    return this.leafNodes()?.next()?.value.metadata != null;
+    for (const node of this.leafNodes()) {
+      if (node.metadata != null) return true;
+    }
+    return false;
   }
 
   get metadata() {
@@ -128,6 +142,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
               median: 0,
               mean: 0,
               variance: 0,
+              standardDeviation: 0,
               boxBounds: [],
               pdfBounds: [],
             };
@@ -143,7 +158,6 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
           const entry = meta[key] as Real;
           entry.values.push({ node: node.id, value });
           entry.mean += value;
-          entry.variance += value * value; // Placeholder for variance
           entry.min = Math.min(entry.min, value);
           entry.max = Math.max(entry.max, value);
         } else {
@@ -162,16 +176,21 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
         entry.values.sort((a, b) => a.value - b.value);
         const N = entry.values.length || 1;
         entry.mean /= N;
-        // Var(X) = E[X^2] - E[X]^2
-        entry.variance =
-          entry.variance / Math.max(N - 1, 1) - entry.mean * entry.mean;
+        // Two-pass sample variance: sum((x - mean)^2) / (N - 1).
+        let sumOfSquares = 0;
+        for (const { value } of entry.values) {
+          sumOfSquares += (value - entry.mean) ** 2;
+        }
+        entry.variance = N > 1 ? sumOfSquares / (N - 1) : 0;
+        entry.standardDeviation = Math.sqrt(entry.variance);
+        const sd = entry.standardDeviation;
 
         entry.pdfBounds = [
           entry.min,
-          entry.mean - 2 * entry.variance,
-          entry.mean - entry.variance,
-          entry.mean + entry.variance,
-          entry.mean + 2 * entry.variance,
+          entry.mean - 2 * sd,
+          entry.mean - sd,
+          entry.mean + sd,
+          entry.mean + 2 * sd,
           entry.max,
         ];
 
@@ -236,6 +255,11 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
           parent = parent.createChild(parentPath, moduleLevel, isLeaf);
         } else {
           parent = parent.get(parentPath)!;
+          // E15: a visible P was added as a leaf node before its visible sub-module P:x. Make P a non-leaf node so
+          // that, in either order, its outline encloses P and its sub-modules.
+          if (parent.isLeaf && moduleLevel < module.moduleLevel) {
+            parent.makeNonLeaf();
+          }
         }
       }
 
@@ -266,6 +290,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
   }
 
   static create(parent: Diagram, network: NetworkFile) {
+    validateNetworkNodes(network.nodes);
     return new Network(parent, network);
   }
 
@@ -279,6 +304,7 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
       return leafNode;
     });
 
+    this.inputLeafNodes = leafNodes;
     leafNodes.forEach((node) => node.add());
   }
 
@@ -338,6 +364,30 @@ export default class Network extends AlluvialNodeBase<Module, Diagram> {
 
   moveToIndex(fromIndex: number, toIndex: number) {
     moveItem(this.children, fromIndex, toIndex);
+  }
+
+  // Custom module order: `children` becomes the listed modules (bottom to top) followed by the unlisted ones in
+  // their current order. Modules that are not children of this network, and repeats, are skipped. Hidden modules
+  // may be listed; the next layout re-partitions children into [...visible, ...hidden], keeping each part's order.
+  // Always freezes the order (isCustomSorted), and returns whether `children` changed. The caller lays out.
+  setModuleOrder(modules: Module[]): boolean {
+    const listed = new Set<Module>();
+    for (const module of modules) {
+      if (
+        module.parent === this &&
+        this.getModule(module.moduleId) === module
+      ) {
+        listed.add(module);
+      }
+    }
+    const children = [
+      ...listed,
+      ...this.children.filter((module) => !listed.has(module)),
+    ];
+    const changed = children.some((module, i) => module !== this.children[i]);
+    this.children = children;
+    this.isCustomSorted = true;
+    return changed;
   }
 
   getLinks(streamlineThreshold: number = 0) {
@@ -415,12 +465,21 @@ class TreeNode extends Layout {
   }
 
   addChild(module: Module) {
-    if (!this.isLeaf || !this.parent) {
-      throw new Error("Module added to non-leaf TreeNode");
+    if (!this.parent) {
+      throw new Error("Module added to the root TreeNode");
     }
 
-    this.parent.updateLayout(module);
+    // A module whose own path already has visible sub-modules (a visible P with a visible P:x, E15) joins that
+    // non-leaf node, so its outline encloses P and its sub-modules.
+    (this.isLeaf ? this.parent : this).updateLayout(module);
     this.children.push(module);
+  }
+
+  makeNonLeaf() {
+    this.isLeaf = false;
+    for (const child of this.children) {
+      if (!(child instanceof TreeNode)) this.updateLayout(child);
+    }
   }
 
   private updateMaxModuleLevel(moduleLevel: number) {

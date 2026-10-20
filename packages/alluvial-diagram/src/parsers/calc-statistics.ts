@@ -12,9 +12,7 @@ export function calcStatistics(
   let numLevels = 0;
 
   nodes.forEach((node) => {
-    const path = Array.isArray(node.path)
-      ? node.path
-      : node.path?.split(":") ?? [];
+    const path = Array.isArray(node.path) ? node.path : splitPath(node.path);
     const topModule = Number(path[0]);
     topModules.add(topModule);
     numLevels = Math.max(numLevels, path.length);
@@ -42,4 +40,14 @@ export function calcStatistics(
     numTopModules: topModules.size,
     numLevels,
   };
+}
+
+/**
+ * Split a path string on ":", without the empty last segment
+ * of stree paths ("1:1:1:"), as TreePath does.
+ */
+function splitPath(path: string | undefined) {
+  const parts = path?.split(":") ?? [];
+  if (parts.length > 1 && parts[parts.length - 1] === "") parts.pop();
+  return parts;
 }

@@ -9,7 +9,7 @@ import Module from "./Module";
 import Network from "./Network";
 import StreamlineNode from "./StreamlineNode";
 
-export type VerticalAlign = "bottom" | "justify" | "top";
+export type VerticalAlign = "bottom" | "justify";
 
 export type ModuleSize = "flow" | "nodes";
 export type ModuleOrder = ModuleSize | "highlightIndex" | "nodeId";
@@ -119,12 +119,10 @@ export default class Diagram extends AlluvialNodeBase<Network> {
   }
 
   calcFlow() {
-    console.time("Diagram.calcFlow");
     this.forEachDepthFirstPostOrderWhile(
       (node: any) => node.depth < Depth.LEAF_NODE,
       (node: any) => (node.flow = node.childFlow)
     );
-    console.timeEnd("Diagram.calcFlow");
   }
 
   updateLayout({
@@ -138,7 +136,6 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     moduleSize = "flow",
     sortModulesBy = "flow",
   }: LayoutOpts) {
-    console.time("Diagram.updateLayout");
     const numNetworks = this.children.length;
 
     if (!numNetworks) return;
@@ -207,6 +204,11 @@ export default class Diagram extends AlluvialNodeBase<Network> {
             visibleModules.sort((a, b) => a.index - b.index);
           }
 
+          // E7: index the visible modules in their drawn order also when the order is custom, and zero the margin
+          // of hidden modules (they are not laid out, so a stale margin would only be scaled by the cap below).
+          visibleModules.forEach((module, index) => (module.index = index));
+          invisibleModules.forEach((module) => (module.margin = 0));
+
           node.children = [...visibleModules, ...invisibleModules];
 
           if (i > 0) x += networkWidth;
@@ -255,7 +257,7 @@ export default class Diagram extends AlluvialNodeBase<Network> {
     const marginFractionOfHeight = maxTotalMargin / height;
 
     if (marginFractionOfHeight > maxMarginFractionOfHeight) {
-      // Reduce margins to below 50% of vertical space
+      // Scale the margins down to maxMarginFractionOfHeight (20 %) of the height
       // Use moduleMarginScale such that
       //   moduleMarginScale * maxTotalMargin / height == maxMarginFractionOfHeight
       const moduleMarginScale = zeroMargins ? 0 :
@@ -306,9 +308,11 @@ export default class Diagram extends AlluvialNodeBase<Network> {
       (node: any) => node.depth <= Depth.BRANCH,
       (node: any) => {
         if (node instanceof Branch) {
-          node.children.sort(
-            (a, b) =>
-              a.oppositeStreamlinePosition - b.oppositeStreamlinePosition
+          // E10: tie-safe, two -Infinity keys compare equal instead of NaN.
+          node.children.sort((a, b) =>
+            a.oppositeStreamlinePosition === b.oppositeStreamlinePosition
+              ? 0
+              : a.oppositeStreamlinePosition - b.oppositeStreamlinePosition
           );
         }
       }
@@ -370,8 +374,6 @@ export default class Diagram extends AlluvialNodeBase<Network> {
         }
       }
     );
-
-    console.timeEnd("Diagram.updateLayout");
   }
 }
 

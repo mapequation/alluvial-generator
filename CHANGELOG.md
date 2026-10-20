@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## Unreleased (branch `py-parity-fixes`)
+
+Fix round done together with the Python port (alluvial-py 0.5.0); [#55](https://github.com/mapequation/alluvial/pull/55)
+has the details and the reasons per work package. The version is left at 1.16.0; the API change below is breaking.
+
+### ⚠ BREAKING CHANGES
+
+* The 2019 saved-diagram format is gone: `createFilesFromDiagramObject` (`parsers/from-diagram.ts`) and the web app's
+  unused `io/save-diagram.js` are removed, and such a file no longer loads.
+* `verticalAlign: "top"` (declared but never implemented; it behaved like `"bottom"`) is removed.
+
+### Features
+
+* Saved diagrams: "alluvial network files", `formatVersion` 1 (package README, "Saving and opening diagrams").
+  `serializeDiagram`, `serializeDiagramData`, `zipFiles`, `readAlluvialMetadata`, `sortBySavedPosition`,
+  `SAVED_OPTION_KEYS`, `DiagramStore.getOptions` and `DiagramStore.openNetworks`. The web app gets "Download diagram
+  (.zip)" and opens saved zips and files with their options, scheme, module orders and names.
+* `DiagramStore.setModuleOrder` (a custom order for many modules with one layout) and `setModuleLevel` (expand to a
+  module level with one layout); `Module.canExpand`; `validateNetworkNodes`, `duplicateIdentifiers` and
+  `duplicateIdentifiersMessage`.
+
+### Bug Fixes
+
+* Tree paths: no phantom level for stree paths with a trailing `:`, `isAncestor` no longer treats module `10` as a
+  child of `1`, and `;` anywhere in a path gives an insignificant path instead of a `NaN` module.
+* Nodes with a non-finite or missing flow are rejected at load instead of producing a `NaN` diagram; `bipartiteStartId:
+  null` and invalid JSON `moduleLevel` values are ignored.
+* Recolouring keeps modules in place (an emptied module was re-created), so the colour operations no longer skip
+  modules or depend on history; similarity colours of chains that start after the first network no longer reuse the
+  first colours; several colour-operation edge cases fixed.
+* Layout state: stale indices and margins of hidden modules, a tie-safe branch comparator, moving the top module up,
+  and a module shown together with its own sub-module.
+* `showBipartiteNodes` applies when the networks are set, `moveNetwork` keeps module names, orders and colours, the
+  Expand button is disabled for modules that cannot expand, the margin slider shows the real margin, and the metadata
+  statistics use the sample variance.
+
 ## [1.16.0](https://github.com/mapequation/alluvial/compare/v1.15.0...v1.16.0) (2026-10-20)
 
 

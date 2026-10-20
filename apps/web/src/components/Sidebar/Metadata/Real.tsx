@@ -241,12 +241,12 @@ function Chart({
         <>
           <ReferenceLine x={data.mean} xAxisId="real" />
           <ReferenceLine
-            x={data.mean - data.variance}
+            x={data.mean - data.standardDeviation}
             xAxisId="real"
             strokeDasharray={"3 3"}
           />
           <ReferenceLine
-            x={data.mean + data.variance}
+            x={data.mean + data.standardDeviation}
             xAxisId="real"
             strokeDasharray={"3 3"}
           />
