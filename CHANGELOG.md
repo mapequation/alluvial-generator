@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/mapequation/alluvial/compare/v1.15.0...v1.16.0) (2026-10-20)
+
+
+### Features
+
+* Colour modules by the module hierarchy with c3 2: submodules get colours close to their parent, and a module path gets the same colour in all networks ([#47](https://github.com/mapequation/alluvial/issues/47))
+* Set the c3 tone and offset of the C3 schemes and of colouring by hierarchy in the sidebar, and add a C3 Oklch scheme. The C3 schemes now come from c3 2.0.1 and look different ([#47](https://github.com/mapequation/alluvial/issues/47))
+* Colouring by hierarchy uses interpolated schemes as c3 hue sources, and colour lists such as Mural as seeds for the top modules ([#47](https://github.com/mapequation/alluvial/issues/47))
+
 ## [1.15.0](https://github.com/mapequation/alluvial/compare/v1.14.2...v1.15.0) (2026-10-09)
 
 

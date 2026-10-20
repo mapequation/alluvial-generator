@@ -1,3 +1,4 @@
+import { hierarchy, type Module as HierarchyModule } from "@mapequation/c3";
 import { action, makeObservable, observable, observableRef } from "mobx";
 import { createContext, useContext } from "react";
 import {
@@ -17,7 +18,15 @@ import type {
 import type { Real } from "../alluvial/Network";
 import type { Side } from "../alluvial/Side";
 import type { NetworkFile } from "../parsers/types";
-import { COLOR_SCHEMES, ColorScheme, SchemeName } from "../schemes";
+import {
+  COLOR_SCHEMES,
+  ColorScheme,
+  DEFAULT_TONE,
+  hierarchyOptions,
+  SchemeName,
+  schemeColors,
+  ToneName,
+} from "../schemes";
 import BipartiteGraph from "../utils/BipartiteGraph";
 import TreePath from "../utils/TreePath";
 
@@ -66,6 +75,10 @@ export type DiagramStoreOptions = Partial<
 > & {
   /** Initial color scheme used by the coloring operations. */
   colorScheme?: SchemeName;
+  /** Initial c3 tone of the C3 schemes and of coloring by module hierarchy. */
+  colorTone?: ToneName;
+  /** Initial c3 offset of the first color, in degrees around the hue source. */
+  colorOffset?: number;
 };
 
 export class DiagramStore {
@@ -119,9 +132,12 @@ export class DiagramStore {
 
   selectedScheme: ColorScheme = COLOR_SCHEMES["C3 Sinebow"];
   selectedSchemeName: SchemeName = "C3 Sinebow";
+  selectedTone: ToneName = DEFAULT_TONE;
+  // null for c3's default offset of the scheme
+  selectedOffset: number | null = null;
 
   constructor(options: DiagramStoreOptions = {}) {
-    const { colorScheme, ...settings } = options;
+    const { colorScheme, colorTone, colorOffset, ...settings } = options;
 
     for (const key of OPTION_KEYS) {
       if (settings[key] !== undefined) {
@@ -131,8 +147,18 @@ export class DiagramStore {
 
     if (colorScheme !== undefined) {
       this.selectedSchemeName = colorScheme;
-      this.selectedScheme = COLOR_SCHEMES[colorScheme];
     }
+    if (colorTone !== undefined) {
+      this.selectedTone = colorTone;
+    }
+    if (colorOffset !== undefined) {
+      this.selectedOffset = colorOffset;
+    }
+    this.selectedScheme = schemeColors(
+      this.selectedSchemeName,
+      this.selectedTone,
+      this.selectedOffset
+    );
 
     this.highlightColors = [...this.selectedScheme];
 
@@ -174,6 +200,8 @@ export class DiagramStore {
       showBipartiteNodes: observable,
       selectedScheme: observableRef,
       selectedSchemeName: observable,
+      selectedTone: observable,
+      selectedOffset: observable,
     });
   }
 
@@ -235,7 +263,27 @@ export class DiagramStore {
 
   setSelectedScheme = action((scheme: SchemeName) => {
     this.selectedSchemeName = scheme;
-    this.selectedScheme = COLOR_SCHEMES[scheme];
+    // The default offset differs between hue sources
+    this.selectedOffset = null;
+    this.selectedScheme = schemeColors(scheme, this.selectedTone);
+  });
+
+  setSelectedTone = action((tone: ToneName) => {
+    this.selectedTone = tone;
+    this.selectedScheme = schemeColors(
+      this.selectedSchemeName,
+      tone,
+      this.selectedOffset
+    );
+  });
+
+  setSelectedOffset = action((offset: number) => {
+    this.selectedOffset = offset;
+    this.selectedScheme = schemeColors(
+      this.selectedSchemeName,
+      this.selectedTone,
+      offset
+    );
   });
 
   setIdentifier = action((identifier: Identifier) => {
@@ -788,6 +836,56 @@ export class DiagramStore {
         })
       );
     }
+
+    this.updateLayout();
+  }
+
+  /**
+   * Color the visible modules by their place in the module hierarchy, so that
+   * submodules get colors close to their parent. The same module path gets the
+   * same color in all networks.
+   */
+  colorModuleHierarchyInAllNetworks() {
+    if (this.diagram.children.length === 0) return;
+
+    // Clearing colors can replace modules, and leaves their flows stale until
+    // the next layout, so remember which modules were visible by id
+    const visibleModuleIds = new Set(
+      this.diagram.children.flatMap((network) =>
+        network.children
+          .filter((module) => module.isVisible)
+          .map((module) => module.id)
+      )
+    );
+
+    this.clearColors(false);
+
+    // One entry per node, c3 sums the flow of each module path
+    const modules: HierarchyModule[] = [];
+    for (const network of this.diagram.children) {
+      for (const node of network.leafNodes()) {
+        const path = node.treePath.toArray();
+        modules.push({
+          path: path.length > 1 ? path.slice(0, -1) : path,
+          flow: node.flow,
+        });
+      }
+    }
+
+    const color = hierarchy(
+      modules,
+      hierarchyOptions(
+        this.selectedSchemeName,
+        this.selectedTone,
+        this.selectedOffset
+      )
+    );
+
+    this.diagram.children
+      .flatMap((network) =>
+        network.children.filter((module) => visibleModuleIds.has(module.id))
+      )
+      .forEach((module) => this.colorModule(module, color(module.path)!, false));
 
     this.updateLayout();
   }

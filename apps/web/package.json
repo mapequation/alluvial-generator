@@ -1,6 +1,6 @@
 {
   "name": "alluvial-app",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -8,7 +8,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mapequation/alluvial-diagram": "*",
-    "@mapequation/c3": "^1.1.1",
+    "@mapequation/c3": "^2.0.1",
     "@mapequation/infomap": "^2.15.1",
     "@mapequation/infomap-parser": "^1.0.2",
     "@mapequation/infomap-react": "^1.0.0",

@@ -1,4 +1,10 @@
-import * as c3 from "@mapequation/c3";
+import {
+  palette,
+  tones,
+  type HierarchyOptions,
+  type HueSource,
+  type ToneName,
+} from "@mapequation/c3";
 import {
   interpolateBlues,
   interpolateBrBG,
@@ -115,14 +121,31 @@ const mural_colors = [
   "#9a9a61",
 ]
 
-const c3options = {
-  saturation: 0.55,
-  saturationEnd: 0.8,
-  lightness: 0.5,
-  lightnessEnd: 0.9,
-  midpoint: 4.5,
-  steepness: 1,
-};
+// Where the C3 schemes take their hues from
+const C3_HUES = {
+  "C3 Oklch": "Oklch",
+  "C3 Turbo": "Turbo",
+  "C3 Rainbow": "Rainbow",
+  "C3 Sinebow": "Sinebow",
+  "C3 Viridis": "Viridis",
+} as const satisfies Record<string, HueSource>;
+
+type C3SchemeName = keyof typeof C3_HUES;
+
+export type { ToneName };
+
+/** The c3 tones, which set the lightness and chroma of the C3 schemes */
+export const TONES = Object.keys(tones) as ToneName[];
+
+// c3's default tone
+export const DEFAULT_TONE: ToneName = "strong";
+
+const c3Scheme = (
+  name: C3SchemeName,
+  tone: ToneName,
+  offset: number | null = null
+) =>
+  palette(512, { hue: C3_HUES[name], tone, offset: offset ?? undefined });
 
 const scheme = (
   (n: number) =>
@@ -134,6 +157,62 @@ const scheme = (
       return result;
     }
 )(21);
+
+// d3 interpolators, sampled for the schemes and used as hue sources by c3
+const INTERPOLATED = {
+  // diverging
+  "Brown-Green": interpolateBrBG,
+  "Purple-Green": interpolatePRGn,
+  "Pink-Green": interpolatePiYG,
+  "Purple-Orange": interpolatePuOr,
+  "Red-Blue": interpolateRdBu,
+  "Red-Gray": interpolateRdGy,
+  "Red-Yellow-Blue": interpolateRdYlBu,
+  "Red-Yellow-Green": interpolateRdYlGn,
+  Spectral: interpolateSpectral,
+  // sequential-multi
+  "Blue-Green": interpolateBuGn,
+  "Blue-Purple": interpolateBuPu,
+  "Green-Blue": interpolateGnBu,
+  "Orange-Red": interpolateOrRd,
+  "Purple-Blue-Green": interpolatePuBuGn,
+  "Purple-Blue": interpolatePuBu,
+  "Purple-Red": interpolatePuRd,
+  "Red-Purple": interpolateRdPu,
+  "Yellow-Green-Blue": interpolateYlGnBu,
+  "Yellow-Green": interpolateYlGn,
+  "Yellow-Orange-Brown": interpolateYlOrBr,
+  "Yellow-Orange-Red": interpolateYlOrRd,
+  // sequential-single
+  Blues: interpolateBlues,
+  Greens: interpolateGreens,
+  Greys: interpolateGreys,
+  Purples: interpolatePurples,
+  Reds: interpolateReds,
+  Oranges: interpolateOranges,
+  // sequential-multi
+  Cividis: interpolateCividis,
+  Cubehelix: interpolateCubehelixDefault,
+  Warm: interpolateWarm,
+  Cool: interpolateCool,
+  Turbo: interpolateTurbo,
+  Viridis: interpolateViridis,
+  Magma: interpolateMagma,
+  Inferno: interpolateInferno,
+  Plasma: interpolatePlasma,
+  // cyclical
+  Rainbow: interpolateRainbow,
+  Sinebow: interpolateSinebow,
+} satisfies Record<string, (t: number) => string>;
+
+const sampled = <K extends string>(
+  interpolators: Record<K, (t: number) => string>
+) =>
+  Object.fromEntries(
+    Object.entries<(t: number) => string>(interpolators).map(
+      ([name, interpolator]) => [name, scheme(interpolator)]
+    )
+  ) as Record<K, string[]>;
 
 export const COLOR_SCHEMES = {
   // d3
@@ -158,64 +237,73 @@ export const COLOR_SCHEMES = {
   Tableau20: schemeTab20,
   Tableau20b: schemeTab20b,
   Tableau20c: schemeTab20c,
-  // c3
-  "C3 Turbo": c3.colors(512, { scheme: "Turbo", ...c3options }),
-  "C3 Rainbow": c3.colors(512, { scheme: "Rainbow", ...c3options }),
-  "C3 Sinebow": c3.colors(512, { scheme: "Sinebow", ...c3options }),
-  "C3 Viridis": c3.colors(512, { scheme: "Viridis", ...c3options }),
+  // c3, in the default tone
+  "C3 Oklch": c3Scheme("C3 Oklch", DEFAULT_TONE),
+  "C3 Turbo": c3Scheme("C3 Turbo", DEFAULT_TONE),
+  "C3 Rainbow": c3Scheme("C3 Rainbow", DEFAULT_TONE),
+  "C3 Sinebow": c3Scheme("C3 Sinebow", DEFAULT_TONE),
+  "C3 Viridis": c3Scheme("C3 Viridis", DEFAULT_TONE),
   // natural
   "Mural": mural_colors,
   // uniform
   Flare: flare,
   Crest: crest,
-  // diverging
-  "Brown-Green": scheme(interpolateBrBG),
-  "Purple-Green": scheme(interpolatePRGn),
-  "Pink-Green": scheme(interpolatePiYG),
-  "Purple-Orange": scheme(interpolatePuOr),
-  "Red-Blue": scheme(interpolateRdBu),
-  "Red-Gray": scheme(interpolateRdGy),
-  "Red-Yellow-Blue": scheme(interpolateRdYlBu),
-  "Red-Yellow-Green": scheme(interpolateRdYlGn),
-  Spectral: scheme(interpolateSpectral),
-  // sequential-multi
-  "Blue-Green": scheme(interpolateBuGn),
-  "Blue-Purple": scheme(interpolateBuPu),
-  "Green-Blue": scheme(interpolateGnBu),
-  "Orange-Red": scheme(interpolateOrRd),
-  "Purple-Blue-Green": scheme(interpolatePuBuGn),
-  "Purple-Blue": scheme(interpolatePuBu),
-  "Purple-Red": scheme(interpolatePuRd),
-  "Red-Purple": scheme(interpolateRdPu),
-  "Yellow-Green-Blue": scheme(interpolateYlGnBu),
-  "Yellow-Green": scheme(interpolateYlGn),
-  "Yellow-Orange-Brown": scheme(interpolateYlOrBr),
-  "Yellow-Orange-Red": scheme(interpolateYlOrRd),
-  // sequential-single
-  Blues: scheme(interpolateBlues),
-  Greens: scheme(interpolateGreens),
-  Greys: scheme(interpolateGreys),
-  Purples: scheme(interpolatePurples),
-  Reds: scheme(interpolateReds),
-  Oranges: scheme(interpolateOranges),
-  // sequential-multi
-  Cividis: scheme(interpolateCividis),
-  Cubehelix: scheme(interpolateCubehelixDefault),
-  Warm: scheme(interpolateWarm),
-  Cool: scheme(interpolateCool),
-  Turbo: scheme(interpolateTurbo),
-  Viridis: scheme(interpolateViridis),
-  Magma: scheme(interpolateMagma),
-  Inferno: scheme(interpolateInferno),
-  Plasma: scheme(interpolatePlasma),
-  // cyclical
-  Rainbow: scheme(interpolateRainbow),
-  Sinebow: scheme(interpolateSinebow),
+  ...sampled(INTERPOLATED),
 } as const;
 
 export type ColorScheme = typeof COLOR_SCHEMES[keyof typeof COLOR_SCHEMES];
 
 export type SchemeName = keyof typeof COLOR_SCHEMES;
+
+const isC3Scheme = (name: SchemeName): name is C3SchemeName =>
+  name in C3_HUES;
+
+const isInterpolated = (
+  name: SchemeName
+): name is keyof typeof INTERPOLATED => name in INTERPOLATED;
+
+/** The colors of a scheme, where the C3 schemes depend on the tone and offset */
+export function schemeColors(
+  name: SchemeName,
+  tone: ToneName,
+  offset: number | null = null
+): ColorScheme {
+  if (!isC3Scheme(name) || (tone === DEFAULT_TONE && offset === null)) {
+    return COLOR_SCHEMES[name];
+  }
+  return c3Scheme(name, tone, offset);
+}
+
+/**
+ * Whether c3 takes the scheme as a hue source, so that the tone and offset
+ * change its colors or its hierarchy coloring
+ */
+export const schemeIsHueSource = (name: SchemeName) =>
+  isC3Scheme(name) || isInterpolated(name);
+
+/**
+ * Where c3 puts the first color by default, in degrees around the hue source:
+ * its hue on the OKLCH hue circle, or 0 at the start of a scheme
+ */
+export const defaultSchemeOffset = (name: SchemeName) =>
+  isC3Scheme(name) && C3_HUES[name] === "Oklch" ? 245 : 0;
+
+/**
+ * Options for c3's `hierarchy()` that make top modules follow a scheme. The C3
+ * and interpolated schemes are hue sources in the tone and offset, so flows can
+ * weigh the colors. The other schemes are lists of colors, which c3 takes as seeds and
+ * infers the tone from.
+ */
+export function hierarchyOptions(
+  name: SchemeName,
+  tone: ToneName,
+  offset: number | null = null
+): HierarchyOptions {
+  const options = { tone, offset: offset ?? undefined };
+  if (isC3Scheme(name)) return { hue: C3_HUES[name], ...options };
+  if (isInterpolated(name)) return { hue: INTERPOLATED[name], ...options };
+  return { seeds: COLOR_SCHEMES[name] };
+}
 
 export const SCHEME_GROUPS: { [key: string]: SchemeName[] } = {
   ColorBrewer: [
@@ -232,7 +320,7 @@ export const SCHEME_GROUPS: { [key: string]: SchemeName[] } = {
   ],
   Seaborn: ["Deep", "Muted", "Pastel", "Bright", "Dark", "Colorblind"],
   Matplotlib: ["Tableau20", "Tableau20b", "Tableau20c"],
-  C3: ["C3 Turbo", "C3 Rainbow", "C3 Sinebow", "C3 Viridis"],
+  C3: ["C3 Oklch", "C3 Turbo", "C3 Rainbow", "C3 Sinebow", "C3 Viridis"],
   Natural: ["Mural"],
   Uniform: [
     "Flare",

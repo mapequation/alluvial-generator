@@ -38,8 +38,15 @@ export {
 export type { DiagramStoreOptions, HistogramBin } from "./store/DiagramStore";
 
 // Color schemes
-export { COLOR_SCHEMES, SCHEME_GROUPS } from "./schemes";
-export type { ColorScheme, SchemeName } from "./schemes";
+export {
+  COLOR_SCHEMES,
+  DEFAULT_TONE,
+  defaultSchemeOffset,
+  SCHEME_GROUPS,
+  schemeIsHueSource,
+  TONES,
+} from "./schemes";
+export type { ColorScheme, SchemeName, ToneName } from "./schemes";
 
 // React renderer
 export { DiagramView } from "./react";
