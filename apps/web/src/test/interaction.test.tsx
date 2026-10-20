@@ -1,8 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { parse } from "@mapequation/infomap-parser";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createFile,
   setIdentifiers,
@@ -96,5 +96,30 @@ describe("interaction", () => {
 
     // Use store too for a more direct assertion.
     expect(store.networks.length).toBeGreaterThan(0);
+  });
+
+  it("the closed Load dialog ignores the C and E shortcuts", async () => {
+    const fetch = vi.fn(() => new Promise<Response>(() => {}));
+    vi.stubGlobal("fetch", fetch);
+    const { store } = renderApp();
+    const dialog = (part: string) =>
+      document.querySelector(`[data-scope="dialog"][data-part="${part}"]`)!;
+    fireEvent.click(dialog("close-trigger"));
+    await waitFor(() =>
+      expect(dialog("content").getAttribute("data-state")).toBe("closed")
+    );
+
+    const diagram = store.diagram;
+    const module = diagram.children[0].visibleChildren[0];
+    store.setSelectedModule(module);
+
+    // C contracts and E expands the selected module. In the Load dialog they
+    // mean "create diagram" and "load example", which replace the diagram.
+    fireEvent.keyDown(window, { key: "e" });
+    fireEvent.keyDown(window, { key: "c" });
+
+    expect(store.diagram).toBe(diagram);
+    expect(fetch).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });
