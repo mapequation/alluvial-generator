@@ -85,8 +85,11 @@ export type DiagramStoreOptions = Partial<
   colorScheme?: SchemeName;
   /** Initial c3 tone of the C3 schemes and of coloring by module hierarchy. */
   colorTone?: ToneName;
-  /** Initial c3 offset of the first color, in degrees around the hue source. */
-  colorOffset?: number;
+  /**
+   * Initial c3 offset of the first color, in degrees around the hue source,
+   * or null for c3's default offset of the scheme.
+   */
+  colorOffset?: number | null;
 };
 
 export class DiagramStore {
@@ -390,7 +393,8 @@ export class DiagramStore {
     );
   });
 
-  setSelectedOffset = action((offset: number) => {
+  // null for c3's default offset of the scheme
+  setSelectedOffset = action((offset: number | null) => {
     this.selectedOffset = offset;
     this.selectedScheme = schemeColors(
       this.selectedSchemeName,
