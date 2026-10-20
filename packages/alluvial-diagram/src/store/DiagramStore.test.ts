@@ -1,5 +1,5 @@
 import { isObservableProp } from "mobx";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { NetworkFile } from "../parsers/types";
 import { COLOR_SCHEMES, schemeColors } from "../schemes";
 import { DiagramStore } from "./DiagramStore";
@@ -142,6 +142,20 @@ describe("DiagramStore", () => {
     expect(store.networks.map((n) => n.id)).toEqual(["b", "a"]);
     expect(store.diagram.children.map((n) => n.networkId)).toEqual(["b", "a"]);
     expect(store.selectedModule?.networkId).toBe("a");
+  });
+
+  it("moveNetwork leaves no timer running when the network can't move", () => {
+    const store = new DiagramStore();
+    store.setNetworks([network("a", [0.6, 0.4]), network("b", [0.5, 0.5])]);
+    store.setSelectedModule(store.diagram.children[0].children[0]);
+    const time = vi.spyOn(console, "time");
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    store.moveNetwork("left");
+
+    expect(time).not.toHaveBeenCalledWith("DiagramStore.moveNetwork");
+    expect(store.networks.map((n) => n.id)).toEqual(["a", "b"]);
+    vi.restoreAllMocks();
   });
 
   it("moveNetwork keeps the colors of highlighted modules", () => {
