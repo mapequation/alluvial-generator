@@ -50,7 +50,12 @@ async function load(files: File[]) {
 }
 
 async function editedStore() {
-  const store = new DiagramStore({ height: 500, colorScheme: "Paired" });
+  const store = new DiagramStore({
+    height: 500,
+    colorScheme: "Paired",
+    colorTone: "pastel",
+    colorOffset: 90,
+  });
   store.setNetworks(
     await load([file("a.tree", TREE_A), file("b.tree", TREE_B)])
   );
@@ -112,6 +117,8 @@ describe("serializeDiagram", () => {
         position: 0,
         numNetworks: 2,
         colorScheme: "Paired",
+        colorTone: "pastel",
+        colorOffset: 90,
         options: store.getOptions(),
       },
       network: {
@@ -119,6 +126,15 @@ describe("serializeDiagram", () => {
         moduleOrder: ["3", "1:1", "1:2", "2"],
       },
     });
+    expect(Object.keys(a.alluvial.diagram)).toEqual([
+      "saveId",
+      "position",
+      "numNetworks",
+      "colorScheme",
+      "colorTone",
+      "colorOffset",
+      "options",
+    ]);
     expect(Object.keys(a.alluvial.diagram.options)).toEqual([
       ...SAVED_OPTION_KEYS,
     ]);
@@ -206,6 +222,8 @@ describe("readAlluvialMetadata", () => {
         {},
         {
           colorScheme: "toString",
+          colorTone: "toString",
+          colorOffset: "90",
           options: { height: -1, fontSize: 12, verticalAlign: "top", foo: 1 },
         }
       ),
@@ -215,6 +233,8 @@ describe("readAlluvialMetadata", () => {
       "ignoring the saved option height (invalid value)",
       "ignoring the saved option verticalAlign (invalid value)",
       "ignoring the saved color scheme (unknown scheme)",
+      "ignoring the saved color tone (unknown tone)",
+      "ignoring the saved color offset (invalid value)",
     ]);
   });
 
@@ -269,6 +289,8 @@ describe("save and open", () => {
       expect(warnings).toEqual([]);
       expect(reloaded.getOptions()).toEqual(store.getOptions());
       expect(reloaded.selectedSchemeName).toBe("Paired");
+      expect(reloaded.selectedTone).toBe("pastel");
+      expect(reloaded.selectedOffset).toBe(90);
       expect(reloaded.highlightColors).toEqual(store.highlightColors);
       const ids = (s: DiagramStore) =>
         s.diagram.children.map((n) => n.children.map((m) => m.moduleId));

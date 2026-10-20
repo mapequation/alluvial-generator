@@ -196,16 +196,18 @@ The contract of `formatVersion` 1:
   or the stree string (e.g. `"1;1;63;"`) when a level is insignificant.
 - Everything else is in one block that other readers ignore:
   `"alluvial": { "format": "alluvial-network", "formatVersion": 1, "generator", "diagram": { "saveId", "position",
-  "numNetworks", "colorScheme", "options" }, "network": { "moduleNames", "moduleOrder" } }`. `diagram` is the same
-  in every file of one save (`saveId` ties them together, `position` orders them); `options` holds every saved
-  store option (`SAVED_OPTION_KEYS`). `network.moduleOrder` lists every module, hidden ones included, and is
+  "numNetworks", "colorScheme", "colorTone", "colorOffset", "options" }, "network": { "moduleNames", "moduleOrder" }
+  }`. `diagram` is the same in every file of one save (`saveId` ties them together, `position` orders them);
+  `colorTone` and `colorOffset` are the c3 tone and offset of the scheme (`colorOffset` is `null` for c3's default);
+  `options` holds every saved store option (`SAVED_OPTION_KEYS`). `network.moduleOrder` lists every module, hidden ones included, and is
   written only for a custom order.
 - `parseAcceptedFiles` sorts the files of one save into saved order. `openNetworks` applies each file's `network`
   part, and the `diagram` part only when every file has a valid version-1 block of the same save and the positions
   are complete. Anything else warns and loads what it can: a block with a newer `formatVersion` or an invalid block
   is ignored, files from different saves or an incomplete save keep their module names and orders but not the
-  options, and an invalid option value or an unknown scheme is skipped. The networks always load with their
-  colours and module levels.
+  options, and an invalid option value, an unknown scheme or tone, or an invalid offset is skipped. A save without
+  `colorTone` or `colorOffset` keeps the current tone, and the current offset unless the scheme changes. The networks
+  always load with their colours and module levels.
 - Readers ignore unknown keys, so new optional keys do not change the version. Only an incompatible change to the
   block bumps `formatVersion`.
 

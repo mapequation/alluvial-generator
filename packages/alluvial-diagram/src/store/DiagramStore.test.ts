@@ -133,6 +133,46 @@ describe("DiagramStore", () => {
     expect(store.selectedOffset).toBeNull();
   });
 
+  it("moveNetwork keeps the tone and offset", () => {
+    const store = new DiagramStore({ colorTone: "pastel", colorOffset: 90 });
+    store.setNetworks([network("a", [0.6, 0.4]), network("b", [0.5, 0.5])]);
+    store.setSelectedModule(store.diagram.children[0].children[0]);
+
+    store.moveNetwork("right");
+
+    expect(store.selectedTone).toBe("pastel");
+    expect(store.selectedOffset).toBe(90);
+    expect(store.selectedScheme).toEqual(
+      schemeColors("C3 Sinebow", "pastel", 90)
+    );
+  });
+
+  it("openNetworks keeps the tone, and the offset unless the scheme changes, for a save without them", () => {
+    const saved = (colorScheme: string) => {
+      const source = new DiagramStore();
+      source.setNetworks([network("a", [0.6, 0.4])]);
+      const [{ data }] = serializeDiagramData(source, { saveId: "s" });
+      const alluvial = data.alluvial as any;
+      delete alluvial.diagram.colorTone;
+      delete alluvial.diagram.colorOffset;
+      alluvial.diagram.colorScheme = colorScheme;
+      return [{ ...network("a", [0.6, 0.4]), alluvial }];
+    };
+    const store = new DiagramStore({ colorTone: "deep", colorOffset: 90 });
+
+    expect(store.openNetworks(saved("C3 Sinebow"))).toEqual([]);
+    expect(store.selectedTone).toBe("deep");
+    expect(store.selectedOffset).toBe(90);
+    expect(store.selectedScheme).toEqual(
+      schemeColors("C3 Sinebow", "deep", 90)
+    );
+
+    store.openNetworks(saved("C3 Turbo"));
+    expect(store.selectedTone).toBe("deep");
+    expect(store.selectedOffset).toBeNull();
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Turbo", "deep"));
+  });
+
   it("moveNetwork rebuilds the diagram in the new order", () => {
     const store = new DiagramStore();
     store.setNetworks([network("a", [0.6, 0.4]), network("b", [0.5, 0.5])]);
