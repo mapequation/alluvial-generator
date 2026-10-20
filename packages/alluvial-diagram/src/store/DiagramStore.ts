@@ -308,14 +308,22 @@ export class DiagramStore {
 
     if (diagram) {
       Object.assign(this, diagram.options);
-      // A save has no tone or offset, so keep them when the scheme is the
-      // current one (moveNetwork)
+      const { colorScheme, colorTone, colorOffset } = diagram;
       if (
-        diagram.colorScheme !== undefined &&
-        diagram.colorScheme !== this.selectedSchemeName
+        colorScheme !== undefined &&
+        colorScheme !== this.selectedSchemeName
       ) {
-        this.setSelectedScheme(diagram.colorScheme);
+        this.selectedSchemeName = colorScheme;
+        // The default offset differs between hue sources
+        this.selectedOffset = null;
       }
+      if (colorTone !== undefined) this.selectedTone = colorTone;
+      if (colorOffset !== undefined) this.selectedOffset = colorOffset;
+      this.selectedScheme = schemeColors(
+        this.selectedSchemeName,
+        this.selectedTone,
+        this.selectedOffset
+      );
     }
 
     this.setNetworks(networks);

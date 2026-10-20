@@ -18,7 +18,8 @@ has the details and the reasons per work package. The version is left at 1.16.0;
 * Saved diagrams: "alluvial network files", `formatVersion` 1 (package README, "Saving and opening diagrams").
   `serializeDiagram`, `serializeDiagramData`, `zipFiles`, `readAlluvialMetadata`, `sortBySavedPosition`,
   `SAVED_OPTION_KEYS`, `DiagramStore.getOptions` and `DiagramStore.openNetworks`. The web app gets "Download diagram
-  (.zip)" and opens saved zips and files with their options, scheme, module orders and names.
+  (.zip)" and opens saved zips and files with their options, scheme (with its c3 tone and offset), module
+  orders and names.
 * `DiagramStore.setModuleOrder` (a custom order for many modules with one layout) and `setModuleLevel` (expand to a
   module level with one layout); `Module.canExpand`; `validateNetworkNodes`, `duplicateIdentifiers` and
   `duplicateIdentifiersMessage`.

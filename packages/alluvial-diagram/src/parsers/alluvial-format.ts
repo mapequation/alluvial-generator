@@ -9,7 +9,8 @@
 //
 //   "alluvial": {
 //     "format": "alluvial-network", "formatVersion": 1, "generator": "...",
-//     "diagram": {saveId, position, numNetworks, colorScheme, options},
+//     "diagram": {saveId, position, numNetworks, colorScheme, colorTone,
+//                 colorOffset, options},
 //     "network": {moduleNames?, moduleOrder?}
 //   }
 //
@@ -20,7 +21,7 @@
 import JSZip from "jszip";
 import type Network from "../alluvial/Network";
 import type LeafNode from "../alluvial/LeafNode";
-import { COLOR_SCHEMES, SchemeName } from "../schemes";
+import { COLOR_SCHEMES, SchemeName, TONES, ToneName } from "../schemes";
 import type { DiagramStore } from "../store/DiagramStore";
 
 export const ALLUVIAL_FORMAT = "alluvial-network";
@@ -79,6 +80,9 @@ export type AlluvialDiagramMetadata = {
   position: number;
   numNetworks: number;
   colorScheme?: string;
+  colorTone?: string;
+  // null for c3's default offset of the scheme
+  colorOffset?: number | null;
   options?: Partial<Record<SavedOptionKey, unknown>>;
 };
 
@@ -101,7 +105,12 @@ export type SavedFile = { name: string; text: string };
 /** What `readAlluvialMetadata` found in a set of files, ready to restore. */
 export type AlluvialRestore = {
   // The diagram options and scheme, when the files form one complete save.
-  diagram?: { colorScheme?: SchemeName; options: Partial<SavedOptions> };
+  diagram?: {
+    colorScheme?: SchemeName;
+    colorTone?: ToneName;
+    colorOffset?: number | null;
+    options: Partial<SavedOptions>;
+  };
   // One entry per file (undefined for a file without a valid v1 block).
   networks: (AlluvialNetworkMetadata | undefined)[];
   warnings: string[];
@@ -238,6 +247,8 @@ export function serializeDiagramData(
         position,
         numNetworks: networks.length,
         colorScheme: store.selectedSchemeName,
+        colorTone: store.selectedTone,
+        colorOffset: store.selectedOffset,
         options,
       },
       network: networkMetadata(network),
@@ -256,7 +267,8 @@ export function serializeDiagramData(
  * order, named `NN_<network name>.json`. Loading the texts with
  * `parseAcceptedFiles` and `DiagramStore.openNetworks` restores the diagram:
  * network order and names, the palette and every node's colour and module
- * level, module names, custom module orders, the options and the scheme.
+ * level, module names, custom module orders, the options, and the scheme
+ * with its tone and offset.
  *
  * Text: `JSON.stringify(value, null, 2)`, no trailing newline.
  */
@@ -384,7 +396,12 @@ export function readAlluvialMetadata(files: BlockOf[]): AlluvialRestore {
   if (save.warning) warnings.push(save.warning);
   if (!save.diagrams) return { networks, warnings };
 
-  const { colorScheme, options: rawOptions } = save.diagrams[0];
+  const {
+    colorScheme,
+    colorTone,
+    colorOffset,
+    options: rawOptions,
+  } = save.diagrams[0];
   const options: Record<string, unknown> = {};
   if (isObject(rawOptions)) {
     for (const key of SAVED_OPTION_KEYS) {
@@ -408,6 +425,20 @@ export function readAlluvialMetadata(files: BlockOf[]): AlluvialRestore {
       diagram.colorScheme = colorScheme as SchemeName;
     } else {
       warnings.push("ignoring the saved color scheme (unknown scheme)");
+    }
+  }
+  if (colorTone !== undefined) {
+    if (TONES.includes(colorTone as ToneName)) {
+      diagram.colorTone = colorTone as ToneName;
+    } else {
+      warnings.push("ignoring the saved color tone (unknown tone)");
+    }
+  }
+  if (colorOffset !== undefined) {
+    if (colorOffset === null || Number.isFinite(colorOffset)) {
+      diagram.colorOffset = colorOffset;
+    } else {
+      warnings.push("ignoring the saved color offset (invalid value)");
     }
   }
   return { diagram, networks, warnings };
