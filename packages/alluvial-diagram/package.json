@@ -1,6 +1,6 @@
 {
   "name": "@mapequation/alluvial-diagram",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "Interactive alluvial diagram visualization for hierarchical networks.",
   "license": "MIT",
   "repository": {
