@@ -36,8 +36,12 @@ export function setIdentifiers(
   } else if (format === "json") {
     nodes.forEach((node) => {
       node.identifier = node.identifier ?? id(node);
-      // TODO: remove. Used only for example data.
-      if (!Array.isArray(node.path)) {
+      // String paths with insignificant levels (stree, "1:2;3;") are kept
+      // as strings, as TreePath parses them. Other strings become arrays.
+      if (
+        !Array.isArray(node.path) &&
+        !(typeof node.path === "string" && node.path.includes(";"))
+      ) {
         node.path = TreePath.toArray(node.path!);
       }
     });

@@ -153,6 +153,18 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
         To get hierarchically nested modules, you need to use the formats{" "}
         <Code>tree</Code>, <Code>ftree</Code> or <Code>json</Code>
       </Text>
+      <Heading as="h3" size="sm" my={6}>
+        Save and open a diagram
+      </Heading>
+      <Text mt={4}>
+        <b>Download diagram (.zip)</b> in the Export section saves one{" "}
+        <Code>json</Code> file per network in a zip. Each file is Infomap JSON
+        output with the network name, the colors and the expanded modules, and
+        an <Code>alluvial</Code> block with the settings, the color scheme, the
+        module names and any custom module order. Drop the zip (or its files) on{" "}
+        <b>Load networks</b> to open the diagram again. Other programs that read
+        Infomap JSON ignore the extra block.
+      </Text>
       <Text mt={4}>
         Infomap is available on the web at{" "}
         <a href="https://www.mapequation.org/infomap">Infomap Online</a>.

@@ -22,7 +22,10 @@ import Item from "./Item";
 import "./LoadNetworks.css";
 import NodeIdentifier from "./NodeIdentifier";
 import Stepper from "./Stepper";
-import { parseAcceptedFiles, fetchScienceData } from "@mapequation/alluvial-diagram";
+import {
+  parseAcceptedFiles,
+  fetchScienceData,
+} from "@mapequation/alluvial-diagram";
 
 const acceptedFormats = [
   "tree",
@@ -69,10 +72,13 @@ export default observer(function LoadNetworks({ onClose }: Props) {
       store.identifier
     );
 
-    errors.forEach(({ file, errors }) =>
+    errors.forEach(({ file, errors, warning }) =>
       onError({
-        title: `Could not load ${file.name}`,
+        title: warning
+          ? `Loaded ${file.name} with a warning`
+          : `Could not load ${file.name}`,
         description: errors.map(({ message }) => message).join("\n"),
+        ...(warning && { type: "warning" as const }),
       })
     );
 
@@ -100,9 +106,18 @@ export default observer(function LoadNetworks({ onClose }: Props) {
 
   const createDiagram = useCallback(() => {
     dispatch({ type: "set", payload: { isCreatingDiagram: true } });
-    store.setNetworks(files);
+    // A saved diagram restores its options, module names and module order;
+    // what could not be restored is shown as a warning.
+    const warnings = store.openNetworks(files);
+    if (warnings.length) {
+      onError({
+        title: "Some saved settings were not restored",
+        description: warnings.join("\n"),
+        type: "warning",
+      });
+    }
     onClose();
-  }, [onClose, files, store]);
+  }, [onClose, files, store, onError]);
 
   const loadExample = useCallback(async () => {
     console.time("loadExample");

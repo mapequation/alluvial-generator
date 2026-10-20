@@ -15,8 +15,16 @@ import type {
   ModuleSize,
   VerticalAlign,
 } from "../alluvial/Diagram";
+import type Network from "../alluvial/Network";
 import type { Real } from "../alluvial/Network";
 import type { Side } from "../alluvial/Side";
+import {
+  AlluvialMetadata,
+  readAlluvialMetadata,
+  SAVED_OPTION_KEYS,
+  SavedOptions,
+  serializeDiagramData,
+} from "../parsers/alluvial-format";
 import type { NetworkFile } from "../parsers/types";
 import {
   COLOR_SCHEMES,
@@ -34,7 +42,7 @@ import TreePath from "../utils/TreePath";
 export type HistogramBin = { x0: number; x1: number; color: string };
 
 // Settings that can be given initial values through the constructor.
-const OPTION_KEYS = [
+export const OPTION_KEYS = [
   "identifier",
   "height",
   "duration",
@@ -205,33 +213,48 @@ export class DiagramStore {
     });
   }
 
+  // Merge the files' palettes into the highlight color registry (first
+  // occurrence wins). An array palette is local to its file: each node's
+  // highlightIndex into it is remapped to the merged index, and the file's
+  // colors are replaced by the merged palette so that a second call on the
+  // same files is the identity. Indices outside the file's palette (-1, past
+  // the end) are kept. With `colors: true`, each node's color sets its index.
   private checkColors(networks: any[]) {
-    let colors: string[] = [];
-    const colorIndices = new Map();
+    const colors: string[] = [];
+    const colorIndices = new Map<string, number>();
+    const register = (color: string) => {
+      let index = colorIndices.get(color);
+      if (index === undefined) {
+        index = colors.push(color) - 1;
+        colorIndices.set(color, index);
+      }
+      return index;
+    };
+    const arrayPalettes = [];
 
     for (let network of networks) {
       if (Array.isArray(network?.colors)) {
         // Colors are specified on the top level, nodes have highlightIndex.
-        network.colors?.forEach((color: string) => {
-          if (!colorIndices.has(color)) {
-            colors.push(color);
-            const dummyIndex = 0;
-            colorIndices.set(color, dummyIndex);
+        const merged: number[] = network.colors.map(register);
+        network.nodes?.forEach((node: any) => {
+          const local = node?.highlightIndex;
+          if (Number.isInteger(local) && local >= 0 && local < merged.length) {
+            node.highlightIndex = merged[local];
           }
         });
+        arrayPalettes.push(network);
       } else if (network?.colors === true) {
         // Colors are specified on the nodes, need to set highlightIndex.
         network.nodes?.forEach((node: any) => {
           if (node?.color != null) {
-            if (!colorIndices.has(node.color)) {
-              node.highlightIndex = colors.push(node.color) - 1;
-              colorIndices.set(node.color, node.highlightIndex);
-            } else {
-              node.highlightIndex = colorIndices.get(node.color);
-            }
+            node.highlightIndex = register(node.color);
           }
         });
       }
+    }
+
+    for (const network of arrayPalettes) {
+      network.colors = [...colors];
     }
 
     this.setHighlightColors(colors);
@@ -243,28 +266,105 @@ export class DiagramStore {
    * them when networks are reordered with `moveNetwork`.
    */
   setNetworks = action((networks: NetworkFile[], selectLargest = true) => {
-    console.time("DiagramStore.setNetworks");
-
     this.checkColors(networks);
-    this.buildDiagram(networks);
+
+    this.setSelectedModule(null);
+    this.networks = networks;
+    this.diagram = new Diagram(networks);
+    this.numNetworks = networks.length;
+    // E19: hide the bipartite nodes before the first layout when the option
+    // says so (before, only setShowBipartiteNodes applied it).
+    this.diagram.children.forEach((network) =>
+      network.toggleShowBipartiteNodes(this.showBipartiteNodes)
+    );
+    this.updateLayout();
 
     // Select the largest module in the leftmost network.
     if (selectLargest) {
       this.setSelectedModule(this.diagram.children[0]?.children[0]);
     }
-
-    console.timeEnd("DiagramStore.setNetworks");
   });
 
-  // Builds the diagram without reading colors from the network files, so the
-  // current highlight colors and the node highlight indices are kept.
-  private buildDiagram = action((networks: NetworkFile[]) => {
-    this.setSelectedModule(null);
-    this.networks = networks;
-    this.diagram = new Diagram(networks);
-    this.numNetworks = networks.length;
-    this.updateLayout();
+  /**
+   * Open the files of a saved diagram (or any network files): restore the
+   * saved options and scheme, build the diagram, then restore the custom
+   * module orders and the module names (see parsers/alluvial-format.ts).
+   * The options are assigned directly, so no layout of the old diagram runs;
+   * the build lays out once, and the module orders at most once more
+   * (without calcFlow). Files without a saved block load as with
+   * setNetworks. The saved blocks are consumed: they are removed from the
+   * files once read, so opening the same files again (e.g. Create diagram in
+   * the Load networks dialog, which passes store.networks) keeps the current
+   * state instead of restoring the save a second time. Returns warnings for
+   * what could not be restored.
+   */
+  openNetworks = action((networks: NetworkFile[]) => {
+    const {
+      diagram,
+      networks: saved,
+      warnings,
+    } = readAlluvialMetadata(networks);
+    for (const file of networks) delete file.alluvial;
+
+    if (diagram) {
+      Object.assign(this, diagram.options);
+      // A save has no tone or offset, so keep them when the scheme is the
+      // current one (moveNetwork)
+      if (
+        diagram.colorScheme !== undefined &&
+        diagram.colorScheme !== this.selectedSchemeName
+      ) {
+        this.setSelectedScheme(diagram.colorScheme);
+      }
+    }
+
+    this.setNetworks(networks);
+
+    const orders: [Network, Module[]][] = [];
+    this.diagram.children.forEach((network, i) => {
+      const moduleOrder = saved[i]?.moduleOrder;
+      if (!moduleOrder) return;
+      const modules: Module[] = [];
+      for (const moduleId of moduleOrder) {
+        const module = network.getModule(moduleId);
+        if (module) {
+          modules.push(module);
+        } else {
+          warnings.push(
+            `${network.name}: module ${moduleId} of the saved module order does not exist`
+          );
+        }
+      }
+      orders.push([network, modules]);
+    });
+    if (orders.length) this.setModuleOrder(orders);
+
+    this.diagram.children.forEach((network, i) => {
+      const moduleNames = saved[i]?.moduleNames ?? {};
+      for (const [moduleId, name] of Object.entries(moduleNames)) {
+        const module = network.getModule(moduleId);
+        if (module) {
+          module.name = name;
+        } else {
+          warnings.push(
+            `${network.name}: module ${moduleId} of the saved module names does not exist`
+          );
+        }
+      }
+    });
+
+    this.toggleUpdate();
+    return warnings;
   });
+
+  /** The options a saved diagram stores (SAVED_OPTION_KEYS, in that order). */
+  getOptions(): SavedOptions {
+    const options: Record<string, unknown> = {};
+    for (const key of SAVED_OPTION_KEYS) {
+      options[key] = this[key];
+    }
+    return options as SavedOptions;
+  }
 
   setSelectedScheme = action((scheme: SchemeName) => {
     this.selectedSchemeName = scheme;
@@ -507,7 +607,8 @@ export class DiagramStore {
     this.updateLayout();
 
     const visibleSubModules = parent.children.filter(
-      (module) => module.isVisible && module.moduleId.startsWith(moduleId)
+      (module) =>
+        module.isVisible && TreePath.isAncestor(moduleId, module.moduleId)
     );
 
     if (visibleSubModules.length > 0) {
@@ -517,6 +618,61 @@ export class DiagramStore {
       this.setSelectedModule(largestSubModule);
     }
     return success;
+  }
+
+  // Expands every network to module level `levels` (one level for all networks, or one per network) in
+  // rounds: each round expands the visible modules below the level that can expand (Module.canExpand), in
+  // children order, then recomputes the flows and the network's flow threshold so that the next round sees
+  // the new sub-modules. The diagram is laid out once at the end, and only if something was expanded.
+  // Never regroups. Returns whether some module was expanded.
+  setModuleLevel(levels: number | number[]) {
+    const networks = this.diagram.children;
+    const ks = Array.isArray(levels) ? levels : networks.map(() => levels);
+    if (
+      ks.length !== networks.length ||
+      !ks.every((k) => Number.isInteger(k) && k >= 1)
+    ) {
+      throw new Error(
+        `setModuleLevel: expected an integer >= 1 or one per network (${networks.length}), ` +
+          `got ${JSON.stringify(levels)}`
+      );
+    }
+
+    let changed = false;
+    networks.forEach((network, i) => {
+      for (;;) {
+        const round = network.children.filter(
+          (module) =>
+            module.isVisible && module.moduleLevel < ks[i] && module.canExpand
+        );
+        if (round.length === 0) break;
+        round.forEach((module) => module.expand());
+        changed = true;
+        this.diagram.calcFlow();
+        network.updateFlowThreshold(this.flowThreshold);
+      }
+    });
+
+    if (changed) this.updateLayout();
+
+    // Like expand: an expanded selected module leaves its network, so select
+    // its largest visible sub-module instead (or nothing).
+    const selected = this.selectedModule;
+    if (selected && !selected.parent.children.includes(selected)) {
+      const visibleSubModules = selected.parent.children.filter(
+        (module) =>
+          module.isVisible &&
+          TreePath.isAncestor(selected.moduleId, module.moduleId)
+      );
+      this.setSelectedModule(
+        visibleSubModules.length > 0
+          ? visibleSubModules.reduce((max, module) =>
+              module.flow > max.flow ? module : max
+            )
+          : null
+      );
+    }
+    return changed;
   }
 
   regroup(module: Module) {
@@ -563,10 +719,30 @@ export class DiagramStore {
     return didMove;
   }
 
+  // Sets a custom module order on each listed network in one go (Network.setModuleOrder: the listed modules
+  // bottom to top, then the unlisted ones). Every listed network is frozen (isCustomSorted), and if some order
+  // changed the diagram is laid out once, without calcFlow (like moveSelectedModule: flows do not change).
+  setModuleOrder(orders: [Network, Module[]][]) {
+    let changed = false;
+    for (const [network, modules] of orders) {
+      changed = network.setModuleOrder(modules) || changed;
+    }
+
+    if (changed) {
+      this.diagram.updateLayout(this);
+      this.toggleUpdate();
+    }
+
+    return changed;
+  }
+
   // Moves the selected module's network one step left or right. Streamlines
-  // only connect neighbouring networks, so the diagram is rebuilt from the
-  // reordered network files after syncing names, colors and expanded modules
-  // back to them.
+  // only connect neighbouring networks, so the diagram is rebuilt (H3): the
+  // current state is serialised in memory as a save (serializeDiagramData),
+  // written onto the network files, and restored with openNetworks in the new
+  // order. The palette, every node's colour and module level (per input node,
+  // so duplicates keep their own), network and module names, custom module
+  // orders, the options and the scheme survive the move.
   moveNetwork(direction: "left" | "right") {
     const selectedModule = this.selectedModule;
     if (!selectedModule) return;
@@ -583,32 +759,38 @@ export class DiagramStore {
       return;
     }
 
-    console.time("DiagramStore.moveNetwork");
+    const saved = serializeDiagramData(this, { saveId: "moveNetwork" });
+    const files = this.diagram.children.map((network, i) => {
+      const file = this.networks.find((f) => f.id === network.networkId)!;
+      const data = saved[i].data;
+      file.name = data.name as string;
+      file.colors = [...((data.colors as string[] | undefined) ?? [])];
+      const nodes = data.nodes as {
+        highlightIndex: number;
+        moduleLevel: number;
+      }[];
+      file.nodes.forEach((node, j) => {
+        node.highlightIndex = nodes[j].highlightIndex;
+        node.moduleLevel = nodes[j].moduleLevel;
+      });
+      file.alluvial = data.alluvial as AlluvialMetadata;
+      return file;
+    });
 
-    const files = this.networks;
-
-    for (const file of files) {
-      const network = this.diagram.getNetwork(file.id)!;
-      file.name = network.name;
-
-      for (const node of file.nodes) {
-        const leafNode = network.getLeafNode(node.identifier!)!;
-        node.highlightIndex = leafNode.highlightIndex;
-        node.moduleLevel = leafNode.moduleLevel;
-      }
-    }
-
-    const file = files.splice(index, 1)[0];
+    const [file] = files.splice(index, 1);
     files.splice(newIndex, 0, file);
-    // setNetworks would reset the highlight colors (and the highlight indices
-    // of nodes with a color) from the files.
-    this.buildDiagram(files);
+    files.forEach((file, position) => {
+      file.alluvial!.diagram = { ...file.alluvial!.diagram!, position };
+    });
+
+    // Reorder store.networks in place: callers (the Load networks dialog)
+    // keep a reference to this array. openNetworks consumes the blocks.
+    this.networks.splice(0, this.networks.length, ...files);
+    this.openNetworks(this.networks);
 
     this.setSelectedModule(
       this.diagram.children[newIndex].getModule(selectedModule.moduleId)!
     );
-
-    console.timeEnd("DiagramStore.moveNetwork");
   }
 
   colorModule(module: Module, color: string, updateLayout = true) {
@@ -657,9 +839,8 @@ export class DiagramStore {
       return;
     }
 
-    console.time("DiagramStore.colorMatchingModulesInAllNetworks");
-
     const bipartiteGraphs = [];
+    let highlightIndex = 0;
 
     for (let i = 0; i < networks.length - 1; ++i) {
       const leftNetwork = networks[i];
@@ -673,7 +854,6 @@ export class DiagramStore {
           );
       }
 
-      let highlightIndex = 0;
       for (const left of B.left) {
         let color: string;
 
@@ -707,7 +887,6 @@ export class DiagramStore {
       }
     }
 
-    console.timeEnd("DiagramStore.colorMatchingModulesInAllNetworks");
     this.updateLayout();
   }
 
@@ -722,7 +901,10 @@ export class DiagramStore {
           .getLeafNodes()
           .reduce((nodes, node) => {
             const oppositeNode = network.getLeafNode(node.identifier);
-            if (oppositeNode) {
+            if (
+              oppositeNode &&
+              oppositeNode.highlightIndex !== highlightIndex
+            ) {
               oppositeNode.highlightIndex = highlightIndex;
               nodes.push(oppositeNode);
             }
@@ -756,12 +938,14 @@ export class DiagramStore {
   colorSelectedNodes(nodes: LeafNode[], color: string) {
     const highlightIndex = this.getHighlightIndex(color);
     nodes.forEach((node) => {
-      node.highlightIndex = highlightIndex;
-      node.update();
+      if (node.highlightIndex !== highlightIndex) {
+        node.highlightIndex = highlightIndex;
+        node.update();
+      }
       this.diagram.children.forEach((network) => {
         if (network.networkId === node.networkId) return;
         const other = network.getLeafNode(node.identifier);
-        if (!other) return;
+        if (!other || other.highlightIndex === highlightIndex) return;
         other.highlightIndex = highlightIndex;
         other.update();
       });
@@ -788,6 +972,8 @@ export class DiagramStore {
   }
 
   colorModuleIdsInAllNetworks() {
+    this.clearColors(false);
+
     const moduleIdColorMap = new Map();
 
     const setModuleColor = (module: Module) => {
@@ -815,23 +1001,26 @@ export class DiagramStore {
           network.layerId != null && network.originalId === multilayerNetworkId
       )
     ) {
-      const modulesById: {
-        [moduleId: string]: { flow: number; modules: Module[] };
-      } = {};
+      const modulesById = new Map<
+        string,
+        { flow: number; modules: Module[] }
+      >();
 
       this.diagram.children.forEach((network) =>
         network.children.forEach((module) => {
           if (module.isVisible) {
-            if (!modulesById[module.moduleId]) {
-              modulesById[module.moduleId] = { flow: 0, modules: [] };
+            let entry = modulesById.get(module.moduleId);
+            if (!entry) {
+              entry = { flow: 0, modules: [] };
+              modulesById.set(module.moduleId, entry);
             }
-            modulesById[module.moduleId].flow += module.flow;
-            modulesById[module.moduleId].modules.push(module);
+            entry.flow += module.flow;
+            entry.modules.push(module);
           }
         })
       );
 
-      const modules = Array.from(Object.values(modulesById));
+      const modules = Array.from(modulesById.values());
       modules.sort((a, b) => b.flow - a.flow);
       modules.forEach(({ modules }) => modules.forEach(setModuleColor));
     } else {
@@ -915,8 +1104,11 @@ export class DiagramStore {
             }
 
             let color = layerIdColorMap.get(node.layerId);
-            node.highlightIndex = this.getHighlightIndex(color);
-            node.update();
+            const highlightIndex = this.getHighlightIndex(color);
+            if (node.highlightIndex !== highlightIndex) {
+              node.highlightIndex = highlightIndex;
+              node.update();
+            }
           });
         }
       });
@@ -941,8 +1133,11 @@ export class DiagramStore {
             }
 
             let color = physicalIdColorMap.get(node.nodeId);
-            node.highlightIndex = this.getHighlightIndex(color);
-            node.update();
+            const highlightIndex = this.getHighlightIndex(color);
+            if (node.highlightIndex !== highlightIndex) {
+              node.highlightIndex = highlightIndex;
+              node.update();
+            }
           });
         }
       });
@@ -976,8 +1171,11 @@ export class DiagramStore {
           const meta = node.metadata[name] as string;
 
           if (colors.has(meta)) {
-            node.highlightIndex = this.getHighlightIndex(colors.get(meta)!);
-            node.update();
+            const highlightIndex = this.getHighlightIndex(colors.get(meta)!);
+            if (node.highlightIndex !== highlightIndex) {
+              node.highlightIndex = highlightIndex;
+              node.update();
+            }
           }
         });
       });
@@ -1010,10 +1208,19 @@ export class DiagramStore {
 
           const meta = node.metadata[name] as number;
 
-          for (const bin of bins) {
-            if (meta >= bin.x0 && meta < bin.x1) {
-              node.highlightIndex = this.getHighlightIndex(bin.color);
-              node.update();
+          for (let i = 0; i < bins.length; ++i) {
+            const bin = bins[i];
+            // Half-open bins [x0, x1), but the last bin includes its x1 (the
+            // data maximum when the bins come from d3.bin).
+            const isLast = i === bins.length - 1;
+            const inBin =
+              meta >= bin.x0 && (meta < bin.x1 || (isLast && meta === bin.x1));
+            if (inBin) {
+              const highlightIndex = this.getHighlightIndex(bin.color);
+              if (node.highlightIndex !== highlightIndex) {
+                node.highlightIndex = highlightIndex;
+                node.update();
+              }
               break;
             }
           }
@@ -1053,8 +1260,11 @@ export class DiagramStore {
 
           const meta = node.metadata[name] as number;
 
-          node.highlightIndex = this.getHighlightIndex(getColor(meta));
-          node.update();
+          const highlightIndex = this.getHighlightIndex(getColor(meta));
+          if (node.highlightIndex !== highlightIndex) {
+            node.highlightIndex = highlightIndex;
+            node.update();
+          }
         });
       });
     });

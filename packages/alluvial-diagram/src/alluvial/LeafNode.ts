@@ -53,9 +53,11 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       node.highlightIndex != null && Number.isInteger(node.highlightIndex)
         ? node.highlightIndex
         : NOT_HIGHLIGHTED;
+    // Only an integer level >= 1 is meaningful (0, negatives and
+    // fractions fall back to the top level).
     this.moduleLevel =
-      node.moduleLevel && Number.isInteger(node.moduleLevel)
-        ? node.moduleLevel
+      Number.isInteger(node.moduleLevel) && node.moduleLevel! >= 1
+        ? node.moduleLevel!
         : 1;
     this.network = network;
   }
@@ -70,6 +72,11 @@ export default class LeafNode extends AlluvialNodeBase<never> {
 
   override set flow(value: number) {
     this._flow = value;
+  }
+
+  // The flow of the input node, also when the node is hidden (see flow).
+  get inputFlow(): number {
+    return this._flow;
   }
 
   get level(): number {
@@ -134,9 +141,16 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       let oppositeNode = this.getOpposite(side);
       const neighborNetwork = this.network.getNeighbor(side);
 
-      // Does a matching node exist in the neighbor network?
+      // Does a matching node exist in the neighbor network? Only mutually
+      // registered leaves are linked: with duplicate identifiers, only the
+      // registered (last) duplicate links, and the others stay dangling
+      // instead of stealing the opposite leaf from it.
       if (!oppositeNode) {
-        oppositeNode = neighborNetwork?.getLeafNode(this.identifier) || null;
+        const candidate = neighborNetwork?.getLeafNode(this.identifier) ?? null;
+        oppositeNode =
+          candidate && this.network.getLeafNode(this.identifier) === this
+            ? candidate
+            : null;
         this.setOpposite(oppositeNode, side);
       }
 
@@ -218,7 +232,9 @@ export default class LeafNode extends AlluvialNodeBase<never> {
       module?.removeChild(group);
     }
 
-    if (module?.isEmpty) {
+    // Keep an emptied module when the leaf goes straight back into it
+    // (colour changes): re-creating it would lose its name, position and flow.
+    if (module?.isEmpty && module.moduleId !== this.moduleId) {
       network?.removeChild(module);
     }
 

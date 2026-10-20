@@ -56,7 +56,7 @@ export default observer(function Layout() {
         value={store.marginExponent}
         min={-1}
         max={6}
-        valueLabelFormat={(value: number) => 2 ** (value - 1)}
+        valueLabelFormat={(value: number) => 2 ** value}
         onChange={store.setMarginExponent}
         disabled={store.zeroMargins}
       />
