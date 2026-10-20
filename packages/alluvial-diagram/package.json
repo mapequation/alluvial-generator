@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
-    "prepublishOnly": "npm run build",
+    "prepack": "pnpm build",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
