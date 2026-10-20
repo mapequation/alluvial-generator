@@ -1,7 +1,7 @@
 import { isObservableProp } from "mobx";
 import { describe, expect, it } from "vitest";
 import type { NetworkFile } from "../parsers/types";
-import { COLOR_SCHEMES } from "../schemes";
+import { COLOR_SCHEMES, schemeColors } from "../schemes";
 import { DiagramStore } from "./DiagramStore";
 
 function network(id: string, moduleFlows: number[]): NetworkFile {
@@ -113,6 +113,23 @@ describe("DiagramStore", () => {
     const children = [color(a, "1:1"), color(a, "1:2")];
     expect(new Set([...children, color(a, "2")]).size).toBe(3);
     expect(children).not.toContain(color(b, "1"));
+  });
+
+  it("takes the tone and offset of the C3 schemes as options and settings", () => {
+    const store = new DiagramStore({ colorTone: "deep" });
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "deep"));
+
+    store.setSelectedTone("pastel");
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "pastel"));
+
+    store.setSelectedOffset(90);
+    expect(store.selectedScheme).toEqual(
+      schemeColors("C3 Sinebow", "pastel", 90)
+    );
+
+    store.setSelectedScheme("Set3");
+    expect(store.selectedScheme).toBe(COLOR_SCHEMES.Set3);
+    expect(store.selectedOffset).toBeNull();
   });
 
   it("moveNetwork rebuilds the diagram in the new order", () => {

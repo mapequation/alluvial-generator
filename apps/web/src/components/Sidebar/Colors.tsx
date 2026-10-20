@@ -1,4 +1,8 @@
 import { ButtonGroup, Flex, Kbd, List, Text } from "@chakra-ui/react";
+import {
+  defaultSchemeOffset,
+  schemeIsHueSource,
+} from "@mapequation/alluvial-diagram";
 import { observer } from "mobx-react";
 import { useContext } from "react";
 import { IoMdColorFill } from "react-icons/io";
@@ -6,9 +10,10 @@ import { MdClear } from "react-icons/md";
 import useEventListener from "../../hooks/useEventListener";
 import { StoreContext } from "../../store";
 import ColorSchemeSelect from "./ColorSchemeSelect";
-import { Button, Label, ListItemHeader } from "./components";
+import { Button, Label, ListItemHeader, Slider } from "./components";
 import { SidebarContext } from "./Sidebar";
 import Swatch from "./Swatch";
+import ToneSelect from "./ToneSelect";
 
 export default observer(function Colors() {
   const store = useContext(StoreContext);
@@ -45,7 +50,24 @@ export default observer(function Colors() {
       <List.Item>
         <Label>Color scheme</Label>
         <ColorSchemeSelect />
+        <Label>Tone</Label>
+        <ToneSelect />
+      </List.Item>
 
+      <Slider
+        label="Offset"
+        value={
+          store.selectedOffset ?? defaultSchemeOffset(store.selectedSchemeName)
+        }
+        min={0}
+        max={359}
+        step={1}
+        onChange={store.setSelectedOffset}
+        valueLabelFormat={(value: number) => `${value}°`}
+        disabled={!schemeIsHueSource(store.selectedSchemeName)}
+      />
+
+      <List.Item>
         <Flex mt={2} gap={1} wrap="wrap">
           <Swatch
             color={defaultHighlightColor}
