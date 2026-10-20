@@ -574,8 +574,6 @@ export class DiagramStore {
     // The diagram must have been built with setNetworks to be rebuilt.
     if (this.networks.length !== this.diagram.children.length) return;
 
-    console.time("DiagramStore.moveNetwork");
-
     const network = this.diagram.getNetwork(selectedModule.networkId)!;
     const index = this.diagram.children.indexOf(network);
     const newIndex = index + (direction === "left" ? LEFT : RIGHT);
@@ -584,6 +582,8 @@ export class DiagramStore {
       console.warn("Cannot move network further");
       return;
     }
+
+    console.time("DiagramStore.moveNetwork");
 
     const files = this.networks;
 
