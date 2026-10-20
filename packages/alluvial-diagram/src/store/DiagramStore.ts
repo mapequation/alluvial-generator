@@ -246,12 +246,7 @@ export class DiagramStore {
     console.time("DiagramStore.setNetworks");
 
     this.checkColors(networks);
-
-    this.setSelectedModule(null);
-    this.networks = networks;
-    this.diagram = new Diagram(networks);
-    this.numNetworks = networks.length;
-    this.updateLayout();
+    this.buildDiagram(networks);
 
     // Select the largest module in the leftmost network.
     if (selectLargest) {
@@ -259,6 +254,16 @@ export class DiagramStore {
     }
 
     console.timeEnd("DiagramStore.setNetworks");
+  });
+
+  // Builds the diagram without reading colors from the network files, so the
+  // current highlight colors and the node highlight indices are kept.
+  private buildDiagram = action((networks: NetworkFile[]) => {
+    this.setSelectedModule(null);
+    this.networks = networks;
+    this.diagram = new Diagram(networks);
+    this.numNetworks = networks.length;
+    this.updateLayout();
   });
 
   setSelectedScheme = action((scheme: SchemeName) => {
@@ -595,7 +600,9 @@ export class DiagramStore {
 
     const file = files.splice(index, 1)[0];
     files.splice(newIndex, 0, file);
-    this.setNetworks(files, false);
+    // setNetworks would reset the highlight colors (and the highlight indices
+    // of nodes with a color) from the files.
+    this.buildDiagram(files);
 
     this.setSelectedModule(
       this.diagram.children[newIndex].getModule(selectedModule.moduleId)!

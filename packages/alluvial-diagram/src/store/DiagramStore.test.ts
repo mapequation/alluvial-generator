@@ -143,4 +143,82 @@ describe("DiagramStore", () => {
     expect(store.diagram.children.map((n) => n.networkId)).toEqual(["b", "a"]);
     expect(store.selectedModule?.networkId).toBe("a");
   });
+
+  it("moveNetwork keeps the colors of highlighted modules", () => {
+    const store = new DiagramStore();
+    store.setNetworks([
+      network("a", [0.6, 0.4]),
+      network("b", [0.5, 0.5]),
+      network("c", [0.7, 0.3]),
+    ]);
+    const order = () => store.diagram.children.map((n) => n.networkId);
+    const colors = () =>
+      Object.fromEntries(
+        store.diagram.children.flatMap((network) =>
+          network.children.map((module) => [
+            `${network.networkId}/${module.moduleId}`,
+            store.getHighlightColor(module.highlightIndex),
+          ])
+        )
+      );
+
+    const [a, b, c] = store.diagram.children;
+    store.colorModule(a.getModule("1")!, "#ff0000");
+    store.colorModule(b.getModule("2")!, "#00ff00");
+    store.colorModule(c.getModule("1")!, "#0000ff");
+    store.colorModule(c.getModule("2")!, "#ff0000");
+    const gray = store.defaultHighlightColor;
+    const before = {
+      "a/1": "#ff0000",
+      "a/2": gray,
+      "b/1": gray,
+      "b/2": "#00ff00",
+      "c/1": "#0000ff",
+      "c/2": "#ff0000",
+    };
+    expect(colors()).toEqual(before);
+
+    // Move b to the left, then a to the right.
+    store.setSelectedModule(store.diagram.getNetwork("b")!.children[0]);
+    store.moveNetwork("left");
+    expect(order()).toEqual(["b", "a", "c"]);
+    expect(colors()).toEqual(before);
+
+    store.setSelectedModule(store.diagram.getNetwork("a")!.children[0]);
+    store.moveNetwork("right");
+    expect(order()).toEqual(["b", "c", "a"]);
+    expect(colors()).toEqual(before);
+  });
+
+  it("moveNetwork keeps recolored modules in networks with node colors", () => {
+    // Networks from json files can set the colors of their nodes.
+    const withNodeColors = (id: string, nodeColors: string[]) => {
+      const file = network(id, [0.6, 0.4]);
+      file.nodes.forEach((node, i) =>
+        Object.assign(node, { color: nodeColors[i] })
+      );
+      return Object.assign(file, { colors: true });
+    };
+    const store = new DiagramStore();
+    store.setNetworks([
+      withNodeColors("a", ["#111111", "#222222"]),
+      withNodeColors("b", ["#333333", "#444444"]),
+    ]);
+    const module = (networkId: string, moduleId: string) =>
+      store.diagram.getNetwork(networkId)!.getModule(moduleId)!;
+    const color = (networkId: string, moduleId: string) =>
+      store.getHighlightColor(module(networkId, moduleId).highlightIndex);
+
+    expect(color("a", "1")).toBe("#111111");
+    store.colorModule(module("a", "1"), "#ff0000");
+
+    store.setSelectedModule(module("a", "1"));
+    store.moveNetwork("right");
+
+    expect(store.diagram.children.map((n) => n.networkId)).toEqual(["b", "a"]);
+    expect(color("a", "1")).toBe("#ff0000");
+    expect(color("a", "2")).toBe("#222222");
+    expect(color("b", "1")).toBe("#333333");
+    expect(color("b", "2")).toBe("#444444");
+  });
 });
