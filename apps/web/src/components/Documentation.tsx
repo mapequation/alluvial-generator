@@ -38,22 +38,6 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
     <DialogCloseTrigger />
     <DialogBody>
       <Heading as="h2" size="md" my={8}>
-        New version since January 2022
-      </Heading>
-      <Text mt={4}>
-        Most of the features are now available in the new version. One exception
-        is the "module filter" feature, which won't be implemented. If you want
-        to filter modules, you need to preprocess the input files and remove
-        the modules you don't want.
-        <br />
-        If you miss the old version, it's available at <br />
-        <a href="//mapequation.org/alluvial/old">
-          mapequation.org/alluvial/old
-        </a>
-        .
-      </Text>
-
-      <Heading as="h2" size="md" my={8}>
         About
       </Heading>
       <Text mt={4}>
@@ -67,7 +51,7 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
         drawn as a rectangle.
       </Text>
       <Text mt={4}>
-        Streamlines connect modules that contains the same nodes. The height of
+        Streamlines connect modules that contain the same nodes. The height of
         the streamline is proportional to the aggregated flow in the nodes that
         are present in the connected modules.
       </Text>
@@ -103,9 +87,8 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
       </video>
       <Text mt={4}>
         To show the sub-modules within any module, double click on it. If the
-        modules wiggles back and forth, the module is already expanded to its
-        deepest level. We currently don't support expanding modules to it's
-        individual nodes.
+        module wiggles back and forth, it is already expanded to its deepest
+        level. Modules can't be expanded to their individual nodes.
       </Text>
       <Text mt={4}>
         To keep the heights proportional to the contained flow, we re-scale the
@@ -151,19 +134,11 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
       </List.Root>
       <Text mt={4}>
         To get hierarchically nested modules, you need to use the formats{" "}
-        <Code>tree</Code>, <Code>ftree</Code> or <Code>json</Code>
+        <Code>tree</Code>, <Code>ftree</Code> or <Code>json</Code>.
       </Text>
-      <Heading as="h3" size="sm" my={6}>
-        Save and open a diagram
-      </Heading>
       <Text mt={4}>
-        <b>Download diagram (.zip)</b> in the Export section saves one{" "}
-        <Code>json</Code> file per network in a zip. Each file is Infomap JSON
-        output with the network name, the colors and the expanded modules, and
-        an <Code>alluvial</Code> block with the settings, the color scheme, the
-        module names and any custom module order. Drop the zip (or its files) on{" "}
-        <b>Load networks</b> to open the diagram again. Other programs that read
-        Infomap JSON ignore the extra block.
+        Networks in Pajek <Code>net</Code> format can be loaded too. Run Infomap
+        on them in the <b>Load networks</b> dialog before creating the diagram.
       </Text>
       <Text mt={4}>
         Infomap is available on the web at{" "}
@@ -176,12 +151,39 @@ const Documentation = ({ onClose }: { onClose: () => void }) => (
         </a>
         .
       </Text>
+
+      <Heading as="h3" size="sm" my={6}>
+        Save and open a diagram
+      </Heading>
+      <Text mt={4}>
+        <b>Download diagram (.zip)</b> in the Export section saves one{" "}
+        <Code>json</Code> file per network in a zip. Each file is Infomap JSON
+        output with the network name, the colors and the expanded modules, and
+        an <Code>alluvial</Code> block with the settings, the color scheme, the
+        module names and any custom module order. Drop the zip (or its files) on{" "}
+        <b>Load networks</b> to open the diagram again. Other programs that read
+        Infomap JSON ignore the extra block.
+      </Text>
+
+      <Heading as="h2" size="md" my={8}>
+        Python
+      </Heading>
+      <Text mt={4}>
+        The{" "}
+        <a href="https://mapequation.org/alluvial-py/">
+          <Code>alluvial</Code> Python package
+        </a>{" "}
+        draws the same diagrams with matplotlib, from Infomap output files or
+        straight from Infomap in Python. Its layout is a port of this app's, so
+        module order, sizes and colors match, and it opens and saves the same
+        diagram files. Install it with <Code>pip install alluvial</Code>.
+      </Text>
     </DialogBody>
     <DialogFooter>
       <Button
         as="a"
         // @ts-ignore - chakra-button forwards href when rendered as `a`
-        href="https://github.com/mapequation/alluvial-generator/issues"
+        href="https://github.com/mapequation/alluvial/issues"
         variant="outline"
         mr="auto"
       >
