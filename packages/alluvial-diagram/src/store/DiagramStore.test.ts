@@ -128,6 +128,11 @@ describe("DiagramStore", () => {
       schemeColors("C3 Sinebow", "pastel", 90)
     );
 
+    store.setSelectedOffset(null);
+    expect(store.selectedOffset).toBeNull();
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "pastel"));
+    store.setSelectedOffset(90);
+
     store.setSelectedScheme("Set3");
     expect(store.selectedScheme).toBe(COLOR_SCHEMES.Set3);
     expect(store.selectedOffset).toBeNull();
