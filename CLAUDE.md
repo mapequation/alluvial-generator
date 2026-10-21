@@ -8,8 +8,13 @@ the web app `apps/web`. The app tests import the library's `dist`, so run `pnpm 
 `alluvial-py` ports the engine in `packages/alluvial-diagram` to Python, line for line: layout, parsers, colour
 schemes and colour operations, and the saved-diagram format (`formatVersion` 1). It reproduces this engine bit for
 bit, against reference fixtures that its tooling makes by running the TypeScript sources of a checkout of this repo.
-It is not published yet. The checkout is `../../alluvial-py` from the main checkout (`code/alluvial-py` next to
-`code/web/alluvial`).
+Repo: https://github.com/mapequation/alluvial-py, docs: https://mapequation.org/alluvial-py/, PyPI package:
+[`alluvial`](https://pypi.org/project/alluvial/). The local checkout is `../../alluvial-py` from the main checkout
+(`code/alluvial-py` next to `code/web/alluvial`). If it is missing, clone the repo there.
+
+alluvial-py's CI also checks parity, after the fact. `tests.yml` checks against the TS commit in its
+`tests/fixtures/provenance.txt`. `ts-drift.yml` runs weekly against this repo's `master` and fails when the TS output
+changes. A behaviour change merged here without the port being updated shows up there within a week.
 
 ### Changes that affect the port
 
