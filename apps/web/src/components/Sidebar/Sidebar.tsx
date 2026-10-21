@@ -1,4 +1,4 @@
-import { Box, Kbd, List, Text } from "@chakra-ui/react";
+import { Box, HStack, Kbd, List, Text } from "@chakra-ui/react";
 import Infomap from "@mapequation/infomap";
 import { observer } from "mobx-react";
 import {
@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { MdFileUpload, MdHelp } from "react-icons/md";
+import { SiGithub, SiNpm, SiPypi } from "react-icons/si";
 import { StoreContext } from "../../store";
 import Logo from "../Logo";
 import { useColorModeValue } from "../ui/color-mode";
@@ -19,6 +20,20 @@ import Export from "./Export";
 import Layout from "./Layout";
 import Metadata from "./Metadata";
 import Module from "./Module";
+
+const links = [
+  {
+    label: "GitHub",
+    href: "https://github.com/mapequation/alluvial",
+    Icon: SiGithub,
+  },
+  {
+    label: "npm",
+    href: "https://www.npmjs.com/package/@mapequation/alluvial-diagram",
+    Icon: SiNpm,
+  },
+  { label: "PyPI", href: "https://pypi.org/project/alluvial/", Icon: SiPypi },
+];
 
 export const SidebarContext = createContext<{
   color: string;
@@ -68,6 +83,25 @@ export default observer(function Sidebar({
           <Text ml="3.6em" mt={-1} fontSize="xs">
             Powered by Infomap v{Infomap.__version__}
           </Text>
+        </List.Item>
+
+        <List.Item>
+          <HStack gap={2}>
+            {links.map(({ label, href, Icon }) => (
+              <Button key={label} asChild>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  // index.css colours every link; match the other buttons.
+                  style={{ color: "var(--chakra-colors-color-palette-fg)" }}
+                >
+                  <Icon />
+                  {label}
+                </a>
+              </Button>
+            ))}
+          </HStack>
         </List.Item>
 
         <ListItemButton onClick={onLoadClick}>
