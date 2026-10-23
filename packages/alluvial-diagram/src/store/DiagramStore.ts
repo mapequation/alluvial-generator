@@ -141,8 +141,8 @@ export class DiagramStore {
 
   showBipartiteNodes = true;
 
-  selectedScheme: ColorScheme = COLOR_SCHEMES["C3 Sinebow"];
-  selectedSchemeName: SchemeName = "C3 Sinebow";
+  selectedScheme: ColorScheme = COLOR_SCHEMES["C3 Oklch"];
+  selectedSchemeName: SchemeName = "C3 Oklch";
   selectedTone: ToneName = DEFAULT_TONE;
   // null for c3's default offset of the scheme
   selectedOffset: number | null = null;

@@ -137,8 +137,8 @@ export type { ToneName };
 /** The c3 tones, which set the lightness and chroma of the C3 schemes */
 export const TONES = Object.keys(tones) as ToneName[];
 
-// c3's default tone
-export const DEFAULT_TONE: ToneName = "strong";
+// The default tone of the C3 schemes: "vivid", more saturated than c3's own default ("strong")
+export const DEFAULT_TONE: ToneName = "vivid";
 
 const c3Scheme = (
   name: C3SchemeName,
