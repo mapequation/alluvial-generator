@@ -42,8 +42,9 @@ describe("DiagramStore", () => {
     const store = new DiagramStore();
     expect(store.identifier).toBe("id");
     expect(store.showModuleId).toBe(false);
-    expect(store.selectedSchemeName).toBe("C3 Sinebow");
-    expect(store.highlightColors).toEqual([...COLOR_SCHEMES["C3 Sinebow"]]);
+    expect(store.selectedSchemeName).toBe("C3 Oklch");
+    expect(store.selectedTone).toBe("vivid");
+    expect(store.highlightColors).toEqual([...COLOR_SCHEMES["C3 Oklch"]]);
   });
 
   it("takes initial values as constructor options, also from subclasses", () => {
@@ -88,7 +89,7 @@ describe("DiagramStore", () => {
 
     store.colorNodesInModulesInAllNetworks(undefined);
     expect(store.highlightColors).toEqual(
-      COLOR_SCHEMES["C3 Sinebow"].slice(0, 2)
+      COLOR_SCHEMES["C3 Oklch"].slice(0, 2)
     );
   });
 
@@ -118,19 +119,19 @@ describe("DiagramStore", () => {
 
   it("takes the tone and offset of the C3 schemes as options and settings", () => {
     const store = new DiagramStore({ colorTone: "deep" });
-    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "deep"));
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Oklch", "deep"));
 
     store.setSelectedTone("pastel");
-    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "pastel"));
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Oklch", "pastel"));
 
     store.setSelectedOffset(90);
     expect(store.selectedScheme).toEqual(
-      schemeColors("C3 Sinebow", "pastel", 90)
+      schemeColors("C3 Oklch", "pastel", 90)
     );
 
     store.setSelectedOffset(null);
     expect(store.selectedOffset).toBeNull();
-    expect(store.selectedScheme).toEqual(schemeColors("C3 Sinebow", "pastel"));
+    expect(store.selectedScheme).toEqual(schemeColors("C3 Oklch", "pastel"));
     store.setSelectedOffset(90);
 
     store.setSelectedScheme("Set3");
@@ -148,7 +149,7 @@ describe("DiagramStore", () => {
     expect(store.selectedTone).toBe("pastel");
     expect(store.selectedOffset).toBe(90);
     expect(store.selectedScheme).toEqual(
-      schemeColors("C3 Sinebow", "pastel", 90)
+      schemeColors("C3 Oklch", "pastel", 90)
     );
   });
 
@@ -165,11 +166,11 @@ describe("DiagramStore", () => {
     };
     const store = new DiagramStore({ colorTone: "deep", colorOffset: 90 });
 
-    expect(store.openNetworks(saved("C3 Sinebow"))).toEqual([]);
+    expect(store.openNetworks(saved("C3 Oklch"))).toEqual([]);
     expect(store.selectedTone).toBe("deep");
     expect(store.selectedOffset).toBe(90);
     expect(store.selectedScheme).toEqual(
-      schemeColors("C3 Sinebow", "deep", 90)
+      schemeColors("C3 Oklch", "deep", 90)
     );
 
     store.openNetworks(saved("C3 Turbo"));

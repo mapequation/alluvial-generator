@@ -83,7 +83,7 @@ import "@mapequation/alluvial-diagram/style.css";
 
 ## Store options
 
-Pass initial settings to the constructor. Every layout/display setting on the store can be given here (`identifier`, `height`, `moduleWidth`, `sortModulesBy`, `showModuleId`, `fontSize`, …), plus `colorScheme`, a key of `COLOR_SCHEMES`. Defaults: `identifier: "id"`, `colorScheme: "C3 Sinebow"`, `showModuleId: false`.
+Pass initial settings to the constructor. Every layout/display setting on the store can be given here (`identifier`, `height`, `moduleWidth`, `sortModulesBy`, `showModuleId`, `fontSize`, …), plus `colorScheme`, a key of `COLOR_SCHEMES`. Defaults: `identifier: "id"`, `colorScheme: "C3 Oklch"` (tone `"vivid"`), `showModuleId: false`.
 
 ```ts
 const store = new DiagramStore({
