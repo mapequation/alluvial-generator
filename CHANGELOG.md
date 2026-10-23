@@ -1,43 +1,32 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to the library `@mapequation/alluvial-diagram` and the web app, which share one version.
 
-## Unreleased (branch `py-parity-fixes`)
+## [1.17.0](https://github.com/mapequation/alluvial/compare/v1.16.0...v1.17.0) (2026-10-23)
 
-Fix round done together with the Python port (alluvial-py 0.5.0); [#55](https://github.com/mapequation/alluvial/pull/55)
-has the details and the reasons per work package. The version is left at 1.16.0; the API change below is breaking.
-
-### ⚠ BREAKING CHANGES
-
-* The 2019 saved-diagram format is gone: `createFilesFromDiagramObject` (`parsers/from-diagram.ts`) and the web app's
-  unused `io/save-diagram.js` are removed, and such a file no longer loads.
-* `verticalAlign: "top"` (declared but never implemented; it behaved like `"bottom"`) is removed.
+The diagram engine now has a Python port, [`alluvial`](https://pypi.org/project/alluvial/) on PyPI, which reproduces its layout and colours exactly.
 
 ### Features
 
-* Saved diagrams: "alluvial network files", `formatVersion` 1 (package README, "Saving and opening diagrams").
-  `serializeDiagram`, `serializeDiagramData`, `zipFiles`, `readAlluvialMetadata`, `sortBySavedPosition`,
-  `SAVED_OPTION_KEYS`, `DiagramStore.getOptions` and `DiagramStore.openNetworks`. The web app gets "Download diagram
-  (.zip)" and opens saved zips and files with their options, scheme (with its c3 tone and offset), module
-  orders and names.
-* `DiagramStore.setModuleOrder` (a custom order for many modules with one layout) and `setModuleLevel` (expand to a
-  module level with one layout); `Module.canExpand`; `validateNetworkNodes`, `duplicateIdentifiers` and
-  `duplicateIdentifiersMessage`.
+* Save and open diagrams. "Download diagram (.zip)" in the web app saves the networks together with the diagram's options, colour scheme (with its c3 tone and offset), module orders and module names, and opening the zip or its files restores them. The library reads and writes this format (`formatVersion` 1) with `serializeDiagram`, `serializeDiagramData`, `zipFiles`, `readAlluvialMetadata`, `sortBySavedPosition`, `SAVED_OPTION_KEYS`, `DiagramStore.getOptions` and `DiagramStore.openNetworks`, as the package README describes under "Saving and opening diagrams". It replaces the 2019 saved-diagram format, which no longer opens, and `createFilesFromDiagramObject` is removed ([#55](https://github.com/mapequation/alluvial/pull/55), [#57](https://github.com/mapequation/alluvial/pull/57))
+* New diagrams are coloured with C3 Oklch in the vivid tone instead of C3 Sinebow in the strong tone. Saved diagrams keep their scheme and tone ([#64](https://github.com/mapequation/alluvial/pull/64))
+* `DiagramStore.setModuleOrder` sets a custom order for many modules with one layout, and `setModuleLevel` expands all modules to a level with one layout. Also new: `Module.canExpand`, `validateNetworkNodes`, `duplicateIdentifiers` and `duplicateIdentifiersMessage` ([#55](https://github.com/mapequation/alluvial/pull/55))
+* The sidebar links to the GitHub repository, the npm package and the Python package, and the Help dialog has a section on the Python package ([#62](https://github.com/mapequation/alluvial/pull/62), [#63](https://github.com/mapequation/alluvial/pull/63))
 
 ### Bug Fixes
 
-* Tree paths: no phantom level for stree paths with a trailing `:`, `isAncestor` no longer treats module `10` as a
-  child of `1`, and `;` anywhere in a path gives an insignificant path instead of a `NaN` module.
-* Nodes with a non-finite or missing flow are rejected at load instead of producing a `NaN` diagram; `bipartiteStartId:
-  null` and invalid JSON `moduleLevel` values are ignored.
-* Recolouring keeps modules in place (an emptied module was re-created), so the colour operations no longer skip
-  modules or depend on history; similarity colours of chains that start after the first network no longer reuse the
-  first colours; several colour-operation edge cases fixed.
-* Layout state: stale indices and margins of hidden modules, a tie-safe branch comparator, moving the top module up,
-  and a module shown together with its own sub-module.
-* `showBipartiteNodes` applies when the networks are set, `moveNetwork` keeps module names, orders and colours, the
-  Expand button is disabled for modules that cannot expand, the margin slider shows the real margin, and the metadata
-  statistics use the sample variance.
+* Expanding a module could throw halfway and leave the diagram half updated, and contracting or expanding a module could rebuild the diagram without its colours or reload the example ([#58](https://github.com/mapequation/alluvial/pull/58))
+* Moving a network keeps module colours, names and orders, and moving one at the edge of the diagram no longer logs a timer warning ([#53](https://github.com/mapequation/alluvial/pull/53), [#54](https://github.com/mapequation/alluvial/pull/54), [#55](https://github.com/mapequation/alluvial/pull/55))
+* Tree paths: a trailing `:` in an stree path no longer adds a phantom level, module `10` is no longer taken for a child of module `1`, and a `;` anywhere in a path gives an insignificant path instead of a `NaN` module ([#55](https://github.com/mapequation/alluvial/pull/55))
+* Loading networks: nodes with a missing or non-finite flow are rejected instead of giving a `NaN` diagram, and `bipartiteStartId: null` and invalid `moduleLevel` values in JSON files are ignored ([#55](https://github.com/mapequation/alluvial/pull/55))
+* Colours: recolouring keeps modules in place, so the colour operations no longer skip modules or depend on earlier operations, and similarity colours of module chains that start after the first network no longer reuse the first colours. Several edge cases of the colour operations are fixed, and the `colorOffset` option and `setSelectedOffset` accept `null` for c3's default offset ([#55](https://github.com/mapequation/alluvial/pull/55), [#60](https://github.com/mapequation/alluvial/pull/60))
+* Layout: stale indices and margins of hidden modules, ties in the branch order, moving the top module up, and a module shown together with its own submodule ([#55](https://github.com/mapequation/alluvial/pull/55))
+* `showBipartiteNodes` applies when the networks are set, the Expand button is disabled for modules that can't expand, the margin slider shows the real margin, and the metadata statistics use the sample variance ([#55](https://github.com/mapequation/alluvial/pull/55))
+* `verticalAlign: "top"` is removed. It was never implemented and behaved like `"bottom"` ([#55](https://github.com/mapequation/alluvial/pull/55))
+
+### Other
+
+* The license credits the mapequation authors ([#59](https://github.com/mapequation/alluvial/pull/59))
 
 ## [1.16.0](https://github.com/mapequation/alluvial/compare/v1.15.0...v1.16.0) (2026-10-20)
 
