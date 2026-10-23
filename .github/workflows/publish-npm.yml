@@ -1,6 +1,7 @@
 name: Publish npm package
 
 # Publishes @mapequation/alluvial-diagram to npm with trusted publishing when a GitHub release is published.
+# `pnpm release` (scripts/release.mjs) makes the release; see "Releasing" in CLAUDE.md.
 # The release tag must match the version in packages/alluvial-diagram/package.json, like v1.16.0.
 
 on:

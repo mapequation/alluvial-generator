@@ -51,3 +51,19 @@ Changes that don't: UI in `apps/web`, styles, tests and docs.
 
 The C3 schemes, their tone and offset, and colouring by module hierarchy come from `@mapequation/c3`. Its Python port
 is `c3-colors` on PyPI. Keep both at the same version (2.0.1 now). A c3 upgrade changes the colour fixtures.
+
+## Releasing
+
+The library and the web app share one version, set in the three `package.json` files and `CITATION.cff`. Releases are
+made by hand from `master`, when asked:
+
+1. Pick the version from the changes since the last tag (`git log --oneline v<current>..master`): major for changes
+   that break code or saved diagrams people use, minor for features, patch for fixes.
+2. Write the release notes under `## Unreleased` at the top of `CHANGELOG.md`, for users of the library and the app.
+   They can stay uncommitted.
+3. Run `pnpm release <version>` (or `major`, `minor`, `patch`). `--dry-run` shows the version and the notes first. It
+   checks that `master` is clean and up to date, builds and tests, sets the version, dates the changelog section,
+   commits `chore(release): <version>`, tags `v<version>`, pushes both and creates the GitHub release.
+4. The release starts `publish-npm.yml`, which publishes the library to npm with trusted publishing, and the push
+   starts `pages.yml`. Check that both runs pass, that `npm view @mapequation/alluvial-diagram version` shows the new
+   version, and that the app at https://mapequation.org/alluvial/ shows it next to the logo.

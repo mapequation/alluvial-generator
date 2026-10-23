@@ -11,7 +11,8 @@
     "build": "pnpm build:lib && pnpm build:app",
     "preview": "pnpm --filter alluvial-app preview",
     "test": "pnpm --filter @mapequation/alluvial-diagram test && pnpm --filter alluvial-app test",
-    "test:watch": "pnpm --filter alluvial-app test:watch"
+    "test:watch": "pnpm --filter alluvial-app test:watch",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.9",
